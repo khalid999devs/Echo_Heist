@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import platform
 import sys
 from collections.abc import Sequence
 from contextlib import suppress
@@ -54,6 +55,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 mute=args.mute,
                 screenshot=args.screenshot,
             )
+        report["runtime"] = {
+            "python": platform.python_version(),
+            "architecture": platform.machine(),
+            "frozen": bool(getattr(sys, "frozen", False)),
+        }
         if args.report is not None:
             atomic_write_json(args.report, report)
         if sys.stdout is not None:

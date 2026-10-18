@@ -8,10 +8,12 @@ Suhita's Windows x64 bootstrap and branch workflow: [Windows setup/P02 handoff](
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | None; P01 claims released | main; completed incremental commits | None | P01 done; P02-K1/K2 ready but unclaimed |
+| Khalid | P02-K1/K2 | work/khalid-p02 | core/simulation/**, core/abilities/**; additive core/contracts fields; ui/input/**, ui/presenters/objective.py; diagnostics/human_preview.py; infrastructure/resources.py gameplay-config adapter; resources/data/gameplay/**; related grouped tests and own tracking/handoff | IN_PROGRESS |
 | Suhita | None | None | None | P02-S1/S2 ready but unclaimed |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
+
+P02 integration boundary: [runtime contract](../architecture/integration/P02_RUNTIME.md). Khalid reserves `ui/presenters/objective.py` and `ui/input/human.py`; Suhita retains `level/io/**`, map resources, `ui/scenes/**` and `ui/render/**`. app.py/bootstrap.py remain untouched by Khalid's P02 slices. Shared contract changes on his branch are additive; reconcile them before connecting the final scene.
 
 ## Claim protocol
 

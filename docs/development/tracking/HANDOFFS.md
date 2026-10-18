@@ -6,7 +6,7 @@ Baseline: no implementation claims or handoffs exist. P01 belongs to Khalid; Suh
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | None | None | None | Ready for P01-K1 |
+| Khalid | P01-K1, then K2/K3 | main; incremental local commits | Foundation package, root configuration, checks, packaging and P01 tracking | IN_PROGRESS |
 | Suhita | None | None | None | Waiting for P01 foundation; preparation allowed |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.

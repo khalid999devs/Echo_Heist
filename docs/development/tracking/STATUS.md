@@ -8,7 +8,7 @@ Active target: complete working initial draft in **eight phases over four develo
 
 | Day / phase | Target | Integrator | Actual status |
 | --- | --- | --- | --- |
-| 1 / P01 | Environment/filesystem/contracts/runnable shell; Khalid-only | Khalid | TODO |
+| 1 / P01 | Environment/filesystem/contracts/runnable shell; Khalid-only | Khalid | IN_PROGRESS |
 | 1 / P02 | Five-zone scene, complete Human loop and basic tools | Suhita | TODO |
 | 2 / P03 | Fair sensors, active defenders, BFS/A*/fuzzy and replay | Khalid | TODO |
 | 2 / P04 | Autonomous Companion/MCTS, Interceptor/minimax and NEXUS | Khalid | TODO |

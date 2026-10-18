@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "echo-heist"
+dynamic = ["version"]
+description = "A desktop stealth game about autonomous adversarial AI."
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+  "pygame-ce>=2.5.5,<3",
+  "platformdirs>=4,<5",
+]
+
+[project.optional-dependencies]
+dev = ["mypy>=1.15,<2", "pytest>=8.3,<10", "ruff>=0.11,<1"]
+build = ["pyinstaller>=6.13,<7"]
+
+[project.scripts]
+echo-heist = "echo_heist.app:main"
+
+[tool.hatch.version]
+path = "src/echo_heist/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/echo_heist"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/tests", "/scripts", "/packaging", "/pyproject.toml", "/README.md"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+extend-include = ["*.spec"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+files = ["src/echo_heist"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+markers = ["smoke: subprocess desktop/resource smoke checks"]
+
+[tool.uv]
+required-version = ">=0.8"
+
+[tool.echo-heist.structure]
+max-lines = 1000
+max-files = 6
+ignored-directories = [
+  ".git", ".venv", ".cache", "__pycache__", ".pytest_cache", ".mypy_cache",
+  ".ruff_cache", "build", "dist", "output", "tmp", "htmlcov",
+]
+line-exempt-paths = ["docs/idea", "uv.lock"]

@@ -6,7 +6,7 @@ Schedule/owner: [P01](../planning/phases/foundation/PHASE_01.md), opening of Day
 
 ## Verified toolchain and remaining platform checks
 
-Python 3.13.16, pygame-ce 2.5.8, platformdirs 4.13.4, uv 0.12.22, pytest 9.1.1, Ruff 0.17.1, mypy 1.20.2 and PyInstaller 6.22.3 are the actual local foundation baseline. Exact dependencies are in uv.lock. The Mac arm64 wheel/native application is exercised; Windows x64 binary-wheel resolution passes, while Windows execution and hosted CI are NOT_RUN. Tiled JSON importing belongs to Suhita's P02 assignment.
+Python 3.13.16, pygame-ce 2.5.8, platformdirs 4.13.4, uv 0.12.22, pytest 9.1.1, Ruff 0.17.1, mypy 1.20.2 and PyInstaller 6.22.3 are the actual local foundation baseline. Exact dependencies are in uv.lock. At P01 completion, the Mac arm64 wheel/native application was exercised and Windows x64 binary-wheel resolution passed; Windows execution and hosted CI were NOT_RUN. See [current Status](../tracking/STATUS.md) for subsequent GitHub runs and the [Windows handoff](setup/WINDOWS_SUHITA.md) for Suhita's workstation. Tiled JSON importing belongs to her P02 assignment.
 
 The initial system interpreter was Python 3.14.4. The project explicitly uses the already available Python 3.13.16 in its own .venv; the global interpreter was not changed. Use the locked 3.13 environment consistently rather than silently switching to system Python.
 

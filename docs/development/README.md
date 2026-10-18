@@ -42,7 +42,7 @@ Preserve approved gameplay requirements. The blueprint explicitly identifies con
 | Tracking | [Changelog](tracking/CHANGELOG.md) | Dated development handoffs and verification |
 | Tracking | [Claims and handoffs](tracking/HANDOFFS.md) | Owner/file coordination, runnable integration evidence and shared-task completion |
 
-Current runnable baseline: [P01 handoff](tracking/handoffs/khalid/day_01/P01.md) and [verification](quality/reports/phase01/VERIFICATION.md). The installed package/headless diagnostic and native Apple Silicon smoke app work; this is not yet the playable mission. Windows execution and hosted CI remain NOT_RUN.
+Current runnable baseline: [P01 handoff](tracking/handoffs/khalid/day_01/P01.md) and [verification](quality/reports/phase01/VERIFICATION.md). The installed package/headless diagnostic and native Apple Silicon smoke app work; this is not yet the playable mission. The [public GitHub repository](https://github.com/khalid999devs/Echo_Heist) now holds the incremental history. Follow [Status](tracking/STATUS.md) for current hosted CI evidence; Suhita's Windows desktop QA is still pending.
 
 Suhita's workstation entry: [Windows x64 setup and P02 handoff](workflow/setup/WINDOWS_SUHITA.md), including PowerShell clone/run/check/native-build commands and the P02-S1/S2 boundary.
 

@@ -41,7 +41,7 @@ On macOS this produces `dist/Echo Heist.app` and a platform ZIP. On Windows it p
 uv run --locked --all-extras python scripts/packaging/smoke.py "dist/Echo Heist.app" --mute
 ```
 
-Use `dist/EchoHeist/EchoHeist.exe` on Windows. The smoke helper runs the frozen app from an unrelated directory, compares headless hashes and checks resources/settings. `--dummy-video` is available for CI and does not verify a real desktop. GitHub Actions is configured but has not run remotely. Windows wheel availability is verified; Windows execution remains untested locally.
+Use `dist/EchoHeist/EchoHeist.exe` on Windows. The smoke helper runs the frozen app from an unrelated directory, compares headless hashes and checks resources/settings. `--dummy-video` is available for CI and does not verify a real desktop. See [current Status](docs/development/tracking/STATUS.md) for hosted CI evidence. Windows wheel availability is verified; native Windows desktop QA remains pending.
 
 See the [P01 verification](docs/development/quality/reports/phase01/VERIFICATION.md) and [Suhita's runnable handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md). Both can begin their assigned P02 slices after reading those interfaces.
 

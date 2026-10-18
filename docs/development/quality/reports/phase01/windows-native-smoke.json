@@ -1,0 +1,16 @@
+{
+  "artifact": "D:\\a\\Echo_Heist\\Echo_Heist\\dist\\EchoHeist\\EchoHeist.exe",
+  "checks": {
+    "frames_rendered": true,
+    "frozen_desktop": true,
+    "frozen_headless": true,
+    "resources_loaded": true,
+    "same_event_hash": true,
+    "same_state_hash": true,
+    "settings_saved": true,
+    "surface_saved": true
+  },
+  "passed": true,
+  "scope": "CI dummy video",
+  "video_driver": "dummy"
+}

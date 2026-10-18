@@ -50,7 +50,7 @@ Updated: 2026-10-18. Decisions below are proposed engineering defaults unless id
 | Q01 | Available hours and academic deadline? | Implementation began 2026-10-18; owners Khalid/Suhita; keep the eight-phase/four-day target and record actual effort | Before the remaining phase scheduling |
 | Q02 | Minimum OS and supported hardware? | Advertise none as tested until recorded; test candidates early | Before P07 candidate |
 | Q03 | Mac signing/notarization resources? | Preserve truthful unsigned/ad-hoc fallback and validate install flow; signing preferred when available | Before final artifacts |
-| Q04 | Source license, copyright owners and public PDF redistribution? | No invented license; prepare source/asset provenance for owner decision | Before public GitHub |
+| Q04 | Source license, copyright owners and public PDF redistribution? | User explicitly authorized pushing the existing source/blueprint to public GitHub on 2026-10-18; no license grant invented; ownership/provenance and source-license choice remain pending | Before a reuse/license claim or game release |
 | Q05 | Baseline difficulty, Speedrunner threshold and target success rate? | Measure complete runs and failure causes; calibrate shared pace reference from draft candidate | Day 4 balancing |
 | Q07 | Exact input remapping scope and same-tick action priorities? | Implement the PDF's configurable controls and deterministic central validation; Khalid records priority in P01 contracts | Before P02 gameplay integration |
 

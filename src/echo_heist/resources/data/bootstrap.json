@@ -1,0 +1,11 @@
+{
+  "title": "ECHO HEIST",
+  "stage": "PHASE 01 / FOUNDATION",
+  "logical_width": 1280,
+  "logical_height": 720,
+  "target_fps": 60,
+  "background": "#101921",
+  "foreground": "#e5edf2",
+  "muted": "#96a9b7",
+  "accent": "#57d6c6"
+}

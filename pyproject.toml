@@ -55,6 +55,6 @@ max-lines = 1000
 max-files = 6
 ignored-directories = [
   ".git", ".venv", ".cache", "__pycache__", ".pytest_cache", ".mypy_cache",
-  ".ruff_cache", "build", "dist", "output", "tmp", "htmlcov",
+  ".ruff_cache", ".local", "build", "dist", "output", "tmp", "htmlcov",
 ]
 line-exempt-paths = ["docs/idea", "uv.lock"]

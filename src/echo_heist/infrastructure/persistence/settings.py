@@ -71,6 +71,12 @@ class SettingsStore:
 
     def load(self) -> SettingsLoad:
         try:
+            # Windows may report a missing file when an ancestor is a regular file.
+            for directory in self.path.parents:
+                if directory.exists():
+                    if not directory.is_dir():
+                        raise NotADirectoryError(f"Settings directory is blocked: {directory}")
+                    break
             payload = json.loads(self.path.read_text(encoding="utf-8"))
             settings = decode_settings(payload)
         except FileNotFoundError:

@@ -6,6 +6,8 @@
 - Linked the guide from the owner/startup guides, README, development hub and actual P01 handoff. Recorded exact P02-S1/S2 scope, Khalid's retained simulation/input ownership, integration dependencies, verification/report paths and the stop boundary.
 - Kept P02 unclaimed/unstarted and Windows execution NOT_RUN until actual evidence arrives. No gameplay or dependency versions changed.
 - First GitHub push exposed a workflow validation error before jobs started: runner.temp is unavailable in job-level env. Changed the cache path to github.workspace/.cache/uv; the initial failed run remains visible in history.
+- Published main and the full original development history to the user-specified public origin. Verified a fresh clone through 99a8658 includes the Windows handoff and all nine commits; no gameplay work was started. Re-ran local structure/lint/format/strict typing and all 21 tests successfully; 209 local documentation links resolved before the publication-status update.
+- The first executable CI run passed Linux checks and the Mac native build/smoke, but the existing unavailable-storage regression failed on Windows: a regular-file ancestor was reported as a missing settings file. Added nearest-existing-directory validation so load reports unwritable storage consistently and save preserves the blocking file. Kept the existing regression assertion rather than skipping or weakening it.
 
 ## 2026-10-18 - Phase 1 complete
 

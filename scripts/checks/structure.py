@@ -16,7 +16,9 @@ AUTHORED_SUFFIXES = {".py", ".pyi", ".spec", ".md", ".toml", ".json", ".yml", ".
 def maintained_files(ignored: set[str]) -> Iterator[Path]:
     for directory, subdirectories, filenames in ROOT.walk():
         subdirectories[:] = [
-            name for name in subdirectories if name not in ignored and not name.endswith(".egg-info")
+            name
+            for name in subdirectories
+            if name not in ignored and not name.endswith(".egg-info")
         ]
         for name in sorted(filenames):
             if name != ".DS_Store":

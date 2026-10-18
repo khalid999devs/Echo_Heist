@@ -5,8 +5,19 @@ from enum import StrEnum
 from math import isfinite
 
 type Tile = tuple[int, int]
+type Position = tuple[int, int]
 type Scalar = str | int | float | bool | None
 SIMULATION_HZ = 30
+POSITION_UNITS_PER_TILE = 30_000
+
+
+def tile_center(tile: Tile) -> Position:
+    half = POSITION_UNITS_PER_TILE // 2
+    return tile[0] * POSITION_UNITS_PER_TILE + half, tile[1] * POSITION_UNITS_PER_TILE + half
+
+
+def position_tile(position: Position) -> Tile:
+    return position[0] // POSITION_UNITS_PER_TILE, position[1] // POSITION_UNITS_PER_TILE
 
 
 class ActorKind(StrEnum):

@@ -8,12 +8,14 @@ from echo_heist.core.contracts.world import ActorSpawn, StaticMap
 from echo_heist.core.simulation.engine import Simulation
 from echo_heist.core.simulation.randomness import seeded_rng
 from echo_heist.diagnostics.foundation import run_fixture
+from echo_heist.infrastructure.resources import load_game_rules
 
 
 def simulation() -> Simulation:
     return Simulation(
         StaticMap("test", 4, 4, frozenset({(2, 1)})),
         (ActorSpawn("operative", (1, 1)),),
+        rules=load_game_rules(),
     )
 
 
@@ -21,7 +23,7 @@ def test_identical_seed_and_actions_repeat_state_and_events() -> None:
     first = run_fixture(1042)
     assert first == run_fixture(1042)
     assert first["tick"] == 5
-    assert first["events"] == 5
+    assert first["events"] == 6
     assert first["final_tile"] == [0, 0]
     assert run_fixture(1043)["state_hash"] != first["state_hash"]
 
@@ -47,14 +49,16 @@ def test_stale_and_future_actions_do_not_move_or_spend_stock(issued_tick: int) -
     assert sim.observe("operative").own_status == before
 
 
-def test_blocked_and_unsupported_actions_are_rejected_without_side_effects() -> None:
+def test_blocked_and_malformed_actions_are_rejected_without_side_effects() -> None:
     sim = simulation()
+    for _ in range(2):
+        sim.step((Action("operative", ActionKind.MOVE, sim.tick, (1, 0)),))
     before = sim.observe("operative").own_status
-    blocked = sim.step((Action("operative", ActionKind.MOVE, 0, (1, 0)),))
+    blocked = sim.step((Action("operative", ActionKind.MOVE, sim.tick, (1, 0)),))
     assert blocked.events[0].kind == EventKind.ACTION_REJECTED
     assert blocked.events[0].details == (("reason", "blocked"),)
-    unsupported = sim.step((Action("operative", ActionKind.EMP, 1),))
-    assert unsupported.events[0].details == (("reason", "not_available_in_foundation"),)
+    malformed = sim.step((Action("operative", ActionKind.EMP, sim.tick, sprint=True),))
+    assert malformed.events[0].details == (("reason", "unexpected_movement_payload"),)
     assert sim.observe("operative").own_status == before
 
 
@@ -80,4 +84,4 @@ def test_old_observations_and_snapshots_are_immutable_values() -> None:
     sim.step((Action("operative", ActionKind.MOVE, 0, (0, 1)),))
     assert previous.own_status.tile == (1, 1)
     assert snapshot.actors[0].tile == (1, 1)
-    assert sim.observe("operative").own_status.tile == (1, 2)
+    assert sim.observe("operative").own_status.position != previous.own_status.position

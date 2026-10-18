@@ -102,3 +102,29 @@ git push -u origin work/suhita-p02
 ```
 
 If access is denied, retain the local commits and record the blocker; Khalid must grant your account collaborator access or arrange a fork contribution. Never force-push, publish credentials or push unfinished owner work directly to main. At the shared phase gate, integrate through the agreed review/merge process with checks; both owners' tracking changes may need reconciliation.
+
+## Ready-to-paste starting prompt
+
+```text
+I'm Suhita, working on Windows x64.
+
+Clone https://github.com/khalid999devs/Echo_Heist.git into this workspace,
+or reuse its existing checkout while preserving local changes. Install
+missing prerequisites from official sources as needed.
+
+Read AGENTS.md, docs/development/workflow/owners/SUHITA.md and
+docs/development/workflow/setup/WINDOWS_SUHITA.md. Follow their startup
+sequence to retrieve the blueprint, current tracking, P01 handoff,
+P02 specification, contracts, code rules and approved scoring.
+
+Set up the locked Windows environment and verify the foundation. Work on
+work/suhita-p02. Claim and implement only P02-S1 and P02-S2: the five-zone
+map, typed loader/validation, scenes, camera and basic UI flow. Respect
+Khalid's simulation/input ownership and document integration dependencies.
+
+Run the appropriate checks, guide me through the visible result, and record
+actual Windows results and my runnable handoff. Make short natural commits
+with my own Git identity and push my branch when access permits. Preserve
+main for integration. Stop at my P02 slice boundary; the full phase needs
+both owners' work and verified Human win/capture behavior.
+```

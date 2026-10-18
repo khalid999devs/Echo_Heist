@@ -8,6 +8,7 @@
 - First GitHub push exposed a workflow validation error before jobs started: runner.temp is unavailable in job-level env. Changed the cache path to github.workspace/.cache/uv; the initial failed run remains visible in history.
 - Published main and the full original development history to the user-specified public origin. Verified a fresh clone through 99a8658 includes the Windows handoff and all nine commits; no gameplay work was started. Re-ran local structure/lint/format/strict typing and all 21 tests successfully; 209 local documentation links resolved before the publication-status update.
 - The first executable CI run passed Linux checks and the Mac native build/smoke, but the existing unavailable-storage regression failed on Windows: a regular-file ancestor was reported as a missing settings file. Added nearest-existing-directory validation so load reports unwritable storage consistently and save preserves the blocking file. Kept the existing regression assertion rather than skipping or weakening it.
+- Run 39136504276 at a5d1400 passes all three hosted jobs, including 21 tests per platform and Windows x64/Mac arm64 native builds plus all frozen smoke assertions with SDL dummy video. Added the actual CI evidence report and artifact instructions; Suhita's own interactive Windows QA and full-game release checks remain pending.
 
 ## 2026-10-18 - Phase 1 complete
 

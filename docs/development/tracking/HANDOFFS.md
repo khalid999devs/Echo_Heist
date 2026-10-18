@@ -1,13 +1,13 @@
 # Work claims and runnable handoffs
 
-Baseline: no implementation claims or handoffs exist. P01 belongs to Khalid; Suhita's first implementation phase is P02 after the runnable foundation handoff. The [phase specs](../planning/phases/README.md) define owner slices and [Backlog](BACKLOG.md) maps shared feature anchors.
+P01 is complete and handed off by Khalid. [Runnable handoff](handoffs/khalid/day_01/P01.md) contains actual commands/contracts and evidence. Suhita's first implementation phase is now ready: P02. The [phase specs](../planning/phases/README.md) define slices and [Backlog](BACKLOG.md) maps shared feature anchors.
 
 ## Active claims
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | P01-K1, then K2/K3 | main; incremental local commits | Foundation package, root configuration, checks, packaging and P01 tracking | IN_PROGRESS |
-| Suhita | None | None | None | Waiting for P01 foundation; preparation allowed |
+| Khalid | None; P01 claims released | main; completed incremental commits | None | P01 done; P02-K1/K2 ready but unclaimed |
+| Suhita | None | None | None | P02-S1/S2 ready but unclaimed |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
 
@@ -25,7 +25,7 @@ Do not start a teammate agent or send external messages just because an owner is
 
 Create records only after real work under `tracking/handoffs/<owner>/day_01/`, `day_02/`, `day_03/`, or `day_04/`, using phase filenames such as `P02.md`. This keeps at most two normal phase records in each day directory. If a phase needs more than six records, group revisions under a subdirectory. Link the resulting evidence from Status/Backlog and this index.
 
-No completed records are present yet.
+- [Khalid / Day 1 / P01](handoffs/khalid/day_01/P01.md): DONE; runnable foundation, native Apple Silicon smoke, actual contract map and next-owner instructions.
 
 ## Handoff template
 

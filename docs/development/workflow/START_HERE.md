@@ -1,6 +1,6 @@
 # Start or resume developer work
 
-This is the operational entry point for either developer's coding agent. The goal is a complete working initial V1 draft in eight phases over four development days. Implementation has not started yet; inspect actual tracking/repository state rather than assuming these planned modules exist.
+This is the operational entry point for either developer's coding agent. The goal is a complete working initial V1 draft in eight phases over four development days. P01 is implemented; retrieve its [actual runnable handoff](../tracking/handoffs/khalid/day_01/P01.md). P02-P08 are pending; inspect current tracking/code before assuming later modules exist.
 
 ## Resolve the developer once
 

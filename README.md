@@ -2,7 +2,7 @@
 
 A Python + pygame-ce desktop stealth game with Human and autonomous Companion modes.
 
-Current development: runnable Phase 1 foundation (`0.1.0a1`). The window is a development shell; the full mission/game scenes belong to P02 onward. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
+Current development: **Phase 1 complete** (`0.1.0a1`). The window is a development shell; the full mission/game scenes belong to P02 onward. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
 
 ## Development setup
 
@@ -24,6 +24,24 @@ uv run --locked echo-heist --smoke-frames 12 --mute --data-dir .local/profile --
 ```
 
 Settings normally live in the OS user application-data folder (`Echo Heist`), never beside the executable. `--data-dir` overrides that location for checks. Invalid files are backed up before recovery; settings from a newer schema stay untouched. Test data/logs/builds are ignored by Git. Use `uv run --locked pytest` for the focused behavior suite; the combined check command also runs structure/lint/format/type checks.
+
+## Native foundation build
+
+On Apple Silicon macOS or Windows x64:
+
+```sh
+uv run --locked --all-extras python scripts/packaging/build.py
+```
+
+On macOS this produces `dist/Echo Heist.app` and a platform ZIP. On Windows it produces `dist/EchoHeist/EchoHeist.exe` with its support folder and a platform ZIP. Keep the whole bundle/folder. The local macOS build is ad-hoc signed, not notarized. It is a foundation smoke artifact, not the finished game.
+
+```sh
+uv run --locked --all-extras python scripts/packaging/smoke.py "dist/Echo Heist.app" --mute
+```
+
+Use `dist/EchoHeist/EchoHeist.exe` on Windows. The smoke helper runs the frozen app from an unrelated directory, compares headless hashes and checks resources/settings. `--dummy-video` is available for CI and does not verify a real desktop. GitHub Actions is configured but has not run remotely. Windows wheel availability is verified; Windows execution remains untested locally.
+
+See the [P01 verification](docs/development/quality/reports/phase01/VERIFICATION.md) and [Suhita's runnable handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md). Both can begin their assigned P02 slices after reading those interfaces.
 
 ## Development plan
 

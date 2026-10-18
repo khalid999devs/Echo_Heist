@@ -1,6 +1,6 @@
 # ECHO HEIST development hub
 
-Created: 2026-10-18. Stage: planning complete; implementation not started.
+Created: 2026-10-18. Stage: P01 complete; P02-P08 implementation pending. Day 1 implementation started on 2026-10-18.
 
 Current target: a complete working initial draft in **eight phases over four development days**. Khalid owns Phase 1; later work is split by strengths with 80 estimated points each. All defined functionality must work after Phase 8; later work improves accuracy and polish. Public distribution retains its platform/release checks.
 
@@ -41,6 +41,8 @@ Preserve approved gameplay requirements. The blueprint explicitly identifies con
 | Tracking | [Risks and decisions](tracking/RISKS_AND_DECISIONS.md) | Open risks, mitigations, proposed implementation decisions |
 | Tracking | [Changelog](tracking/CHANGELOG.md) | Dated development handoffs and verification |
 | Tracking | [Claims and handoffs](tracking/HANDOFFS.md) | Owner/file coordination, runnable integration evidence and shared-task completion |
+
+Current runnable baseline: [P01 handoff](tracking/handoffs/khalid/day_01/P01.md) and [verification](quality/reports/phase01/VERIFICATION.md). The installed package/headless diagnostic and native Apple Silicon smoke app work; this is not yet the playable mission. Windows execution and hosted CI remain NOT_RUN.
 
 ## Tracking rules
 

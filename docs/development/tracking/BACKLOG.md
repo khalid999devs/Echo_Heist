@@ -1,6 +1,6 @@
 # Feature backlog and owner-slice mapping
 
-Status vocabulary: TODO / IN_PROGRESS / BLOCKED / DONE. All implementation remains TODO. P01-P08 replace the retired M0-M5 labels. See the [phase index](../planning/phases/README.md) for detailed owner assignments and the [workload table](../planning/WORKLOAD.md) for 80/80 estimated effort.
+Status vocabulary: TODO / IN_PROGRESS / BLOCKED / DONE. P01 / EH-001 through EH-005 are DONE; all later implementation remains TODO. P01-P08 replace the retired M0-M5 labels. See the [phase index](../planning/phases/README.md) for detailed owner assignments and the [workload table](../planning/WORKLOAD.md) for 80/80 estimated effort.
 
 EH IDs are stable feature anchors, not exclusive single-person tasks. Named Pxx-Kx/Pxx-Sx slices own implementation. Where several slices contribute, the EH item becomes DONE only after all required contributions and feature acceptance pass. Phase completion is recorded separately in [Status](STATUS.md).
 
@@ -18,11 +18,11 @@ EH IDs are stable feature anchors, not exclusive single-person tasks. Named Pxx-
 | ID | Phase | Responsible slices | Work item | Depends on | Scope | Required acceptance | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | EH-000 | Planning | Planning baseline | Authoritative source, plan, workload and instructions | None | R01-R27 | Indexed documents and validation | DONE |
-| EH-001 | P01 | P01-K1 | Interpreter/dependency/native runner baseline | EH-000 | R24-R25 | Resolved version/architecture and runner-access record | TODO |
-| EH-002 | P01 | P01-K1 | Git, grouped package, lock, README, source-license status | EH-001 | R24, R26 | Clean locked install, entry point and six-file root budget | TODO |
-| EH-003 | P01 | P01-K2 | Typed contracts, headless fixed tick, RNG and fixture | EH-002 | R20-R21 | Repeatable fixture and immutable observation boundary | TODO |
-| EH-004 | P01 | P01-K3 | Desktop/resource/settings/bootstrap and input shell | EH-002 | R19, R21, R24 | Launch/save/recovery/audio checks outside project cwd | TODO |
-| EH-005 | P01 | P01-K1, P01-K3 | Structure/lint/test checks, CI and available native smoke build | EH-003, EH-004 | R24-R25 | Actual checks/artifact evidence, other target status explicit | TODO |
+| EH-001 | P01 | P01-K1 | Interpreter/dependency/native runner baseline | EH-000 | R24-R25 | Resolved version/architecture and runner-access record | DONE |
+| EH-002 | P01 | P01-K1 | Git, grouped package, lock, README, source-license status | EH-001 | R24, R26 | Clean locked install, entry point and six-file root budget | DONE |
+| EH-003 | P01 | P01-K2 | Typed contracts, headless fixed tick, RNG and fixture | EH-002 | R20-R21 | Repeatable fixture and immutable observation boundary | DONE |
+| EH-004 | P01 | P01-K3 | Desktop/resource/settings/bootstrap and input shell | EH-002 | R19, R21, R24 | Launch/save/recovery/audio checks outside project cwd | DONE |
+| EH-005 | P01 | P01-K1, P01-K3 | Structure/lint/test checks, CI and available native smoke build | EH-003, EH-004 | R24-R25 | Actual checks/artifact evidence, other target status explicit | DONE |
 | EH-006 | P02 | P02-S1, P02-S2 | Five-zone scene/map, Tiled importer and connectivity validation | EH-003, EH-004 | R03, R09 | Branches/cross-link/anchors and malformed-map diagnostics | TODO |
 | EH-007 | P02 | P02-K1, P02-K2 | Human movement/collision/sprint/actions and interaction prompt | EH-006 | R04, R09, R20 | Speed/collision/legality tests and real input response | TODO |
 | EH-008 | P02 | P02-K1, P02-S1 | Core ownership/theft, mandatory lockdown, extraction/result terminals | EH-007 | R01, R22 | T02/T08 mission rules, once-only events and visible objective/result | TODO |
@@ -57,3 +57,5 @@ EH IDs are stable feature anchors, not exclusive single-person tasks. Named Pxx-
 Phase gates and slice dependencies are authoritative for incremental work. A feature spanning phases stays IN_PROGRESS while its later slices remain; consumers can use an explicitly handed-off verified subset (for example P02 tool legality) without falsely closing the whole feature. This avoids a cycle where P04 MCTS waits for P05 effects or P07 waits for its own audited guide.
 
 EH-029 is optional. EH-031 is public distribution/submission, not a ninth functional phase; it may run on Day 4 if release checks pass. EH-032 improves a complete draft and cannot absorb missing required features. Record slice claims and actual evidence in [Handoffs](HANDOFFS.md) and phase gates in [Status](STATUS.md). No passing CI/build/native QA result is implied by this plan.
+
+P01 evidence: [runnable handoff](handoffs/khalid/day_01/P01.md) and [verification](../quality/reports/phase01/VERIFICATION.md). Local package/checks/native Mac smoke pass; CI is configured but unrun, Windows execution is NOT_RUN, and the source-license decision remains pending before publication. No P02 feature or shared later slice has been marked complete.

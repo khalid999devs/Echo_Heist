@@ -8,7 +8,7 @@ Updated: 2026-10-18. Decisions below are proposed engineering defaults unless id
 | --- | --- | --- | --- | --- |
 | RK01 | Required work misses the four-day draft target | Integrate Human loop on Day 1, all algorithms on Day 2, full interface on Day 3; reserve Day 4 for fixes/builds; cut optional polish/Linux first and report precise checkpoint gaps | Both | OPEN |
 | RK02 | Windows/native Mac build or test access unavailable | Khalid confirms native runners/testers in P01; first available smoke build there; never infer Windows acceptance from Mac results | Khalid | OPEN |
-| RK03 | Python/dependency/architecture mismatch | Verify candidate minor and wheels on both targets, lock exact versions, check binary slices; local Python 3.14.4 is not yet project-approved | Khalid | OPEN |
+| RK03 | Python/dependency/architecture mismatch | P01 verifies Python 3.13.16/Mac arm64 package and Windows x64 locked-wheel resolution; complete actual Windows execution before a release claim | Khalid | OPEN |
 | RK04 | Hidden state leaks into Companion, NEXUS or rollouts | Explicit immutable observations, forbidden-import checks and noninterference tests at each controller boundary | Both | OPEN |
 | RK05 | Algorithm names hide placeholder or unused implementations | Log actual calls/metrics; compare minimax modes; test real MCTS stages; demonstrate policy changes in controlled scenarios | Khalid | OPEN |
 | RK06 | Determinism breaks through wall time, global RNG or ordering | Integer ticks, separate RNG streams, stable ties, full run header/action replay; compare target builds before broader claims | Khalid | OPEN |
@@ -31,7 +31,7 @@ Updated: 2026-10-18. Decisions below are proposed engineering defaults unless id
 | D01 | Desktop first: Windows x64 + macOS arm64; Linux only after testing; free itch.io downloads | REQUIRED: user clarification and PDF p. 19 | Explicit owner-approved release scope change |
 | D02 | Python + pygame-ce + Tiled JSON + pytest + native PyInstaller one-folder | REQUIRED: PDF pp. 16, 19 | Demonstrated blocker and owner-approved technology change |
 | D03 | One installable `src/echo_heist` package with pure simulation and typed controller boundaries | PROPOSED: maps PDF boundaries into a testable Python package | Evidence that structure obstructs actual integration |
-| D04 | Candidate Python 3.13, uv lock, Ruff, mypy and optional build tools | PROPOSED: Khalid verifies exact compatibility/versions in P01 | Target wheel or build compatibility evidence |
+| D04 | Python 3.13.16 project baseline, uv.lock, Ruff/mypy/pytest and optional PyInstaller tools | VERIFIED in P01 on macOS arm64; Windows binary-wheel resolution passes; exact versions in handoff | Actual Windows native execution remains required before support claims |
 | D05 | Deeply immutable observations; belief-only MCTS; no controller WorldState access | REQUIRED: PDF pp. 12-13, 16 | Cannot be weakened for convenience |
 | D06 | 30 Hz simulation, 60 FPS presentation target, deterministic search iterations | PROPOSED defaults: PDF pp. 5, 13 | Performance and feel measurements |
 | D07 | EMP/stun resolves before capture; completed same-tick capture precedes extraction | First part REQUIRED by p. 8; tie precedence PROPOSED to resolve an unspecified edge | Playtest evidence; preserve recoverable interruption semantics |
@@ -47,7 +47,7 @@ Updated: 2026-10-18. Decisions below are proposed engineering defaults unless id
 
 | ID | Question | Working handling | Resolve by |
 | --- | --- | --- | --- |
-| Q01 | Start date, available hours and academic deadline? | Owners are Khalid/Suhita; use the eight-phase/four-day target and record actual effort; academic submission has its own deadline | P01 scheduling |
+| Q01 | Available hours and academic deadline? | Implementation began 2026-10-18; owners Khalid/Suhita; keep the eight-phase/four-day target and record actual effort | Before the remaining phase scheduling |
 | Q02 | Minimum OS and supported hardware? | Advertise none as tested until recorded; test candidates early | Before P07 candidate |
 | Q03 | Mac signing/notarization resources? | Preserve truthful unsigned/ad-hoc fallback and validate install flow; signing preferred when available | Before final artifacts |
 | Q04 | Source license, copyright owners and public PDF redistribution? | No invented license; prepare source/asset provenance for owner decision | Before public GitHub |

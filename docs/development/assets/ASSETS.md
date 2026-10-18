@@ -2,6 +2,8 @@
 
 Blueprint basis: pp. 2-4, 19. Status: no production assets have been imported or licensed in this planning pass. Required interaction features stay in scope even if optional decorative assets are cut.
 
+P01 foundation asset: [original SVG mark](../../../src/echo_heist/resources/assets/branding/mark.svg), with package-owned bootstrap JSON. This is a simple project-authored development graphic, not an imported third-party asset or finished scene art. It is exercised in source, wheel and native builds. Final production-art/source licensing and owner credits remain pending before public release; minimum production rows below remain TODO.
+
 ## Minimum production set
 
 | ID | Asset group | Minimum content | Status |

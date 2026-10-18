@@ -1,12 +1,12 @@
-# Proposed codebase architecture
+# Codebase architecture and foundation baseline
 
-Blueprint basis: PDF pp. 16-17. This design is planned; none of these modules exists yet.
+Blueprint basis: PDF pp. 16-17. P01 now implements the package/bootstrap, core contracts/simulation, explicit diagnostics, resources/settings IO, checks/tests and native packaging. The level loader, gameplay scenes, AI and Workshop remain planned. Read the [actual P01 API/handoff](../tracking/handoffs/khalid/day_01/P01.md) before extending these boundaries.
 
 Required: follow [code rules](../workflow/CODE_RULES.md), with no authored file over 1,000 lines and no maintained directory over six direct files. The [phase/workload plan](../planning/WORKLOAD.md) assigns both developers actual frontend/backend work; package ownership does not mean one developer owns every file in a layer.
 
 ## Package layout
 
-Use one installable `src` package, preserving the PDF's functional boundaries inside `echo_heist`:
+Use one installable `src` package, preserving the PDF's functional boundaries inside `echo_heist`. This tree includes both implemented foundation areas and later planned groups:
 
 ```text
 AGENTS.md                      # agent discovery; detailed instructions under docs/development
@@ -25,6 +25,7 @@ src/echo_heist/
   workshop/                    # policy models, presets, policy-to-weight translation
   ui/                          # pygame input, scenes, HUD, camera, rendering, audio
   infrastructure/              # resource lookup, writable paths, JSON files, logs
+  diagnostics/                 # explicit P01 tile fixture; not shipped mission behavior
   resources/
     assets/                    # sprites, fonts, audio and effects
     data/                      # Tiled JSON, balance config, dialogue and presets
@@ -60,6 +61,8 @@ The root has exactly six reserved maintained files listed above. Avoid additiona
 For example, keep simulation engine/world/mission/motion/capture plus an initializer within six files; put scoring in its own group instead of adding a seventh sibling. Split MCTS/tree/rollout code by actual responsibility when needed, not to generate a file per method. Apply the same rule to maps, assets and reports by grouping logical families. Large generated artifacts remain outside the maintained source tree.
 
 Khalid establishes the actual contract/import map in P01. Both agents must read that handoff and claim exact files before editing; the phase's owner boundaries guide parallel work. All test-only code/fixtures remain under `tests/`, never adjacent to source modules.
+
+The current shared StaticMap/MapObject boundary is in core/contracts/world.py, so P02's Tiled loader can construct pure values without importing Simulation. Mutable WorldState lives in core/simulation/world.py and stays private. The desktop shell in ui/bootstrap.py is a temporary composition baseline for P02's real scenes, with no placeholder mission or AI success behavior.
 
 ## Ownership and imports
 

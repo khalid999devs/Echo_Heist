@@ -2,7 +2,7 @@
 
 Identity: Khalid, the project owner in this conversation. Focus: software architecture, system design, core/AI strategy and logic, with real input/diagnostics/result presentation work. Estimated workload: 80 of 160 points. P01 is entirely yours.
 
-Follow [startup/context retrieval](../START_HERE.md) and [code rules](../CODE_RULES.md). Check [Status](../../tracking/STATUS.md), [claims/handoffs](../../tracking/HANDOFFS.md) and your phase's prerequisite evidence before editing. No game source exists in the planning baseline.
+Follow [startup/context retrieval](../START_HERE.md) and [code rules](../CODE_RULES.md). Check [Status](../../tracking/STATUS.md), [claims/handoffs](../../tracking/HANDOFFS.md) and actual prerequisite evidence. P01 is complete; source and its [runnable handoff](../../tracking/handoffs/khalid/day_01/P01.md) now exist.
 
 ## Assigned queue
 
@@ -21,7 +21,7 @@ The full slice prefix applies to abbreviated IDs in this table, for example P03-
 
 ## Start now
 
-The next implementation work is P01-K1, then K2/K3. Read [initial setup](../INITIAL_SETUP.md), resolve the actual Python/dependency/native runner baseline, create the grouped repository and executable structure check, then produce the smallest real desktop/headless foundation. Keep root files within six; keep all authored files below 1,001 lines and tests under grouped `tests/`.
+P01-K1/K2/K3 are DONE. The P01-only assignment stops at its handoff. On a new authorized P02 assignment, take P02-K1/K2 and coordinate Suhita's map/scene integration. The verified foundation uses Python 3.13.16, a locked environment, structure checks and an actual desktop/headless package. Keep root files within six, authored files below 1,001 lines and tests under grouped `tests/`.
 
 Hand Suhita actual commands, import paths, map/action/scene/event interfaces and a known-good build. Do not leave her a documentation-only scaffold or require her to repair your environment setup. P02 integrates both owners on that foundation.
 

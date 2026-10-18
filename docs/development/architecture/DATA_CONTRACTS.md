@@ -1,6 +1,6 @@
-# Proposed contracts and tuning baseline
+# Contract targets and implemented foundation
 
-Blueprint basis: pp. 5-17. These contracts are implementation decisions for Khalid to validate and hand off in P01; they are not existing APIs. Suhita and Khalid consume the recorded actual interfaces from P02 onward.
+Blueprint basis: pp. 5-17. P01 has implemented the immutable DTOs and diagnostic Simulation subset; its [actual interfaces and limitations](../tracking/handoffs/khalid/day_01/P01.md) are the integration baseline. The table below describes full-game targets, not a claim that mission/sensing/scoring systems are already implemented. Suhita and Khalid use the actual handoff from P02 onward.
 
 ## Simulation interfaces
 
@@ -17,6 +17,8 @@ Blueprint basis: pp. 5-17. These contracts are implementation decisions for Khal
 RunResult also records distinct detection encounters, completion/stealth/pace subtotals, final score, scoring version and pace-reference ticks, following the [approved scoring specification](../planning/SCORING.md). Raw per-guard confirmations remain diagnostic events; scoring uses the shared encounter count. The Simulation owns encounter lifetime and scoring; UI and controllers cannot emit extra point awards.
 
 Action kinds follow the PDF: MOVE, WAIT, INTERACT, ECHO, EMP, MELEE, HIDE. Human E resolves to a stable interaction request for doors/core/hiding. Controller requests are validated centrally; illegal/expired requests consume no resource and produce a rejection reason for diagnostics. Define a bounded tick-validity window and deterministic priority for simultaneous requests during P01.
+
+Implemented P01 rule: an action must match its latest Observation.tick; multiple intents for one actor all reject, and actors resolve in stable ID order. The diagnostic accepts cardinal tile MOVE/WAIT only, increments a committed tick and emits typed events. Sprint, interactions/tools, continuous speed, sensing and terminal scoring remain assigned later behavior. Only individual Observation values go to controllers; StepResult/presentation snapshots stay with orchestration/UI.
 
 The mission is INFILTRATE -> CORE_HELD/LOCKDOWN -> WIN, CAPTURED or ABORTED. Capture can also end infiltration. Aborted attempts are unsuccessful but labeled distinctly. Core theft assigns ownership, raises lockdown, emits CORE_TAKEN and changes objective atomically, exactly once. Only the actual carrier may extract. An Echo is a decoy entity with no inventory or mission authority.
 

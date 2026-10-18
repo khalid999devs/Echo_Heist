@@ -1,14 +1,14 @@
 # Phase 1 setup: Khalid's implementation batch
 
-Status: TODO. This is the concrete setup specification; no game source, dependency environment, Git repository or build has been created by the planning pass.
+Status: DONE for P01. The environment, Git history, foundation source and available native smoke build are implemented. See the [actual handoff](../tracking/handoffs/khalid/day_01/P01.md) and [verification](../quality/reports/phase01/VERIFICATION.md). The ordered steps below remain the setup/reproduction reference.
 
 Schedule/owner: [P01](../planning/phases/foundation/PHASE_01.md), opening of Day 1, belongs entirely to Khalid. Suhita has no required setup implementation. Record a runnable contract/command handoff so both developers can start P02 that day. A minimal window alone is not the entire Day 1 outcome.
 
-## Proposed toolchain
+## Verified toolchain and remaining platform checks
 
-Use Python 3.13 as an initial compatibility candidate, pygame-ce as the runtime, Tiled JSON for maps, uv for dependency locking/install, pytest for behavior tests, Ruff for formatting/lint, and mypy for typed core/controller contracts. Use PyInstaller as an optional build dependency. Exact package versions must be resolved and locked after verifying compatible wheels on Windows x64 and macOS arm64; these documents do not claim compatibility has been tested.
+Python 3.13.16, pygame-ce 2.5.8, platformdirs 4.13.4, uv 0.12.22, pytest 9.1.1, Ruff 0.17.1, mypy 1.20.2 and PyInstaller 6.22.3 are the actual local foundation baseline. Exact dependencies are in uv.lock. The Mac arm64 wheel/native application is exercised; Windows x64 binary-wheel resolution passes, while Windows execution and hosted CI are NOT_RUN. Tiled JSON importing belongs to Suhita's P02 assignment.
 
-The inspected local host is arm64 with Python 3.14.4 and no installed pygame/pytest. Do not silently use that interpreter as the project baseline. Either provision the proposed interpreter locally, or record evidence for adopting another supported minor version consistently across development and builds. The first setup task owns this decision.
+The initial system interpreter was Python 3.14.4. The project explicitly uses the already available Python 3.13.16 in its own .venv; the global interpreter was not changed. Use the locked 3.13 environment consistently rather than silently switching to system Python.
 
 The official [pygame-ce repository](https://github.com/pygame-community/pygame-ce) documents installation and its `pygame` import namespace. Install `pygame-ce`, avoiding the separate `pygame` distribution in the same environment. The [PyInstaller manual](https://pyinstaller.org/en/stable/index.html) requires native OS builds; a local Mac build cannot validate Windows packaging.
 
@@ -27,19 +27,20 @@ The official [pygame-ce repository](https://github.com/pygame-community/pygame-c
 
 ## Planned developer commands
 
-These become valid only after the package/tool configuration above is implemented. The uv bootstrap itself is a separate machine prerequisite; document its official installation method in the repository README during setup.
+These are now available from the repository root after installing uv/Python 3.13. The repository README documents the official uv bootstrap and locked setup.
 
 ```sh
 uv sync --locked --extra dev --extra build
 uv run python -m echo_heist
 uv run ruff check .
 uv run ruff format --check .
-uv run mypy src/echo_heist
+uv run mypy
 uv run pytest
-uv run pyinstaller --clean --noconfirm packaging/echo_heist.spec
+uv run --locked --all-extras python scripts/checks/run.py
+uv run --locked --all-extras python scripts/packaging/build.py
 ```
 
-Use the same locked commands in CI. The packaging script must choose native settings or platform-specific specs explicitly. The headless seed CLI and replay CLI are later deliverables, not assumed existing commands.
+Use the same locked checks in CI. The packaging script chooses the native primary target explicitly. `echo-heist --headless --seed 1042` runs the real P01 diagnostic; the full mission replay/experiment CLI is still later work. This phase does not claim the complete game is playable.
 
 ## Setup acceptance
 

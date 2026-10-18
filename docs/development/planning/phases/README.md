@@ -1,6 +1,6 @@
 # Eight implementation phases
 
-All statuses are TODO. The user requires a complete functional initial draft after P08, within four development days. The earlier M0-M5 labels are retired for active implementation; EH task IDs remain as feature traceability anchors.
+P01 is DONE; P02-P08 are TODO. The user requires a complete functional initial draft after P08, within four development days. The earlier M0-M5 labels are retired for active implementation; EH task IDs remain as feature traceability anchors. Read the [runnable P01 handoff](../../tracking/handoffs/khalid/day_01/P01.md) before starting P02.
 
 | Phase | Day | Specification | Prerequisite | Integrator |
 | --- | --- | --- | --- | --- |

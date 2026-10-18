@@ -36,6 +36,8 @@ def test_headless_core_and_fixture_do_not_import_pygame() -> None:
         "import sys; "
         "from echo_heist.diagnostics.foundation import run_fixture; "
         "run_fixture(); "
+        "from echo_heist.app import main; "
+        "assert main(['--headless']) == 0; "
         "assert not any(m == 'pygame' or m.startswith('pygame.') for m in sys.modules)"
     )
     subprocess.run([sys.executable, "-c", command], check=True, timeout=15)

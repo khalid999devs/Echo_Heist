@@ -1,6 +1,6 @@
 # P01 - Environment, repository and runnable foundation
 
-Day 1, opening block. Owner/integrator: **Khalid only**. Effort: Khalid 12, Suhita 0. Status: TODO. Prerequisite: planning baseline. Feature anchors: EH-001 through EH-005. Source: PDF pp. 16-17, 19; user explicitly assigns initial setup to Khalid.
+Day 1, opening block. Owner/integrator: **Khalid only**. Effort: Khalid 12, Suhita 0. Status: DONE on 2026-10-18. P01-K1/K2/K3: DONE. Feature anchors: EH-001 through EH-005. Source: PDF pp. 16-17, 19; user explicitly assigns initial setup to Khalid.
 
 ## Required context
 
@@ -32,3 +32,5 @@ The initial Simulation API accepts typed actions, advances one committed tick an
 - Record the P01 foundation handoff and close all three slices before marking P01 DONE.
 
 Suhita has no required implementation or setup-repair work in this phase. She may read the source and prepare scene ideas/provenance while waiting. P02 can begin once the runnable foundation and its contract handoff exist; native external access gaps stay tracked rather than causing idle local work.
+
+Completion evidence: [P01 handoff](../../../tracking/handoffs/khalid/day_01/P01.md), [verification report](../../../quality/reports/phase01/VERIFICATION.md). Local checks/21 tests pass; actual extracted macOS arm64 app smoke passes; Windows locked-wheel resolution passes. Windows native execution and hosted CI remain NOT_RUN, and source licensing remains a pre-publication decision. P02 remains unstarted.

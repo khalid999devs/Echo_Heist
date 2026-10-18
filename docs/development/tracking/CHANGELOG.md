@@ -1,5 +1,16 @@
 # Development changelog
 
+## 2026-10-18 - Phase 1 complete
+
+- Initialized local main and committed actual progress in short separate steps: planning, Python setup/checks, deterministic contracts/runtime, desktop/settings and native packaging/CI. No remote or publication was created.
+- Installed the Python 3.13.16 environment with a real lock; pygame-ce 2.5.8/platformdirs 4.13.4 and development/build versions are recorded in the runnable handoff. Global Python was unchanged; source license remains pending before publication.
+- Implemented immutable map/action/event/observation/result boundaries, private fixed-tick diagnostic simulation, deterministic events/RNG namespaces and rejected-action handling. No P02+ game rules/AI were substituted with fake success.
+- Added installed/frozen-safe SVG/JSON resources, a resizable desktop foundation, isolated/OS-writable settings, atomic JSON writes, corrupt recovery/future-version preservation and audio fallback.
+- Added the 1,000-line/six-direct-file/test-placement checker with absolute/relative import guards, grouped useful tests and one combined check command. Local lint/format/types and 21 tests pass; negative structural probes reject actual violations.
+- Built a wheel and installed/exercised it from an unrelated cwd. Built the native ad-hoc-signed Mac arm64 ZIP from clean commit 61a00a0, extracted it and passed all eight frozen headless/Cocoa/resource/settings/hash checks without development Python paths.
+- Windows x64 binary-wheel resolution passes. Windows native execution, hosted CI and public Gatekeeper/download flow remain NOT_RUN; the three-target workflow is configured and locally parsed only.
+- Completed P01-K1/K2/K3 and EH-001 through EH-005; released claims and prepared the exact runnable/API handoff for Suhita. P02 and all later implementation remain TODO. This assignment ends at the P01 boundary.
+
 ## 2026-10-18 - Eight phases, named balanced ownership and agent instructions
 
 - Replaced active M0-M5 milestones with P01-P08, two phases per development day, retaining stable EH feature anchors and the complete-functional-draft requirement.

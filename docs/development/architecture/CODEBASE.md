@@ -1,6 +1,6 @@
 # Codebase architecture and foundation baseline
 
-Blueprint basis: PDF pp. 16-17. P01 now implements the package/bootstrap, core contracts/simulation, explicit diagnostics, resources/settings IO, checks/tests and native packaging. The level loader, gameplay scenes, AI and Workshop remain planned. Read the [actual P01 API/handoff](../tracking/handoffs/khalid/day_01/P01.md) before extending these boundaries.
+Blueprint basis: PDF pp. 16-17. P01 implements package/bootstrap, immutable contracts, resources/settings, checks and native packaging. Khalid's [P02 implementation](../tracking/handoffs/khalid/day_01/P02.md) adds continuous core/mission/capture/tool rules plus ui/input and ui/presenters; it preserves Suhita's level-loader/scenes/render ownership. AI and Workshop remain planned. Read actual owner handoffs before extending these boundaries.
 
 Required: follow [code rules](../workflow/CODE_RULES.md), with no authored file over 1,000 lines and no maintained directory over six direct files. The [phase/workload plan](../planning/WORKLOAD.md) assigns both developers actual frontend/backend work; package ownership does not mean one developer owns every file in a layer.
 

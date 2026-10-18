@@ -21,7 +21,7 @@ The full slice prefix applies to abbreviated IDs in this table, for example P03-
 
 ## Start now
 
-P01-K1/K2/K3 are DONE. The P01-only assignment stops at its handoff. On a new authorized P02 assignment, take P02-K1/K2 and coordinate Suhita's map/scene integration. The verified foundation uses Python 3.13.16, a locked environment, structure checks and an actual desktop/headless package. Keep root files within six, authored files below 1,001 lines and tests under grouped `tests/`.
+P01-K1/K2/K3 and P02-K1/K2 are DONE. [Your P02 handoff](../../tracking/handoffs/khalid/day_01/P02.md) records implemented core/tools/input/objective interfaces and actual checks. The authorized P02 assignment stops at your slice boundary; full P02 awaits Suhita's map/scene integration and gate. Do not start dependent P03 before that prerequisite and a new assignment. The verified foundation uses Python 3.13.16, a locked environment and actual desktop/headless builds. Keep root files within six, authored files below 1,001 lines and tests under grouped `tests/`.
 
 Hand Suhita actual commands, import paths, map/action/scene/event interfaces and a known-good build. Do not leave her a documentation-only scaffold or require her to repair your environment setup. P02 integrates both owners on that foundation.
 

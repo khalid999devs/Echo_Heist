@@ -8,7 +8,7 @@ Suhita's Windows x64 bootstrap and branch workflow: [Windows setup/P02 handoff](
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | P02-K1/K2 | work/khalid-p02 | core/simulation/**, core/abilities/**; additive core/contracts fields; ui/input/**, ui/presenters/objective.py; diagnostics/human_preview.py; infrastructure/resources.py gameplay-config adapter; resources/data/gameplay/**; related grouped tests and own tracking/handoff | IN_PROGRESS |
+| Khalid | None; P02-K1/K2 completed and released | work/khalid-p02; runtime 789da10 plus final handoff commit | None | P02-K1/K2 DONE; full P02 awaits Suhita integration |
 | Suhita | None | None | None | P02-S1/S2 ready but unclaimed |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
@@ -30,6 +30,7 @@ Do not start a teammate agent or send external messages just because an owner is
 Create records only after real work under `tracking/handoffs/<owner>/day_01/`, `day_02/`, `day_03/`, or `day_04/`, using phase filenames such as `P02.md`. This keeps at most two normal phase records in each day directory. If a phase needs more than six records, group revisions under a subdirectory. Link the resulting evidence from Status/Backlog and this index.
 
 - [Khalid / Day 1 / P01](handoffs/khalid/day_01/P01.md): DONE; runnable foundation, native Apple Silicon smoke, actual contract map and next-owner instructions.
+- [Khalid / Day 1 / P02](handoffs/khalid/day_01/P02.md): P02-K1/K2 DONE; core/tools/input/objective presenter, diagnostic native win/capture, 45 passing tests and three-platform CI. Full P02 remains open.
 
 ## Handoff template
 

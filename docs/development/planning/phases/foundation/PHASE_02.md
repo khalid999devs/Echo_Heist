@@ -1,6 +1,8 @@
 # P02 - Complete Human loop and five-zone game scene
 
-Day 1, remainder. Integrator: **Suhita**. Effort: Khalid 8, Suhita 12. Status: TODO. Prerequisite: P01 foundation handoff. Feature anchors: EH-006, EH-007, EH-008, EH-011, EH-012 and initial EH-019. Source: PDF pp. 2-7, 15-17.
+Day 1, remainder. Integrator: **Suhita**. Effort: Khalid 8, Suhita 12. Status: IN_PROGRESS. P02-K1/K2 DONE on work/khalid-p02; Suhita's contributions/final-map integration gate remain pending acceptance. Prerequisite: P01 foundation handoff. Feature anchors: EH-006, EH-007, EH-008, EH-011, EH-012 and initial EH-019. Source: PDF pp. 2-7, 15-17.
+
+Implemented core/input consumer reference: [Khalid's P02 handoff](../../../tracking/handoffs/khalid/day_01/P02.md) and [runtime contract](../../../architecture/integration/P02_RUNTIME.md). All original shared phase gates below still apply; the diagnostic room does not complete Suhita's map/scene work.
 
 ## Inputs
 

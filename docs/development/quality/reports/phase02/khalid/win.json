@@ -1,0 +1,26 @@
+{
+  "diagnostic": "p02-contact-room",
+  "event_counts": {
+    "ACTION_ACCEPTED": 27,
+    "ACTOR_MOVED": 216,
+    "CORE_TAKEN": 1,
+    "LOCKDOWN_STARTED": 1,
+    "MISSION_ENDED": 1,
+    "NOISE_CREATED": 19
+  },
+  "frames": 90,
+  "mission_end": {
+    "capture_by": null,
+    "elapsed_ticks": 243,
+    "operative_id": "operative",
+    "outcome": "WIN"
+  },
+  "paused_frames": 3,
+  "phase": "WON",
+  "restarts": 0,
+  "seed": 1042,
+  "simulation_steps": 243,
+  "state_hash": "bae3837ba0a6cb78d7b37bf732d323662ba54c82cb67f0471cc6d910af8c28f2",
+  "tick": 243,
+  "video_driver": "cocoa"
+}

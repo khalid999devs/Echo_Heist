@@ -1,6 +1,6 @@
 # Eight implementation phases
 
-P01 is DONE; P02-P08 are TODO. The user requires a complete functional initial draft after P08, within four development days. The earlier M0-M5 labels are retired for active implementation; EH task IDs remain as feature traceability anchors. Read the [runnable P01 handoff](../../tracking/handoffs/khalid/day_01/P01.md) before starting P02.
+P01 is DONE; P02 is IN_PROGRESS with Khalid's K1/K2 handed off; P03-P08 are TODO. The user requires a complete functional initial draft after P08, within four development days. The earlier M0-M5 labels are retired for active implementation; EH task IDs remain as feature traceability anchors. Read the [runnable P01 handoff](../../tracking/handoffs/khalid/day_01/P01.md) and [P02 core/input handoff](../../tracking/handoffs/khalid/day_01/P02.md) for actual interfaces.
 
 | Phase | Day | Specification | Prerequisite | Integrator |
 | --- | --- | --- | --- | --- |

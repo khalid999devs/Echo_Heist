@@ -1,6 +1,6 @@
 # Contract targets and implemented foundation
 
-Blueprint basis: pp. 5-17. P01 has implemented the immutable DTOs and diagnostic Simulation subset; its [actual interfaces and limitations](../tracking/handoffs/khalid/day_01/P01.md) are the integration baseline. The table below describes full-game targets, not a claim that mission/sensing/scoring systems are already implemented. Suhita and Khalid use the actual handoff from P02 onward.
+Blueprint basis: pp. 5-17. P01 established immutable DTOs; Khalid's [P02 handoff](../tracking/handoffs/khalid/day_01/P02.md) now records continuous motion, mission/capture/tools and input/presentation extensions. Use that exact implemented contract when integrating. The table below remains a full-game target; sensing/scoring and later systems are not inferred as complete.
 
 ## Simulation interfaces
 
@@ -18,7 +18,7 @@ RunResult also records distinct detection encounters, completion/stealth/pace su
 
 Action kinds follow the PDF: MOVE, WAIT, INTERACT, ECHO, EMP, MELEE, HIDE. Human E resolves to a stable interaction request for doors/core/hiding. Controller requests are validated centrally; illegal/expired requests consume no resource and produce a rejection reason for diagnostics. Define a bounded tick-validity window and deterministic priority for simultaneous requests during P01.
 
-Implemented P01 rule: an action must match its latest Observation.tick; multiple intents for one actor all reject, and actors resolve in stable ID order. The diagnostic accepts cardinal tile MOVE/WAIT only, increments a committed tick and emits typed events. Sprint, interactions/tools, continuous speed, sensing and terminal scoring remain assigned later behavior. Only individual Observation values go to controllers; StepResult/presentation snapshots stay with orchestration/UI.
+Implemented rule: an action must match its latest Observation.tick; multiple intents for one actor all reject, and actors resolve in stable ID order. P02 replaces the P01 tile fixture's motion with fixed-point normalized continuous motion/sprint, timed Core interaction, real initial tools, capture and unscored MissionEnd. GameRules is a public immutable config contract loaded explicitly by infrastructure. StepResult.terminal remains None until P06 scoring. Full sensing is P03. Only individual Observation values go to controllers; StepResult/presentation snapshots stay with orchestration/UI.
 
 The mission is INFILTRATE -> CORE_HELD/LOCKDOWN -> WIN, CAPTURED or ABORTED. Capture can also end infiltration. Aborted attempts are unsuccessful but labeled distinctly. Core theft assigns ownership, raises lockdown, emits CORE_TAKEN and changes objective atomically, exactly once. Only the actual carrier may extract. An Echo is a decoy entity with no inventory or mission authority.
 

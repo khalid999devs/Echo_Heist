@@ -1,5 +1,15 @@
 # Development changelog
 
+## 2026-10-18 - Khalid's P02 core gameplay and input handoff
+
+- Completed P02-K1/K2 on work/khalid-p02 through real incremental commits. Preserved app/bootstrap, Suhita's level/io, map resources and scene/render files; published the contract/file claim before implementation.
+- Added bundled validated gameplay rules/public config DTO, fixed-point normalized continuous movement/sprint, body collision/substeps/sliding, noise cadence, continuous theft/atomic lockdown, carrier-only extraction, unscored outcome/abort/terminal freeze, telegraphed contact capture and interrupt/tie precedence.
+- Implemented initial real Echo path/stock/lifetime/nonphysical authority, radial EMP disable/stock/noise and single-target melee/stun/recovery immunity. P03 guard perception and P05 environment/effect work remain separate; approved scoring is unchanged and deferred to its assigned P06 implementation.
+- Added remappable event-to-action input, focus/pause/UI requests and own-observation objective/interaction presentation. Added an explicitly diagnostic contact room without replacing the real game scene.
+- Structure/lint/format/strict types and 45 tests pass. Real Cocoa scripted input traces produce WIN at tick 243 with three paused frames and CAPTURED at tick 94; screenshots were inspected. Fixed the stale post-terminal capture warning/ring found in that inspection.
+- Clean 789da10 native Mac build/extracted Cocoa smoke passes all eight assertions. Hosted run 39141181536 passes Linux, Windows x64 and Mac arm64 checks/native jobs. Native builds still use the foundation entry pending scene integration; no five-zone/AI/release acceptance claim was made.
+- Recorded the runnable P02 handoff and grouped QA summaries, released Khalid's claims, and left shared EH items/P02 IN_PROGRESS. Stopped at Khalid's slice boundary; no P03 or main merge.
+
 ## 2026-10-18 - Windows teammate startup handoff
 
 - Added Suhita's native Windows x64 PowerShell setup: clone, isolated owner branch, Python 3.13 provisioning, locked dependencies, source checks, desktop launch and Windows native build/smoke commands.

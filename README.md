@@ -2,7 +2,7 @@
 
 A Python + pygame-ce desktop stealth game with Human and autonomous Companion modes.
 
-Current development: **Phase 1 complete** (`0.1.0a1`). The window is a development shell; the full mission/game scenes belong to P02 onward. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
+Current development: **P01 complete; Khalid's P02 core/input slices complete** (`0.1.0a1`, work/khalid-p02). The full five-zone map and scenes await Suhita's integration. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
 
 ## Development setup
 
@@ -17,7 +17,15 @@ uv run --locked echo-heist --headless --seed 1042
 uv run --locked python scripts/checks/run.py
 ```
 
-The desktop loads packaged JSON/SVG resources, preserves aspect ratio on resize, and closes with Escape or the window close button. `--mute` skips audio initialization; unavailable audio devices also fall back silently. `--headless` runs a small seeded MOVE/WAIT diagnostic twice and prints its state/event hashes without importing pygame. These diagnostic tile moves are not the final mission physics.
+The standard desktop entry still opens the foundation shell until the scenes are integrated. It loads packaged resources, preserves aspect ratio on resize and closes with Escape/window close. `--mute` skips audio initialization; unavailable audio devices fall back silently. `--headless` repeats a small seeded continuous MOVE/WAIT diagnostic without importing pygame.
+
+Try Khalid's real input/mission rules in the explicitly diagnostic contact room:
+
+```sh
+uv run --locked python -m echo_heist.diagnostics.human_preview
+```
+
+WASD/arrows move, Shift sprints, hold E near the yellow Core then return to the green Entry marker. Q deploys Echo, F uses EMP, Space melees one reachable guard; Escape pauses and R retries. The guard is stationary for capture testing. See the [P02 owner handoff](docs/development/tracking/handoffs/khalid/day_01/P02.md) for exact contracts, tests and Suhita's integration steps. This room is separate from her five-zone scene.
 
 For an isolated window check:
 

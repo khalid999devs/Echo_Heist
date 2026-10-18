@@ -1,6 +1,6 @@
 # P02 runtime integration: Khalid -> Suhita
 
-Owner: Khalid; work/khalid-p02. Initial status: implementation in progress. Read the final P02 owner handoff for actual verification before relying on completion. This narrow contract is published before implementation to expose shared-file changes while both owners work independently.
+Owner: Khalid; work/khalid-p02. Status: P02-K1/K2 DONE; full P02 awaits Suhita integration. This narrow contract was published before implementation to expose shared-file changes. The [actual P02 handoff](../../tracking/handoffs/khalid/day_01/P02.md) now contains exact signatures, migration notes and verification.
 
 ## Ownership and composition
 
@@ -29,3 +29,5 @@ Echo/EMP/melee perform real initial effects and resource/range checks. Echo is a
 ## Consumer handoff
 
 Before integrating, read `tracking/handoffs/khalid/day_01/P02.md` when present, inspect the branch diff and use the actual signatures/examples there. Full P02 stays open until both owners' work and the combined Human win/capture/pause/retry gate pass. Khalid stops at P02-K1/K2.
+
+Implemented configuration type: `core/contracts/config/gameplay.py:GameRules`; `Simulation(world_map, spawns, *, rules, mission=None, seed=1042)`. `step(actions=(), *, abort=False)` returns StepResult with unscored mission_end. `HumanInput.feed(events)` returns separate PAUSE/FOCUS_LOST/OBJECTIVE/LAB/QUIT requests; `action_for(own_observation)` supplies one intent per tick. Scene owner handles pause/focus explicitly and runs no ticks while paused.

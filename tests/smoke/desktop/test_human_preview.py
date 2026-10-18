@@ -49,6 +49,8 @@ def exercise(output: Path, *, scenario: str = "win") -> dict[str, object]:
     else:
         assert report["phase"] == "WON", report
         assert report["paused_frames"] == 3, report
+        # Three paused render frames must contribute zero simulation ticks.
+        assert report["tick"] == report["simulation_steps"] == 243, report
         assert report["event_counts"]["CORE_TAKEN"] == 1
         assert report["event_counts"]["LOCKDOWN_STARTED"] == 1
     assert report["event_counts"]["MISSION_ENDED"] == 1

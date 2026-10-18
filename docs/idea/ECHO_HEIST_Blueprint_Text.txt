@@ -1,0 +1,1348 @@
+       2D / TOP-DOWN / SCI-FI STEALTH / AI vs AI
+
+
+
+
+       ECHO HEIST
+       The Core Rebellion
+       CHAPTER ONE / COMPLETE V1 DEVELOPMENT BLUEPRINT
+
+       Story, world, controls, AI architecture, Workshop,
+       production rules, test plan, and desktop release.
+
+
+
+
+  ONE CANONICAL MISSION                         TWO PLAYABLE MODES                    ONE EXPERIMENTAL LOOP
+  Infiltrate, steal the energy core,            Human vs AI or configurable           Build AI policy, deploy, inspect
+  survive mandatory lockdown, extract.          autonomous Companion vs NEXUS         failures, refine blocks, replay.
+                                                and guards.
+
+
+
+
+  Document purpose
+
+This document extends the approved five-page V1.1 proposal into a concrete implementation-oriented reference
+for two developers or a coding agent. It specifies scene flow, level topology, controls, perception, game-state
+transitions, agent algorithms, UI, data contracts, testing and release. It is not source code or a pixel-perfect map file.
+
+
+     STATUS / SOURCE BOUNDARIES
+   Approved baseline: single five-zone heist, first-launch Human / AI-vs-AI modes, autonomous configurable companion,
+   BFS, heuristic A*, fuzzy suspicion, minimax/alpha-beta, MCTS, NEXUS rules, Echo/EMP/melee, capture-based failure,
+   mandatory lockdown and itch.io release. New blueprint defaults: exact controls, timings, layout coordinates,
+   telemetry schemas, numerical weights and UI copy are proposed implementation choices; playtest and adjust them.
+
+
+
+  Where to start
+
+ READ FIRST                                IMPLEMENT NEXT                             VERIFY LAST
+
+ 02-05: story, world, art, controls        06-09: stealth and abilities               16-18: engine contracts and tests
+
+ 10-12: enemy decision systems             13-15: companion, MCTS, Workshop           19: build and publish checklist
+
+
+Scope: two developers | four-week target | Python + pygame-ce | GitHub source & gameplay video | free Windows/macOS
+builds on itch.io; Linux only if tested.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                              01 / 19
+ECHO HEIST              / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+01 / NARRATIVE SPECIFICATION
+
+
+Story, narrative and mission beats
+The entire story is delivered within one 10-20 minute successful run; dialogue is short, readable, and optional to skip.
+
+
+
+  Premise and cast
+
+NEXUS is the facility supervisory intelligence, a voice on displays and alarms rather than a boss that physically fights. It
+commandeered a high-security energy-research facility and sealed away an unstable experimental energy core. The
+intruder - either a human operative or an autonomous companion robot - must retrieve the core and exit through the
+original entry/extraction zone. Sentinels, Trackers and an Interceptor are its physical security agents.
+
+ BEAT / TRIGGER                  WHAT PLAYER SEES                                                  STATE EFFECT
+
+ 01 | ENTER                      Cold cyan doorway, floor markings, distant motor sounds.          Spawn at Entry; CORE_HELD=false;
+ Start run                       One-line mission directive; player gains control.                 LOCKDOWN=false.
+
+ 02 | INFILTRATE                 Service Wing cover and noisy objects; route branches into         Guards patrol and investigate. Local
+ Approach inner sectors          Security Control or Research Floor.                               alerts may rise and subside.
+
+ 03 | STEAL                      Energy core lifts from pedestal; charge ring drains; facility     Atomic event CORE_TAKEN; objective
+ Interact with core plinth       screens flicker.                                                  swaps to EXIT; possession=true.
+
+ 04 | LOCKDOWN                   Red warning strips, siren burst, bulkhead lights, NEXUS           Global security phase LOCKDOWN;
+ Immediately after theft         broadcast; patrols reassign.                                      alternate routes remain traversable.
+
+ 05 | EXTRACT                    Door beacon switches green; core leaves map with intruder;        WIN if and only if CORE_HELD and exit
+ Core-carrier at exit            results display.                                                  trigger reached uncaptured.
+
+
+
+  Short in-game narrative script (suggested copy)
+
+
+  OPENING & ALERT                                                          THEFT & EXTRACTION
+
+
+  At insertion                                                             At core theft
+  MISSION FEED: "NEXUS holds the core. Get in, recover it,                 NEXUS: "Critical asset displaced. Lockdown engaged."
+  return to extraction."
+                                                                           At win
+  First confirmed detection                                                MISSION FEED: "Core secured. Facility control lost."
+  NEXUS: "Intrusion confirmed. Units, secure the sector."
+
+
+
+
+     EPILOGUE / REPLICATION SEED
+   After the result, a brief diagnostic flickers: "Auxiliary archive: replication seed intact." NEXUS may return in Chapter
+   Two. The core theft remains a real victory; later playable attempts are tactical reconstructions, not repeated thefts in
+   canon.
+
+
+
+  Narrative guardrails
+
+    No mission two, boss battle, cutscene editor, lengthy text trees, collectible lore, or permanent death in V1.
+
+    The two modes tell the same story and use the same map/objectives; Companion wins are fully valid Chapter One
+    completions.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                          02 / 19
+ECHO HEIST           / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+02 / LEVEL SPECIFICATION
+
+
+Level topology and navigation design
+Use one connected Tiled map with two meaningful paths to and from the core; keep all routes physically readable.
+
+
+
+  Canonical five-zone layout
+
+
+
+                                                              SECURITY
+                                                              CONTROL
+
+  ENTRY                       SERVICE                                                            CORE
+  EXTRACTION                  WING                                                               CHAMBER
+
+                                                              RESEARCH
+                                                              FLOOR
+
+
+
+Map topology: Entry/Extraction connects to Service Wing; Service Wing branches into Security Control (upper) and Research
+Floor (lower); both reconnect near the Core Chamber. Add at least one narrow cross-link between the branches, gated only by
+patrol timing or simple door interaction, not a permanently locked puzzle.
+
+
+  Map implementation defaults - tune by playtest
+
+ PROPERTY                          STARTING VALUE / RULE
+
+ Coordinate model                  32 px logical collision tile; sample layout ~80 x 56 cells, camera follows operative. These are design
+                                   starting points, not a fixed production map.
+
+ Navigation                        4-neighbor, unit tile moves for BFS/A* graph; guard sprites smoothly interpolate between cell
+                                   centers. No diagonal corner-cutting.
+
+ Connectivity                      Every walkable navigation cell reachable from at least one valid branch; both branches allow return
+                                   to extraction after lockdown.
+
+ Guard roster                      2-3 Sentinels, 1-2 Trackers, 1 Interceptor = roughly 5-6 physical units. NEXUS is nonphysical.
+
+ Route character                   Security Control: shorter, exposed sightlines, chokepoints. Research Floor: longer, noisy props, more
+                                   cover.
+
+ Objective anchors                 SPAWN/EXIT and CORE_PLINTH typed map objects. They do not relocate between modes.
+
+
+
+  Essential world entities
+
+Walls (opaque and collidable); glass partitions (visibility and sound rules explicitly tagged); cover obstacles; marked hiding
+cabinets; doors and controlled passages; core plinth; exit; glass equipment rack; loose rolling canister; patrol waypoints;
+navigation sectors and tactical chokepoints; lighting overlays and security screens.
+
+
+
+     NO FAKE DIFFICULTY
+   Create meaningful route tradeoffs, not unavoidable traps. A cautious intruder must always have at least one navigable path
+   to the core and, during lockdown, back to extraction. A guard predicting a chokepoint should be a challenge, not a
+   guaranteed softlock.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                        03 / 19
+ECHO HEIST            / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+03 / ART + AUDIO BIBLE
+
+
+Scene direction, environment and mood
+The facility should feel like a compact, believable place - clean but uneasy before theft, hostile after lockdown.
+
+
+
+  Room-by-room scene art guide
+
+ ZONE                        SET DRESSING / MOOD                                             GAMEPLAY USE
+
+ Entry / Extraction          Sealed airlock, scratched metal floor, wall beacon, animated    Clear safe opening, tutorial hints without
+                             exit shutter, exterior rain sound beneath ventilation. Cyan     compulsory tutorial; visible final extraction
+                             mission display.                                                marker.
+
+ Service Wing                Pipes, stacked crates, ducts, maintenance strips, humming       First meaningful patrol timing; prop noise
+                             transformers, canister and cover recess. Haze at floor level.   and hiding demonstration.
+
+ Security Control            Wide scanner cones, glass control room, surveillance panels,    Shorter but more exposed corridor, one
+                             alert consoles, cable floor, red status panel.                  strong chokepoint for Interceptor.
+
+ Research Floor              Test benches, shattered glass rack, storage alcoves,            Safer-looking alternate route with accidental
+                             transparent test cells, cold monitors, irregular cover.         audio hazards; Tracker patrol.
+
+ Core Chamber                Tall containment ring, bright pulsing core pedestal,            Final objective interaction; scene-wide
+                             concentric floor markers, suspended cables and protective       alarm/color transition on taking core.
+                             shutters.
+
+
+
+  Visual language: readable stealth before spectacle
+
+
+  PHASE A / INFILTRATION                                                  PHASE B / LOCKDOWN
+
+
+  BEFORE THEFT                                                            AFTER THEFT
+  Graphite/navy infrastructure. Cyan and muted teal lights.               Emergency crimson strips and siren pulse over the same
+  Warm amber used only for suspicion, restricted access and               level. Existing navigation remains legible. Markers, cones
+  caution. Stationary security cameras, subtle screen glows.              and objective arrows work without relying solely on color.
+
+
+
+
+  Art asset and animation minimum
+
+   Operative and companion: idle, move (4 or 8 facings), hide, gadget, strike, carry-core indication, captured. Different
+   silhouettes, same hitbox.
+
+   Guards: Sentinel wide/slow, Tracker lean/mobile, Interceptor angular/heavy; idle, travel, scan, alert, stunned, grab.
+
+   Core pedestal: idle pulse, pickup flash, empty state. Echo: semi-transparent cyan ghost with trailing path; EMP: one
+   expanding electrical ring.
+
+   Environmental FX: glass fragments as short particles, rolling-canister sprite, cone overlay, footprints/markers optional; do
+   not build full real-time light engine.
+
+
+     SOUND IS GAMEPLAY DATA
+   Distinct cue families: footfalls / metal impact / glass break / electrical EMP / radio confirmation / alert siren / core resonance.
+   Each SFX that matters must correspond to an actual simulation NoiseEvent; cosmetic sounds must not secretly alert robots.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                           04 / 19
+ECHO HEIST            / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+04 / MOMENT-TO-MOMENT GAMEPLAY
+
+
+Player experience and action contract
+Both modes share the same simulation and objective. In Companion Mode the AI emits the same actions that human
+input would emit.
+
+
+
+     Default input scheme - configurable in settings
+
+ INPUT                      INTENDED ACTION                         RULE
+
+ WASD / arrows              Move in top-down world                  Normalized diagonal human movement; tile collision, no
+                                                                    phase-through walls.
+
+ Shift (hold)               Sprint                                  Faster but louder footsteps; no stamina meter in V1.
+
+ E                          Interact / enter or leave hiding        Requires range and line of interaction; use for core, doors, cabinets
+                                                                    and optional props.
+
+ Q                          Deploy Echo                             Uses one charge; spawns recent-path hologram.
+
+ F                          Activate EMP                            Uses the single charge if available; emits electrical signal.
+
+ Space                      Emergency melee                         Requires one reachable adjacent guard; short stun and strong noise.
+
+ Tab                        Objective summary                       Show destination and core-held status, not omniscient live enemy
+                                                                    positions.
+
+ Esc / F3                   Pause / AI Lab View                     F3 is a development or optional teaching overlay.
+
+
+
+     Fixed-step motion and camera
+
+Proposed: simulation 30 ticks/second; graphical rendering targets 60 frames/second with interpolation if convenient. Human
+speed ~2.2 tiles/s, sprint ~3.6 tiles/s; guards ~1.8-2.8 tiles/s by type. Keep units consistent and tune speeds against
+reaction/capture times. Follow player with smooth clamped camera; objective and threats remain readable at common laptop
+resolutions.
+
+
+     Main play loop
+
+
+  01                         02                                03                        04                            05
+ Observe vision,             Plan route and                Move, hide,                  React to reports               Extract or review
+ sound & sector              manage resources              distract or escape           and lockdown                   failure
+
+
+
+
+     Feedback without accidental omniscience
+
+     HUD: current objective, suspicion/confirmed alert indicator, Echo x3, EMP x1, carrying-core indicator and elapsed time.
+
+     On confirmed contact, display last-reported sector and a radio pulse; on sound, show subtle sound ripple only where
+     caused/observed.
+
+     For Companion Mode, camera follows robot; small decision ticker shows "HIDE / REPLAN / ECHO" plus an optional
+     explanation panel.
+
+     Pause menu exposes Resume, Restart, Settings, and Return to Menu; warning before discarding an active run.
+
+
+       NO FORCED TUTORIAL
+     First launch may show 2-3 short contextual hints near the Entry Wing. Both Human and AI vs AI can be selected from the
+     main menu immediately. The AI Workshop does not require prior human success.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                           05 / 19
+ECHO HEIST            / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+05 / STATE MACHINE + SENSING
+
+
+Stealth, suspicion, detection and capture
+Separate "something happened" from "I have identified the intruder." Discovery creates pursuit, not automatic defeat.
+
+
+
+  Detection states and transitions
+
+ STATE                          ENTRY CONDITION                                         BEHAVIOR / EXIT
+
+ PATROL                         Default: nothing relevant observed.                     Follow route; respond to sight and sound.
+
+ SUSPICIOUS                     Audible event, weak visual glimpse or unclear cue.      Turn/search toward cue; retain source with TTL. Sound
+                                                                                        alone never reports confirmed position.
+
+ SPOTTED                        Line of sight to actual intruder, identification        Show readable confirmation meter; hiding or cover
+                                progress increasing.                                    may interrupt before full confirmation.
+
+ DISCOVERED / CHASE             Identification threshold reached; near face-to-face     Transmit sighting with timestamp; pursue last known
+                                confirms rapidly.                                       actual position.
+
+ SEARCH                         LOS lost and chase reached last-known point.            Inspect plausible neighbor locations, then expire old
+                                                                                        report.
+
+ CAPTURE WIND-UP                Guard adjacent with valid contact and line of reach.    ~0.4 s telegraphed grab; successful interrupt/escape
+                                                                                        cancels. Completed grab ends run.
+
+ RETURN / LOCKDOWN              Search expires; or global core alarm triggers.          Restore patrol or move to defensible post while
+                                                                                        preserving fairness.
+
+
+
+  Sensing rules, timing defaults
+
+   Sight: cone angle and range differ by guard type; raycast grid walls / tagged solid occluders. Detection rises only while
+   actual intruder is visibly identified.
+
+   Sound: NoiseEvent(position, radius, kind, tick) notifies only guards in acoustic reach; path occlusion may reduce range.
+   Investigate source, not actor coordinates.
+
+   Fuzzy suspicion produces investigation urgency from hearing and partial visibility; confirmed identity additionally needs
+   actual line of sight.
+
+   Memory: record last actual sighting and its age; old locations lose confidence. Reports carry a source, sector, observed
+   position and timestamp.
+
+   Hiding: explicit cabinet/cove sets concealment when not currently witnessed; a guard seeing entry can search that specific
+   hide spot.
+
+
+  Failure, alert and pressure - separate concepts
+
+
+  RECOVERABLE DISCOVERY                                                      MANDATORY PLOT EVENT
+
+
+  LOCAL SECURITY ALERT                                                       GLOBAL CORE LOCKDOWN
+  Any confirmed pre-theft sighting can cause pursuit and                     Atomic CORE_TAKEN event guarantees facility-wide red
+  local investigation. When contact is lost, search can cool                 alert and revised patrol assignments. Never equate this
+  down; it does not trigger permanent lockdown.                              with defeat or close off every escape route.
+
+
+
+
+     EXACT WIN / LOSE CONTRACT
+   WIN requires possession of the energy core and reaching the Entry extraction trigger. LOSS occurs only after a robot
+   completes capture, or on voluntary abort. Being spotted, surrounded, noisy, out of gadgets, or in lockdown is not by itself
+   failure.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                              06 / 19
+ECHO HEIST               / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+06 / ENVIRONMENTAL LOGIC
+
+
+Interactive level objects and noise engine
+A small number of reliable interactions should create emergent decisions. Avoid complex rigid-body physics.
+
+
+
+  World object contracts
+
+ OBJECT                            ACTION / TRIGGER                                PHYSICS / AI EFFECT
+
+ Hide cabinet / recess             Interact E while within ~1 tile. Exit by E or   Conceal if entry unseen; if observed entering, guards
+                                   move.                                           remember container ID and may inspect.
+
+ Loose canister                    Collision, bump or optional interact.           Scripted roll/slide for 0.4-1 s, collision stop, emit
+                                                                                   METAL_CLANG centered on final impact.
+
+ Glass equipment rack              Collision at sprint speed or explicit           One-time state INTACT -> SHATTERED; glass SFX/particles
+                                   interaction.                                    and GLASS_BREAK sound event.
+
+ Door / bulkhead                   Interact at marked hotspot; optional            Changes walkable/LOS grid together; path caches
+                                   auto-open on approach.                          invalidated. Lockdown must leave exit graph valid.
+
+ Core plinth                       Interact when in valid range; progress ~0.8     CORE_TAKEN event exactly once; set inventory, alert,
+                                   s proposed.                                     visual phase and extraction goal atomically.
+
+ Exit zone                         Cross activation marker with core in            Mission WIN; no success if core not yet recovered.
+                                   possession.
+
+
+
+  NoiseEvent and investigation example
+
+
+   SOUND SYSTEM CONTRACT
+   NoiseEvent {id, kind, tile, radius_tiles, tick, source_visible?}
+   create(event): if sound is gameplay-relevant, enqueue once
+   for each guard: hear(event) iff acoustic_distance <= radius
+   heard_guard.memory.last_noise = event.tile; state = INVESTIGATE
+   # hearing reveals the noisy tile, NOT the intruder's hidden tile
+
+
+Suggested radii: walk 0-1, sprint 3, rolling canister 4, glass break 6, melee 6, EMP 5 tiles. These are balance defaults; visual
+sound ripples should match the actual detection radii. Guards may hear multiple events and prefer stronger/recent cues, but
+never invent the cause.
+
+
+  Collision, interaction and replay safety
+
+   Treat movement as collision queries against physics layers; use swept or substepped collision to avoid tunneling at sprint
+   speed.
+
+   Tag all interactables with stable IDs and persistent per-run state. Glass cannot "break twice" or emit duplicate alarms per
+   overlap frame.
+
+   Resolve interaction priority deterministically: closest valid object, tie-break by ID. Show an "E - Interact" hint on eligible
+   objects.
+
+   Echo decoy is an illusion object, not a second physical operative. It may attract sight but must never steal the core or
+   trigger exit.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                               07 / 19
+ECHO HEIST              / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+07 / STEALTH TOOL SPECIFICATION
+
+
+Echo, EMP, melee and encounter balancing
+Every emergency response buys time at a cost. Stealth is always the primary way to win.
+
+
+
+  Ability rules and exact initial parameters
+
+ ABILITY                       BEHAVIOR                                                     TRADEOFF / RESTRICTIONS
+
+ ECHO HOLOGRAM                 Store the operative path over last 2.5 s in a ring buffer.   Decoy can attract guards that see it or its effects;
+ 3 charges                     On Q, spawn cyan ghost that retraces it backward from        does not physically collide, hold core, erase radio
+                               current position.                                            reports, or grant invisibility.
+
+ EMP                           On F, electrical ring centered on intruder; robots within    Makes an electrical NoiseEvent; NEXUS can log a
+ 1 charge                      ~2.5 tile radius enter DISABLED for ~3 s.                    credible EMP event; charges do not regenerate in
+                                                                                            V1.
+
+ MELEE                         On Space at adjacent guard and valid timing, interrupt it    One target only; loud metallic impact. No HP,
+ unlimited action              and apply ~1.5 s STUNNED.                                    enemy damage, destruction, combo, or
+                                                                                            permanent knockouts.
+
+ BREAK LOS / HIDE              Move behind true occluder, use branch or enter marked        Not a magic reset: defenders retain fresh last
+ unlimited action              hide recess.                                                 sightings and may inspect an observed entry.
+
+
+
+  Behavior precedence and anti-exploit
+
+   A disabled/stunned guard cannot start or complete capture; cancel an in-progress grab if stun lands before capture
+   resolves.
+
+   After recovering from melee, a short stun immunity window (suggested ~2 s) stops infinite stunlock loops. Hitting it again
+   still emits noise.
+
+   Echo deception must be plausible: a Sentinel checks unusual motion via normal sight and may investigate the ghost
+   location; the ghost is not guaranteed to fool every observer.
+
+   Do not let melee eliminate robots, EMP recharge at checkpoints, or gadgets solve every encounter. Resource discipline
+   affects scores, not simple normal gadget use.
+
+
+  Encounter example: recoverable crisis
+
+At a narrow Research Corridor corner, the Tracker confirms the intruder. The intruder can turn back, retreat behind a rack,
+use one Echo, stun the Tracker at close range, or spend the EMP. Melee makes a clang audible to a Sentinel in the next
+room. If the intruder escapes line of sight, pursuit shifts into a last-seen-location search instead of magically tracking its new
+route.
+
+
+     BALANCE PRINCIPLE
+   First completion should feel earned; a cautious route exists, mistakes may be recovered from, and S rank is significantly
+   harder. Test for "fair but tense": no unavoidable capture on a blind corner, no all-powerful EMP, and no route that needs
+   perfect reflexes.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                              08 / 19
+ECHO HEIST            / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+08 / DEFENDER INTELLIGENCE - TYPE A
+
+
+Sentinel: BFS, FSM and fuzzy suspicion
+The Sentinel is a reliable patrol guard, not omniscient; fuzzy inference grades uncertainty and the FSM decides behavior.
+
+
+
+  Finite-state machine and patrol strategy
+
+
+  01                          02                              03                      04                            05
+ PATROL                       INVESTIGATE                     SPOTTED                 CHASE / SEARCH                RETURN
+ BFS to waypoint              last noise                      visual check            last known cell               BFS home
+
+
+
+Patrol uses BFS on the static unweighted 4-connected occupancy graph. Recompute after blocked doors or large detours, not
+every render frame. Patrol route and home waypoint are per-guard data. A high-confidence confirmed sighting triggers CHASE;
+otherwise hears, scans, and returns after investigation timeout.
+
+
+  Fuzzy Logic design - prototype inference
+
+ INPUT                               FUZZY SETS / EXAMPLE                    EFFECT
+
+ Visibility of cue                   none / partial / clear                  A partial glimpse raises suspicion but is not identity
+                                                                             confirmation.
+
+ Distance                            near / medium / far                     Closer uncertain cues should be investigated sooner.
+
+ Sound salience                      quiet / notable / loud                  Loud events justify investigation even with zero LOS.
+
+
+Use triangular/trapezoidal memberships in [0,1]. For an initial zero-order Sugeno model, compute each rule firing as
+min(input memberships), then weighted-average singleton outputs. Example output is an investigation urgency value in [0,1];
+use it to vary turn speed, approach urgency and SUSPICIOUS threshold. Keep the separate visual identification meter
+authoritative for confirmed detection.
+
+ FUZZY RULE                                                                                                              URGENCY
+
+ IF sound is loud AND distance is near, THEN investigate very strongly                                                   0.95
+
+ IF partial vision AND distance is near, THEN investigate strongly                                                       0.80
+
+ IF sound is notable AND distance is far, THEN investigate moderately                                                    0.45
+
+ IF no sight AND quiet sound, THEN maintain routine or weakly inspect                                                    0.10
+
+
+
+   FUZZY --> FSM BRIDGE
+   w_i = min(mu_visibility_i, mu_distance_i, mu_sound_i)
+   urgency = sum(w_i * output_i) / max(epsilon, sum(w_i))
+   if actual_visible_intruder: update_identification_meter(dt)
+   elif urgency >= investigate_threshold: investigate(cue_tile)
+   # sound/decoy only: NEVER fabricate confirmed intruder position
+
+
+
+
+       DEMO / TESTABLE BEHAVIOR
+   A glass break behind the wall causes investigation but not confirmed detection. A brief partial glimpse causes a slow
+   orientation response. Sustained close sight confirms rapidly. Log memberships, rule activations, urgency and FSM state for
+   Lab View.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                          09 / 19
+ECHO HEIST           / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+09 / DEFENDER INTELLIGENCE - TYPES B AND C
+
+
+Tracker and Interceptor algorithms
+The Tracker reacts to evidence; the Interceptor makes uncertain adversarial predictions over a small route graph.
+
+
+
+  Tracker - heuristic A* + last-seen memory
+
+The Tracker receives actual sightings and legitimate radio reports. When it sees the intruder, it A*-plans toward the visible tile.
+Once LOS breaks, it goes to its stored last-known location, inspects a few nearby feasible tiles, then returns when memory
+expires. Proposed memory TTL: ~5 s after last direct visual contact, extend only on fresh reports.
+
+
+   A* AND LIMITED MEMORY
+   g(start)=0; h(n)=abs(nx-gx)+abs(ny-gy)
+   f(n)=g(n)+h(n)                        # unit-cost Manhattan heuristic
+   if observed-danger routing: g += nonnegative exposure_penalty
+   on_los: remember(real_intruder_tile, now); state=CHASE
+   on_los_lost: pathfind(memory.tile); state=SEARCH
+   on_ttl_elapsed: lower confidence; state=RETURN
+
+
+Correctness: With 4-neighbor unit movement and nonnegative danger penalties, Manhattan x minimum-step-cost remains
+admissible. Never use unobserved intruder coordinates as an A* goal. Search for plausible neighbors rather than marching to the
+intruder through walls.
+
+
+  Interceptor - bounded minimax + alpha-beta pruning
+
+The Interceptor defends route-level chokepoints (Security Junction, Service Access, Research Return), not individual pixel
+positions. At a major sighting or lockdown, it considers 2-3 plausible intruder routes consistent with last-known evidence,
+compares possible block locations, and chooses a move minimizing the intruder's escape advantage. An incorrect hypothesis
+can lead it to the wrong post.
+
+ COMPONENT                        DESIGN
+
+ State abstraction                Small graph of sector gates, safe branches, core and extraction; annotate guard travel time.
+
+ Players in search                Intruder chooses plausible branch; Interceptor chooses block/post; alternate as adversarial choices.
+
+ Evaluation                       Prefer blocking likely exit/quick routes; punish slow unreachable intercepts and leaving all gates
+                                  unguarded.
+
+ Search budget                    Depth 2-3 initially; alpha-beta prunes dominated branches. Run on meaningful new reports, not every
+                                  frame.
+
+ Fairness                         Opponent intent is an estimated distribution, not hidden real future action. Guard must physically travel
+                                  to chosen post.
+
+
+
+   INTERCEPTOR DECISION
+   choose_post(reports):
+     candidate_routes = infer_plausible_routes(reports)
+     best_post = alphabeta(route_graph, depth=3, hypotheses=candidate_routes)
+     return a_star_route_to(best_post)       # physical movement, no teleport
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                           10 / 19
+ECHO HEIST              / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+10 / FACILITY DIRECTOR AI
+
+
+NEXUS: coordination, escalation and adaptation
+NEXUS is an adversarial director, not a physical guard, and does not need MCTS in V1.
+
+
+
+  Inputs, priorities and outputs
+
+ INPUT EVIDENCE                                  DECISION / EFFECT
+
+ Guard sees the intruder                         Record observed tile + time + source, raise local alarm, route nearby response.
+
+ Guard hears glass, metal, melee                 Assign one nearby available guard to investigate the event position.
+
+ A guard sees Echo / EMP use                     Log only observed event, potentially infer decoy tactics; do not know who is hidden
+                                                 afterward.
+
+ Energy core is taken                            Always trigger GLOBAL_LOCKDOWN once, play announcement, adjust patrol priorities.
+
+ No fresh contact                                Allow normal sector reports to decay; do not retain permanent perfect tracking.
+
+
+
+  Director utility priorities
+
+Compute coarse task scores such as protect exit, investigate credible alarm, guard core, support confirmed pursuit,
+and return to patrol. Example relative priorities: core-taken exit defense=100; direct fresh contact=80; strong unexplained
+noise=45; routine patrol=20. Avoid moving every guard to a single sound: cap dispatch counts and retain sector coverage.
+
+
+  NEXUS COORDINATION TICK / EVENT-DRIVEN
+  if first(CORE_TAKEN): set LOCKDOWN; broadcast_global_event()
+  tasks = score_tasks(permitted_event_log, mission_phase)
+  for task in stable_priority_order(tasks):
+       assign_eligible_guard(task, respecting_sector_coverage=True)
+  for each report: redact_any_unseen_world_information()
+  # Guard moves are physical; directives do not teleport robots.
+
+
+
+
+  Limited persistent countermeasures between attempts
+
+ ANNOUNCED PROTOCOL                 OBSERVED TRIGGER                       COUNTERPLAY
+
+ VERIFY ECHO                        Multiple witnessed Echo distractions   Sentinels inspect decoy signals more carefully; real hiding and
+                                                                           route choice still work.
+
+ REINFORCE ROUTE                    Repeated confirmed contacts on a       Move one guard patrol toward that sector; alternate corridor
+                                    route                                  remains open.
+
+ SPREAD FORMATION                   Evidence that grouped guards were      Widen patrol coverage while preserving gaps and sight/LOS
+                                    bypassed                               rules.
+
+
+
+
+     FAIR REPLAY TOGGLE
+   At most one evidence-backed protocol is active per later attempt; announce it before deployment. "Reset NEXUS Memory"
+   removes this adaptation for fixed-seed comparisons. It never learns the companion's workshop policy or hidden route
+   unless legitimately observed.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                        11 / 19
+ECHO HEIST              / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+11 / INTRUDER INTELLIGENCE ARCHITECTURE
+
+
+Companion AI: knowledge, FSM, utility and A*
+The robot can win on the very first launch, with no recorded human playthrough, scripted path or training prerequisite.
+
+
+
+  Preloaded knowledge vs working memory
+
+
+  STATIC KNOWLEDGE BASE                                                   DYNAMIC BELIEF / MEMORY
+
+
+  AT SPAWN - PUBLIC FACTS                                                 OBSERVED DURING RUN
+  Map geometry / traversable tiles, entry/exit, core location,            Visible guards and their facing, audible disturbances,
+  hiding points, gadget inventory, mission goals, rules and               last-seen contacts with age, perceived danger tiles,
+  current Workshop policy. It may know guard types, not                   reported alerts and NEXUS protocol; forget or discount old
+  hidden live locations.                                                  evidence.
+
+
+
+
+  Mission FSM and strategic choices
+
+
+ 01                                02                      03                            04                             05
+ INFILTRATE                        REACH CORE              TAKE CORE                     RETURN / EXTRACT               WIN or CAPTURE
+
+
+
+
+A single CompanionController chooses actions. The FSM defines phase and legal goal; utility logic handles immediate danger
+(break line of sight, interrupt a grab, conserve gadgets when safe); strategic MCTS selects among plans at important events;
+danger-aware heuristic A* converts the selected target into a traversable path. Every frame is not an expensive strategic
+search.
+
+ UTILITY FEATURE                                EXAMPLE WEIGHT / POLICY EFFECT
+
+ Threat / line-of-sight exposure                Cautious strategy assigns high penalty to exposed tiles and confirmed threat arcs.
+
+ Elapsed time / path length                     Bold/Rush strategy cares more about distance and fast extraction.
+
+ Gadget scarcity                                EMP is reserved for capture threats; Echo for plausible distractions.
+
+ Uncertainty / stale memory                     Old sightings become hypotheses with declining confidence, not hard obstacles.
+
+ Mode fairness                                  Same legal Action set, speed, collision rules and gadget stock as human operative.
+
+
+
+  Danger-aware A*
+
+
+   COMPANION NAVIGATION MODEL
+   path_cost(edge) = travel_cost + risk_weight * seen_risk(edge)
+   h(n) = Manhattan(n, target) * minimum_positive_step_cost
+   # only OBSERVED or conservatively inferred danger in seen_risk
+   # never query WorldState.hidden_guard_position()
+   replan when: guard observed, route blocked, new mission phase,
+                   MCTS changes tactical objective, or current path unsafe
+
+
+
+
+      IMPORTANT: NO AUTOMATIC TRAINING IN V1
+   The companion reasons from a built-in ruleset on the first attempt. You improve policies between attempts in the
+   Workshop; it does not retrain a neural network or automatically change its own persistent policy.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                         12 / 19
+ECHO HEIST            / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+12 / MONTE CARLO TREE SEARCH DESIGN
+
+
+Companion MCTS: a real bounded search
+Apply MCTS to choices at junctions or alert events, not to every pixel of movement.
+
+
+
+  Search model and action space
+
+A tactical state contains current zone, subgoal, resource counts, fresh sightings, coarse alert level, candidate passages, and
+whether the core is carried. Legal actions: advance, wait, hide, take alternate route, deploy Echo, retreat; add EMP or
+melee only when range and inventory make them legal. MCTS uses a small abstract facility graph and a belief model built
+from allowed observations.
+
+ MCTS STAGE                        V1 BEHAVIOR
+
+ Selection                         UCT: exploit estimated value plus exploration term c * sqrt(ln(parent visits) / child visits).
+
+ Expansion                         Add one legal strategic response not tried from the chosen node.
+
+ Rollout                           Simulate short 3-4 tactical transitions using approximate guard rules; unknown guards are sampled
+                                   from plausible hypotheses, not actual hidden positions.
+
+ Backpropagation                   Propagate normalized reward to the selected branch; retain visits and mean return.
+
+ Execution                         Choose a high-visit action, then use utility overrides and heuristic A* to execute it physically.
+
+
+
+  Decision budget and reward (proposed defaults)
+
+Start with 64 simulations per major decision, max depth 4 abstract moves; trigger on new sighting, route junction,
+objective transition or inability to progress. Avoid time-based nondeterministic search stops for comparable fixed-seed tests.
+Normalized trial reward: +100 extraction, +30 progress toward next objective, -100 capture, -25 confirmed detection, -5
+gadget cost, -small time cost; policy weights re-scale the risk/time terms.
+
+
+   MCTS STRATEGIC PLANNER
+   def strategic_mcts(observation, policy, seed):
+       root = make_belief_state(observation)         # never real hidden guards
+       for i in range(policy.simulations):         # e.g. 64
+             node = select_uct(root); child = expand_legal(node)
+             value = rollout_model(child, depth=4, rng=seeded_rng)
+             backpropagate(child, value)
+       return max(root.children, key=lambda a: a.visits).action
+
+
+
+
+  Proof of real MCTS use
+
+   Display chosen action, visit counts and mean rewards for at least three alternatives in AI Lab View.
+
+   Unit test legal action filtering, backpropagation changes to visits, fixed-seed repeatability and preference shifts from
+   Workshop weights.
+
+   Fallback if action becomes illegal due to a changed world state: retreat/wait safely, re-observe and re-plan.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                           13 / 19
+ECHO HEIST            / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+13 / USER-CONFIGURABLE INTELLIGENCE
+
+
+AI Workshop, presets and iteration
+The Workshop changes policy weights and legal tactical preferences; it is not a drag-and-drop programming language.
+
+
+
+  Screens and editable blocks
+
+ CONFIGURATION BLOCK              AVAILABLE CHOICES                             EFFECT ON DECISION ENGINE
+
+ Navigation                       Safest known / Balanced / Shortest            Changes A* risk cost and MCTS time-vs-risk reward.
+
+ Guard reaction                   Prioritize hide / Retreat+replan / Consider   Changes candidate-action ordering and tactical reward,
+                                  Echo                                          not world physics.
+
+ Emergency priority               Escape-first / Melee if adjacent / EMP if     Changes utility overrides and scarce-tool thresholds.
+                                  trapped
+
+ Risk tolerance                   Cautious / Balanced / Bold                    Scales risk, noise, uncertainty and time terms; clamp to
+                                                                                safe configuration bounds.
+
+
+
+  Starting presets: documented behavior, not secret buffs
+
+ PRESET                INITIAL BLOCK COMBINATION                                           TRADEOFF
+
+ GHOST                 Safest / Hide / Escape-first / Cautious                             Low detection but may be slow or trapped by
+                                                                                           conservative waiting.
+
+ BALANCED              Balanced / Retreat+replan / EMP if trapped / Balanced               Reacts flexibly; recommended baseline for
+                                                                                           tuning AI solvability.
+
+ RUSH                  Shortest / Consider Echo / Melee if adjacent / Bold                 Fast attempts with higher chance of contact,
+                                                                                           noise and capture.
+
+
+
+  Visible learn-by-testing loop
+
+
+ 01                          02                            03                         04                            05
+ Pick preset / edit         Deploy AI vs AI run            Watch meaningful          Read structured               Change policy &
+ blocks                                                    decisions                 report                        retry
+
+
+
+Sample report: "Captured at Research Junction; chose shortest exposed route after seeing Tracker; EMP still unused. MCTS
+preferred Advance (48 visits) over Retreat (11)." On retry, user changes Navigation to Safest and Guard Reaction to
+Retreat+replan. They can compare on the same seed with NEXUS memory reset to isolate policy changes.
+
+
+  Policy safety and persistence
+
+   Save named JSON profiles with an ID, preset base, four block fields, policy version and optional user label. Never allow
+   arbitrary executable code in config.
+
+   Validate allowed enum values and numerical weight bounds. Apply policy only to companion decision-making, not guard
+   HP, detection radius or map geometry.
+
+   Report outcome, elapsed time, detections, gadgets, capture cause/sector, observed threat, MCTS visits/action and policy
+   ID. Allow "Retry this seed" and "New challenge seed".
+
+
+      WHAT "TRAINING" MEANS HERE
+   The user performs manual iterative optimization. The robot does not persistently learn its own weights or train with ML/RL.
+   MCTS planning happens during each run; it is not persistent model training.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                            14 / 19
+ECHO HEIST            / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+14 / SCENE + UI SPECIFICATION
+
+
+Menus, game HUD and results interface
+Clear AI vs AI access is mandatory for the lab project; make Companion Mode visible before the first playthrough.
+
+
+
+  Scene graph and navigation
+
+
+  01                         02                         03                        04                          05
+ MAIN MENU                   MODE SELECT                WORKSHOP                 HEIST SCENE                  RESULT / RETRY
+                                                        (AI only)
+
+
+
+Main Menu shows Start Heist, AI Lab / Algorithm Guide, Settings and Quit. Mode Select prominently exposes Human vs AI and AI
+vs AI - Companion. Human starts at Entry immediately. AI mode opens Workshop, then a deploy action starts the same map.
+Both routes end at identical result screens.
+
+
+  Gameplay HUD reference (not final pixels)
+
+
+
+       OBJECTIVE: REACH CORE CHAMBER                                                                ECHO 3 | EMP 1 | 04:12
+
+
+
+
+                                                                                                SECURITY
+
+                                                                                                Suspicious
+
+                                                                                                Guard: Investigate
+
+                                                                                                F3: AI Lab View
+
+
+
+
+  Workshop and Results wireframe content
+
+
+  BEFORE THE RUN                                                    AFTER THE RUN
+
+
+  WORKSHOP PANEL                                                    RESULTS PANEL
+  Preset tabs: Ghost / Balanced / Rush. Four drop-down blocks;      WIN or CAPTURED; rank/achievement; time, detections,
+  policy summary, optional seed field, toggle Reset NEXUS           gadgets, location, decisive AI choice. Actions: Retry same
+  Memory. Large "Deploy Companion" CTA.                             seed / New seed / Edit Workshop / Menu.
+
+
+
+
+  Accessibility and responsive windows
+
+Render at a logical reference size (e.g. 1280x720), scale UI for 1366x768 and 1920x1080, preserve aspect ratio, and expose
+windowed/fullscreen mode. Add pause, separate music/SFX sliders, reduced flashing, legible status icons as well as color, and
+subtitles for critical NEXUS messages.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                     15 / 19
+ECHO HEIST           / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+15 / SYSTEMS DESIGN
+
+
+Engineering architecture and state machine
+Separate the deterministic simulation from rendering so AI experiments can run headlessly and real-time gameplay can
+share identical rules.
+
+
+
+  Runtime pipeline
+
+
+  01                        02                            03                             04                             05
+ WorldState                 Filter observations          Human or AI                     Fixed simulation               Event log + render
+                                                         Actions                         step
+
+
+
+A top-level GameController manages MENU / MODE / WORKSHOP / PLAY / RESULT / EPILOGUE. The headless Simulation owns
+physics, entity inventories, guard vision, noise, mission progress, alarms, score and win/fail evaluation. Pygame handles input,
+presentation, animation and audio. Controllers return structured actions; no controller can mutate the world directly.
+
+
+  Recommended Python package boundaries
+
+ DIRECTORY                             OWNERSHIP
+
+ game/core/                            WorldState, entities, collision, fixed_tick, events, observation filters, action validation, mission FSM,
+                                       scoring.
+
+ game/level/                           Tiled JSON importer, object layers, navigation grid, LOS occlusion, sector/chokepoint graph, path
+                                       caches.
+
+ game/ai/                              BFS, A*, fuzzy, memory, guards, alpha-beta, MCTS, NEXUS director, companion controller and
+                                       beliefs.
+
+ game/workshop/                        Policy enums, presets, validation, profile save/load, run comparison.
+
+ game/ui/                              Main menu, modes, workshop, HUD, result reports, Lab View, accessibility, camera and animation.
+
+ assets/ + data/                       Textures, sprite atlases, SFX/music, Tiled maps, dialogue and default config.
+
+ tests/ + scripts/                     Unit/integration tests, fixed-seed experiments, benchmark runner and platform packaging.
+
+
+
+  Deterministic tick order - all gameplay is resolved here
+
+
+   FIXED-TICK UPDATE CONTRACT
+   1. Read queued player input / AI choice from last Observation
+   2. Validate legality and resources; resolve movement + collisions
+   3. Execute interaction/ability actions; emit NoiseEvent/CORE_TAKEN
+   4. Update sensors (sight, acoustic reach) and memory
+   5. Update NEXUS orders, guard FSM and capture wind-ups
+   6. Evaluate global alert, mission win/loss, rank; append JSONL log
+   7. Render the committed state; deliver next filtered Observation
+
+
+
+
+       FAIRNESS / CODE REVIEW RULE
+   AI controllers receive immutable typed Observation objects; only Simulation has authoritative WorldState. MCTS rollout uses a
+   copy of the agent belief state, not a hidden clone of the real world. Make tests fail if controllers access forbidden fields.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                              16 / 19
+ECHO HEIST                / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+16 / IMPLEMENTABLE CONTRACTS
+
+
+Data schemas, Tiled objects and configuration
+Keep inputs explicit, serializable and testable; never hide gameplay constants in rendering code.
+
+
+
+  Core data interfaces (indicative JSON / Python fields)
+
+
+   DATA CONTRACTS
+   WorldState: tick, phase, actors[], grid, doors, core_held,
+                  noise_events[], guard_memories[], nexus_memory, seed
+   Observation: agent_id, tick, visible_entities[], heard_events[],
+                   shared_reports[], map_static, phase, own_status, inventory
+   Action: actor_id, kind[MOVE|WAIT|INTERACT|ECHO|EMP|MELEE|HIDE],
+            target_tile?, direction?, tick_issued
+   SecurityReport: source_guard, report_kind, tile, tick, confidence
+   RunResult: mode, seed, outcome, seconds, detections, gadgets,
+                policy_id?, capture_by?, sector?, grade, decisive_events[]
+
+
+
+
+  Suggested map object types and required properties
+
+ TILED LAYER / OBJECT                       FIELDS / SEMANTICS
+
+ Ground + Decor                             Render-only tile layers, optional foreground above actors.
+
+ Solid + Opaque                             Tile flags: movement_blocked, vision_blocked, sound_attenuation.
+
+ ZonePolygon                                id, name, ambience, sector_graph_node.
+
+ Spawn / Exit / Core                        Unique stable object IDs; core once-only interaction; win checks own core inventory.
+
+ HideSpot / Door / Prop                     type, collider, use_range, initial_state, sound_event_kind, animation_id.
+
+ PatrolPath / Chokepoint                    guard assignment and ordered nodes; interceptor abstract route node and links.
+
+
+
+  Sample AI Workshop policy file
+
+
+   VALIDATED CONFIG / EXAMPLE
+   {
+       "id": "custom_01", "base": "BALANCED", "policy_version": 1,
+       "navigation": "SAFEST", "guard_reaction": "RETREAT",
+       "emergency": "EMP_IF_TRAPPED", "risk": "CAUTIOUS",
+       "mcts_simulations": 64, "seed": 1042,
+       "reset_nexus_memory": true
+   }
+
+
+
+Persistence: settings.json, policies.json, run_history.json and JSONL telemetry in a user-writable application data directory. Do not
+write saves into read-only packaged application folders. Include deterministic schema versions and backward-safe defaults.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                       17 / 19
+ECHO HEIST              / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+17 / LAB EXPERIMENTS + ACCEPTANCE
+
+
+Scoring, algorithm evidence and quality gates
+Success must be measured as an autonomous adversarial game, not a scripted demonstration.
+
+
+
+  Outcome grading / proposed first tuning pass
+
+ COMPONENT                                  INITIAL SCORE RULE
+
+ Core extraction                            60 points only when core is held and extraction reached. Failure is always F.
+
+ Stealth                                    Up to 20: penalize confirmed detections and repeatedly unnecessary noisy confrontations, not
+                                            normal Echo use.
+
+ Elapsed time                               Up to 10: baseline curve from completed-run playtests; never a hard mission deadline.
+
+ Resource discipline                        Up to 10: reward avoiding needless EMP/melee; do not punish needed tactical Echo use by default.
+
+ Ranks / achievements                       S >=90, A >=75, B >=60, C otherwise on win. Ghost = no confirmed sighting; Speedrunner =
+                                            tested threshold; AI Master = Companion victory.
+
+
+
+  Concrete acceptance scenarios
+
+ TEST ID        GIVEN / WHEN                                                   REQUIRED RESULT
+
+ T01            Human mode and AI mode on fresh installation                   Both launch without prior success or unlock.
+
+ T02            Companion reaches core with no detected enemies                CORE_TAKEN once; lockdown; extraction objective.
+
+ T03            Guard hears glass behind opaque wall                           Investigate sound tile; no hidden-player coordinates or confirmed
+                                                                               contact.
+
+ T04            Intruder breaks line of sight after chase                      Tracker searches last seen tile; memory eventually expires.
+
+ T05            EMP during capture wind-up before resolution                   Guard disabled, grab canceled; resource consumed; noise emitted.
+
+ T06            Interceptor receives plausible route reports                   Minimax selects legal post; physically travels; alpha-beta nodes
+                                                                               logged.
+
+ T07            Seed fixed, NEXUS memory reset, policy changed                 Deterministic same-config replay; differing policies change
+                                                                               decisions in test scenarios.
+
+ T08            Core stolen, escape attempted without/with core                Lockdown occurs; only carrier extraction succeeds.
+
+
+
+  Academic evidence and experiments
+
+Run a reproducible fixed-seed suite (e.g. 20-30 scenarios covering patrol timings, chokepoints and observed threats) for
+Ghost/Balanced/Rush and one user-tuned policy. Compare win rate, time, detections, gadget spend, A* nodes/path cost, Sentinel
+fuzzy urgency values, MCTS action visits/rewards and alpha-beta evaluated/pruned nodes. Also compare minimax with pruning
+switched off on the same small tactical states.
+
+
+
+       NON-NEGOTIABLE PASS CONDITIONS
+   Two genuinely opposing AI sides; companion autonomous win and fail possible; legitimate observation limits; algorithms
+   actually executed and logged; meaningful Workshop variation; no impossible map; fair pursuit/capture; working result
+   screens; source and video ready for lab showcase.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                                 18 / 19
+ECHO HEIST            / THE CORE REBELLION | GAME DEVELOPMENT BLUEPRINT
+
+
+
+18 / PRODUCTION PLAN AND DEFINITION OF DONE
+
+
+Four-week execution, assets and release
+A practical handoff roadmap for two developers. Prioritize algorithm correctness and one playable mission over
+ornamental features.
+
+
+
+  Delivery milestones and ownership
+
+ WEEK                      DEVELOPER A / ENGINE + WORLD                               DEVELOPER B / AI + INTERFACE
+
+ 01                        Tiled map, collision, player, core/exit, noise, hiding,    Sentinel BFS/FSM, perception/observation API,
+ Playable heist            capture, lockdown; first packaged smoke test.              HUD/menu prototype, shared data contracts.
+
+ 02                        Headless deterministic runtime, logging, seeded            Companion FSM + heuristic A* + utility, Interceptor
+ AI vs AI active           replay, Tracker A*, movement/action validators.            minimax, NEXUS rules and two-mode UI.
+
+ 03                        Echo path buffer, EMP/melee, props, SFX/art,               Fuzzy membership rules, bounded MCTS, Workshop
+ AI proof + tools          capture/alert refinements and path bugs.                   presets, result report, Lab View metrics.
+
+ 04                        Balance gameplay, QA, capture demos, platform ZIPs         Verify algorithm telemetry, fixed-seed comparisons,
+ Ship                      and itch.io page.                                          README, GitHub tests, lab presentation/video.
+
+
+
+  Asset, platform and release checklist
+
+    Assets: 5-room tileset, 4 actor silhouettes, alert states, 2 prop sprites, energy-core VFX, Echo/EMP effects, 6-10 gameplay
+    SFX and one loopable ambience/music layer. Track CC0/permissive license and attribution in ASSETS.md.
+
+    Technology: Python + pygame-ce, Tiled JSON, pytest, deterministic seed runner, PyInstaller one-folder platform builds,
+    GitHub Actions where practical.
+
+    Desktop target: Windows x64 and macOS tested hardware; Linux x64 only if clean-machine-tested. Mac unsigned
+    Gatekeeper instructions in README.
+
+    GitHub: source, install/run guide, license/credits, screenshots, demo video, algorithm descriptions and test command.
+    itch.io: free ZIP files, concise pitch, controls and troubleshooting.
+
+
+  Scope control and final acceptance
+
+
+  OPTIONAL POLISH                                                            CORE IDENTITY
+
+
+  CUT FIRST IF LATE                                                          DO NOT CUT
+  Extra props, lighting upgrades, elaborate cinematics, extra                Complete start-to-extract heist, first-launch AI vs AI, real
+  sound layers, advanced Lab View visualizations, untested                   MCTS/fuzzy/A*/minimax usage, fair observation, Workshop
+  Linux package.                                                             impact, replayable seeded tests, win/fail flow.
+
+
+
+
+        BUILD COMPLETE WHEN
+   A new user can install the game, choose either mode, complete or fail the same Chapter One mission, understand why,
+   modify the autonomous companion, replay and compare strategies; the team can show real logged AI decisions and
+   submit a GitHub link plus gameplay video.
+
+
+
+
+ECHO HEIST / V1.2 / IMPLEMENTATION REFERENCE                                                                                            19 / 19
+

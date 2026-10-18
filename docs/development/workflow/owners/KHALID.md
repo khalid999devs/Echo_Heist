@@ -1,0 +1,34 @@
+# Khalid's agent guide
+
+Identity: Khalid, the project owner in this conversation. Focus: software architecture, system design, core/AI strategy and logic, with real input/diagnostics/result presentation work. Estimated workload: 80 of 160 points. P01 is entirely yours.
+
+Follow [startup/context retrieval](../START_HERE.md) and [code rules](../CODE_RULES.md). Check [Status](../../tracking/STATUS.md), [claims/handoffs](../../tracking/HANDOFFS.md) and your phase's prerequisite evidence before editing. No game source exists in the planning baseline.
+
+## Assigned queue
+
+| Phase | Your slices / points | Your result | Integrator |
+| --- | --- | --- | --- |
+| [P01](../../planning/phases/foundation/PHASE_01.md) | P01-K1 5; K2 4; K3 3 | Environment/structure/contracts/headless shell + visible bootstrap/native smoke | You |
+| [P02](../../planning/phases/foundation/PHASE_02.md) | P02-K1 6; K2 2 | Movement/mission/capture/basic tools + human input/objective presenter | Suhita |
+| [P03](../../planning/phases/intelligence/PHASE_03.md) | P03-K1 7; K2 6; K3 2 | Fair sensors/navigation/defenders/fuzzy/replay + live diagnostics | You |
+| [P04](../../planning/phases/intelligence/PHASE_04.md) | P04-K1 9; K2 3; K3 2 | Autonomous strategy/MCTS/minimax + decision presenter | You |
+| [P05](../../planning/phases/experience/PHASE_05.md) | P05-K1 5; K2 2 | Complete tools/capture ordering + tool input/HUD | Suhita |
+| [P06](../../planning/phases/experience/PHASE_06.md) | P06-K1 4; K2 2 | Approved scoring/encounters + score-breakdown presenter | Suhita |
+| [P07](../../planning/phases/delivery/PHASE_07.md) | P07-K1 5; K2 2; K3 2 | Fairness/replay/performance harness, accurate guide + diagnostics usability | You |
+| [P08](../../planning/phases/delivery/PHASE_08.md) | P08-K1 6; K2 3 | Native archives/manifests and complete functional/source handoff | You |
+
+The full slice prefix applies to abbreviated IDs in this table, for example P03-K2. Read the phase for exact file boundaries, source pages, dependencies and gate. Points include testing/handoff effort; avoid silently absorbing Suhita's assigned systems to save communication time.
+
+## Start now
+
+The next implementation work is P01-K1, then K2/K3. Read [initial setup](../INITIAL_SETUP.md), resolve the actual Python/dependency/native runner baseline, create the grouped repository and executable structure check, then produce the smallest real desktop/headless foundation. Keep root files within six; keep all authored files below 1,001 lines and tests under grouped `tests/`.
+
+Hand Suhita actual commands, import paths, map/action/scene/event interfaces and a known-good build. Do not leave her a documentation-only scaffold or require her to repair your environment setup. P02 integrates both owners on that foundation.
+
+## How to collaborate
+
+You own core strategy but do not own every backend module: Suhita owns map importing/validation, registry adapters, NEXUS/director protocols, environment object systems and profile/policy logic. Your simulation must invoke those systems through agreed data/actions rather than duplicating them.
+
+For your frontend slices, create the agreed adapter/presenter and give Suhita the connection point. Do not rewrite her scene architecture. For a shared contract change, update the contract and explain the consumer effect in the handoff before integration.
+
+When acting as integrator, inspect both slices, run relevant combined checks/playthroughs and reconcile shared task status. Completion evidence must be factual. Leave public platform claims/publishing pending until their actual gates pass. Any change to approved scoring rules must be proposed in chat and approved first.

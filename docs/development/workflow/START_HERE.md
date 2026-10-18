@@ -6,6 +6,7 @@ This is the operational entry point for either developer's coding agent. The goa
 
 - If the user/context identifies Khalid, or explicitly points to his guide, use [Khalid's queue](owners/KHALID.md).
 - If the user/context identifies Suhita, or explicitly points to her guide, use [Suhita's queue](owners/SUHITA.md).
+- Suhita's Windows x64 machine uses the [Windows setup/handoff](setup/WINDOWS_SUHITA.md); it includes clone/bootstrap commands and the P02 owner boundary.
 - Keep that identity for later messages such as "start", "continue" or "finish my part" in the same conversation. Do not ask repeatedly.
 - If no identity is available, read the plan/state without mutations and ask one concise identity question. Do not guess or claim the other developer's slice.
 

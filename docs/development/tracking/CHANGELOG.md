@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-10-18 - Windows teammate startup handoff
+
+- Added Suhita's native Windows x64 PowerShell setup: clone, isolated owner branch, Python 3.13 provisioning, locked dependencies, source checks, desktop launch and Windows native build/smoke commands.
+- Linked the guide from the owner/startup guides, README, development hub and actual P01 handoff. Recorded exact P02-S1/S2 scope, Khalid's retained simulation/input ownership, integration dependencies, verification/report paths and the stop boundary.
+- Kept P02 unclaimed/unstarted and Windows execution NOT_RUN until actual evidence arrives. No gameplay or dependency versions changed.
+
 ## 2026-10-18 - Phase 1 complete
 
 - Initialized local main and committed actual progress in short separate steps: planning, Python setup/checks, deterministic contracts/runtime, desktop/settings and native packaging/CI. No remote or publication was created.

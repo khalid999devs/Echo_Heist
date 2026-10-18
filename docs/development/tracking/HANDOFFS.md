@@ -2,6 +2,8 @@
 
 P01 is complete and handed off by Khalid. [Runnable handoff](handoffs/khalid/day_01/P01.md) contains actual commands/contracts and evidence. Suhita's first implementation phase is now ready: P02. The [phase specs](../planning/phases/README.md) define slices and [Backlog](BACKLOG.md) maps shared feature anchors.
 
+Suhita's Windows x64 bootstrap and branch workflow: [Windows setup/P02 handoff](../workflow/setup/WINDOWS_SUHITA.md). Prepared instructions are not a claim or implementation of P02-S1/S2; both remain unclaimed until her agent starts.
+
 ## Active claims
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |

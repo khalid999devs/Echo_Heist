@@ -6,6 +6,8 @@ Current development: **Phase 1 complete** (`0.1.0a1`). The window is a developme
 
 ## Development setup
 
+Suhita on Windows: use the [Windows setup and Phase 2 handoff](docs/development/workflow/setup/WINDOWS_SUHITA.md) for PowerShell commands, your work branch and assigned implementation boundaries.
+
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.13. The project requires that minor version; uv can provision it on your development machine when needed.
 
 ```sh

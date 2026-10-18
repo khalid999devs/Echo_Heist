@@ -44,6 +44,8 @@ Preserve approved gameplay requirements. The blueprint explicitly identifies con
 
 Current runnable baseline: [P01 handoff](tracking/handoffs/khalid/day_01/P01.md) and [verification](quality/reports/phase01/VERIFICATION.md). The installed package/headless diagnostic and native Apple Silicon smoke app work; this is not yet the playable mission. Windows execution and hosted CI remain NOT_RUN.
 
+Suhita's workstation entry: [Windows x64 setup and P02 handoff](workflow/setup/WINDOWS_SUHITA.md), including PowerShell clone/run/check/native-build commands and the P02-S1/S2 boundary.
+
 ## Tracking rules
 
 Use `TODO`, `IN_PROGRESS`, `BLOCKED`, and `DONE`. A task becomes DONE only when its acceptance condition is met and evidence is recorded. A plan or a compiled executable does not prove gameplay acceptance or platform support.

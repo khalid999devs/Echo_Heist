@@ -138,7 +138,17 @@ class HeistSession:
             self.simulation.observe(self.level.operative_id),
             ticks_per_second=self.simulation.ticks_per_second,
         )
-        draw_hud(canvas, view, self.zone_label(), self.fonts)
+        operative_tile = self.simulation.observe(self.level.operative_id).own_status.tile
+        if snapshot.mission_end is None:
+            draw_hud(
+                canvas,
+                view,
+                self.zone_label(),
+                self.fonts,
+                level=self.level,
+                operative_tile=operative_tile,
+                phase=snapshot.phase,
+            )
         if self.lab_note:
             note = "Algorithm Lab View arrives with P03 telemetry (F3 to close)"
             canvas.blit(self.fonts.small.render(note, True, theme.WARNING), (24, 160))

@@ -16,6 +16,33 @@ from echo_heist.infrastructure.resources import load_bootstrap_config, resource_
 from echo_heist.ui.scenes.flow import GameFlow
 
 
+def _logical_events(
+    events: list[pygame.event.Event],
+    window_size: tuple[int, int],
+    logical_size: tuple[int, int],
+) -> list[pygame.event.Event]:
+    """Translate pointer coordinates through the letterbox used for rendering."""
+    width, height = window_size
+    logical_width, logical_height = logical_size
+    scale = min(width / logical_width, height / logical_height)
+    rendered_width = max(1, int(logical_width * scale))
+    rendered_height = max(1, int(logical_height * scale))
+    offset_x = (width - rendered_width) // 2
+    offset_y = (height - rendered_height) // 2
+    mapped: list[pygame.event.Event] = []
+    for event in events:
+        if event.type not in (pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP):
+            mapped.append(event)
+            continue
+        x, y = event.pos
+        point = (
+            int((x - offset_x) * logical_width / rendered_width),
+            int((y - offset_y) * logical_height / rendered_height),
+        )
+        mapped.append(pygame.event.Event(event.type, {**event.dict, "pos": point}))
+    return mapped
+
+
 def run_desktop(
     data_dir: Path,
     *,
@@ -49,7 +76,9 @@ def run_desktop(
         clock = pygame.time.Clock()
         elapsed_ms = 0
         while flow.running:
-            flow.frame(pygame.event.get(), elapsed_ms)
+            logical_size = (config.logical_width, config.logical_height)
+            events = _logical_events(pygame.event.get(), screen.get_size(), logical_size)
+            flow.frame(events, elapsed_ms)
             flow.draw(canvas)
             width, height = screen.get_size()
             scale = min(width / config.logical_width, height / config.logical_height)

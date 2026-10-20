@@ -14,10 +14,16 @@ from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import build_map_surface
 from echo_heist.ui.scenes.heist import HeistRequest, HeistSession
 from echo_heist.ui.scenes.menus import (
+    LAUNCH_BUTTON,
     MODE_ITEMS,
+    RESULT_MENU,
+    RESULT_RETRY,
     TITLE_ITEMS,
     draw_menu,
     draw_results,
+    load_backdrop,
+    load_operative_portrait,
+    menu_hit,
     move_selection,
 )
 
@@ -50,6 +56,8 @@ class GameFlow:
         self.level = level or load_level()
         self.rules = rules or load_game_rules()
         self.fonts = Fonts()
+        self.backdrop = load_backdrop(view_size)
+        self.portrait = load_operative_portrait()
         self.map_surface = build_map_surface(self.level, self.fonts)
         self.scene = Scene.TITLE
         self.selected = 0
@@ -58,6 +66,7 @@ class GameFlow:
         self.session: HeistSession | None = None
         self.outcomes: Counter[str] = Counter()
         self.runs_started = 0
+        self.ambient_ms = 0
 
     def _start_run(self) -> None:
         self.session = HeistSession(
@@ -75,6 +84,7 @@ class GameFlow:
         self.scene, self.selected, self.notice = scene, 0, ""
 
     def frame(self, events: Sequence[pygame.event.Event], elapsed_ms: int) -> None:
+        self.ambient_ms += max(0, elapsed_ms)
         if self.scene == Scene.HEIST and self.session is not None:
             request = self.session.handle(events)
             if request == HeistRequest.QUIT:
@@ -97,6 +107,25 @@ class GameFlow:
                 self._key(event.key)
                 if not self.running or self.scene == Scene.HEIST:
                     return
+            elif event.type == pygame.MOUSEMOTION and self.scene in (Scene.TITLE, Scene.MODE):
+                hovered = menu_hit(self.scene.value, event.pos)
+                if hovered is not None:
+                    self.selected = hovered
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.scene == Scene.RESULTS:
+                    if RESULT_RETRY.collidepoint(event.pos):
+                        self._start_run()
+                    elif RESULT_MENU.collidepoint(event.pos):
+                        self._go(Scene.TITLE)
+                    return
+                if self.scene not in (Scene.TITLE, Scene.MODE):
+                    continue
+                clicked = menu_hit(self.scene.value, event.pos)
+                if clicked is not None:
+                    self.selected = clicked
+                    self._key(pygame.K_RETURN)
+                elif self.scene == Scene.MODE and LAUNCH_BUTTON.collidepoint(event.pos):
+                    self._key(pygame.K_RETURN)
 
     def _key(self, key: int) -> None:
         if self.scene == Scene.TITLE:
@@ -126,26 +155,31 @@ class GameFlow:
             draw_menu(
                 canvas,
                 self.fonts,
-                heading="Main menu",
-                items=TITLE_ITEMS,
+                self.backdrop,
+                self.portrait,
+                scene="TITLE",
                 selected=self.selected,
                 notice=self.notice,
-                footer="Up/Down select   Enter confirm   Esc quit",
+                clock_ms=self.ambient_ms,
             )
         elif self.scene == Scene.MODE:
             draw_menu(
                 canvas,
                 self.fonts,
-                heading=f"Choose mode  |  map {self.level.static_map.map_id}",
-                items=MODE_ITEMS,
+                self.backdrop,
+                self.portrait,
+                scene="MODE",
                 selected=self.selected,
                 notice=self.notice,
-                footer="Up/Down select   Enter start   Esc back",
+                clock_ms=self.ambient_ms,
             )
         elif self.session is not None:
             self.session.draw(canvas)
             end = self.session.mission_end
             if self.scene == Scene.RESULTS and end is not None:
+                canvas.fill((3, 12, 20))
+                crop = pygame.Rect(650, 0, 620, self.view_size[1])
+                canvas.blit(self.backdrop, (0, 0), crop)
                 draw_results(canvas, end, self.fonts, ticks_per_second=self.rules.simulation_hz)
 
     def report(self) -> dict[str, object]:

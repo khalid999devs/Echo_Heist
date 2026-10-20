@@ -1,4 +1,4 @@
-"""Draw the static five-zone map once, then actors/objects from each snapshot."""
+"""Detailed 2.5D facility rendering over Suhita's authoritative map geometry."""
 
 from math import pi
 
@@ -7,15 +7,9 @@ import pygame
 from echo_heist.core.contracts.results import PresentationSnapshot
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, ActorKind, MissionPhase
 from echo_heist.level.model import LevelData
-from echo_heist.ui.render import theme
+from echo_heist.ui.render import motifs, theme
 from echo_heist.ui.render.camera import Camera
 from echo_heist.ui.render.theme import Fonts
-
-GUARD_LABELS = {
-    ActorKind.SENTINEL: "Sentinel post",
-    ActorKind.TRACKER: "Tracker post",
-    ActorKind.INTERCEPTOR: "Interceptor post",
-}
 
 
 def to_pixels(position: tuple[int, int], tile_px: int) -> tuple[float, float]:
@@ -25,39 +19,151 @@ def to_pixels(position: tuple[int, int], tile_px: int) -> tuple[float, float]:
     )
 
 
+def _roof_tile(surface: pygame.Surface, rect: pygame.Rect, variant: int) -> None:
+    pygame.draw.rect(surface, (8, 19, 27), rect)
+    pygame.draw.line(surface, (21, 35, 44), rect.topleft, rect.topright, 1)
+    pygame.draw.line(surface, (15, 28, 36), rect.topleft, rect.bottomleft, 1)
+    if variant % 29 == 0:
+        rack = rect.inflate(-5, -4)
+        pygame.draw.rect(surface, (21, 36, 46), rack, border_radius=2)
+        pygame.draw.rect(surface, (57, 78, 87), rack, 1, border_radius=2)
+        for dy in (7, 12, 17, 22):
+            pygame.draw.line(
+                surface,
+                (7, 22, 31),
+                (rack.left + 3, rack.top + dy),
+                (rack.right - 3, rack.top + dy),
+                2,
+            )
+            pygame.draw.circle(
+                surface,
+                theme.ACCENT_DIM,
+                (rack.right - 5, rack.top + dy),
+                1,
+            )
+    elif variant % 13 == 0:
+        pygame.draw.rect(surface, (20, 42, 51), rect.inflate(-11, -10), 1)
+        pygame.draw.line(
+            surface,
+            (32, 73, 83),
+            (rect.left + 9, rect.top + 11),
+            (rect.right - 8, rect.top + 11),
+            1,
+        )
+
+
 def build_map_surface(level: LevelData, fonts: Fonts) -> pygame.Surface:
-    """Static layers only; they never change during a P02 run."""
+    """Prepaint the facility once; visual motifs never affect map collision tags."""
     world_map, size = level.static_map, level.static_map.tile_size_px
     surface = pygame.Surface((world_map.width * size, world_map.height * size))
     surface.fill(theme.BACKGROUND)
-    for x in range(world_map.width):
-        for y in range(world_map.height):
+    for y in range(world_map.height):
+        for x in range(world_map.width):
+            tile = (x, y)
             rect = pygame.Rect(x * size, y * size, size, size)
-            zone = level.zone_at((x, y))
-            if (x, y) in level.glass_tiles:
-                pygame.draw.rect(surface, theme.CORRIDOR_FLOOR, rect)
-                pygame.draw.rect(surface, theme.GLASS, rect.inflate(-size // 2, -4))
-            elif (x, y) in level.cover_tiles:
-                floor = theme.ZONE_FLOORS.get(zone.zone_id) if zone else None
-                pygame.draw.rect(surface, floor or theme.CORRIDOR_FLOOR, rect)
-                pygame.draw.rect(surface, theme.COVER, rect.inflate(-4, -4), border_radius=3)
-            elif world_map.can_walk((x, y)):
-                floor = theme.ZONE_FLOORS.get(zone.zone_id) if zone else None
-                pygame.draw.rect(surface, floor or theme.CORRIDOR_FLOOR, rect)
-                pygame.draw.rect(surface, theme.BACKGROUND, rect, 1)
-            elif any(
-                world_map.can_walk((x + dx, y + dy)) for dx in (-1, 0, 1) for dy in (-1, 0, 1)
-            ):
-                pygame.draw.rect(surface, theme.WALL, rect)
-                pygame.draw.rect(surface, theme.WALL_EDGE, rect, 1)
+            variant = (x * 73 + y * 37 + x * y * 3) & 255
+            zone = level.zone_at(tile)
+            zone_id = zone.zone_id if zone else None
+            if tile in level.glass_tiles:
+                motifs.glass_tile(surface, rect)
+            elif tile in level.cover_tiles:
+                motifs.cover_tile(surface, rect, variant)
+            elif world_map.can_walk(tile):
+                motifs.floor_tile(surface, rect, zone_id, variant)
+            else:
+                adjacent_walk = any(
+                    world_map.can_walk((x + dx, y + dy))
+                    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))
+                )
+                if adjacent_walk:
+                    motifs.wall_tile(
+                        surface,
+                        rect,
+                        edge=world_map.can_walk((x, y + 1)),
+                        beacon=(x + 2 * y) % 6 == 0,
+                    )
+                else:
+                    _roof_tile(surface, rect, variant)
     for marker in level.markers:
         if marker.kind == "HideSpot":
-            rect = pygame.Rect(marker.tile[0] * size, marker.tile[1] * size, size, size)
-            pygame.draw.rect(surface, theme.MUTED, rect.inflate(-10, -10), 1, border_radius=4)
+            x, y = marker.tile
+            rect = pygame.Rect(x * size + 7, y * size + 7, size - 14, size - 14)
+            pygame.draw.rect(surface, theme.ACCENT_DIM, rect, 1, border_radius=3)
+            pygame.draw.line(surface, theme.ACCENT_DIM, rect.topleft, rect.bottomright, 1)
+    for point in level.chokepoints:
+        x, y = point.tile
+        marker_rect = pygame.Rect(x * size + 6, y * size + 12, size - 12, 8)
+        pygame.draw.rect(surface, theme.WARNING, marker_rect, 1)
+        pygame.draw.line(
+            surface,
+            theme.WARNING,
+            marker_rect.topleft,
+            (marker_rect.left + 7, marker_rect.bottom),
+            2,
+        )
     for zone in level.zones:
-        label = fonts.small.render(zone.label.upper(), True, theme.MUTED)
-        surface.blit(label, (zone.left * size + 8, zone.top * size + 6))
+        center = (
+            int((zone.left + zone.width / 2) * size),
+            int((zone.top + zone.height / 2) * size),
+        )
+        color = (
+            theme.ACCENT
+            if zone.zone_id in ("entry", "research-floor", "core-chamber")
+            else theme.WARNING
+        )
+        motifs.light_pool(surface, center, color, min(185, max(90, zone.width * size // 3)))
+        position = (zone.left * size + 9, zone.top * size + 8)
+        title = fonts.small.render(zone.label.upper(), True, theme.MUTED)
+        badge = pygame.Surface((title.get_width() + 18, title.get_height() + 7), pygame.SRCALPHA)
+        badge.fill((3, 12, 20, 190))
+        surface.blit(badge, (position[0] - 7, position[1] - 3))
+        surface.blit(title, position)
     return surface
+
+
+def _anchor(
+    canvas: pygame.Surface,
+    tile: tuple[int, int],
+    size: int,
+    camera: Camera,
+    *,
+    kind: str,
+    active: bool,
+    pulse: float,
+    fonts: Fonts,
+    alert: bool = False,
+) -> None:
+    point = camera.to_screen(((tile[0] + 0.5) * size, (tile[1] + 0.5) * size))
+    color = theme.WARNING if kind == "CORE" else theme.ACCENT
+    if kind == "CORE" and not active:
+        color = theme.DANGER if alert else theme.DISABLED
+    motifs.beacon_glow(canvas, point, color, 48 if kind == "CORE" else 38, pulse)
+    if kind == "CORE":
+        pygame.draw.circle(canvas, (8, 27, 35), point, 16)
+        pygame.draw.circle(canvas, color, point, 13, 3)
+        if active:
+            pygame.draw.polygon(
+                canvas,
+                theme.TEXT,
+                (
+                    (point[0], point[1] - 9),
+                    (point[0] + 7, point[1]),
+                    (point[0], point[1] + 9),
+                    (point[0] - 7, point[1]),
+                ),
+            )
+    else:
+        pygame.draw.rect(canvas, (7, 28, 35), (point[0] - 11, point[1] - 11, 22, 22))
+        pygame.draw.rect(canvas, color, (point[0] - 11, point[1] - 11, 22, 22), 2)
+        pygame.draw.line(
+            canvas,
+            color,
+            (point[0] - 4, point[1]),
+            (point[0] + 5, point[1]),
+            2,
+        )
+    label = fonts.micro.render(kind, True, color)
+    canvas.blit(label, (point[0] - label.get_width() // 2, point[1] - 31))
 
 
 def draw_world(
@@ -73,50 +179,56 @@ def draw_world(
     canvas.fill(theme.BACKGROUND)
     canvas.blit(map_surface, camera.to_screen((0, 0)))
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
-
-    def tile_rect(tile: tuple[int, int], inset: int) -> pygame.Rect:
-        left, top = camera.to_screen((tile[0] * size, tile[1] * size))
-        return pygame.Rect(left, top, size, size).inflate(-inset, -inset)
-
-    lockdown = snapshot.phase == MissionPhase.LOCKDOWN
-    exit_rect = tile_rect(anchors[level.exit_id], 4)
-    exit_width = 3 + int(2 * pulse) if lockdown else 3
-    pygame.draw.rect(canvas, theme.ACCENT, exit_rect, exit_width, border_radius=4)
-    canvas.blit(fonts.small.render("EXIT", True, theme.ACCENT), exit_rect.move(-2, -18).topleft)
-    if snapshot.core_owner is None:
-        core = tile_rect(anchors[level.core_id], 8)
-        points = [core.midtop, core.midright, core.midbottom, core.midleft]
-        pygame.draw.polygon(canvas, theme.WARNING, points)
-        canvas.blit(fonts.small.render("CORE", True, theme.WARNING), core.move(-4, -20).topleft)
-    radius = max(6, size * 3 // 10)
+    _anchor(
+        canvas,
+        anchors[level.exit_id],
+        size,
+        camera,
+        kind="EXIT",
+        active=True,
+        pulse=pulse,
+        fonts=fonts,
+    )
+    _anchor(
+        canvas,
+        anchors[level.core_id],
+        size,
+        camera,
+        kind="CORE",
+        active=snapshot.core_owner is None,
+        alert=snapshot.phase == MissionPhase.LOCKDOWN,
+        pulse=pulse,
+        fonts=fonts,
+    )
     captures = {capture.target_id: capture for capture in snapshot.captures}
     for echo in snapshot.echoes:
         point = camera.to_screen(to_pixels(echo.position, size))
-        pygame.draw.circle(canvas, theme.OPERATIVE, point, radius, 2)
-    for actor in snapshot.actors:
-        if actor.position is None:
+        pygame.draw.circle(canvas, theme.ACCENT, point, 13, 2)
+        pygame.draw.circle(canvas, theme.ACCENT_DIM, point, 8, 1)
+    for entity in snapshot.actors:
+        if entity.position is None:
             continue
-        point = camera.to_screen(to_pixels(actor.position, size))
-        if actor.kind == ActorKind.OPERATIVE:
-            color = theme.OPERATIVE
-        elif actor.disabled:
-            color = theme.DISABLED
-        elif actor.stunned:
-            color = theme.WARNING
-        else:
-            color = theme.DANGER
-        pygame.draw.circle(canvas, color, point, radius)
-        if actor.actor_id == snapshot.core_owner:
-            pygame.draw.circle(canvas, theme.WARNING, point, radius // 2)
-        if actor.kind in GUARD_LABELS:
-            label = fonts.small.render(GUARD_LABELS[actor.kind], True, color)
-            canvas.blit(label, (point[0] - label.get_width() // 2, point[1] + radius + 2))
-        capture = captures.get(actor.actor_id)
+        point = camera.to_screen(to_pixels(entity.position, size))
+        if entity.kind == ActorKind.OPERATIVE:
+            motifs.light_pool(canvas, point, theme.ACCENT, 65)
+        motifs.actor(
+            canvas,
+            point,
+            entity.kind,
+            disabled=entity.disabled,
+            stunned=entity.stunned,
+            carries_core=entity.actor_id == snapshot.core_owner,
+            pulse=pulse,
+        )
+        capture = captures.get(entity.actor_id)
         if capture is not None:
-            done = 1 - capture.remaining_ticks / max(1, capture.total_ticks)
-            ring = pygame.Rect(0, 0, radius * 3, radius * 3)
+            progress = 1 - capture.remaining_ticks / max(1, capture.total_ticks)
+            ring = pygame.Rect(0, 0, 38, 38)
             ring.center = point
-            pygame.draw.arc(canvas, theme.WARNING, ring, pi / 2, pi / 2 + 2 * pi * done, 4)
-    if lockdown:
-        border = canvas.get_rect().inflate(-4, -4)
-        pygame.draw.rect(canvas, theme.DANGER, border, 3 + int(3 * pulse))
+            pygame.draw.arc(canvas, theme.WARNING, ring, pi / 2, pi / 2 + 2 * pi * progress, 4)
+        if entity.kind != ActorKind.OPERATIVE:
+            label = fonts.micro.render(entity.actor_id.upper(), True, theme.MUTED)
+            canvas.blit(label, (point[0] - label.get_width() // 2, point[1] + 14))
+    if snapshot.phase == MissionPhase.LOCKDOWN:
+        border = canvas.get_rect().inflate(-5, -5)
+        pygame.draw.rect(canvas, theme.DANGER, border, 2 + int(2 * pulse))

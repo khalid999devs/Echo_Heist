@@ -1,5 +1,30 @@
 # Development changelog
 
+## 2026-10-21 - Illustrated gameplay and movement review
+
+- Added original generated floor/bulkhead textures, six facility props and operative/robot frame strips. Walking, sprinting and facing follow committed actor movement; visual animation never changes collision or sensing.
+- Bundled Oxanium with its OFL notice, improved mouse feedback, objective direction, Core hold progress, route/control guide and event cues. Replaced review screenshots and recorded a short actual walk/sprint clip.
+- Structure, Ruff, strict types and 70 focused cases pass. Final clean native build and hosted checks are recorded in the combined verification report.
+- Kept glass breaking, doors, hiding and canisters in Phase 5 under the owner's explicit choice. Guard patrol/perception remains Phase 3.
+
+## 2026-10-20 - Integrated and refined Phase 2 Human mission
+
+- Retrieved Suhita's `work/suhita-p02` at `a98548a`, which already contains Khalid's four P02 commits. Retained her five-zone Tiled export, typed loader/validator, route tests and working scene composition; reviewed on a separate integration branch to preserve both owner branches.
+- Replaced the flat greybox presentation with a generated original 2.5D facility backdrop, operative dossier art, detailed map/actor motifs, readable objective/status/minimap, cinematic title/briefing/outcome screens and pointer input mapped through window letterboxing. Artwork is visual only; the Tiled map and Simulation remain authoritative.
+- Added real `GameFlow` integration cases for menu mouse input, pause freeze, same-seed retry, full Core theft/lockdown/extraction, capture and result navigation. The combined suite reaches 69 passing cases; core and approved scoring rules remain unchanged.
+- Ran native Cocoa source scene captures for title, briefing, gameplay, lockdown, win and capture and inspected all six. Ran a frozen macOS app smoke with packaged art/map, real Cocoa video, isolated settings and matching headless trace. The final artifact/hosted CI status is recorded in [verification](../quality/reports/phase02/integration/VERIFICATION.md).
+- Closed the P02 functional gate under the user's explicit integration direction. P03-P08, active patrol AI, Companion, Workshop, final score and interactive Windows release QA remain later work; no unrun platform check is marked PASS.
+
+## 2026-10-18 - Khalid's P02 core gameplay and input handoff
+
+- Completed P02-K1/K2 on work/khalid-p02 through real incremental commits. Preserved app/bootstrap, Suhita's level/io, map resources and scene/render files; published the contract/file claim before implementation.
+- Added bundled validated gameplay rules/public config DTO, fixed-point normalized continuous movement/sprint, body collision/substeps/sliding, noise cadence, continuous theft/atomic lockdown, carrier-only extraction, unscored outcome/abort/terminal freeze, telegraphed contact capture and interrupt/tie precedence.
+- Implemented initial real Echo path/stock/lifetime/nonphysical authority, radial EMP disable/stock/noise and single-target melee/stun/recovery immunity. P03 guard perception and P05 environment/effect work remain separate; approved scoring is unchanged and deferred to its assigned P06 implementation.
+- Added remappable event-to-action input, focus/pause/UI requests and own-observation objective/interaction presentation. Added an explicitly diagnostic contact room without replacing the real game scene.
+- Structure/lint/format/strict types and 45 tests pass. Real Cocoa scripted input traces produce WIN at tick 243 with three paused frames and CAPTURED at tick 94; screenshots were inspected. Fixed the stale post-terminal capture warning/ring found in that inspection.
+- Clean 789da10 native Mac build/extracted Cocoa smoke passes all eight assertions. Hosted run 39141181536 passes Linux, Windows x64 and Mac arm64 checks/native jobs. Native builds still use the foundation entry pending scene integration; no five-zone/AI/release acceptance claim was made.
+- Recorded the runnable P02 handoff and grouped QA summaries, released Khalid's claims, and left shared EH items/P02 IN_PROGRESS. Stopped at Khalid's slice boundary; no P03 or main merge.
+
 ## 2026-10-18 - Windows teammate startup handoff
 
 - Added Suhita's native Windows x64 PowerShell setup: clone, isolated owner branch, Python 3.13 provisioning, locked dependencies, source checks, desktop launch and Windows native build/smoke commands.

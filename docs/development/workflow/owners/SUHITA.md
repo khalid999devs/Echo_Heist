@@ -2,7 +2,7 @@
 
 Identity: Suhita. Focus: game scene/level architecture, visual composition, presentation and interface flow, with substantive map/NEXUS/environment/policy backend work. Estimated workload: 80 of 160 points. **P01 setup belongs entirely to Khalid.**
 
-Your workstation uses **Windows x64**. Start with the [Windows setup and P02 handoff](../setup/WINDOWS_SUHITA.md) for PowerShell clone/environment/check/build commands and your branch boundaries. The Mac app/ZIP is not your runnable Windows artifact. Windows outcomes must be recorded from actual runs.
+Your workstation uses **Windows x64**. The [Windows setup guide](../setup/WINDOWS_SUHITA.md) still supplies PowerShell environment/check/build commands; its original P02 startup instructions are historical. P02's [integrated baseline](../../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) is complete; P03-S1/S2/S3 are your next assigned slices. The Mac app/ZIP is not your runnable Windows artifact. Windows outcomes must be recorded from actual runs.
 
 On "start" in Suhita's context, retrieve [startup context](../START_HERE.md), [Status](../../tracking/STATUS.md), [claims/handoffs](../../tracking/HANDOFFS.md), [code rules](../CODE_RULES.md) and the earliest ready assigned phase below. Read that phase's source pages/contracts and Khalid's actual foundation handoff before implementation. Do not ask her to explain the whole idea again.
 

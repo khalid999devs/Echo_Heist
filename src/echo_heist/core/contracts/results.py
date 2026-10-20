@@ -5,13 +5,49 @@ from enum import StrEnum
 
 from echo_heist.core.contracts.events import GameEvent
 from echo_heist.core.contracts.observations import EntityView, Observation
-from echo_heist.core.contracts.world import MissionPhase, StaticMap
+from echo_heist.core.contracts.world import MissionPhase, Position, StaticMap, immutable_tile
 
 
 class RunOutcome(StrEnum):
     WIN = "WIN"
     CAPTURED = "CAPTURED"
     ABORTED = "ABORTED"
+
+
+@dataclass(frozen=True, slots=True)
+class MissionSpec:
+    operative_id: str
+    core_object_id: str
+    exit_object_id: str
+    mode: str = "HUMAN"
+
+
+@dataclass(frozen=True, slots=True)
+class MissionEnd:
+    """Unscored outcome; real RunResult scoring is added in P06."""
+
+    outcome: RunOutcome
+    elapsed_ticks: int
+    operative_id: str
+    capture_by: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class EchoView:
+    echo_id: str
+    position: Position
+    remaining_ticks: int
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "position", immutable_tile(self.position))
+
+
+@dataclass(frozen=True, slots=True)
+class CaptureView:
+    guard_id: str
+    target_id: str
+    remaining_ticks: int
+    total_ticks: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,6 +74,7 @@ class StepResult:
     events: tuple[GameEvent, ...]
     observations: tuple[Observation, ...]
     terminal: RunResult | None = None
+    mission_end: MissionEnd | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,3 +85,7 @@ class PresentationSnapshot:
     world_map: StaticMap
     actors: tuple[EntityView, ...]
     phase: MissionPhase
+    echoes: tuple[EchoView, ...] = ()
+    captures: tuple[CaptureView, ...] = ()
+    core_owner: str | None = None
+    mission_end: MissionEnd | None = None

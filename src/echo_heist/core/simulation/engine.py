@@ -1,8 +1,4 @@
-"""Fixed-tick foundation: diagnostic tile MOVE/WAIT, not final game physics.
-
-P02 adds continuous motion, mission rules and tools; P03 adds sensing. Until
-then other actors are deliberately absent from every controller observation.
-"""
+"""Authoritative fixed-step gameplay; pure values in, committed events out."""
 
 import json
 from collections import Counter
@@ -10,12 +6,31 @@ from collections.abc import Iterable
 from dataclasses import asdict
 from hashlib import sha256
 
+from echo_heist.core.abilities.tools import advance_echoes, tool_reason, use_tool
 from echo_heist.core.contracts.actions import Action, ActionKind
+from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind, GameEvent
-from echo_heist.core.contracts.observations import EntityView, Observation, OwnStatus
-from echo_heist.core.contracts.results import PresentationSnapshot, StepResult
-from echo_heist.core.contracts.world import SIMULATION_HZ, ActorSpawn, StaticMap
-from echo_heist.core.simulation.world import ActorState, WorldState
+from echo_heist.core.contracts.observations import Observation
+from echo_heist.core.contracts.results import (
+    MissionSpec,
+    PresentationSnapshot,
+    RunOutcome,
+    StepResult,
+)
+from echo_heist.core.contracts.world import ActorKind, ActorSpawn, Scalar, StaticMap, tile_center
+from echo_heist.core.simulation import views
+from echo_heist.core.simulation.systems.capture import update_captures
+from echo_heist.core.simulation.systems.mission import (
+    check_extraction,
+    end_mission,
+    interaction_reason,
+    mission_object,
+    update_theft,
+)
+from echo_heist.core.simulation.systems.motion import body_fits, move_actor, remember_paths
+from echo_heist.core.simulation.world import GUARD_KINDS, ActorState, WorldState
+
+TOOL_ACTIONS = frozenset({ActionKind.ECHO, ActionKind.EMP, ActionKind.MELEE})
 
 
 class Simulation:
@@ -24,26 +39,49 @@ class Simulation:
         world_map: StaticMap,
         spawns: tuple[ActorSpawn, ...],
         *,
+        rules: GameRules,
+        mission: MissionSpec | None = None,
         seed: int = 1042,
-        ticks_per_second: int = SIMULATION_HZ,
     ) -> None:
-        if ticks_per_second <= 0 or not spawns:
-            raise ValueError("A positive tick rate and at least one actor are required")
-        ids = {spawn.actor_id for spawn in spawns}
-        tiles = {spawn.tile for spawn in spawns}
-        if len(ids) != len(spawns) or len(tiles) != len(spawns):
+        if not spawns:
+            raise ValueError("At least one actor is required")
+        if len({spawn.actor_id for spawn in spawns}) != len(spawns) or len(
+            {spawn.tile for spawn in spawns}
+        ) != len(spawns):
             raise ValueError("Actor IDs and starting tiles must be unique")
-        if any(not world_map.can_walk(spawn.tile) for spawn in spawns):
-            raise ValueError("Actor spawn must be on a walkable map tile")
-        self._map = world_map
-        self._seed = seed
-        self._ticks_per_second = ticks_per_second
+        if any(
+            not body_fits(world_map, tile_center(spawn.tile), rules.actor_radius_units)
+            for spawn in spawns
+        ):
+            raise ValueError("Actor spawn must fit on a walkable map tile")
+        self._map, self._rules, self._mission, self._seed = world_map, rules, mission, seed
         self._world = WorldState(
             actors={
-                spawn.actor_id: ActorState(spawn.actor_id, spawn.kind, spawn.tile)
+                spawn.actor_id: ActorState(
+                    spawn.actor_id,
+                    spawn.kind,
+                    tile_center(spawn.tile),
+                    path=[tile_center(spawn.tile)],
+                )
                 for spawn in sorted(spawns, key=lambda value: value.actor_id)
             }
         )
+        if mission is not None:
+            actor = self._world.actors.get(mission.operative_id)
+            if actor is None or actor.kind not in (ActorKind.OPERATIVE, ActorKind.COMPANION):
+                raise ValueError("Mission operative must identify an intruder actor")
+            if mission.mode not in ("HUMAN", "COMPANION"):
+                raise ValueError("Unsupported mission mode")
+            core = mission_object(world_map, mission.core_object_id)
+            exit_object = mission_object(world_map, mission.exit_object_id)
+            if (
+                core.kind.lower() != "core"
+                or exit_object.kind.lower() != "exit"
+                or core.tile == exit_object.tile
+            ):
+                raise ValueError("Mission needs distinct Core and Exit anchors")
+            if not world_map.can_walk(exit_object.tile):
+                raise ValueError("Extraction marker must be walkable")
 
     @property
     def tick(self) -> int:
@@ -51,60 +89,89 @@ class Simulation:
 
     @property
     def ticks_per_second(self) -> int:
-        return self._ticks_per_second
+        return self._rules.simulation_hz
 
     def observe(self, actor_id: str) -> Observation:
-        actor = self._world.actors[actor_id]
-        return Observation(
-            agent_id=actor.actor_id,
-            tick=self.tick,
-            map_static=self._map,
-            phase=self._world.phase,
-            own_status=OwnStatus(actor.tile, actor.inventory),
-        )
+        return views.observe(self._world, self._map, self._rules, self._mission, actor_id)
 
     def presentation_snapshot(self) -> PresentationSnapshot:
-        return PresentationSnapshot(
-            tick=self.tick,
-            world_map=self._map,
-            actors=tuple(
-                EntityView(actor.actor_id, actor.kind, actor.tile)
-                for actor in self._world.actors.values()
-            ),
-            phase=self._world.phase,
-        )
+        return views.presentation(self._world, self._map, self._rules)
 
-    def step(self, actions: Iterable[Action] = ()) -> StepResult:
-        queued = tuple(actions)
+    def step(self, actions: Iterable[Action] = (), *, abort: bool = False) -> StepResult:
+        if self._world.mission_end is not None:
+            return self._result(())
+        queued = tuple(
+            sorted(actions, key=lambda action: (action.actor_id, action.kind.value, repr(action)))
+        )
         counts = Counter(action.actor_id for action in queued)
-        events: list[GameEvent] = []
-        for action in sorted(
-            queued, key=lambda value: (value.actor_id, value.kind.value, repr(value))
-        ):
+        rejected: list[tuple[Action, str]] = []
+        accepted: list[Action] = []
+        for action in queued:
             reason = self._rejection_reason(action, counts[action.actor_id])
-            if reason:
-                events.append(self._event(EventKind.ACTION_REJECTED, action, (("reason", reason),)))
-                continue
-            if action.kind == ActionKind.MOVE:
-                actor = self._world.actors[action.actor_id]
-                actor.tile = (
-                    actor.tile[0] + action.direction[0],
-                    actor.tile[1] + action.direction[1],
-                )
-                events.append(
-                    self._event(
-                        EventKind.ACTOR_MOVED,
-                        action,
-                        (("x", actor.tile[0]), ("y", actor.tile[1])),
-                    )
-                )
+            if reason is not None:
+                rejected.append((action, reason))
             else:
-                events.append(self._event(EventKind.ACTION_ACCEPTED, action))
+                accepted.append(action)
         self._world.tick += 1
+        events: list[GameEvent] = []
+
+        def emit(
+            kind: EventKind, actor_id: str, details: tuple[tuple[str, Scalar], ...] = ()
+        ) -> None:
+            events.append(
+                GameEvent(
+                    f"{self.tick}:{self._world.next_event_id}", self.tick, kind, actor_id, details
+                )
+            )
+            self._world.next_event_id += 1
+
+        if abort:
+            operative = (
+                self._mission.operative_id if self._mission else next(iter(self._world.actors))
+            )
+            end_mission(self._world, operative, RunOutcome.ABORTED, emit)
+            return self._result(tuple(events))
+        for actor in self._world.actors.values():
+            actor.traversed_tiles = (actor.tile,)
+        advance_echoes(self._world)
+        for action, reason in rejected:
+            emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
+        for action in accepted:
+            if action.kind == ActionKind.MOVE:
+                move_actor(self._world, self._map, self._rules, action, emit)
+            elif action.kind == ActionKind.WAIT:
+                emit(EventKind.ACTION_ACCEPTED, action.actor_id)
+        # Revalidate interaction/tool reach after ALL movements, before effects.
+        # Thus actor-ID ordering cannot make a distant melee hit after a guard moved.
+        interactions: list[Action] = []
+        for action in accepted:
+            if action.kind == ActionKind.INTERACT:
+                reason = interaction_reason(
+                    self._world, self._map, self._rules, self._mission, action
+                )
+                if reason is None:
+                    interactions.append(action)
+                else:
+                    emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
+            elif action.kind in TOOL_ACTIONS:
+                reason = tool_reason(self._world, self._map, self._rules, action)
+                if reason is None:
+                    use_tool(self._world, self._map, self._rules, action, emit)
+                else:
+                    emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
+        update_theft(self._world, self._rules, self._mission, tuple(interactions), emit)
+        # Tools precede capture; completed contact capture precedes extraction.
+        update_captures(self._world, self._map, self._rules, self._mission, emit)
+        check_extraction(self._world, self._map, self._mission, emit)
+        remember_paths(self._world, self._rules)
+        return self._result(tuple(events))
+
+    def _result(self, events: tuple[GameEvent, ...]) -> StepResult:
         return StepResult(
-            tick=self.tick,
-            events=tuple(events),
-            observations=tuple(self.observe(actor_id) for actor_id in self._world.actors),
+            self.tick,
+            events,
+            tuple(self.observe(actor_id) for actor_id in self._world.actors),
+            mission_end=self._world.mission_end,
         )
 
     def _rejection_reason(self, action: Action, count: int) -> str | None:
@@ -114,46 +181,45 @@ class Simulation:
             return "multiple_intents"
         if action.tick_issued != self.tick:
             return "stale_or_future_tick"
-        if action.kind not in (ActionKind.MOVE, ActionKind.WAIT):
-            return "not_available_in_foundation"
-        if action.target_id is not None or action.target_tile is not None or action.sprint:
-            return "unsupported_foundation_payload"
-        if action.kind == ActionKind.WAIT:
-            return None if action.direction == (0, 0) else "wait_has_direction"
-        if action.direction not in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-            return "foundation_requires_cardinal_move"
         actor = self._world.actors[action.actor_id]
-        target = actor.tile[0] + action.direction[0], actor.tile[1] + action.direction[1]
-        occupied = any(other.tile == target for other in self._world.actors.values())
-        if not self._map.can_walk(target) or occupied:
-            return "blocked"
-        return None
-
-    def _event(
-        self,
-        kind: EventKind,
-        action: Action,
-        details: tuple[tuple[str, str | int | float | bool | None], ...] = (),
-    ) -> GameEvent:
-        event = GameEvent(
-            event_id=f"{self.tick + 1}:{self._world.next_event_id}",
-            tick=self.tick + 1,
-            kind=kind,
-            actor_id=action.actor_id,
-            details=details,
-        )
-        self._world.next_event_id += 1
-        return event
+        if actor.incapacitated(self.tick + 1):
+            return "actor_incapacitated"
+        if action.target_tile is not None:
+            return "unsupported_target_tile"
+        if (
+            action.kind not in (ActionKind.INTERACT, ActionKind.MELEE)
+            and action.target_id is not None
+        ):
+            return "unexpected_target_id"
+        if action.kind == ActionKind.MOVE:
+            if any(value not in (-1, 0, 1) for value in action.direction) or action.direction == (
+                0,
+                0,
+            ):
+                return "invalid_direction"
+            if actor.kind in GUARD_KINDS and action.sprint:
+                return "guard_cannot_sprint"
+            return None
+        if action.direction != (0, 0) or action.sprint:
+            return "unexpected_movement_payload"
+        if action.kind == ActionKind.WAIT:
+            return None
+        if actor.kind in GUARD_KINDS:
+            return "intruder_only_action"
+        if action.kind == ActionKind.HIDE:
+            return "environment_system_not_connected"
+        if action.kind == ActionKind.INTERACT:
+            return interaction_reason(self._world, self._map, self._rules, self._mission, action)
+        return tool_reason(self._world, self._map, self._rules, action)
 
     def fingerprint(self) -> str:
-        """Privileged diagnostic hash; this method is not a controller input."""
+        """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 1,
+            "schema_version": 2,
             "seed": self._seed,
-            "tick": self.tick,
-            "ticks_per_second": self.ticks_per_second,
-            "phase": self._world.phase,
-            "event_count": self._world.next_event_id,
+            "rules": asdict(self._rules),
+            "mission": asdict(self._mission) if self._mission else None,
+            "world": asdict(self._world),
             "map": {
                 "id": self._map.map_id,
                 "width": self._map.width,
@@ -163,7 +229,6 @@ class Simulation:
                 "opaque": sorted(self._map.opaque_tiles),
                 "objects": [asdict(obj) for obj in self._map.objects],
             },
-            "actors": [asdict(actor) for actor in self._world.actors.values()],
         }
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False)
-        return sha256(canonical.encode("utf-8")).hexdigest()
+        return sha256(canonical.encode()).hexdigest()

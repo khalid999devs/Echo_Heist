@@ -5,13 +5,18 @@ import pytest
 
 from echo_heist.core.contracts.world import ActorKind, ActorSpawn, MapObject, StaticMap
 from echo_heist.core.simulation.engine import Simulation
+from echo_heist.infrastructure.resources import load_game_rules
 
 
 def test_unseen_actor_changes_do_not_change_permitted_observation() -> None:
     world = StaticMap("same-map", 8, 8)
     own = ActorSpawn("operative", (1, 1))
-    first = Simulation(world, (own, ActorSpawn("guard", (6, 6), ActorKind.SENTINEL)))
-    second = Simulation(world, (own, ActorSpawn("guard", (7, 6), ActorKind.SENTINEL)))
+    first = Simulation(
+        world, (own, ActorSpawn("guard", (6, 6), ActorKind.SENTINEL)), rules=load_game_rules()
+    )
+    second = Simulation(
+        world, (own, ActorSpawn("guard", (7, 6), ActorKind.SENTINEL)), rules=load_game_rules()
+    )
     assert first.observe("operative") == second.observe("operative")
     assert first.observe("operative").visible_entities == ()
     assert first.presentation_snapshot() != second.presentation_snapshot()

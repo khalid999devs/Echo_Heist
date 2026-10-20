@@ -2,7 +2,7 @@
 
 A Python + pygame-ce desktop stealth game with Human and autonomous Companion modes.
 
-Current development: **Phase 1 complete** (`0.1.0a1`). The window is a development shell; the full mission/game scenes belong to P02 onward. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
+Current development: **Phase 2 Human mission complete** (`0.1.0a1`). The five-zone facility, title/briefing/game/results flow, Core theft, lockdown, extraction, capture and basic tools are playable. Autonomous Companion, active guard sensing, Workshop and final scoring belong to later phases. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
 
 ## Development setup
 
@@ -17,7 +17,17 @@ uv run --locked echo-heist --headless --seed 1042
 uv run --locked python scripts/checks/run.py
 ```
 
-The desktop loads packaged JSON/SVG resources, preserves aspect ratio on resize, and closes with Escape or the window close button. `--mute` skips audio initialization; unavailable audio devices also fall back silently. `--headless` runs a small seeded MOVE/WAIT diagnostic twice and prints its state/event hashes without importing pygame. These diagnostic tile moves are not the final mission physics.
+The desktop entry opens the cinematic title, then a Human mission briefing and the actual five-zone heist. Select with mouse or arrows/Enter. In the mission, move with WASD/arrows, sprint with Shift, hold E near the Core, and return to the original Exit after lockdown. Q deploys Echo, F uses EMP, Space melees, Tab opens the route summary, and Escape pauses. Pause offers resume, same-seed retry and confirmed abort. Companion remains visibly unavailable until Phase 4.
+
+The window preserves aspect ratio on resize and maps mouse input through its letterbox. `--mute` skips audio initialization; unavailable audio devices fall back silently. `--headless` repeats the small seeded foundation diagnostic without importing pygame.
+
+The older diagnostic contact room is still available for focused core-rule inspection:
+
+```sh
+uv run --locked python -m echo_heist.diagnostics.human_preview
+```
+
+The five-zone mission has stationary guard posts for P02 capture testing; active patrol AI arrives in P03. See the [Phase 2 integration report](docs/development/quality/reports/phase02/integration/VERIFICATION.md) for actual map/scene checks and screenshots.
 
 For an isolated window check:
 
@@ -27,7 +37,7 @@ uv run --locked echo-heist --smoke-frames 12 --mute --data-dir .local/profile --
 
 Settings normally live in the OS user application-data folder (`Echo Heist`), never beside the executable. `--data-dir` overrides that location for checks. Invalid files are backed up before recovery; settings from a newer schema stay untouched. Test data/logs/builds are ignored by Git. Use `uv run --locked pytest` for the focused behavior suite; the combined check command also runs structure/lint/format/type checks.
 
-## Native foundation build
+## Native draft build
 
 On Apple Silicon macOS or Windows x64:
 
@@ -35,7 +45,7 @@ On Apple Silicon macOS or Windows x64:
 uv run --locked --all-extras python scripts/packaging/build.py
 ```
 
-On macOS this produces `dist/Echo Heist.app` and a platform ZIP. On Windows it produces `dist/EchoHeist/EchoHeist.exe` with its support folder and a platform ZIP. Keep the whole bundle/folder. The local macOS build is ad-hoc signed, not notarized. It is a foundation smoke artifact, not the finished game.
+On macOS this produces `dist/Echo Heist.app` and a platform ZIP. On Windows it produces `dist/EchoHeist/EchoHeist.exe` with its support folder and a platform ZIP. Keep the whole bundle/folder. The local macOS build is ad-hoc signed, not notarized. It contains the Phase 2 Human draft, not the finished V1 game.
 
 ```sh
 uv run --locked --all-extras python scripts/packaging/smoke.py "dist/Echo Heist.app" --mute
@@ -43,7 +53,7 @@ uv run --locked --all-extras python scripts/packaging/smoke.py "dist/Echo Heist.
 
 Use `dist/EchoHeist/EchoHeist.exe` on Windows. The smoke helper runs the frozen app from an unrelated directory, compares headless hashes and checks resources/settings. `--dummy-video` is available for CI and does not verify a real desktop. See [current Status](docs/development/tracking/STATUS.md) for hosted CI evidence. Windows wheel availability is verified; native Windows desktop QA remains pending.
 
-See the [P01 verification](docs/development/quality/reports/phase01/VERIFICATION.md) and [Suhita's runnable handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md). Both can begin their assigned P02 slices after reading those interfaces.
+See the [P01 handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md) and [Phase 2 evidence](docs/development/quality/reports/phase02/integration/VERIFICATION.md). P03-P08 remain in the development plan.
 
 ## Development plan
 

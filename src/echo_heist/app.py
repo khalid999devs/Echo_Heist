@@ -22,7 +22,7 @@ def _positive_int(value: str) -> int:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="ECHO HEIST Phase 1 foundation")
+    parser = argparse.ArgumentParser(description="ECHO HEIST desktop game")
     parser.add_argument("--version", action="version", version=__version__)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument(

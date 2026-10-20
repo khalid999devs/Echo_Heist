@@ -9,11 +9,14 @@ from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.world import ActorSpawn, StaticMap
 from echo_heist.core.simulation.engine import Simulation
 from echo_heist.core.simulation.randomness import seeded_rng
+from echo_heist.infrastructure.resources import load_game_rules
 
 
 def run_fixture(seed: int = 1042) -> dict[str, object]:
     world_map = StaticMap("foundation-diagnostic", 4, 4, frozenset({(3, 3)}))
-    simulation = Simulation(world_map, (ActorSpawn("operative", (0, 0)),), seed=seed)
+    simulation = Simulation(
+        world_map, (ActorSpawn("operative", (0, 0)),), rules=load_game_rules(), seed=seed
+    )
     trace: list[dict[str, object]] = []
     for direction in ((1, 0), (0, 1), (-1, 0), (0, -1), (0, 0)):
         kind = ActionKind.WAIT if direction == (0, 0) else ActionKind.MOVE
@@ -21,8 +24,8 @@ def run_fixture(seed: int = 1042) -> dict[str, object]:
         trace.extend(asdict(event) for event in result.events)
     canonical = json.dumps(trace, sort_keys=True, separators=(",", ":"))
     return {
-        "diagnostic": "phase-1-tile-fixture",
-        "schema_version": 1,
+        "diagnostic": "continuous-motion-fixture",
+        "schema_version": 2,
         "version": __version__,
         "seed": seed,
         "tick": simulation.tick,

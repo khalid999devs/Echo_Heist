@@ -1,17 +1,19 @@
 # Work claims and runnable handoffs
 
-P01 is complete and handed off by Khalid. [Runnable handoff](handoffs/khalid/day_01/P01.md) contains actual commands/contracts and evidence. Suhita's first implementation phase is now ready: P02. The [phase specs](../planning/phases/README.md) define slices and [Backlog](BACKLOG.md) maps shared feature anchors.
+P01 and P02 are complete. The [P01 handoff](handoffs/khalid/day_01/P01.md), [P02 integration handoff](handoffs/khalid/day_01/P02_INTEGRATION.md) and [phase specs](../planning/phases/README.md) define the accepted baseline and next owner slices. [Backlog](BACKLOG.md) maps shared feature anchors.
 
-Suhita's Windows x64 bootstrap and branch workflow: [Windows setup/P02 handoff](../workflow/setup/WINDOWS_SUHITA.md). Prepared instructions are not a claim or implementation of P02-S1/S2; both remain unclaimed until her agent starts.
+Suhita's original Windows x64 setup and branch workflow remain documented in [Windows setup](../workflow/setup/WINDOWS_SUHITA.md). Her `a98548a` source commit was accepted into the user-directed P02 integration review; she did not publish a separate P02 handoff or Windows interactive QA result on that branch.
 
 ## Active claims
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | None; P01 claims released | main; completed incremental commits | None | P01 done; P02-K1/K2 ready but unclaimed |
-| Suhita | None | None | None | P02-S1/S2 ready but unclaimed |
+| Khalid | None; P02-K1/K2 and user-directed integration review complete | work/khalid-p02 and work/p02-integration | None | P02 DONE; P03 not started |
+| Suhita | None; P02-S1/S2 technical work accepted in combined review | work/suhita-p02 at a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
+
+P02 integration boundary: [runtime contract](../architecture/integration/P02_RUNTIME.md). The original owner slices stayed separate; under the user's later explicit request Khalid reviewed/refined Suhita's scene/render files on a new integration branch. Her branch and authorship remain intact. `ui/presenters/objective.py` and `ui/input/human.py` continue to define the core/UI boundary.
 
 ## Claim protocol
 
@@ -28,6 +30,8 @@ Do not start a teammate agent or send external messages just because an owner is
 Create records only after real work under `tracking/handoffs/<owner>/day_01/`, `day_02/`, `day_03/`, or `day_04/`, using phase filenames such as `P02.md`. This keeps at most two normal phase records in each day directory. If a phase needs more than six records, group revisions under a subdirectory. Link the resulting evidence from Status/Backlog and this index.
 
 - [Khalid / Day 1 / P01](handoffs/khalid/day_01/P01.md): DONE; runnable foundation, native Apple Silicon smoke, actual contract map and next-owner instructions.
+- [Khalid / Day 1 / P02](handoffs/khalid/day_01/P02.md): original P02-K1/K2 handoff; core/tools/input/objective presenter, diagnostic native win/capture, 45 tests and three-platform CI at that time.
+- [Combined P02 integration](handoffs/khalid/day_01/P02_INTEGRATION.md): Suhita's map/loader/scene plus Khalid's core and final visual/flow review; full Human phase gate and next P03 contract.
 
 ## Handoff template
 

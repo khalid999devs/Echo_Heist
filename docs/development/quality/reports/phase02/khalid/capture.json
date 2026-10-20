@@ -1,0 +1,27 @@
+{
+  "diagnostic": "p02-contact-room",
+  "event_counts": {
+    "ACTION_ACCEPTED": 1,
+    "ACTION_REJECTED": 5,
+    "ACTOR_MOVED": 88,
+    "CAPTURE_COMPLETED": 1,
+    "CAPTURE_STARTED": 1,
+    "MISSION_ENDED": 1,
+    "NOISE_CREATED": 8
+  },
+  "frames": 90,
+  "mission_end": {
+    "capture_by": "contact-guard",
+    "elapsed_ticks": 94,
+    "operative_id": "operative",
+    "outcome": "CAPTURED"
+  },
+  "paused_frames": 0,
+  "phase": "CAPTURED",
+  "restarts": 0,
+  "seed": 1042,
+  "simulation_steps": 94,
+  "state_hash": "e5cc2be4295bf6adaf5547225b12227cfdbb34b1cb12f88129e1ca1f45bc137e",
+  "tick": 94,
+  "video_driver": "cocoa"
+}

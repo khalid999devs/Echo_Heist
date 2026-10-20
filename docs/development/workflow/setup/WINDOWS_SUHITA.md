@@ -1,5 +1,7 @@
 # Suhita: Windows setup and first implementation handoff
 
+Update 2026-10-20: the original P02 branch/start prompts below are historical. The [integrated P02 handoff](../../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) is the current gameplay baseline; read [Status](../../tracking/STATUS.md) before claiming P03 work. The PowerShell environment, build and smoke commands remain useful for Windows x64 checks.
+
 Prepared by Khalid on 2026-10-18. Repository: [khalid999devs/Echo_Heist](https://github.com/khalid999devs/Echo_Heist). Platform: **Windows x64**, using PowerShell and native Windows Python, not WSL. P01 is complete. Your first assignment is **P02-S1 and P02-S2**; P02-K1/K2 belong to Khalid. This guide prepares your workstation; it does not transfer P01 implementation ownership to you.
 
 The foundation now passes Windows x64 checks/native build/frozen smoke in hosted CI; see [actual GitHub evidence](../../quality/reports/phase01/GITHUB_CI.md). Its video driver was dummy, so your own interactive Windows desktop check remains necessary. That report links the downloadable Windows artifact too; use source for development.

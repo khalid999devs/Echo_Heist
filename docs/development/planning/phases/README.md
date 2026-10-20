@@ -1,11 +1,11 @@
 # Eight implementation phases
 
-P01 is DONE; P02-P08 are TODO. The user requires a complete functional initial draft after P08, within four development days. The earlier M0-M5 labels are retired for active implementation; EH task IDs remain as feature traceability anchors. Read the [runnable P01 handoff](../../tracking/handoffs/khalid/day_01/P01.md) before starting P02.
+P01 and P02 are DONE; P03-P08 are TODO. The user requires a complete functional initial draft after P08, within four development days. The earlier M0-M5 labels are retired for active implementation; EH task IDs remain as feature traceability anchors. Read the [runnable P02 integration handoff](../../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) for the current baseline.
 
 | Phase | Day | Specification | Prerequisite | Integrator |
 | --- | --- | --- | --- | --- |
 | P01 | 1 | [Environment and foundation](foundation/PHASE_01.md) | Planning baseline | Khalid |
-| P02 | 1 | [Playable Human heist and scene](foundation/PHASE_02.md) | P01 | Suhita |
+| P02 | 1 | [Playable Human heist and scene](foundation/PHASE_02.md) | P01 | Suhita planned; Khalid final review by user direction |
 | P03 | 2 | [Fair perception and defenders](intelligence/PHASE_03.md) | P02 | Khalid |
 | P04 | 2 | [Companion strategy and NEXUS](intelligence/PHASE_04.md) | P03 | Khalid |
 | P05 | 3 | [Tools and environment](experience/PHASE_05.md) | P04 | Suhita |

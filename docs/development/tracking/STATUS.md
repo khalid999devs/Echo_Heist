@@ -1,15 +1,15 @@
 # Current development status
 
-Updated: 2026-10-18, Asia/Dhaka.
+Updated: 2026-10-20, Asia/Dhaka.
 
-Active target: complete working initial draft in **eight phases over four development days**. Day 1 implementation started on 2026-10-18. Owners: Khalid and Suhita; estimated allocation 80 points each. P01 is complete; P02-P08 remain unstarted. This assignment stops at the P01 boundary.
+Active target: complete working initial draft in **eight phases over four development days**. Day 1 implementation started on 2026-10-18. Owners: Khalid and Suhita; estimated allocation 80 points each. P01 and the complete Human P02 gate are DONE after user-directed integration review of Suhita's branch. P03-P08 remain pending.
 
 ## Eight-phase checkpoints
 
 | Day / phase | Target | Integrator | Actual status |
 | --- | --- | --- | --- |
 | 1 / P01 | Environment/filesystem/contracts/runnable shell; Khalid-only | Khalid | DONE |
-| 1 / P02 | Five-zone scene, complete Human loop and basic tools | Suhita | TODO |
+| 1 / P02 | Five-zone scene, complete Human loop and basic tools | Suhita planned; Khalid completed integration review | DONE; both owner slices accepted on actual map with Human win/capture/pause/retry evidence |
 | 2 / P03 | Fair sensors, active defenders, BFS/A*/fuzzy and replay | Khalid | TODO |
 | 2 / P04 | Autonomous Companion/MCTS, Interceptor/minimax and NEXUS | Khalid | TODO |
 | 3 / P05 | Complete tools/props and scene/audio feedback | Suhita | TODO |
@@ -29,19 +29,21 @@ Active target: complete working initial draft in **eight phases over four develo
 | Local Git/source package/dependencies | DONE | main with incremental commits; installed 0.1.0a1 package, Python 3.13.16 and real uv.lock |
 | GitHub source and teammate bootstrap | DONE | [Public repository](https://github.com/khalid999devs/Echo_Heist), main pushed with original history; fresh clone verified through 99a8658; [Windows handoff](../workflow/setup/WINDOWS_SUHITA.md) prepared |
 | P01 contracts/runtime/resources/settings | DONE | [Runnable handoff](handoffs/khalid/day_01/P01.md); pure headless diagnostic and actual desktop shell |
-| Gameplay / AI / Workshop | TODO | P01 shell only; mission, Tiled importer, AI and Workshop remain assigned later work |
-| Local automated checks | DONE | Structure/lint/format/strict types and 21 behavior/smoke cases pass; [verification](../quality/reports/phase01/VERIFICATION.md) |
-| Hosted CI | DONE | [Run 39136504276](https://github.com/khalid999devs/Echo_Heist/actions/runs/39136504276), a5d1400: all three jobs pass; checks/21 tests per runner, Windows x64 and Mac arm64 native builds/frozen dummy-video smoke; [evidence](../quality/reports/phase01/GITHUB_CI.md) |
-| P01 native packaging | DONE | Extracted arm64 .app passes eight real-Cocoa smoke checks locally; Windows x64 and Mac arm64 builds pass all eight hosted frozen smoke checks with dummy video |
+| P02 core gameplay/input | DONE | Continuous physics, mission/capture/initial tools, Human input and objective presenter; [owner handoff](handoffs/khalid/day_01/P02.md) |
+| P02 five-zone map/scene | DONE | Suhita's `a98548a` map/loader/flow retained; illustrated floor/bulkhead/props/actor strips and refined sci-fi UI; [integration verification](../quality/reports/phase02/integration/VERIFICATION.md) |
+| AI / Workshop / final scoring | TODO | P03-P06 deliver active defenders, autonomous Companion, complete tools/environment, Workshop and approved rank calculation |
+| Local automated checks | DONE | Structure/lint/format/strict types and **70** focused cases pass on the integrated candidate; [combined report](../quality/reports/phase02/integration/VERIFICATION.md) |
+| Hosted CI | DONE for P02 code candidate | Run [39503129521](https://github.com/khalid999devs/Echo_Heist/actions/runs/39503129521) passed Linux checks and Windows/macOS checks/native builds/frozen dummy-video smoke at `4b9cc49` |
+| Native packaging | DONE for P02 local macOS | Clean `4b9cc49` illustrated app and freshly extracted ZIP pass all eight real-Cocoa frozen smoke checks; exact archive/hash in the combined report |
 | V1 platform/hardware QA | NOT_RUN | Suhita's interactive Windows desktop/download QA, wider macOS/download behavior and full-game release matrix remain untested |
-| Assets and licensing | IN_PROGRESS | Original foundation SVG/JSON added; production assets and owner-selected source license still pending |
+| Assets and licensing | IN_PROGRESS | Original generated scene/tile/prop/actor art plus Oxanium/OFL recorded in [asset register](../assets/ASSETS.md); remaining production set and source license pending |
 | itch.io/video/submission | TODO | GitHub source is published; game distribution, gameplay video and academic submission are still pending |
 
-P01 completion is not game completion. The package, immutable contracts, diagnostic simulation, settings/resource services, desktop bootstrap, tests, checks and native packaging are real. No later-phase gameplay success or public platform release is claimed.
+P02 is a playable Human draft, not the full V1 game. The standard app launches the actual five-zone scene; P03-P08 and public-release gates remain separate. Outcomes are unscored until P06; guards are stationary P02 posts until P03. The 3D-style title art is an illustration; gameplay collision comes only from the validated Tiled map.
 
 ## Next action
 
-On the next P02 assignment, Khalid takes P02-K1/K2 and Suhita takes P02-S1/S2. Both read the [P01 handoff](handoffs/khalid/day_01/P01.md); Suhita integrates the five-zone scene and complete Human mission against Khalid's simulation/input. No owner claim is active now, and P02 has not started.
+P03 is the next Khalid assignment; start it under a new task from the integrated main baseline. Suhita's interactive Windows x64 check remains useful platform evidence and must not be represented as complete until run on her machine.
 
 ## Open inputs to resolve during development
 

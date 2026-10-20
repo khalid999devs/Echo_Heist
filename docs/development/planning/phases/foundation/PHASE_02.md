@@ -1,6 +1,8 @@
 # P02 - Complete Human loop and five-zone game scene
 
-Day 1, remainder. Integrator: **Suhita**. Effort: Khalid 8, Suhita 12. Status: TODO. Prerequisite: P01 foundation handoff. Feature anchors: EH-006, EH-007, EH-008, EH-011, EH-012 and initial EH-019. Source: PDF pp. 2-7, 15-17.
+Day 1 phase, completed on 2026-10-20. Planned integrator: **Suhita**; user-directed final integration/review: **Khalid**. Effort allocation remains Khalid 8, Suhita 12; integration review is recorded separately. Status: **DONE** for the P02 functional gate. Suhita's source commit `a98548a` includes Khalid's P02 branch; the combined map, scene, source/native checks and Human outcomes are recorded in [integration verification](../../../quality/reports/phase02/integration/VERIFICATION.md). Prerequisite: P01 foundation handoff. Feature anchors: EH-006, EH-007, EH-008, EH-011, EH-012 and initial EH-019. Source: PDF pp. 2-7, 15-17.
+
+Implemented core/input consumer reference: [Khalid's P02 handoff](../../../tracking/handoffs/khalid/day_01/P02.md) and [runtime contract](../../../architecture/integration/P02_RUNTIME.md). The actual five-zone scene is now the standard desktop entry. The diagnostic room remains separate.
 
 ## Inputs
 
@@ -30,3 +32,5 @@ Initial Echo/EMP/melee legality must be executable so P04 can plan legal tool ch
 - Both branches/cross-link and lockdown return connectivity validate; collision tags match scene boundaries.
 - Invalid maps and unreachable anchors fail clearly. Test collision/mission rules and importer validation with small fixtures, not cosmetic screen snapshots.
 - Suhita records map IDs/screens/loader schema; Khalid records legal actions/mission events. Integrate these on the same build and update both slice statuses before closing the phase.
+
+The [P02 integration handoff](../../../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) records Suhita's map IDs/schema, accepted branch files, real scene outcomes and review screenshots. Native Windows interactive QA remains a later platform check and is not implied by P02 completion.

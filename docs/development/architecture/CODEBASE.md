@@ -1,6 +1,6 @@
 # Codebase architecture and foundation baseline
 
-Blueprint basis: PDF pp. 16-17. P01 now implements the package/bootstrap, core contracts/simulation, explicit diagnostics, resources/settings IO, checks/tests and native packaging. The level loader, gameplay scenes, AI and Workshop remain planned. Read the [actual P01 API/handoff](../tracking/handoffs/khalid/day_01/P01.md) before extending these boundaries.
+Blueprint basis: PDF pp. 16-17. P01 implements package/bootstrap, immutable contracts, resources/settings, checks and native packaging. Khalid's [P02 owner work](../tracking/handoffs/khalid/day_01/P02.md) adds continuous core/mission/capture/tool rules and input/presenters; Suhita's map/loader/scene source was accepted in the [P02 integration review](../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md). AI and Workshop remain planned. Read actual handoffs before extending these boundaries.
 
 Required: follow [code rules](../workflow/CODE_RULES.md), with no authored file over 1,000 lines and no maintained directory over six direct files. The [phase/workload plan](../planning/WORKLOAD.md) assigns both developers actual frontend/backend work; package ownership does not mean one developer owns every file in a layer.
 
@@ -62,7 +62,7 @@ For example, keep simulation engine/world/mission/motion/capture plus an initial
 
 Khalid establishes the actual contract/import map in P01. Both agents must read that handoff and claim exact files before editing; the phase's owner boundaries guide parallel work. All test-only code/fixtures remain under `tests/`, never adjacent to source modules.
 
-The current shared StaticMap/MapObject boundary is in core/contracts/world.py, so P02's Tiled loader can construct pure values without importing Simulation. Mutable WorldState lives in core/simulation/world.py and stays private. The desktop shell in ui/bootstrap.py is a temporary composition baseline for P02's real scenes, with no placeholder mission or AI success behavior.
+The shared StaticMap/MapObject boundary is in core/contracts/world.py, so the Tiled loader constructs pure values without importing Simulation. Mutable WorldState lives in core/simulation/world.py and stays private. The standard ui/bootstrap.py composition now runs the P02 five-zone Human scene; Companion and active defender behavior remain assigned to P03/P04.
 
 ## Ownership and imports
 

@@ -9,7 +9,7 @@ Suhita's Windows x64 bootstrap and branch workflow: [Windows setup/P02 handoff](
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
 | Khalid | None; P02-K1/K2 completed and released | work/khalid-p02; runtime 789da10 plus final handoff commit | None | P02-K1/K2 DONE; full P02 awaits Suhita integration |
-| Suhita | None | None | None | P02-S1/S2 ready but unclaimed |
+| Suhita | P02-S1, P02-S2 (P02 integrator) | work/suhita-p02, merged from origin/work/khalid-p02 at fd93224 | `level/**`, `resources/data/maps/**`, `ui/scenes/**`, `ui/render/**`, `tests/unit/level/**`, `tests/integration/mission/test_five_zone_mission.py`, `docs/development/tracking/handoffs/suhita/**`, `docs/development/quality/reports/phase02/windows/**`; narrow shared edit: `ui/bootstrap.py` desktop loop routes into scenes (report keys unchanged) | IN_PROGRESS; claimed 2026-10-19 |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
 

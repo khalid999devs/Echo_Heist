@@ -1,5 +1,13 @@
 # Development changelog
 
+## 2026-10-20 - Integrated and refined Phase 2 Human mission
+
+- Retrieved Suhita's `work/suhita-p02` at `a98548a`, which already contains Khalid's four P02 commits. Retained her five-zone Tiled export, typed loader/validator, route tests and working scene composition; reviewed on a separate integration branch to preserve both owner branches.
+- Replaced the flat greybox presentation with a generated original 2.5D facility backdrop, operative dossier art, detailed map/actor motifs, readable objective/status/minimap, cinematic title/briefing/outcome screens and pointer input mapped through window letterboxing. Artwork is visual only; the Tiled map and Simulation remain authoritative.
+- Added real `GameFlow` integration cases for menu mouse input, pause freeze, same-seed retry, full Core theft/lockdown/extraction, capture and result navigation. The combined suite reaches 69 passing cases; core and approved scoring rules remain unchanged.
+- Ran native Cocoa source scene captures for title, briefing, gameplay, lockdown, win and capture and inspected all six. Ran a frozen macOS app smoke with packaged art/map, real Cocoa video, isolated settings and matching headless trace. The final artifact/hosted CI status is recorded in [verification](../quality/reports/phase02/integration/VERIFICATION.md).
+- Closed the P02 functional gate under the user's explicit integration direction. P03-P08, active patrol AI, Companion, Workshop, final score and interactive Windows release QA remain later work; no unrun platform check is marked PASS.
+
 ## 2026-10-18 - Khalid's P02 core gameplay and input handoff
 
 - Completed P02-K1/K2 on work/khalid-p02 through real incremental commits. Preserved app/bootstrap, Suhita's level/io, map resources and scene/render files; published the contract/file claim before implementation.

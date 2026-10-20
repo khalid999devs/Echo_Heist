@@ -1,6 +1,6 @@
 # Feature backlog and owner-slice mapping
 
-Status vocabulary: TODO / IN_PROGRESS / BLOCKED / DONE. P01 / EH-001 through EH-005 are DONE. P02-K1/K2 are implemented/verified on work/khalid-p02; their shared features remain IN_PROGRESS pending real-map/scene integration or later slices. P01-P08 replace the retired M0-M5 labels. See the [phase index](../planning/phases/README.md) and [workload table](../planning/WORKLOAD.md).
+Status vocabulary: TODO / IN_PROGRESS / BLOCKED / DONE. P01 and P02 are complete; EH-001 through EH-008 include the accepted P02 map/Human/mission work. Items spanning later phases remain IN_PROGRESS. P01-P08 replace the retired M0-M5 labels. See the [phase index](../planning/phases/README.md) and [workload table](../planning/WORKLOAD.md).
 
 EH IDs are stable feature anchors, not exclusive single-person tasks. Named Pxx-Kx/Pxx-Sx slices own implementation. Where several slices contribute, the EH item becomes DONE only after all required contributions and feature acceptance pass. Phase completion is recorded separately in [Status](STATUS.md).
 
@@ -23,12 +23,12 @@ EH IDs are stable feature anchors, not exclusive single-person tasks. Named Pxx-
 | EH-003 | P01 | P01-K2 | Typed contracts, headless fixed tick, RNG and fixture | EH-002 | R20-R21 | Repeatable fixture and immutable observation boundary | DONE |
 | EH-004 | P01 | P01-K3 | Desktop/resource/settings/bootstrap and input shell | EH-002 | R19, R21, R24 | Launch/save/recovery/audio checks outside project cwd | DONE |
 | EH-005 | P01 | P01-K1, P01-K3 | Structure/lint/test checks, CI and available native smoke build | EH-003, EH-004 | R24-R25 | Actual checks/artifact evidence, other target status explicit | DONE |
-| EH-006 | P02 | P02-S1, P02-S2 | Five-zone scene/map, Tiled importer and connectivity validation | EH-003, EH-004 | R03, R09 | Branches/cross-link/anchors and malformed-map diagnostics | TODO |
-| EH-007 | P02 | P02-K1, P02-K2 | Human movement/collision/sprint/actions and interaction prompt | EH-006 | R04, R09, R20 | Speed/collision/legality tests and real input response; K slices done, final-map connection pending | IN_PROGRESS |
-| EH-008 | P02 | P02-K1, P02-S1 | Core ownership/theft, mandatory lockdown, extraction/result terminals | EH-007 | R01, R22 | Core rules verified; Suhita scene/result integration pending | IN_PROGRESS |
+| EH-006 | P02 | P02-S1, P02-S2 | Five-zone scene/map, Tiled importer and connectivity validation | EH-003, EH-004 | R03, R09 | Both branches/cross-link/anchors, malformed-map diagnostics and standard scene verified | DONE |
+| EH-007 | P02 | P02-K1, P02-K2 | Human movement/collision/sprint/actions and interaction prompt | EH-006 | R04, R09, R20 | Real HumanInput drives the map; motion and interaction tests pass | DONE |
+| EH-008 | P02 | P02-K1, P02-S1 | Core ownership/theft, mandatory lockdown, extraction/result terminals | EH-007 | R01, R22 | Real five-zone theft, lockdown, win/capture/result and no-core rejection verified | DONE |
 | EH-011 | P02-P03 | P02-K1, P03-K1, P03-S2 | Fair capture/interrupt logic and telegraph | EH-008 | R04 | Contact/interrupt/timing verified; active-guard integration pending | IN_PROGRESS |
 | EH-019 | P02-P05 | P02-K1, P05-K1, P05-K2, P05-S2 | Initial legal tools, complete Echo/EMP/melee rules and feedback | EH-011 | R06-R08 | Real early tools verified; P05 complete effect/environment work pending | IN_PROGRESS |
-| EH-012 | P02-P06 | P02-S1, P02-K2, P06-S2, P06-S3 | Menu/modes/HUD/pause/results and complete navigation | EH-008, EH-011 | R02, R17-R19 | Input/objective presenter verified; actual scene/full navigation pending | IN_PROGRESS |
+| EH-012 | P02-P06 | P02-S1, P02-K2, P06-S2, P06-S3 | Menu/modes/HUD/pause/results and complete navigation | EH-008, EH-011 | R02, R17-R19 | P02 Human title/briefing/HUD/pause/results verified; Workshop, complete modes and settings remain P06 | IN_PROGRESS |
 | EH-009 | P03 | P03-K1, P03-S1, P03-S2, P03-S3 | Fair sight/hearing/reports/hiding/expiry and cue data | EH-006, EH-007 | R05, R09 | Occlusion/acoustics/provenance and visible cue alignment | TODO |
 | EH-010 | P03 | P03-K2, P03-S1, P03-S2 | Sentinel BFS/FSM and data-driven patrol | EH-009 | R10 | Shortest patrol, heard-only investigation, recoverable chase | TODO |
 | EH-013 | P03-P07 | P03-K2, P07-K1, P07-S1 | Replay headers/events and fixed-seed experiment harness | EH-003, EH-009 | R20-R21, R23 | Replay reproducibility first, executable comparison harness by P07 | TODO |
@@ -58,4 +58,4 @@ Phase gates and slice dependencies are authoritative for incremental work. A fea
 
 EH-029 is optional. EH-031 is public distribution/submission, not a ninth functional phase; it may run on Day 4 if release checks pass. EH-032 improves a complete draft and cannot absorb missing required features. Record slice claims and actual evidence in [Handoffs](HANDOFFS.md) and phase gates in [Status](STATUS.md). No passing CI/build/native QA result is implied by this plan.
 
-P01 evidence: [runnable handoff](handoffs/khalid/day_01/P01.md), [verification](../quality/reports/phase01/VERIFICATION.md) and subsequent [GitHub CI](../quality/reports/phase01/GITHUB_CI.md). P02-K1/K2 evidence: [actual handoff](handoffs/khalid/day_01/P02.md) and [45-test/native report](../quality/reports/phase02/khalid/VERIFICATION.md). Only Khalid's slices are done; no shared P02/later feature is closed. Suhita's own Windows desktop QA and the source-license choice remain pending.
+P01 evidence: [runnable handoff](handoffs/khalid/day_01/P01.md), [verification](../quality/reports/phase01/VERIFICATION.md) and subsequent [GitHub CI](../quality/reports/phase01/GITHUB_CI.md). P02-K1/K2 evidence: [owner handoff](handoffs/khalid/day_01/P02.md) and [original verification](../quality/reports/phase02/khalid/VERIFICATION.md). The [combined P02 verification](../quality/reports/phase02/integration/VERIFICATION.md) accepts the map/scene and closes EH-006/007/008. Later-span EH items, Windows interactive QA and source-license choice remain open.

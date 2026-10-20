@@ -1,6 +1,6 @@
 # P02 runtime integration: Khalid -> Suhita
 
-Owner: Khalid; work/khalid-p02. Status: P02-K1/K2 DONE; full P02 awaits Suhita integration. This narrow contract was published before implementation to expose shared-file changes. The [actual P02 handoff](../../tracking/handoffs/khalid/day_01/P02.md) now contains exact signatures, migration notes and verification.
+Owner: Khalid; work/khalid-p02. Status: P02-K1/K2 DONE; the full P02 was later integrated on work/p02-integration under the user's 2026-10-20 direction. This narrow contract was published before implementation to expose shared-file changes. The [actual P02 handoff](../../tracking/handoffs/khalid/day_01/P02.md) contains exact signatures and migration notes; [integration evidence](../../quality/reports/phase02/integration/VERIFICATION.md) records the consumer.
 
 ## Ownership and composition
 
@@ -31,3 +31,7 @@ Echo/EMP/melee perform real initial effects and resource/range checks. Echo is a
 Before integrating, read `tracking/handoffs/khalid/day_01/P02.md` when present, inspect the branch diff and use the actual signatures/examples there. Full P02 stays open until both owners' work and the combined Human win/capture/pause/retry gate pass. Khalid stops at P02-K1/K2.
 
 Implemented configuration type: `core/contracts/config/gameplay.py:GameRules`; `Simulation(world_map, spawns, *, rules, mission=None, seed=1042)`. `step(actions=(), *, abort=False)` returns StepResult with unscored mission_end. `HumanInput.feed(events)` returns separate PAUSE/FOCUS_LOST/OBJECTIVE/LAB/QUIT requests; `action_for(own_observation)` supplies one intent per tick. Scene owner handles pause/focus explicitly and runs no ticks while paused.
+
+## Integrated consumer
+
+`ui/scenes/flow.py:GameFlow` loads `data/maps/vault-five-zone.json` through `level/io/tiled.py`, constructs `HeistSession` in `ui/scenes/heist.py` with the exact Simulation/mission/rules interfaces above, and consumes only `Observation` for HumanInput plus `PresentationSnapshot` for rendering. `ui/bootstrap.py` owns the resizable desktop lifecycle and maps mouse coordinates through the logical letterbox. The flow was verified for Human win, capture, pause, retry and result navigation on the actual map. The earlier future-tense ownership paragraphs document the initial parallel contract; the later user-directed integration review changed only the integration responsibility.

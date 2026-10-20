@@ -1,6 +1,6 @@
 # Verification and quality gates
 
-Status: P01 foundation and P02-K1/K2 have 45 implemented passing cases; [actual P02 verification](reports/phase02/khalid/VERIFICATION.md) distinguishes constructed mechanics/native traces from pending full-game gates. The scenarios below remain the complete-game acceptance plan.
+Status: P01 and full P02 have 69 implemented passing cases; [combined P02 verification](reports/phase02/integration/VERIFICATION.md) distinguishes real five-zone Human outcomes and native source/build checks from pending P03-P08 full-game gates. The scenarios below remain the complete-game acceptance plan.
 
 Schedule: begin behavior checks on Day 1, exercise the full interface by Day 3, and run the integrated working-draft gate on Day 4. Public-release checks remain separate and evidence-based.
 

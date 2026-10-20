@@ -1,6 +1,6 @@
 # ECHO HEIST development hub
 
-Created: 2026-10-18. Stage: P01 complete; P02-K1/K2 complete on work/khalid-p02, full P02 awaiting Suhita integration; P03-P08 pending. Day 1 implementation started on 2026-10-18.
+Created: 2026-10-18. Stage: P01 and complete Human P02 integrated; P03-P08 pending. Day 1 implementation started on 2026-10-18; P02 was accepted on 2026-10-20.
 
 Current target: a complete working initial draft in **eight phases over four development days**. Khalid owns Phase 1; later work is split by strengths with 80 estimated points each. All defined functionality must work after Phase 8; later work improves accuracy and polish. Public distribution retains its platform/release checks.
 
@@ -42,7 +42,7 @@ Preserve approved gameplay requirements. The blueprint explicitly identifies con
 | Tracking | [Changelog](tracking/CHANGELOG.md) | Dated development handoffs and verification |
 | Tracking | [Claims and handoffs](tracking/HANDOFFS.md) | Owner/file coordination, runnable integration evidence and shared-task completion |
 
-Current runnable baseline: [P01 handoff](tracking/handoffs/khalid/day_01/P01.md) and [verification](quality/reports/phase01/VERIFICATION.md). The installed package/headless diagnostic and native Apple Silicon smoke app work; this is not yet the playable mission. The [public GitHub repository](https://github.com/khalid999devs/Echo_Heist) now holds the incremental history. Follow [Status](tracking/STATUS.md) for current hosted CI evidence; Suhita's Windows desktop QA is still pending.
+Current runnable baseline: [P02 integrated handoff](tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) and [verification/screenshots](quality/reports/phase02/integration/VERIFICATION.md). The standard desktop app now runs the five-zone Human mission. The [public GitHub repository](https://github.com/khalid999devs/Echo_Heist) holds the incremental owner history. Follow [Status](tracking/STATUS.md) for current hosted CI evidence; Suhita's interactive Windows desktop QA is still pending.
 
 Suhita's workstation entry: [Windows x64 setup and P02 handoff](workflow/setup/WINDOWS_SUHITA.md), including PowerShell clone/run/check/native-build commands and the P02-S1/S2 boundary.
 

@@ -1,6 +1,6 @@
 # Start or resume developer work
 
-This is the operational entry point for either developer's coding agent. The goal is a complete working initial V1 draft in eight phases over four development days. P01 is implemented; retrieve its [actual runnable handoff](../tracking/handoffs/khalid/day_01/P01.md). Khalid's [P02 core/input handoff](../tracking/handoffs/khalid/day_01/P02.md) is ready on work/khalid-p02; full P02 awaits Suhita integration. P03-P08 are pending; inspect current tracking/code before assuming later modules exist.
+This is the operational entry point for either developer's coding agent. The goal is a complete working initial V1 draft in eight phases over four development days. P01 and P02 are implemented; retrieve the [actual P02 integrated handoff](../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md). P03-P08 are pending; inspect current tracking/code before assuming later modules exist.
 
 ## Resolve the developer once
 

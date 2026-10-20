@@ -1,0 +1,16 @@
+{
+  "artifact": "/private/tmp/echo-heist-p02-final.FBRPZv/Echo Heist.app/Contents/MacOS/EchoHeist",
+  "checks": {
+    "frames_rendered": true,
+    "frozen_desktop": true,
+    "frozen_headless": true,
+    "resources_loaded": true,
+    "same_event_hash": true,
+    "same_state_hash": true,
+    "settings_saved": true,
+    "surface_saved": true
+  },
+  "passed": true,
+  "scope": "native display smoke",
+  "video_driver": "cocoa"
+}

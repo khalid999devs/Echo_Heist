@@ -33,8 +33,8 @@ Active target: complete working initial draft in **eight phases over four develo
 | P02 five-zone map/scene | DONE | Suhita's `a98548a` map/loader/flow retained; illustrated floor/bulkhead/props/actor strips and refined sci-fi UI; [integration verification](../quality/reports/phase02/integration/VERIFICATION.md) |
 | AI / Workshop / final scoring | TODO | P03-P06 deliver active defenders, autonomous Companion, complete tools/environment, Workshop and approved rank calculation |
 | Local automated checks | DONE | Structure/lint/format/strict types and **70** focused cases pass on the integrated candidate; [combined report](../quality/reports/phase02/integration/VERIFICATION.md) |
-| Hosted CI | IN_PROGRESS | Earlier owner branch CI passed all three jobs; integrated branch CI is recorded in the combined report after push |
-| Native packaging | IN_PROGRESS for final art candidate | Earlier integrated arm64 .app passed real-Cocoa frozen smoke; final art candidate rebuild pending; Windows CI and interactive desktop statuses are recorded separately in the combined report |
+| Hosted CI | DONE for P02 code candidate | Run [39503129521](https://github.com/khalid999devs/Echo_Heist/actions/runs/39503129521) passed Linux checks and Windows/macOS checks/native builds/frozen dummy-video smoke at `4b9cc49` |
+| Native packaging | DONE for P02 local macOS | Clean `4b9cc49` illustrated app and freshly extracted ZIP pass all eight real-Cocoa frozen smoke checks; exact archive/hash in the combined report |
 | V1 platform/hardware QA | NOT_RUN | Suhita's interactive Windows desktop/download QA, wider macOS/download behavior and full-game release matrix remain untested |
 | Assets and licensing | IN_PROGRESS | Original generated scene/tile/prop/actor art plus Oxanium/OFL recorded in [asset register](../assets/ASSETS.md); remaining production set and source license pending |
 | itch.io/video/submission | TODO | GitHub source is published; game distribution, gameplay video and academic submission are still pending |
@@ -43,7 +43,7 @@ P02 is a playable Human draft, not the full V1 game. The standard app launches t
 
 ## Next action
 
-After the integration branch passes hosted CI and is merged to main, Khalid may start his assigned P03 slices under a new task. Suhita's interactive Windows x64 check remains useful platform evidence and must not be represented as complete until run on her machine.
+P03 is the next Khalid assignment; start it under a new task from the integrated main baseline. Suhita's interactive Windows x64 check remains useful platform evidence and must not be represented as complete until run on her machine.
 
 ## Open inputs to resolve during development
 

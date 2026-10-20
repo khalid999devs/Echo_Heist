@@ -1,6 +1,6 @@
 # Phase 2 combined verification
 
-Date: 2026-10-20, Asia/Dhaka. Candidate: `work/p02-integration`, based on Suhita's `a98548a` (which already includes Khalid's `fd93224`). The user's direction on 2026-10-20 transferred final P02 integration review to Khalid. The source PDF SHA256 remains `64fc08b2725796211931d28550a95557e09ddf3c43f3d66c774e6354e36dedda`.
+Dates: 2026-10-20 through 2026-10-21, Asia/Dhaka. Candidate: `work/p02-integration`, based on Suhita's `a98548a` (which already includes Khalid's `fd93224`). The user's direction on 2026-10-20 transferred final P02 integration review to Khalid. The source PDF SHA256 remains `64fc08b2725796211931d28550a95557e09ddf3c43f3d66c774e6354e36dedda`.
 
 ## Review decision
 
@@ -33,9 +33,11 @@ The six screenshots below were captured on a macOS Cocoa display through the sam
 
 The [2.4-second gameplay clip](movement-preview.mp4) is a 72-frame capture from the real scene with walk, sprint and direction changes. It confirms sprite frames and camera motion on the Cocoa display; it is not a human playtest. The screenshots and clip include the new packaged tiles, props, actor art and Oxanium UI font. Asset origin, hashes and font license are recorded in the [asset register](../../../../assets/ASSETS.md).
 
-An earlier arm64 app/ZIP passed all eight frozen smoke assertions before the final visual assets were integrated. A clean candidate rebuild with the illustrated gameplay resources is required below before this report can claim those assets passed frozen smoke.
+The final illustrated candidate was built from clean commit `4b9cc49db768fdea2b2c2928e1c6ff17a9d93a24` using `UV_CACHE_DIR="$PWD/.cache/uv" uv run --locked --all-extras python scripts/packaging/build.py`. The [build manifest](build-manifest.json) records `working_tree_dirty=false`. Local archive: `dist/echo-heist-0.1.0a1-macos-arm64.zip`; 29,198,546 bytes; SHA256 `1679740607d557d8e81472abf9ebee3635f8fa2806e7134e7835aaf66946477d`. Signing is ad-hoc, not notarized. The manifest's build-time `native_smoke=NOT_RUN` is superseded by the separate smoke evidence below.
 
-Clean candidate archive: PENDING clean build after integration commit. Hosted macOS/Windows/Linux CI: PENDING branch push. Interactive Windows x64 desktop: **NOT_RUN** on Suhita's machine. Native macOS keyboard feel/accessibility check: **NOT_RUN**; scripted Cocoa rendering and frozen smoke are PASS. No Windows or public-release claim is inferred from the Mac screenshots.
+`uv run --locked --all-extras python scripts/packaging/smoke.py "dist/Echo Heist.app" --mute --output-dir output/phase02/final-native-smoke` passed all eight assertions on real Cocoa. The ZIP was then extracted to a fresh `/private/tmp/echo-heist-p02-final.FBRPZv` directory and its app passed the same check with output at `output/phase02/final-extracted-smoke`. The [committed extracted-app summary](native-smoke.json) records all eight checks, isolated settings, system-only PATH and native Cocoa rendering. Source scene interaction tests and screenshots cover actual heist flow; frozen smoke covers startup/resource loading and deterministic diagnostic hashes.
+
+[Hosted run 39503129521](https://github.com/khalid999devs/Echo_Heist/actions/runs/39503129521) passed on the same code commit: Linux headless checks, macOS arm64 checks/build/frozen dummy-video smoke and Windows x64 checks/build/frozen dummy-video smoke. Both native job artifacts were uploaded successfully. These are hosted automated checks; interactive Windows x64 desktop remains **NOT_RUN** on Suhita's machine. Native macOS human keyboard feel/accessibility check remains **NOT_RUN**; scripted Cocoa rendering and frozen smoke are PASS. No public-release claim is inferred from these checks.
 
 ## Scope boundary
 

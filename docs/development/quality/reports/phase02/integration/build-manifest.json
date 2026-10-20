@@ -1,0 +1,17 @@
+{
+  "architecture": "arm64",
+  "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+  "archive_bytes": 29198546,
+  "archive_sha256": "1679740607d557d8e81472abf9ebee3635f8fa2806e7134e7835aaf66946477d",
+  "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+  "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+  "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+  "pyinstaller": "6.22.3",
+  "python": "3.13.16",
+  "signing": "ad-hoc; not notarized",
+  "source_commit": "4b9cc49db768fdea2b2c2928e1c6ff17a9d93a24",
+  "stage": "P02 Human mission draft; full V1 remains in development",
+  "target": "macos-arm64",
+  "version": "0.1.0a1",
+  "working_tree_dirty": false
+}

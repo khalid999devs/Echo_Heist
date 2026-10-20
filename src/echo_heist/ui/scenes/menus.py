@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from io import BytesIO
+from math import sin
 
 import pygame
 
@@ -30,6 +31,7 @@ MODE_BUTTONS = (pygame.Rect(44, 438, 452, 64), pygame.Rect(44, 514, 452, 64))
 LAUNCH_BUTTON = pygame.Rect(44, 609, 452, 65)
 RESULT_RETRY = pygame.Rect(660, 590, 552, 48)
 RESULT_MENU = pygame.Rect(660, 648, 552, 48)
+BACKDROP_PAD = 16
 
 
 def load_backdrop(size: tuple[int, int]) -> pygame.Surface:
@@ -37,7 +39,9 @@ def load_backdrop(size: tuple[int, int]) -> pygame.Surface:
     art = pygame.image.load(
         BytesIO(resource_bytes("assets/scenes/title-facility.png")), "title.png"
     )
-    return pygame.transform.smoothscale(art, size)
+    return pygame.transform.smoothscale(
+        art, (size[0] + 2 * BACKDROP_PAD, size[1] + 2 * BACKDROP_PAD)
+    )
 
 
 def load_operative_portrait() -> pygame.Surface:
@@ -71,7 +75,9 @@ def _text(
 
 
 def _frame(canvas: pygame.Surface, backdrop: pygame.Surface, fonts: Fonts, clock_ms: int) -> None:
-    canvas.blit(backdrop, (0, 0))
+    drift_x = round(7 * sin(clock_ms / 4700))
+    drift_y = round(5 * sin(clock_ms / 6100))
+    canvas.blit(backdrop, (-BACKDROP_PAD + drift_x, -BACKDROP_PAD + drift_y))
     shade = pygame.Surface((530, canvas.get_height()), pygame.SRCALPHA)
     shade.fill((2, 9, 16, 228))
     canvas.blit(shade, (0, 0))
@@ -102,16 +108,35 @@ def _button(
     selected: bool,
     enabled: bool,
     note: str = "",
+    clock_ms: int = 0,
 ) -> None:
-    fill = (7, 45, 59, 228) if selected and enabled else (5, 18, 29, 215)
+    glow = (1 + sin(clock_ms / 280)) / 2 if selected and enabled else 0
+    fill = (
+        (7, 39 + round(11 * glow), 53 + round(10 * glow), 232)
+        if selected and enabled
+        else (5, 18, 29, 215)
+    )
     panel(canvas, rect, fill=fill, border=theme.ACCENT if selected and enabled else theme.BORDER)
     if selected and enabled:
         pygame.draw.rect(canvas, theme.ACCENT, (rect.x, rect.y, 4, rect.h))
+        pygame.draw.line(
+            canvas,
+            theme.ACCENT,
+            (rect.x + 11, rect.bottom - 5),
+            (rect.x + 75 + round(10 * glow), rect.bottom - 5),
+            2,
+        )
     color = theme.TEXT if enabled else theme.DISABLED
     _text(canvas, fonts.body, label, color, (rect.x + 21, rect.y + (11 if note else 19)))
     if note:
         _text(canvas, fonts.micro, note, theme.MUTED, (rect.x + 22, rect.y + 40))
-    _text(canvas, fonts.body, ">" if enabled else "·", color, (rect.right - 32, rect.y + 16))
+    _text(
+        canvas,
+        fonts.body,
+        ">" if enabled else "·",
+        color,
+        (rect.right - 32 + round(3 * glow), rect.y + 16),
+    )
 
 
 def draw_menu(
@@ -136,6 +161,7 @@ def draw_menu(
                 fonts,
                 selected=index == selected,
                 enabled=item.enabled,
+                clock_ms=clock_ms,
             )
         _text(canvas, fonts.small, "WASD / ARROWS  •  ENTER  •  MOUSE", theme.MUTED, (44, 600))
     else:
@@ -150,6 +176,7 @@ def draw_menu(
                 selected=index == selected,
                 enabled=item.enabled,
                 note=item.note,
+                clock_ms=clock_ms,
             )
         launch_enabled = MODE_ITEMS[selected].enabled
         _button(
@@ -159,6 +186,7 @@ def draw_menu(
             fonts,
             selected=launch_enabled,
             enabled=launch_enabled,
+            clock_ms=clock_ms,
         )
         if notice:
             _text(canvas, fonts.micro, notice, theme.WARNING, (44, 587))
@@ -171,7 +199,13 @@ def draw_menu(
 
 
 def draw_results(
-    canvas: pygame.Surface, end: MissionEnd, fonts: Fonts, *, ticks_per_second: int
+    canvas: pygame.Surface,
+    end: MissionEnd,
+    fonts: Fonts,
+    *,
+    ticks_per_second: int,
+    hovered: str | None = None,
+    clock_ms: int = 0,
 ) -> None:
     """Report only committed mission facts; final score/rank is a P06 rule."""
     seconds = end.elapsed_ticks // max(1, ticks_per_second)
@@ -204,8 +238,14 @@ def draw_results(
     _text(canvas, fonts.stat, f"{seconds // 60:02d}:{seconds % 60:02d}", theme.TEXT, (658, 410))
     _text(canvas, fonts.micro, f"{end.elapsed_ticks} SIMULATION TICKS", theme.MUTED, (662, 463))
     _text(canvas, fonts.micro, "SCORE / RANK UNLOCK IN PHASE 06", theme.WARNING, (662, 525))
-    panel(canvas, RESULT_RETRY, fill=(5, 46, 56, 222), border=theme.ACCENT)
+    glow = round(8 * (1 + sin(clock_ms / 280))) if hovered == "RETRY" else 0
+    panel(canvas, RESULT_RETRY, fill=(5, 42 + glow, 56 + glow, 222), border=theme.ACCENT)
     _text(canvas, fonts.small, "R  RETRY SAME SEED", theme.ACCENT, (678, 605))
-    panel(canvas, RESULT_MENU)
+    panel(
+        canvas,
+        RESULT_MENU,
+        fill=(6, 34, 45, 230) if hovered == "MENU" else theme.PANEL,
+        border=theme.ACCENT if hovered == "MENU" else theme.BORDER,
+    )
     _text(canvas, fonts.small, "ENTER  MAIN MENU", theme.TEXT, (678, 663))
     _text(canvas, fonts.micro, "ESC QUIT", theme.MUTED, (1127, 666))

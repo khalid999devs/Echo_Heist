@@ -15,6 +15,7 @@ class ObjectiveView:
     inventory: str
     elapsed: str
     warning: str
+    interaction_progress: tuple[int, int] | None
 
 
 def build_objective_view(observation: Observation, *, ticks_per_second: int) -> ObjectiveView:
@@ -28,10 +29,12 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
         MissionPhase.ABORTED: "Run aborted",
     }[observation.phase]
     interaction = ""
+    interaction_progress = None
     if observation.interactions:
         hint = observation.interactions[0]
         progress = 100 * hint.progress_ticks // max(1, hint.required_ticks)
         interaction = f"Hold E - Recover core ({progress}%)"
+        interaction_progress = hint.progress_ticks, hint.required_ticks
     inventory = observation.own_status.inventory
     seconds = observation.tick // ticks_per_second
     remaining = observation.own_status.capture_ticks_remaining
@@ -42,6 +45,7 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
         f"Core {'YES' if inventory.core_held else 'NO'}",
         f"{seconds // 60:02d}:{seconds % 60:02d}",
         "CAPTURE WIND-UP - Escape, EMP or melee" if remaining is not None else "",
+        interaction_progress,
     )
 
 

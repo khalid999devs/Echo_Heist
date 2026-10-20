@@ -1,6 +1,10 @@
-"""Readable industrial palette shared by scenes and renderers."""
+"""Readable industrial palette and bundled interface type shared by scenes."""
+
+from io import BytesIO
 
 import pygame
+
+from echo_heist.infrastructure.resources import resource_bytes
 
 type Color = tuple[int, int, int]
 
@@ -30,13 +34,17 @@ CORRIDOR_FLOOR: Color = (31, 45, 54)
 
 
 class Fonts:
-    """Created after pygame.font.init(); default font ships with pygame."""
+    """Load the same legible futuristic faces in source and frozen builds."""
 
     def __init__(self) -> None:
-        self.logo = pygame.font.Font(None, 81)
-        self.title = pygame.font.Font(None, 65)
-        self.heading = pygame.font.Font(None, 39)
-        self.body = pygame.font.Font(None, 26)
-        self.small = pygame.font.Font(None, 20)
-        self.micro = pygame.font.Font(None, 17)
-        self.stat = pygame.font.Font(None, 57)
+        def face(weight: str, size: int) -> pygame.font.Font:
+            data = resource_bytes(f"assets/fonts/Oxanium-{weight}.ttf")
+            return pygame.font.Font(BytesIO(data), size)
+
+        self.logo = face("Bold", 74)
+        self.title = face("Bold", 59)
+        self.heading = face("Bold", 35)
+        self.body = face("SemiBold", 23)
+        self.small = face("Regular", 19)
+        self.micro = face("SemiBold", 15)
+        self.stat = face("Bold", 55)

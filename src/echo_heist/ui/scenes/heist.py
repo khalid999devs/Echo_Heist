@@ -6,6 +6,7 @@ from enum import StrEnum
 import pygame
 
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.results import MissionEnd
 from echo_heist.core.simulation.engine import Simulation
 from echo_heist.level.model import LevelData
@@ -14,15 +15,25 @@ from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.camera import Camera
 from echo_heist.ui.render.hud import draw_dialog, draw_hud
+from echo_heist.ui.render.motifs import ActorMotion
 from echo_heist.ui.render.theme import Fonts
-from echo_heist.ui.render.world import build_map_surface, draw_world, to_pixels
+from echo_heist.ui.render.world import (
+    VisualPulse,
+    WorldArt,
+    build_map_surface,
+    draw_world,
+    to_pixels,
+)
 
 MAX_CATCH_UP = 8_000  # At most eight 30 Hz ticks after a long frame.
 ROUTE_SUMMARY = (
-    ("Entry -> Service Wing -> Security Control (upper)", theme.TEXT),
-    ("or Research Floor (lower); a cross-link joins both", theme.TEXT),
-    ("Hold E at the gold Core, then return to the green Exit", theme.ACCENT),
-    ("Press Tab to close", theme.MUTED),
+    ("1  Follow the amber CORE marker on the minimap.", theme.WARNING),
+    ("2  Take the upper Security or lower Research route.", theme.TEXT),
+    ("3  Hold E beside the Core until the link fills.", theme.TEXT),
+    ("4  Escape through the green Entry lift.", theme.ACCENT),
+    ("WASD move  /  Shift sprint  /  Q Echo decoy", theme.MUTED),
+    ("F EMP  /  Space melee  /  Esc pause", theme.MUTED),
+    ("Tab closes this guide", theme.ACCENT),
 )
 
 
@@ -41,18 +52,28 @@ class HeistSession:
         fonts: Fonts,
         view_size: tuple[int, int],
         map_surface: pygame.Surface | None = None,
+        art: WorldArt | None = None,
     ) -> None:
-        self.level, self.seed, self.fonts = level, seed, fonts
+        self.level, self.seed, self.fonts, self.rules = level, seed, fonts, rules
         self.simulation = Simulation(
             level.static_map, level.spawns(), rules=rules, mission=level.mission(), seed=seed
         )
         self.input = HumanInput(level.operative_id)
-        self.map_surface = map_surface or build_map_surface(level, fonts)
+        self.art = art or WorldArt.load()
+        self.map_surface = map_surface or build_map_surface(level, fonts, self.art)
         self.camera = Camera(*view_size, *self.map_surface.get_size())
         self.paused = self.summary = self.lab_note = self.confirm_abort = False
         self.accumulator = 0
         self.clock_ms = 0
         self.steps = 0
+        self._last_positions = {
+            actor.actor_id: actor.position
+            for actor in self.simulation.presentation_snapshot().actors
+        }
+        self.actor_motion: dict[str, ActorMotion] = {}
+        self.pulses: list[VisualPulse] = []
+        self.notice = ""
+        self.notice_until_ms = 0
         self._follow(0.0, snap=True)
 
     @property
@@ -109,7 +130,9 @@ class HeistSession:
         return None
 
     def update(self, elapsed_ms: int) -> None:
-        self.clock_ms += elapsed_ms
+        if not self.paused and self.mission_end is None:
+            self.clock_ms += elapsed_ms
+            self.pulses = [pulse for pulse in self.pulses if self.clock_ms - pulse.started_ms < 650]
         if self.paused or self.mission_end is not None:
             self.accumulator = 0
         else:
@@ -118,12 +141,71 @@ class HeistSession:
             while self.accumulator >= 1000:
                 observation = self.simulation.observe(self.level.operative_id)
                 result = self.simulation.step((self.input.action_for(observation),))
+                self._record_motion()
+                self._record_events(result.events)
                 self.accumulator -= 1000
                 self.steps += 1
                 if result.mission_end is not None:
                     self.accumulator = 0
                     break
         self._follow(elapsed_ms / 1000)
+
+    def _record_motion(self) -> None:
+        sprint_delta = (
+            self.rules.walk_speed_units_per_second + self.rules.sprint_speed_units_per_second
+        ) / (2 * self.simulation.ticks_per_second)
+        for actor in self.simulation.presentation_snapshot().actors:
+            previous, current = self._last_positions.get(actor.actor_id), actor.position
+            if current is None:
+                continue
+            old_motion = self.actor_motion.get(actor.actor_id, ActorMotion())
+            if previous is None:
+                self.actor_motion[actor.actor_id] = ActorMotion(old_motion.direction)
+            else:
+                dx, dy = current[0] - previous[0], current[1] - previous[1]
+                moving = dx != 0 or dy != 0
+                direction = (
+                    (1 if dx > 0 else -1 if dx < 0 else 0, 1 if dy > 0 else -1 if dy < 0 else 0)
+                    if moving
+                    else old_motion.direction
+                )
+                sprinting = actor.actor_id == self.level.operative_id and (
+                    dx * dx + dy * dy > sprint_delta * sprint_delta
+                )
+                self.actor_motion[actor.actor_id] = ActorMotion(direction, moving, sprinting)
+            self._last_positions[actor.actor_id] = current
+
+    def _record_events(self, events: tuple[GameEvent, ...]) -> None:
+        actors = {actor.actor_id: actor for actor in self.simulation.presentation_snapshot().actors}
+        for event in events:
+            if event.kind == EventKind.CORE_TAKEN:
+                self.notice = "CORE SECURED  /  RETURN TO THE GREEN EXIT"
+                self.notice_until_ms = self.clock_ms + 4200
+            elif event.kind == EventKind.CAPTURE_STARTED:
+                self.notice = "GUARD GRAB INCOMING  /  BREAK RANGE"
+                self.notice_until_ms = self.clock_ms + 1800
+            elif event.kind == EventKind.CAPTURE_CANCELED:
+                self.notice = "GRAB ESCAPED"
+                self.notice_until_ms = self.clock_ms + 1200
+            elif event.kind == EventKind.ACTION_REJECTED:
+                reason = dict(event.details).get("reason")
+                self.notice = {
+                    "echo_empty": "NO ECHO CHARGES LEFT",
+                    "emp_empty": "NO EMP CHARGES LEFT",
+                    "no_reachable_guard": "MELEE NEEDS A NEARBY GUARD",
+                }.get(str(reason), self.notice)
+                self.notice_until_ms = self.clock_ms + 1400
+            elif event.kind == EventKind.TOOL_USED:
+                tool = dict(event.details).get("tool")
+                self.notice = {
+                    "ECHO": "ECHO DECOY DEPLOYED",
+                    "EMP": "EMP DISCHARGED",
+                    "MELEE": "MELEE CONTACT",
+                }.get(str(tool), "TOOL USED")
+                self.notice_until_ms = self.clock_ms + 1600
+                actor = actors.get(event.actor_id)
+                if actor is not None and actor.position is not None and tool in ("ECHO", "EMP"):
+                    self.pulses.append(VisualPulse(actor.position, str(tool), self.clock_ms))
 
     def zone_label(self) -> str:
         observation = self.simulation.observe(self.level.operative_id)
@@ -133,7 +215,19 @@ class HeistSession:
     def draw(self, canvas: pygame.Surface) -> None:
         snapshot = self.simulation.presentation_snapshot()
         pulse = abs((self.clock_ms % 1000) - 500) / 500
-        draw_world(canvas, self.level, self.map_surface, snapshot, self.camera, self.fonts, pulse)
+        draw_world(
+            canvas,
+            self.level,
+            self.map_surface,
+            snapshot,
+            self.camera,
+            self.fonts,
+            pulse,
+            actor_motion=self.actor_motion,
+            clock_ms=self.clock_ms,
+            pulses=tuple(self.pulses),
+            art=self.art,
+        )
         view = build_objective_view(
             self.simulation.observe(self.level.operative_id),
             ticks_per_second=self.simulation.ticks_per_second,
@@ -148,10 +242,12 @@ class HeistSession:
                 level=self.level,
                 operative_tile=operative_tile,
                 phase=snapshot.phase,
+                clock_ms=self.clock_ms,
+                notice=self.notice if self.clock_ms < self.notice_until_ms else "",
             )
         if self.lab_note:
-            note = "Algorithm Lab View arrives with P03 telemetry (F3 to close)"
-            canvas.blit(self.fonts.small.render(note, True, theme.WARNING), (24, 160))
+            note = "Algorithm Lab telemetry arrives in Phase 03  /  F3 to close"
+            canvas.blit(self.fonts.small.render(note, True, theme.WARNING), (24, 225))
         if self.paused:
             self._draw_pause(canvas)
         elif self.summary:

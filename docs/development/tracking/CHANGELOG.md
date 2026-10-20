@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-10-21 - Illustrated gameplay and movement review
+
+- Added original generated floor/bulkhead textures, six facility props and operative/robot frame strips. Walking, sprinting and facing follow committed actor movement; visual animation never changes collision or sensing.
+- Bundled Oxanium with its OFL notice, improved mouse feedback, objective direction, Core hold progress, route/control guide and event cues. Replaced review screenshots and recorded a short actual walk/sprint clip.
+- Structure, Ruff, strict types and 70 focused cases pass. Final clean native build and hosted checks are recorded in the combined verification report.
+- Kept glass breaking, doors, hiding and canisters in Phase 5 under the owner's explicit choice. Guard patrol/perception remains Phase 3.
+
 ## 2026-10-20 - Integrated and refined Phase 2 Human mission
 
 - Retrieved Suhita's `work/suhita-p02` at `a98548a`, which already contains Khalid's four P02 commits. Retained her five-zone Tiled export, typed loader/validator, route tests and working scene composition; reviewed on a separate integration branch to preserve both owner branches.

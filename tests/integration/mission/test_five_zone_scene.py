@@ -124,3 +124,21 @@ def test_mouse_menu_and_letterbox_coordinates() -> None:
     assert flow.scene == Scene.MODE
     flow.frame([pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(70, 640))], 0)
     assert flow.scene == Scene.HEIST
+
+
+def test_art_and_gait_follow_committed_movement_without_changing_simulation() -> None:
+    flow = start()
+    assert flow.session is not None
+    art = flow.session.art
+    assert art.operative[0].get_size() == (52, 66)
+    assert pygame.image.tobytes(art.operative[0], "RGBA") != pygame.image.tobytes(
+        art.operative[3], "RGBA"
+    )
+    first_tick = flow.session.simulation.tick
+    flow.frame([key(pygame.KEYDOWN, pygame.K_d), key(pygame.KEYDOWN, pygame.K_LSHIFT)], 34)
+    assert flow.session.simulation.tick == first_tick + 1
+    assert flow.session.actor_motion[flow.level.operative_id].sprinting
+    tick_after_move = flow.session.simulation.tick
+    canvas = pygame.Surface((1280, 720))
+    flow.draw(canvas)
+    assert flow.session.simulation.tick == tick_after_move

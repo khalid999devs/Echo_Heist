@@ -11,9 +11,10 @@ from echo_heist.infrastructure.resources import load_game_rules, resource_bytes
 from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.ui.render.theme import Fonts
-from echo_heist.ui.render.world import build_map_surface
+from echo_heist.ui.render.world import WorldArt, build_map_surface
 from echo_heist.ui.scenes.heist import HeistRequest, HeistSession
 from echo_heist.ui.scenes.menus import (
+    BACKDROP_PAD,
     LAUNCH_BUTTON,
     MODE_ITEMS,
     RESULT_MENU,
@@ -56,12 +57,14 @@ class GameFlow:
         self.level = level or load_level()
         self.rules = rules or load_game_rules()
         self.fonts = Fonts()
+        self.art = WorldArt.load()
         self.backdrop = load_backdrop(view_size)
         self.portrait = load_operative_portrait()
-        self.map_surface = build_map_surface(self.level, self.fonts)
+        self.map_surface = build_map_surface(self.level, self.fonts, self.art)
         self.scene = Scene.TITLE
         self.selected = 0
         self.notice = ""
+        self.hovered_result: str | None = None
         self.running = True
         self.session: HeistSession | None = None
         self.outcomes: Counter[str] = Counter()
@@ -69,6 +72,7 @@ class GameFlow:
         self.ambient_ms = 0
 
     def _start_run(self) -> None:
+        self.hovered_result = None
         self.session = HeistSession(
             self.level,
             self.rules,
@@ -76,12 +80,14 @@ class GameFlow:
             fonts=self.fonts,
             view_size=self.view_size,
             map_surface=self.map_surface,
+            art=self.art,
         )
         self.runs_started += 1
         self.scene = Scene.HEIST
 
     def _go(self, scene: Scene) -> None:
         self.scene, self.selected, self.notice = scene, 0, ""
+        self.hovered_result = None
 
     def frame(self, events: Sequence[pygame.event.Event], elapsed_ms: int) -> None:
         self.ambient_ms += max(0, elapsed_ms)
@@ -98,6 +104,7 @@ class GameFlow:
             if end is not None:
                 self.outcomes[end.outcome.value] += 1
                 self.scene = Scene.RESULTS
+                self.hovered_result = None
             return
         if any(event.type == pygame.QUIT for event in events):
             self.running = False
@@ -111,6 +118,14 @@ class GameFlow:
                 hovered = menu_hit(self.scene.value, event.pos)
                 if hovered is not None:
                     self.selected = hovered
+            elif event.type == pygame.MOUSEMOTION and self.scene == Scene.RESULTS:
+                self.hovered_result = (
+                    "RETRY"
+                    if RESULT_RETRY.collidepoint(event.pos)
+                    else "MENU"
+                    if RESULT_MENU.collidepoint(event.pos)
+                    else None
+                )
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.scene == Scene.RESULTS:
                     if RESULT_RETRY.collidepoint(event.pos):
@@ -178,9 +193,16 @@ class GameFlow:
             end = self.session.mission_end
             if self.scene == Scene.RESULTS and end is not None:
                 canvas.fill((3, 12, 20))
-                crop = pygame.Rect(650, 0, 620, self.view_size[1])
+                crop = pygame.Rect(650 + BACKDROP_PAD, BACKDROP_PAD, 620, self.view_size[1])
                 canvas.blit(self.backdrop, (0, 0), crop)
-                draw_results(canvas, end, self.fonts, ticks_per_second=self.rules.simulation_hz)
+                draw_results(
+                    canvas,
+                    end,
+                    self.fonts,
+                    ticks_per_second=self.rules.simulation_hz,
+                    hovered=self.hovered_result,
+                    clock_ms=self.ambient_ms,
+                )
 
     def report(self) -> dict[str, object]:
         return {

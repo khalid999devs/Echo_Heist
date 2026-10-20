@@ -30,13 +30,13 @@ Active target: complete working initial draft in **eight phases over four develo
 | GitHub source and teammate bootstrap | DONE | [Public repository](https://github.com/khalid999devs/Echo_Heist), main pushed with original history; fresh clone verified through 99a8658; [Windows handoff](../workflow/setup/WINDOWS_SUHITA.md) prepared |
 | P01 contracts/runtime/resources/settings | DONE | [Runnable handoff](handoffs/khalid/day_01/P01.md); pure headless diagnostic and actual desktop shell |
 | P02 core gameplay/input | DONE | Continuous physics, mission/capture/initial tools, Human input and objective presenter; [owner handoff](handoffs/khalid/day_01/P02.md) |
-| P02 five-zone map/scene | DONE | Suhita's `a98548a` map/loader/flow retained; refined cinematic UI and procedural facility rendering; [integration verification](../quality/reports/phase02/integration/VERIFICATION.md) |
+| P02 five-zone map/scene | DONE | Suhita's `a98548a` map/loader/flow retained; illustrated floor/bulkhead/props/actor strips and refined sci-fi UI; [integration verification](../quality/reports/phase02/integration/VERIFICATION.md) |
 | AI / Workshop / final scoring | TODO | P03-P06 deliver active defenders, autonomous Companion, complete tools/environment, Workshop and approved rank calculation |
-| Local automated checks | DONE | Structure/lint/format/strict types and **69** focused cases pass on the integrated candidate; [combined report](../quality/reports/phase02/integration/VERIFICATION.md) |
+| Local automated checks | DONE | Structure/lint/format/strict types and **70** focused cases pass on the integrated candidate; [combined report](../quality/reports/phase02/integration/VERIFICATION.md) |
 | Hosted CI | IN_PROGRESS | Earlier owner branch CI passed all three jobs; integrated branch CI is recorded in the combined report after push |
-| Native packaging | DONE for P02 local macOS | Integrated arm64 .app passes real-Cocoa frozen smoke; Windows CI and interactive desktop statuses are recorded separately in the combined report |
+| Native packaging | IN_PROGRESS for final art candidate | Earlier integrated arm64 .app passed real-Cocoa frozen smoke; final art candidate rebuild pending; Windows CI and interactive desktop statuses are recorded separately in the combined report |
 | V1 platform/hardware QA | NOT_RUN | Suhita's interactive Windows desktop/download QA, wider macOS/download behavior and full-game release matrix remain untested |
-| Assets and licensing | IN_PROGRESS | Original generated menu/operative art and code-drawn gameplay motifs recorded in [asset register](../assets/ASSETS.md); remaining production set and source license pending |
+| Assets and licensing | IN_PROGRESS | Original generated scene/tile/prop/actor art plus Oxanium/OFL recorded in [asset register](../assets/ASSETS.md); remaining production set and source license pending |
 | itch.io/video/submission | TODO | GitHub source is published; game distribution, gameplay video and academic submission are still pending |
 
 P02 is a playable Human draft, not the full V1 game. The standard app launches the actual five-zone scene; P03-P08 and public-release gates remain separate. Outcomes are unscored until P06; guards are stationary P02 posts until P03. The 3D-style title art is an illustration; gameplay collision comes only from the validated Tiled map.

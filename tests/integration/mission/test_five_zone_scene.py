@@ -16,9 +16,9 @@ def key(event_type: int, value: int) -> pygame.event.Event:
     return pygame.event.Event(event_type, key=value)
 
 
-def start() -> GameFlow:
+def start(*, security_enabled: bool = False) -> GameFlow:
     pygame.font.init()
-    flow = GameFlow((1280, 720))
+    flow = GameFlow((1280, 720), security_enabled=security_enabled)
     flow.frame([key(pygame.KEYDOWN, pygame.K_RETURN)], 0)
     assert flow.scene == Scene.MODE
     flow.frame([key(pygame.KEYDOWN, pygame.K_RETURN)], 0)
@@ -142,3 +142,19 @@ def test_art_and_gait_follow_committed_movement_without_changing_simulation() ->
     canvas = pygame.Surface((1280, 720))
     flow.draw(canvas)
     assert flow.session.simulation.tick == tick_after_move
+
+
+def test_default_live_guard_allows_actual_lower_route_core_and_extraction() -> None:
+    flow = start(security_enabled=True)
+    assert flow.session is not None
+    first = flow.session.simulation.presentation_snapshot()
+    assert first.guards and first.guards[0].actor_id == "guard-service"
+    route = [(12, 17), (23, 17), (23, 27), (43, 27), (43, 23), (58, 23), (58, 18)]
+    back = [(58, 23), (43, 23), (43, 27), (23, 27), (23, 17), (12, 17), (2, 17)]
+    drive(flow, route, take_core=True)
+    guard = flow.session.simulation.presentation_snapshot().guards[0]
+    # Actual pursuit has finite memory; it does not track the hidden carrier forever.
+    assert guard.last_seen_tick == -1
+    drive(flow, back, expected_end=RunOutcome.WIN)
+    assert flow.session.mission_end is not None
+    assert flow.session.mission_end.outcome == RunOutcome.WIN

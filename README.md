@@ -2,7 +2,7 @@
 
 A Python + pygame-ce desktop stealth game with Human and autonomous Companion modes.
 
-Current development: **Phase 2 Human mission complete** (`0.1.0a1`). The five-zone facility, title/briefing/game/results flow, Core theft, lockdown, extraction, capture and basic tools are playable. Autonomous Companion, active guard sensing, Workshop and final scoring belong to later phases. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
+Current development: **Phase 2 Human mission complete** (`0.1.0a1`). The five-zone facility, title/briefing/game/results flow, Core theft, lockdown, extraction, capture and basic tools are playable. The first P03 stealth slice adds one active Sentinel with fair sight/hearing, BFS patrol, investigation/chase/search, compact HUD, event audio and Settings. Companion, the remaining advanced defenders, Workshop and scoring are pending. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
 
 ## Development setup
 
@@ -27,7 +27,7 @@ The older diagnostic contact room is still available for focused core-rule inspe
 uv run --locked python -m echo_heist.diagnostics.human_preview
 ```
 
-The five-zone mission has stationary guard posts for P02 capture testing; active patrol AI arrives in P03. See the [Phase 2 integration report](docs/development/quality/reports/phase02/integration/VERIFICATION.md) for actual map/scene checks and screenshots.
+The Entry/Service approach now has physical furniture and a live Sentinel. Three other posts retain P02 contact behavior while the remaining P03/P04 algorithms are developed. F3 opens real Sentinel telemetry; Tab opens the normal route/controls guide. Music and sound volumes are adjustable in Settings. See the [Phase 2 integration report](docs/development/quality/reports/phase02/integration/VERIFICATION.md) for actual map/scene checks and screenshots.
 
 For an isolated window check:
 
@@ -45,7 +45,7 @@ On Apple Silicon macOS or Windows x64:
 uv run --locked --all-extras python scripts/packaging/build.py
 ```
 
-On macOS this produces `dist/Echo Heist.app` and a platform ZIP. On Windows it produces `dist/EchoHeist/EchoHeist.exe` with its support folder and a platform ZIP. Keep the whole bundle/folder. The local macOS build is ad-hoc signed, not notarized. It contains the Phase 2 Human draft, not the finished V1 game.
+On macOS this produces `dist/Echo Heist.app` and a platform ZIP. On Windows it produces `dist/EchoHeist/EchoHeist.exe` with its support folder and a platform ZIP. Keep the whole bundle/folder. The local macOS build is ad-hoc signed, not notarized. It contains the current Human stealth slice; the full V1 remains in development.
 
 ```sh
 uv run --locked --all-extras python scripts/packaging/smoke.py "dist/Echo Heist.app" --mute
@@ -53,7 +53,7 @@ uv run --locked --all-extras python scripts/packaging/smoke.py "dist/Echo Heist.
 
 Use `dist/EchoHeist/EchoHeist.exe` on Windows. The smoke helper runs the frozen app from an unrelated directory, compares headless hashes and checks resources/settings. `--dummy-video` is available for CI and does not verify a real desktop. See [current Status](docs/development/tracking/STATUS.md) for hosted CI evidence. Windows wheel availability is verified; native Windows desktop QA remains pending.
 
-See the [P01 handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md) and [Phase 2 evidence](docs/development/quality/reports/phase02/integration/VERIFICATION.md). P03-P08 remain in the development plan.
+See the [P01 handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md) and [Phase 2 evidence](docs/development/quality/reports/phase02/integration/VERIFICATION.md). P03 is in progress; P04-P08 remain in the development plan.
 
 ## Development plan
 

@@ -8,6 +8,7 @@ from echo_heist.core.contracts.results import (
     MissionSpec,
     PresentationSnapshot,
 )
+from echo_heist.core.contracts.security.model import GuardView, SecuritySpec
 from echo_heist.core.contracts.world import StaticMap
 from echo_heist.core.simulation.systems.mission import interaction_hints
 from echo_heist.core.simulation.world import WorldState
@@ -39,12 +40,21 @@ def observe(
             if world.interaction_actor == actor_id
             else 0,
             capture_ticks_remaining=min(captures) if captures else None,
+            facing=actor.facing,
+            disabled=world.tick < actor.disabled_until,
+            stunned=world.tick < actor.stunned_until,
         ),
+        visible_entities=world.visible_entities.get(actor_id, ()),
+        heard_events=world.heard_cues.get(actor_id, ()),
+        shared_reports=world.security_reports if actor_id in world.guard_memories else (),
+        visual_cues=world.visual_cues.get(actor_id, ()),
         interactions=interaction_hints(world, world_map, rules, mission, actor_id),
     )
 
 
-def presentation(world: WorldState, world_map: StaticMap, rules: GameRules) -> PresentationSnapshot:
+def presentation(
+    world: WorldState, world_map: StaticMap, rules: GameRules, security: SecuritySpec | None = None
+) -> PresentationSnapshot:
     return PresentationSnapshot(
         tick=world.tick,
         world_map=world_map,
@@ -56,6 +66,7 @@ def presentation(world: WorldState, world_map: StaticMap, rules: GameRules) -> P
                 actor.position,
                 world.tick < actor.disabled_until,
                 world.tick < actor.stunned_until,
+                actor.facing,
             )
             for actor in world.actors.values()
         ),
@@ -75,4 +86,24 @@ def presentation(world: WorldState, world_map: StaticMap, rules: GameRules) -> P
         ),
         core_owner=world.core_owner,
         mission_end=world.mission_end,
+        guards=tuple(
+            GuardView(
+                actor_id,
+                memory.state,
+                world.actors[actor_id].facing,
+                memory.identity_ticks,
+                security.rules.identification_ticks,
+                security.rules.sight_range_tiles,
+                security.rules.half_angle_degrees,
+                memory.target,
+                memory.last_seen_tile,
+                memory.last_seen_tick,
+                memory.path,
+                memory.expanded_nodes,
+                memory.urgency,
+            )
+            for actor_id, memory in world.guard_memories.items()
+        )
+        if security is not None
+        else (),
     )

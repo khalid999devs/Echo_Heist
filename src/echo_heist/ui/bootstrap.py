@@ -117,7 +117,10 @@ def run_desktop(
             elapsed_ms = clock.tick(config.target_fps)
         if screenshot is not None:
             screenshot.parent.mkdir(parents=True, exist_ok=True)
-            pygame.image.save(screen, str(screenshot))
+            rgb = pygame.image.frombytes(
+                pygame.image.tobytes(screen, "RGB"), screen.get_size(), "RGB"
+            )
+            pygame.image.save(rgb, str(screenshot))
         actual_size = screen.get_size()
         saved_settings = replace(
             flow.settings,

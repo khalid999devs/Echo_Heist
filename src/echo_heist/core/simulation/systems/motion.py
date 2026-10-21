@@ -94,6 +94,7 @@ def move_actor(
     if actor.position == origin:
         emit(EventKind.ACTION_REJECTED, actor.actor_id, (("reason", "blocked"),))
         return
+    actor.facing = action.direction
     emit(
         EventKind.ACTOR_MOVED, actor.actor_id, (("x", actor.position[0]), ("y", actor.position[1]))
     )

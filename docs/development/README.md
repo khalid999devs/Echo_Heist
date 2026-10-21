@@ -1,6 +1,6 @@
 # ECHO HEIST development hub
 
-Created: 2026-10-18. Stage: P01 and complete Human P02 integrated; P03-P08 pending. Day 1 implementation started on 2026-10-18; P02 was accepted on 2026-10-20.
+Created: 2026-10-18. Stage: P01 and complete Human P02 integrated; first P03 stealth slice in progress; P04-P08 pending. Day 1 implementation started on 2026-10-18; P02 was accepted on 2026-10-20.
 
 Current target: a complete working initial draft in **eight phases over four development days**. Khalid owns Phase 1; later work is split by strengths with 80 estimated points each. All defined functionality must work after Phase 8; later work improves accuracy and polish. Public distribution retains its platform/release checks.
 
@@ -53,3 +53,5 @@ Next integration baseline: [Khalid's actual P02 handoff](tracking/handoffs/khali
 Use `TODO`, `IN_PROGRESS`, `BLOCKED`, and `DONE`. A task becomes DONE only when its acceptance condition is met and evidence is recorded. A plan or a compiled executable does not prove gameplay acceptance or platform support.
 
 At the end of each implementation batch, update your owner slice/handoff and relevant Backlog/Status/Changelog records without overwriting the other developer's changes. The phase integrator closes the shared gate only after combined verification. Store future QA reports under grouped `quality/reports/`, experiment summaries under `quality/experiments/`, and manifests under `release/manifests/`; create them only for real evidence and group before adding a seventh direct file. Keep large generated logs, captures/builds and experiment output outside version control, with durable artifact references in reports.
+
+Current revision: [first stealth runtime contracts](architecture/integration/STEALTH_SLICE.md), [audio integration](assets/AUDIO.md), and [updated screen review](quality/reports/phase02/presentation/REVIEW.md). The owner brief is being implemented in playable milestones; full V1 acceptance remains open.

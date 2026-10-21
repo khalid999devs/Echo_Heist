@@ -1,0 +1,10 @@
+{
+  "sight_range_tiles": 8,
+  "half_angle_degrees": 50,
+  "identification_ticks": 18,
+  "near_identification_ticks": 6,
+  "memory_ticks": 150,
+  "search_ticks": 90,
+  "report_ttl_ticks": 90,
+  "patrol_pause_ticks": 12
+}

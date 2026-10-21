@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from dataclasses import asdict
 from hashlib import sha256
 
+from echo_heist.ai.navigation.grid import bfs
 from echo_heist.core.abilities.tools import advance_echoes, tool_reason, use_tool
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.config.gameplay import GameRules
@@ -17,8 +18,10 @@ from echo_heist.core.contracts.results import (
     RunOutcome,
     StepResult,
 )
+from echo_heist.core.contracts.security.model import GuardMemory, SecuritySpec
 from echo_heist.core.contracts.world import ActorKind, ActorSpawn, Scalar, StaticMap, tile_center
 from echo_heist.core.simulation import views
+from echo_heist.core.simulation.systems import security as guard_security
 from echo_heist.core.simulation.systems.capture import update_captures
 from echo_heist.core.simulation.systems.mission import (
     check_extraction,
@@ -42,6 +45,7 @@ class Simulation:
         rules: GameRules,
         mission: MissionSpec | None = None,
         seed: int = 1042,
+        security: SecuritySpec | None = None,
     ) -> None:
         if not spawns:
             raise ValueError("At least one actor is required")
@@ -55,6 +59,7 @@ class Simulation:
         ):
             raise ValueError("Actor spawn must fit on a walkable map tile")
         self._map, self._rules, self._mission, self._seed = world_map, rules, mission, seed
+        self._security = security
         self._world = WorldState(
             actors={
                 spawn.actor_id: ActorState(
@@ -82,6 +87,40 @@ class Simulation:
                 raise ValueError("Mission needs distinct Core and Exit anchors")
             if not world_map.can_walk(exit_object.tile):
                 raise ValueError("Extraction marker must be walkable")
+        if security is not None:
+            for patrol in security.patrols:
+                guard = self._world.actors.get(patrol.actor_id)
+                if guard is None or guard.kind != ActorKind.SENTINEL:
+                    raise ValueError("The active Sentinel slice requires a Sentinel actor")
+                if any(
+                    not body_fits(world_map, tile_center(tile), rules.actor_radius_units)
+                    for tile in patrol.points
+                ):
+                    raise ValueError("Every patrol waypoint must fit on a walkable tile")
+                if any(
+                    not bfs(world_map, first, second).path
+                    for first, second in zip(
+                        patrol.points, (*patrol.points[1:], patrol.points[0]), strict=True
+                    )
+                ):
+                    raise ValueError("Patrol waypoints must be connected")
+                next_point = next(
+                    (tile for tile in patrol.points if tile != guard.tile), patrol.points[0]
+                )
+                guard.facing = (
+                    1
+                    if next_point[0] > guard.tile[0]
+                    else -1
+                    if next_point[0] < guard.tile[0]
+                    else 0,
+                    1
+                    if next_point[1] > guard.tile[1]
+                    else -1
+                    if next_point[1] < guard.tile[1]
+                    else 0,
+                )
+                self._world.guard_memories[patrol.actor_id] = GuardMemory()
+            guard_security.refresh(self._world, world_map, security, ())
 
     @property
     def tick(self) -> int:
@@ -95,16 +134,37 @@ class Simulation:
         return views.observe(self._world, self._map, self._rules, self._mission, actor_id)
 
     def presentation_snapshot(self) -> PresentationSnapshot:
-        return views.presentation(self._world, self._map, self._rules)
+        return views.presentation(self._world, self._map, self._rules, self._security)
 
     def step(self, actions: Iterable[Action] = (), *, abort: bool = False) -> StepResult:
         if self._world.mission_end is not None:
             return self._result(())
+        choices = (
+            guard_security.decisions(
+                self._security,
+                tuple(self.observe(patrol.actor_id) for patrol in self._security.patrols),
+                self._world,
+            )
+            if self._security is not None
+            else ()
+        )
+        supplied = tuple(actions)
+        controlled = self._world.guard_memories
         queued = tuple(
-            sorted(actions, key=lambda action: (action.actor_id, action.kind.value, repr(action)))
+            sorted(
+                (
+                    *[action for action in supplied if action.actor_id not in controlled],
+                    *(decision.action for _, decision in choices),
+                ),
+                key=lambda action: (action.actor_id, action.kind.value, repr(action)),
+            )
         )
         counts = Counter(action.actor_id for action in queued)
-        rejected: list[tuple[Action, str]] = []
+        rejected: list[tuple[Action, str]] = [
+            (action, "simulation_controlled_actor")
+            for action in supplied
+            if action.actor_id in controlled
+        ]
         accepted: list[Action] = []
         for action in queued:
             reason = self._rejection_reason(action, counts[action.actor_id])
@@ -133,6 +193,8 @@ class Simulation:
             return self._result(tuple(events))
         for actor in self._world.actors.values():
             actor.traversed_tiles = (actor.tile,)
+        if self._security is not None:
+            guard_security.apply_decisions(self._world, self._security, choices, emit)
         advance_echoes(self._world)
         for action, reason in rejected:
             emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
@@ -160,8 +222,17 @@ class Simulation:
                 else:
                     emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
         update_theft(self._world, self._rules, self._mission, tuple(interactions), emit)
+        if self._security is not None:
+            guard_security.refresh(self._world, self._map, self._security, tuple(events))
         # Tools precede capture; completed contact capture precedes extraction.
-        update_captures(self._world, self._map, self._rules, self._mission, emit)
+        update_captures(
+            self._world,
+            self._map,
+            self._rules,
+            self._mission,
+            emit,
+            guard_security.capture_eligible(self._world) if self._security else None,
+        )
         check_extraction(self._world, self._map, self._mission, emit)
         remember_paths(self._world, self._rules)
         return self._result(tuple(events))
@@ -215,10 +286,17 @@ class Simulation:
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 2,
+            "schema_version": 3,
             "seed": self._seed,
             "rules": asdict(self._rules),
             "mission": asdict(self._mission) if self._mission else None,
+            "security": {
+                "patrols": [asdict(patrol) for patrol in self._security.patrols],
+                "rules": asdict(self._security.rules),
+                "sound_blocking_tiles": sorted(self._security.sound_blocking_tiles),
+            }
+            if self._security
+            else None,
             "world": asdict(self._world),
             "map": {
                 "id": self._map.map_id,

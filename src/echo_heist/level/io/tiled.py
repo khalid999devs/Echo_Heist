@@ -24,7 +24,7 @@ OBJECT_KINDS = {
     "zones": frozenset({"Zone"}),
     "anchors": frozenset({"Spawn", "Exit", "Core"}),
     "patrols": frozenset({"PatrolRoute", "GuardSpawn"}),
-    "markers": frozenset({"Cover", "HideSpot", "Chokepoint"}),
+    "markers": frozenset({"Cover", "HideSpot", "Chokepoint", "Furniture"}),
 }
 GEOMETRY_FLAGS = ("blocks_movement", "blocks_vision", "blocks_sound")
 type Json = dict[str, object]
@@ -150,11 +150,11 @@ def _object(item: object, layer: str, raw: RawMap, where: str) -> RawObject | No
         raise MapFormatError(f"{where}: ID {object_id!r} must be lowercase letters/digits/-")
     x, y = _number(entry.get("x"), f"{where}.x"), _number(entry.get("y"), f"{where}.y")
     found = RawObject(object_id, kind, layer, _tile_at(x, y, raw, where), properties)
-    if kind == "Zone":
+    if kind in ("Zone", "Furniture"):
         size = raw.tile_size
         w, h = _number(entry.get("width"), where), _number(entry.get("height"), where)
         if any(value % size for value in (x, y, w, h)) or w <= 0 or h <= 0:
-            raise MapFormatError(f"{where}: zone {object_id!r} must align to whole tiles")
+            raise MapFormatError(f"{where}: {kind} {object_id!r} must align to whole tiles")
         found.rect = (int(x) // size, int(y) // size, int(w) // size, int(h) // size)
     elif kind == "PatrolRoute":
         points = _list(entry.get("polyline"), f"{where}.polyline")
@@ -230,6 +230,38 @@ def parse_tiled(payload: bytes | str) -> RawMap:
     return raw
 
 
+def _apply_furniture(raw: RawMap) -> None:
+    for obj in raw.objects:
+        if obj.kind != "Furniture":
+            continue
+        assert obj.rect is not None
+        left, top, width, height = obj.rect
+        if left + width > raw.width or top + height > raw.height:
+            raise MapFormatError(f"{obj.object_id!r}: furniture footprint extends outside the map")
+        footprint = frozenset(
+            (a, b) for a in range(left, left + width) for b in range(top, top + height)
+        )
+        if footprint & raw.flags.get("blocks_movement", frozenset()):
+            raise MapFormatError(f"{obj.object_id!r}: furniture overlaps existing solid geometry")
+        if obj.properties.get("style") not in (
+            "rack",
+            "console",
+            "tank",
+            "crates",
+            "plant",
+            "workbench",
+        ):
+            raise MapFormatError(f"{obj.object_id!r}: unknown furniture style")
+        for flag in GEOMETRY_FLAGS:
+            if type(obj.properties.get(flag)) is not bool:
+                raise MapFormatError(f"{obj.object_id!r}: furniture requires explicit {flag}")
+            if obj.properties[flag]:
+                raw.flags[flag] = raw.flags.get(flag, frozenset()) | footprint
+        if obj.properties["blocks_movement"] is not True:
+            raise MapFormatError(f"{obj.object_id!r}: furniture must have a physical footprint")
+        obj.properties.update(width_tiles=width, height_tiles=height)
+
+
 def build_level(raw: RawMap) -> LevelData:
     """Construct typed values; validate.check_level decides whether they are playable."""
 
@@ -242,6 +274,7 @@ def build_level(raw: RawMap) -> LevelData:
             raise MapFormatError(f"map: expected exactly one {kind} anchor, found {len(found)}")
         return found[0]
 
+    _apply_furniture(raw)
     spawn, exit_anchor, core = one("Spawn"), one("Exit"), one("Core")
     operative = _text(spawn.properties.get("actor_id", "operative"), "Spawn actor_id")
     guards: list[GuardPost] = []
@@ -264,7 +297,7 @@ def build_level(raw: RawMap) -> LevelData:
         label = obj.properties.get("label", obj.object_id)
         zones.append(Zone(obj.object_id, str(label), *obj.rect))
     blocked = raw.flags.get("blocks_movement", frozenset())
-    visible_kinds = ("Spawn", "Exit", "Core", "Cover", "HideSpot", "Chokepoint")
+    visible_kinds = ("Spawn", "Exit", "Core", "Cover", "HideSpot", "Chokepoint", "Furniture")
     static_map = StaticMap(
         raw.map_id,
         raw.width,

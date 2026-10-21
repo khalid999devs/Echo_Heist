@@ -13,6 +13,7 @@ from echo_heist.level.model import LevelData
 from echo_heist.ui.render import motifs, theme
 from echo_heist.ui.render.camera import Camera
 from echo_heist.ui.render.surfaces.glass import alert_frame
+from echo_heist.ui.render.surfaces.vision import draw_vision
 from echo_heist.ui.render.theme import Fonts
 
 
@@ -135,32 +136,19 @@ def _roof_tile(
         )
 
 
-def _decorate_rooms(surface: pygame.Surface, level: LevelData, art: WorldArt) -> None:
-    """Place visual-only furnishings on authored blocked cells and cover islands."""
+def _decorate_cover(surface: pygame.Surface, level: LevelData, art: WorldArt) -> None:
+    """Illustrate physical cover cells without placing furnishings on closed roofs."""
     size = level.static_map.tile_size_px
-    fixtures = (
-        (0, (29, 16), (56, 72)),
-        (1, (32, 17), (92, 68)),
-        (2, (34, 19), (55, 70)),
-        (0, (42, 16), (56, 72)),
-        (5, (45, 17), (78, 60)),
-        (4, (42, 20), (46, 48)),
-        (3, (19, 20), (62, 40)),
-        (3, (15, 25), (62, 40)),
-        (5, (33, 6), (62, 42)),
-        (5, (36, 28), (62, 42)),
-        (3, (53, 19), (62, 40)),
-    )
-    for index, tile, dimensions in fixtures:
-        if level.static_map.can_walk(tile):
-            continue
-        prop = pygame.transform.smoothscale(art.props[index], dimensions)
-        prop.fill((210, 222, 231), special_flags=pygame.BLEND_RGB_MULT)
-        point = ((tile[0] + 0.5) * size, (tile[1] + 0.5) * size)
-        shadow = pygame.Surface((dimensions[0] + 14, dimensions[1] + 10), pygame.SRCALPHA)
-        pygame.draw.ellipse(shadow, (0, 5, 8, 95), shadow.get_rect().inflate(-4, -5))
-        surface.blit(shadow, shadow.get_rect(center=(point[0] + 3, point[1] + 8)))
-        surface.blit(prop, prop.get_rect(center=point))
+    remaining = set(level.cover_tiles)
+    while remaining:
+        x, y = min(remaining)
+        width = 1
+        while (x + width, y) in remaining:
+            width += 1
+        remaining.difference_update((x + offset, y) for offset in range(width))
+        rect = pygame.Rect(x * size, y * size, width * size, size)
+        prop = pygame.transform.smoothscale(art.props[3], rect.inflate(-3, -3).size)
+        surface.blit(prop, rect.move(1, 0))
 
 
 def _floor_shadows(surface: pygame.Surface, level: LevelData) -> None:
@@ -188,6 +176,41 @@ def _floor_shadows(surface: pygame.Surface, level: LevelData) -> None:
     surface.blit(layer, (0, 0))
 
 
+def _furniture_rects(level: LevelData) -> tuple[tuple[pygame.Rect, str], ...]:
+    size = level.static_map.tile_size_px
+    result = []
+    for obj in level.static_map.objects:
+        if obj.kind == "Furniture":
+            props = dict(obj.properties)
+            width, height = props["width_tiles"], props["height_tiles"]
+            assert isinstance(width, int) and isinstance(height, int)
+            result.append(
+                (
+                    pygame.Rect(
+                        obj.tile[0] * size,
+                        obj.tile[1] * size,
+                        width * size,
+                        height * size,
+                    ),
+                    str(props["style"]),
+                )
+            )
+    return tuple(result)
+
+
+def _draw_furniture(surface: pygame.Surface, level: LevelData, art: WorldArt) -> None:
+    styles = {"rack": 0, "console": 1, "tank": 2, "crates": 3, "plant": 4, "workbench": 5}
+    for footprint, style in _furniture_rects(level):
+        # The sprite and its contact shadow stay within the physical footprint.
+        # No invisible rectangle extends into a neighboring walking lane.
+        prop = pygame.transform.smoothscale(
+            art.props[styles[style]], footprint.inflate(-4, -4).size
+        )
+        prop.fill((205, 220, 232), special_flags=pygame.BLEND_RGB_MULT)
+        pygame.draw.rect(surface, (4, 13, 20), footprint.inflate(-1, -1), border_radius=5)
+        surface.blit(prop, footprint.move(2, 1))
+
+
 def build_map_surface(
     level: LevelData, fonts: Fonts, art: WorldArt | None = None
 ) -> pygame.Surface:
@@ -195,6 +218,15 @@ def build_map_surface(
     world_map, size = level.static_map, level.static_map.tile_size_px
     surface = pygame.Surface((world_map.width * size, world_map.height * size))
     surface.fill(theme.BACKGROUND)
+    roof_texture = art.bulkhead.copy() if art else None
+    if roof_texture is not None:
+        roof_texture.fill((88, 108, 125), special_flags=pygame.BLEND_RGB_MULT)
+    furniture_tiles = {
+        (x, y)
+        for rect, _ in _furniture_rects(level)
+        for x in range(rect.left // size, rect.right // size)
+        for y in range(rect.top // size, rect.bottom // size)
+    }
     for y in range(world_map.height):
         for x in range(world_map.width):
             tile = (x, y)
@@ -202,7 +234,11 @@ def build_map_surface(
             variant = (x * 73 + y * 37 + x * y * 3) & 255
             zone = level.zone_at(tile)
             zone_id = zone.zone_id if zone else None
-            if tile in level.glass_tiles:
+            if tile in furniture_tiles:
+                motifs.floor_tile(
+                    surface, rect, zone_id, variant, texture=art.floor if art else None
+                )
+            elif tile in level.glass_tiles:
                 motifs.glass_tile(surface, rect)
             elif tile in level.cover_tiles:
                 motifs.cover_tile(surface, rect, variant)
@@ -225,10 +261,11 @@ def build_map_surface(
                         texture=art.bulkhead if art else None,
                     )
                 else:
-                    _roof_tile(surface, rect, variant, art.bulkhead if art else None)
+                    _roof_tile(surface, rect, variant, roof_texture)
     _floor_shadows(surface, level)
     if art is not None:
-        _decorate_rooms(surface, level, art)
+        _decorate_cover(surface, level, art)
+        _draw_furniture(surface, level, art)
     anchors = {obj.object_id: obj.tile for obj in world_map.objects}
     for object_id, painter in (
         (level.exit_id, motifs.extraction_floor),
@@ -287,7 +324,7 @@ def _anchor(
     clock_ms: int = 0,
 ) -> None:
     point = camera.to_screen(((tile[0] + 0.5) * size, (tile[1] + 0.5) * size))
-    color = theme.WARNING if kind == "CORE" else theme.ACCENT
+    color = theme.ACCENT
     if kind == "CORE" and not active:
         color = theme.DANGER if alert else theme.DISABLED
     motifs.beacon_glow(canvas, point, color, 48 if kind == "CORE" else 38, pulse)
@@ -330,8 +367,10 @@ def _anchor(
                     (point[0] + 3, point[1] + 4),
                 ),
             )
-    label = fonts.micro.render(kind, True, color)
-    canvas.blit(label, (point[0] - label.get_width() // 2, point[1] - 31))
+    label = fonts.micro.render(
+        "EMPTY SOCKET" if kind == "CORE" and not active else kind, True, color
+    )
+    canvas.blit(label, (point[0] - label.get_width() // 2, point[1] - 55))
 
 
 def draw_world(
@@ -351,6 +390,14 @@ def draw_world(
     size = level.static_map.tile_size_px
     canvas.fill(theme.BACKGROUND)
     canvas.blit(map_surface, camera.to_screen((0, 0)))
+    if snapshot.phase == MissionPhase.LOCKDOWN:
+        canvas.fill((244, 205, 212), special_flags=pygame.BLEND_RGB_MULT)
+        for choke in level.chokepoints:
+            screen_point = camera.to_screen(
+                ((choke.tile[0] + 0.5) * size, (choke.tile[1] + 0.5) * size)
+            )
+            motifs.light_pool(canvas, screen_point, theme.DANGER, 90)
+    draw_vision(canvas, level.static_map, snapshot, camera)
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
     _anchor(
         canvas,

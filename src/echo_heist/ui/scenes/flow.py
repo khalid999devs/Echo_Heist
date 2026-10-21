@@ -7,6 +7,7 @@ from enum import StrEnum
 import pygame
 
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.security.model import GuardState
 from echo_heist.infrastructure.persistence.settings import Settings
 from echo_heist.infrastructure.resources import load_game_rules, resource_bytes
 from echo_heist.level.io import load_tiled_map
@@ -56,11 +57,13 @@ class GameFlow:
         level: LevelData | None = None,
         rules: GameRules | None = None,
         settings: Settings | None = None,
+        security_enabled: bool = True,
     ) -> None:
         self.view_size, self.seed = view_size, seed
         self.level = level or load_level()
         self.rules = rules or load_game_rules()
         self.settings = settings or Settings()
+        self.security_enabled = security_enabled
         self.fonts = Fonts()
         self.art = WorldArt.load()
         self.backdrop = load_backdrop(view_size)
@@ -86,6 +89,7 @@ class GameFlow:
             map_surface=self.map_surface,
             art=self.art,
             reduced_flashing=self.settings.reduced_flashing,
+            security_enabled=self.security_enabled,
         )
         self.runs_started += 1
         self.scene = Scene.HEIST
@@ -281,6 +285,11 @@ class GameFlow:
             phase=snapshot.phase if snapshot else None,
             paused=self.session.paused if self.session else False,
             outcome=snapshot.mission_end.outcome if snapshot and snapshot.mission_end else None,
+            alerted=any(
+                guard.state in (GuardState.CHASE, GuardState.SEARCH) for guard in snapshot.guards
+            )
+            if snapshot
+            else False,
             events=events,
         )
 

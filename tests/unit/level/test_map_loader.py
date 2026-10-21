@@ -135,3 +135,47 @@ def test_invalid_maps_fail_with_a_specific_reason(label: str, edit: Edit, messag
 def test_wrong_expected_map_id_is_rejected() -> None:
     with pytest.raises(MapFormatError, match="expected map_id"):
         load_tiled_map(resource_bytes(f"data/maps/{MAP_ID}.json"), expected_map_id="other-map")
+
+
+def test_furniture_has_matching_physical_opaque_acoustic_footprints() -> None:
+    level = load_tiled_map(resource_bytes(f"data/maps/{MAP_ID}.json"))
+    fixtures = [obj for obj in level.static_map.objects if obj.kind == "Furniture"]
+    assert len(fixtures) == 9
+    for fixture in fixtures:
+        props = dict(fixture.properties)
+        footprint = {
+            (x, y)
+            for x in range(fixture.tile[0], fixture.tile[0] + int(props["width_tiles"]))
+            for y in range(fixture.tile[1], fixture.tile[1] + int(props["height_tiles"]))
+        }
+        assert (
+            footprint
+            <= level.static_map.blocked_tiles
+            & level.static_map.opaque_tiles
+            & level.sound_blocking_tiles
+        )
+
+    reordered = packaged()
+    reordered["layers"].reverse()
+    reversed_level = load_tiled_map(json.dumps(reordered))
+    assert reversed_level.static_map.blocked_tiles == level.static_map.blocked_tiles
+    assert reversed_level.static_map.opaque_tiles == level.static_map.opaque_tiles
+    assert reversed_level.sound_blocking_tiles == level.sound_blocking_tiles
+
+
+@pytest.mark.parametrize("invalid", ["overlap", "bounds", "untagged", "patrol"])
+def test_invalid_furniture_cannot_silently_break_physical_room(invalid: str) -> None:
+    data = packaged()
+    fixture = named(data, "markers", "entry-console")
+    if invalid == "overlap":
+        fixture["x"] = 0
+    elif invalid == "bounds":
+        fixture["width"] = 100 * 32
+    elif invalid == "untagged":
+        fixture["properties"] = [
+            prop for prop in fixture["properties"] if prop["name"] != "blocks_vision"
+        ]
+    else:
+        fixture["x"], fixture["y"] = 18 * 32, 8 * 32
+    with pytest.raises(MapFormatError):
+        load_tiled_map(json.dumps(data))

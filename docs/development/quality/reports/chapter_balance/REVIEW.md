@@ -39,6 +39,8 @@ Audio-enabled accelerated native source run also finished WIN: **1,300 rendered 
 
 ## Packaging and boundary
 
-Clean packaging and hosted CI for this revision are pending at this source checkpoint. The previous macOS ZIP does not yet represent this compact map. Actual build/hash/smoke results will be added after building the committed source.
+Clean **`e92d96e`** macOS arm64 app and freshly extracted ZIP each PASS all eight native Cocoa frozen smoke checks, audio ready / 16 assets loaded. Archive `dist/echo-heist-0.1.0a1-macos-arm64.zip`, **44,050,293 bytes**, SHA256 **`bfa09ce8cb37ae6e5fe68956c9aaeef0d894de198ccf64feb4f530fe63585892`**. Python 3.13.16 / PyInstaller 6.22.3 / macOS 26.4.1 arm64; ad-hoc signed, not notarized. [Actual manifest/smoke results](BUILD.json). Build-manifest smoke reminder is preserved separately from actual executed results.
+
+[Hosted CI 39599989680](https://github.com/khalid999devs/Echo_Heist/actions/runs/39599989680) **PASS** at `e92d96e`: all Linux/Windows/macOS checks, native Windows/macOS builds and frozen dummy-video smoke. Later record changes are documentation only. Native smoke verifies startup/resources/settings and matching headless hashes; full source mission checks are recorded above. Full frozen mission input, downloaded quarantine and interactive Windows hardware are separate unrun gates.
 
 P03 remains partial: one autonomous Sentinel and three contact posts. Tracker A*, shared registry, Companion/MCTS, Interceptor/minimax, NEXUS, Workshop and approved scoring are still assigned later work. Glass breaking, doors, real hiding and canisters remain P05 by explicit owner choice. Interactive Windows hardware, clean-download behavior and final human balance/feel remain unverified.

@@ -37,9 +37,10 @@ def floor_tile(
             rect.x % texture.get_width(), rect.y % texture.get_height(), rect.w, rect.h
         )
         surface.blit(texture, rect.topleft, source)
-    pygame.draw.line(surface, shade(base, -12), rect.topleft, (rect.right - 1, rect.top), 1)
-    pygame.draw.line(surface, shade(base, 7), (rect.left, rect.bottom - 1), rect.bottomright, 1)
-    if variant % 5 == 0:
+    if texture is None:
+        pygame.draw.line(surface, shade(base, -12), rect.topleft, (rect.right - 1, rect.top), 1)
+        pygame.draw.line(surface, shade(base, 7), (rect.left, rect.bottom - 1), rect.bottomright, 1)
+    if texture is None and variant % 5 == 0:
         pygame.draw.line(
             surface,
             shade(base, 10),
@@ -48,7 +49,7 @@ def floor_tile(
             1,
         )
         pygame.draw.circle(surface, shade(base, 16), (rect.right - 5, rect.bottom - 5), 1)
-    if variant % 23 == 0:
+    if texture is None and variant % 23 == 0:
         pygame.draw.rect(surface, shade(base, -14), rect.inflate(-12, -13), 1)
     if variant % 19 == 0:
         pygame.draw.line(
@@ -268,10 +269,12 @@ def actor(
         contour = pygame.mask.from_surface(frame, 96).outline(every=2)
         if len(contour) > 2:
             halo = pygame.Surface(frame.get_size(), pygame.SRCALPHA)
-            pygame.draw.lines(halo, (*accent, 195), True, contour, 3)
+            pygame.draw.lines(halo, (*accent, 85), True, contour, 1)
             canvas.blit(halo, frame_rect)
+        contact = pygame.Surface((42, 18), pygame.SRCALPHA)
+        pygame.draw.ellipse(contact, (*accent, 95), (2, 2, 38, 14), 1)
+        canvas.blit(contact, (x - 21, y + 17))
         canvas.blit(frame, frame_rect)
-        pygame.draw.circle(canvas, accent, (x, y + 10), 17, 1)
         if carries_core:
             pygame.draw.circle(canvas, theme.WARNING, (x + 12, y - 12), 4 + int(pulse), 2)
         if disabled or stunned:

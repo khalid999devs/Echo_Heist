@@ -5,6 +5,7 @@ from enum import StrEnum
 
 from echo_heist.core.contracts.events import GameEvent
 from echo_heist.core.contracts.observations import EntityView, Observation
+from echo_heist.core.contracts.security.model import GuardView
 from echo_heist.core.contracts.world import MissionPhase, Position, StaticMap, immutable_tile
 
 
@@ -89,3 +90,4 @@ class PresentationSnapshot:
     captures: tuple[CaptureView, ...] = ()
     core_owner: str | None = None
     mission_end: MissionEnd | None = None
+    guards: tuple[GuardView, ...] = ()

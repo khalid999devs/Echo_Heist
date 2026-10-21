@@ -16,6 +16,9 @@ class ObjectiveView:
     elapsed: str
     warning: str
     interaction_progress: tuple[int, int] | None
+    echo_charges: int = 0
+    emp_charges: int = 0
+    core_held: bool = False
 
 
 def build_objective_view(observation: Observation, *, ticks_per_second: int) -> ObjectiveView:
@@ -46,6 +49,9 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
         f"{seconds // 60:02d}:{seconds % 60:02d}",
         "CAPTURE WIND-UP - Escape, EMP or melee" if remaining is not None else "",
         interaction_progress,
+        inventory.echo_charges,
+        inventory.emp_charges,
+        inventory.core_held,
     )
 
 

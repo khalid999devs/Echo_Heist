@@ -1,6 +1,6 @@
 # Start or resume developer work
 
-This is the operational entry point for either developer's coding agent. The goal is a complete working initial V1 draft in eight phases over four development days. P01 and P02 are implemented; retrieve the [actual P02 integrated handoff](../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md). P03-P08 are pending; inspect current tracking/code before assuming later modules exist.
+This is the operational entry point for either developer's coding agent. The goal is a complete working initial V1 draft in eight phases over four development days. P01 and P02 are implemented; retrieve the [actual P02 integrated handoff](../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md). P03 has a first verified Sentinel subset; P04-P08 are pending; inspect current tracking/code before assuming later modules exist.
 
 ## Resolve the developer once
 
@@ -15,6 +15,7 @@ This is the operational entry point for either developer's coding agent. The goa
 1. Read [AGENTS.md](../../../AGENTS.md), the [development hub](../README.md), [Status](../tracking/STATUS.md), [Handoffs](../tracking/HANDOFFS.md) and the appropriate owner guide.
 2. Read the [eight-phase index](../planning/phases/README.md), [workload table](../planning/WORKLOAD.md) and the next ready assigned phase. Read its prerequisites' actual handoff, not only their plan text.
 3. Read [code rules](CODE_RULES.md), [codebase](../architecture/CODEBASE.md), [contracts](../architecture/DATA_CONTRACTS.md), [approved scoring](../planning/SCORING.md) and relevant source PDF pages. The user overrides the blueprint's schedule/score defaults; preserve all other required functionality.
+   The owner's [full gameplay/environment/UI brief](../planning/references/IMPLEMENTATION_BRIEF.md) and [repository audit/first milestone](../planning/references/REPOSITORY_AUDIT.md) guide the 2026-10-21 incremental revision; concept screenshots are inspiration, never runtime gameplay or evidence of missing systems.
 4. Inspect existing code, available launch/check commands, working changes, dependency lock and relevant tests. Planned paths are a starting design; follow the P01 actual contract map and update docs if a justified implementation layout differs.
 5. Check your task slices/feature anchors, readiness, active claims and file boundaries. Choose the earliest ready slice for your identity. Do not use a generic A/B role assignment or the retired M0-M5 milestones.
 

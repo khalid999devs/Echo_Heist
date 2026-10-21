@@ -3,8 +3,10 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from echo_heist.core.contracts.events import EventKind
+from echo_heist.core.contracts.events import EventKind, HeardCue, SecurityReport
+from echo_heist.core.contracts.observations import EntityView
 from echo_heist.core.contracts.results import MissionEnd
+from echo_heist.core.contracts.security.model import GuardMemory, VisualCue
 from echo_heist.core.contracts.world import (
     ActorKind,
     Inventory,
@@ -31,6 +33,7 @@ class ActorState:
     path: list[Position] = field(default_factory=list)
     next_footstep_tick: int = 0
     traversed_tiles: tuple[Tile, ...] = ()
+    facing: Tile = (0, -1)
 
     @property
     def tile(self) -> Tile:
@@ -67,3 +70,8 @@ class WorldState:
     echoes: dict[str, EchoState] = field(default_factory=dict)
     next_echo_id: int = 0
     mission_end: MissionEnd | None = None
+    guard_memories: dict[str, GuardMemory] = field(default_factory=dict)
+    visible_entities: dict[str, tuple[EntityView, ...]] = field(default_factory=dict)
+    heard_cues: dict[str, tuple[HeardCue, ...]] = field(default_factory=dict)
+    visual_cues: dict[str, tuple[VisualCue, ...]] = field(default_factory=dict)
+    security_reports: tuple[SecurityReport, ...] = ()

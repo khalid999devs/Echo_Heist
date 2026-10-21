@@ -13,6 +13,7 @@ from echo_heist.infrastructure.persistence.settings import (
     SettingsStore,
 )
 from echo_heist.infrastructure.resources import load_bootstrap_config, resource_bytes
+from echo_heist.ui.audio.director import AudioDirector
 from echo_heist.ui.scenes.flow import GameFlow
 
 
@@ -72,13 +73,31 @@ def run_desktop(
             except pygame.error:
                 audio_state = "unavailable; continuing silently"
         canvas = pygame.Surface((config.logical_width, config.logical_height))
-        flow = GameFlow((config.logical_width, config.logical_height))
+        flow = GameFlow((config.logical_width, config.logical_height), settings=settings)
+        audio = AudioDirector(
+            enabled=audio_state == "ready",
+            music_volume=settings.music_volume,
+            sfx_volume=settings.sfx_volume,
+        )
+        display_fullscreen = settings.fullscreen
         clock = pygame.time.Clock()
         elapsed_ms = 0
         while flow.running:
             logical_size = (config.logical_width, config.logical_height)
             events = _logical_events(pygame.event.get(), screen.get_size(), logical_size)
             flow.frame(events, elapsed_ms)
+            audio.volumes(flow.settings.music_volume, flow.settings.sfx_volume)
+            audio.update(flow.audio_frame(), elapsed_ms)
+            if flow.settings.fullscreen != display_fullscreen:
+                display_fullscreen = flow.settings.fullscreen
+                dimensions = (
+                    (0, 0)
+                    if display_fullscreen
+                    else (flow.settings.window_width, flow.settings.window_height)
+                )
+                screen = pygame.display.set_mode(
+                    dimensions, pygame.FULLSCREEN if display_fullscreen else pygame.RESIZABLE
+                )
             flow.draw(canvas)
             width, height = screen.get_size()
             scale = min(width / config.logical_width, height / config.logical_height)
@@ -98,10 +117,13 @@ def run_desktop(
             elapsed_ms = clock.tick(config.target_fps)
         if screenshot is not None:
             screenshot.parent.mkdir(parents=True, exist_ok=True)
-            pygame.image.save(screen, str(screenshot))
+            rgb = pygame.image.frombytes(
+                pygame.image.tobytes(screen, "RGB"), screen.get_size(), "RGB"
+            )
+            pygame.image.save(rgb, str(screenshot))
         actual_size = screen.get_size()
         saved_settings = replace(
-            settings,
+            flow.settings,
             window_width=max(MIN_WINDOW_SIZE[0], min(actual_size[0], MAX_WINDOW_SIZE[0])),
             window_height=max(MIN_WINDOW_SIZE[1], min(actual_size[1], MAX_WINDOW_SIZE[1])),
         )
@@ -113,6 +135,7 @@ def run_desktop(
             "video_driver": pygame.display.get_driver(),
             "window_size": list(actual_size),
             "audio": audio_state,
+            **audio.report(),
             "resources_loaded": True,
             **flow.report(),
             "settings_saved": saved.saved,

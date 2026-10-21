@@ -21,7 +21,7 @@ The full slice prefix applies to abbreviated IDs in this table, for example P03-
 
 ## Start now
 
-P01 and the full P02 are DONE. [Original P02 owner handoff](../../tracking/handoffs/khalid/day_01/P02.md) records core/tools/input/objective interfaces; the [integration handoff](../../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) records Suhita's map/scene and the user-directed final review. P03 is the next Khalid queue; start it only on a new assignment. The verified baseline uses Python 3.13.16, a locked environment and actual desktop/headless builds. Keep root files within six, authored files below 1,001 lines and tests under grouped `tests/`.
+P01 and the full P02 are DONE. [Original P02 owner handoff](../../tracking/handoffs/khalid/day_01/P02.md) records core/tools/input/objective interfaces; the [integration handoff](../../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) records Suhita's map/scene and the user-directed final review. The owner's 2026-10-21 implementation brief started a first P03 Sentinel/perception subset; retrieve the [stealth runtime contracts](../../architecture/integration/STEALTH_SLICE.md) and current Status before continuing. The shared P03 gate stays open. The verified baseline uses Python 3.13.16, a locked environment and actual desktop/headless builds. Keep root files within six, authored files below 1,001 lines and tests under grouped `tests/`.
 
 Hand Suhita actual commands, import paths, map/action/scene/event interfaces and a known-good build. Do not leave her a documentation-only scaffold or require her to repair your environment setup. P02 integrates both owners on that foundation.
 

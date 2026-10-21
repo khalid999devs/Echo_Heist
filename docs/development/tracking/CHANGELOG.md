@@ -74,3 +74,7 @@
 - Verified documentation links, requirement/backlog identifiers, task dependency order and unchanged source hash in the planning validation pass. No gameplay/test/build success is claimed.
 
 Future entries should record task IDs, resulting behavior, actual checks with outcomes, changed tuning/decisions, evidence paths and the next ready task. Do not copy the entire backlog into each entry.
+
+## 2026-10-21 — Cinematic UI, licensed audio and first live stealth cluster
+
+Khalid followed the owner's new brief and grouped screenshot inspirations, replaced the title with the approved perspective cinematic, blended shared UI surfaces, integrated CC0 context music/event sounds and real Settings, then began the first P03 subset. One Sentinel now uses immutable filtered sensors, actual BFS/fuzzy/FSM behavior, identification, investigation/chase/search/return and expiring evidence. Physical Entry/Service furniture, compact HUD, sensor cones and real F3 telemetry are connected. 89 behavior cases and native playthrough/screens pass; see the [review](../quality/reports/phase02/presentation/REVIEW.md). Remaining shared P03/P04-P08 functionality stays open, including the owner-deferred P05 environment mechanics.

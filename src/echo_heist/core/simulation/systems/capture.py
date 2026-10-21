@@ -15,6 +15,7 @@ def update_captures(
     rules: GameRules,
     mission: MissionSpec | None,
     emit: Emit,
+    eligible_guards: frozenset[str] | None = None,
 ) -> None:
     for guard in world.actors.values():
         if guard.kind not in GUARD_KINDS:
@@ -29,6 +30,7 @@ def update_captures(
                 and clear_reach(world_map, guard.position, actor.position)
             ]
             if not guard.incapacitated(world.tick)
+            and (eligible_guards is None or guard.actor_id in eligible_guards)
             else []
         )
         targets.sort(

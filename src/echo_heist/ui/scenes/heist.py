@@ -1,5 +1,6 @@
 """One heist run: feeds HumanInput into Simulation at fixed ticks and draws the result."""
 
+from collections import deque
 from collections.abc import Sequence
 from enum import StrEnum
 
@@ -8,13 +9,16 @@ import pygame
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.results import MissionEnd
+from echo_heist.core.contracts.security.model import GuardPatrol, SecuritySpec
+from echo_heist.core.contracts.world import ActorKind
 from echo_heist.core.simulation.engine import Simulation
+from echo_heist.infrastructure.resources import load_sensor_rules
 from echo_heist.level.model import LevelData
 from echo_heist.ui.input.human import HumanInput, UiCommand
 from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.camera import Camera
-from echo_heist.ui.render.hud import draw_dialog, draw_hud
+from echo_heist.ui.render.hud import draw_dialog, draw_hud, panel
 from echo_heist.ui.render.motifs import ActorMotion
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import (
@@ -53,10 +57,38 @@ class HeistSession:
         view_size: tuple[int, int],
         map_surface: pygame.Surface | None = None,
         art: WorldArt | None = None,
+        reduced_flashing: bool = False,
+        security_enabled: bool = True,
     ) -> None:
         self.level, self.seed, self.fonts, self.rules = level, seed, fonts, rules
+        candidates = tuple(post for post in level.guards if post.kind == ActorKind.SENTINEL)
+        patrols: tuple[GuardPatrol, ...] = ()
+        if candidates and security_enabled:
+            # First milestone: activate the Sentinel nearest Entry using the
+            # already-validated P02 patrol data. The shared P03 registry remains separate.
+            post = min(
+                candidates,
+                key=lambda value: (
+                    abs(value.tile[0] - level.spawn_tile[0])
+                    + abs(value.tile[1] - level.spawn_tile[1]),
+                    value.guard_id,
+                ),
+            )
+            route = next(route for route in level.routes if route.route_id == post.route_id)
+            points = route.points[:-1] if route.points[0] == route.points[-1] else route.points
+            patrols = (GuardPatrol(post.guard_id, points),)
+        security = (
+            SecuritySpec(patrols, load_sensor_rules(), level.sound_blocking_tiles)
+            if patrols
+            else None
+        )
         self.simulation = Simulation(
-            level.static_map, level.spawns(), rules=rules, mission=level.mission(), seed=seed
+            level.static_map,
+            level.spawns(),
+            rules=rules,
+            mission=level.mission(),
+            seed=seed,
+            security=security,
         )
         self.input = HumanInput(level.operative_id)
         self.art = art or WorldArt.load()
@@ -72,6 +104,8 @@ class HeistSession:
         }
         self.actor_motion: dict[str, ActorMotion] = {}
         self.pulses: list[VisualPulse] = []
+        self.audio_events: deque[GameEvent] = deque(maxlen=512)
+        self.reduced_flashing = reduced_flashing
         self.notice = ""
         self.notice_until_ms = 0
         self._follow(0.0, snap=True)
@@ -167,7 +201,7 @@ class HeistSession:
                 direction = (
                     (1 if dx > 0 else -1 if dx < 0 else 0, 1 if dy > 0 else -1 if dy < 0 else 0)
                     if moving
-                    else old_motion.direction
+                    else actor.facing
                 )
                 sprinting = actor.actor_id == self.level.operative_id and (
                     dx * dx + dy * dy > sprint_delta * sprint_delta
@@ -176,6 +210,7 @@ class HeistSession:
             self._last_positions[actor.actor_id] = current
 
     def _record_events(self, events: tuple[GameEvent, ...]) -> None:
+        self.audio_events.extend(events)
         actors = {actor.actor_id: actor for actor in self.simulation.presentation_snapshot().actors}
         for event in events:
             if event.kind == EventKind.CORE_TAKEN:
@@ -214,7 +249,7 @@ class HeistSession:
 
     def draw(self, canvas: pygame.Surface) -> None:
         snapshot = self.simulation.presentation_snapshot()
-        pulse = abs((self.clock_ms % 1000) - 500) / 500
+        pulse = 0.5 if self.reduced_flashing else abs((self.clock_ms % 1000) - 500) / 500
         draw_world(
             canvas,
             self.level,
@@ -244,28 +279,59 @@ class HeistSession:
                 phase=snapshot.phase,
                 clock_ms=self.clock_ms,
                 notice=self.notice if self.clock_ms < self.notice_until_ms else "",
+                guards=snapshot.guards,
+                unavailable_guards=frozenset(
+                    actor.actor_id for actor in snapshot.actors if actor.disabled or actor.stunned
+                ),
             )
         if self.lab_note:
-            note = "Algorithm Lab telemetry arrives in Phase 03  /  F3 to close"
-            canvas.blit(self.fonts.small.render(note, True, theme.WARNING), (24, 225))
+            self._draw_lab(canvas)
         if self.paused:
             self._draw_pause(canvas)
         elif self.summary:
             draw_dialog(canvas, "Mission route", ROUTE_SUMMARY, self.fonts)
 
+    def _draw_lab(self, canvas: pygame.Surface) -> None:
+        snapshot = self.simulation.presentation_snapshot()
+        panel(canvas, pygame.Rect(20, 158, 410, 200), border=theme.ACCENT_DIM)
+        lines = ["AI LAB  /  F3 to close"]
+        for guard in snapshot.guards:
+            age = (
+                "none"
+                if guard.last_seen_tick < 0
+                else f"{snapshot.tick - guard.last_seen_tick} ticks ago"
+            )
+            lines.extend(
+                (
+                    f"Sentinel  /  {guard.state.value}",
+                    f"BFS  {guard.expanded_nodes} expanded / {len(guard.path)} path tiles",
+                    f"Identification  {guard.identification_ticks}/"
+                    f"{guard.identification_required_ticks}",
+                    f"Last visual contact: {age}",
+                    f"Fuzzy urgency  {guard.fuzzy_urgency:.2f}",
+                )
+            )
+        if not snapshot.guards:
+            lines.append("No active controller in this diagnostic fixture.")
+        for index, line in enumerate(lines):
+            canvas.blit(
+                self.fonts.micro.render(line, True, theme.ACCENT if index == 0 else theme.TEXT),
+                (34, 173 + index * 29),
+            )
+
     def _draw_pause(self, canvas: pygame.Surface) -> None:
         if self.confirm_abort:
             lines = (
-                ("Abort records an unsuccessful run.", theme.TEXT),
+                ("Ending now marks this attempt unsuccessful.", theme.TEXT),
                 ("X: confirm abort    Esc: keep playing", theme.WARNING),
             )
             draw_dialog(canvas, "Abort this run?", lines, self.fonts, title_color=theme.DANGER)
             return
         menu = (
-            ("Simulation time is frozen", theme.MUTED),
+            ("Take a breath. Mission time is paused.", theme.MUTED),
             ("Esc / Enter: resume", theme.TEXT),
-            ("R: restart with the same seed", theme.TEXT),
+            ("R: restart mission", theme.TEXT),
             ("X: abort run", theme.TEXT),
-            ("Map " + self.level.static_map.map_id + f"  |  seed {self.seed}", theme.MUTED),
+            ("Restarting keeps this facility layout.", theme.MUTED),
         )
         draw_dialog(canvas, "PAUSED", menu, self.fonts, title_color=theme.WARNING)

@@ -25,7 +25,7 @@ def run_fixture(seed: int = 1042) -> dict[str, object]:
     canonical = json.dumps(trace, sort_keys=True, separators=(",", ":"))
     return {
         "diagnostic": "continuous-motion-fixture",
-        "schema_version": 2,
+        "schema_version": 3,
         "version": __version__,
         "seed": seed,
         "tick": simulation.tick,

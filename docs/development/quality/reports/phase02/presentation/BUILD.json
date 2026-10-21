@@ -1,0 +1,64 @@
+{
+  "build": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 41578908,
+    "archive_sha256": "4f2ad1550d818d3d8379a2b44c8e0ece65effbcc0448f3feb2a6031c84a748da",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "0dbf827a66c7ae252084ff469c4a0856617f3f34",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "ci": {
+    "headless_checks": "PASS",
+    "interactive_windows": "NOT_RUN",
+    "macos_build_and_dummy_smoke": "PASS",
+    "source_commit": "0dbf827a66c7ae252084ff469c4a0856617f3f34",
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39561964479",
+    "windows_build_and_dummy_smoke": "PASS"
+  },
+  "extracted_zip": {
+    "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/vertical-slice/final-download/Echo Heist.app/Contents/MacOS/EchoHeist",
+    "checks": {
+      "frames_rendered": true,
+      "frozen_desktop": true,
+      "frozen_headless": true,
+      "resources_loaded": true,
+      "same_event_hash": true,
+      "same_state_hash": true,
+      "settings_saved": true,
+      "surface_saved": true
+    },
+    "passed": true,
+    "scope": "native display smoke",
+    "video_driver": "cocoa"
+  },
+  "frozen_audio": {
+    "assets_loaded": 16,
+    "audio": "ready",
+    "music_track": "title"
+  },
+  "native_app": {
+    "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/dist/Echo Heist.app/Contents/MacOS/EchoHeist",
+    "checks": {
+      "frames_rendered": true,
+      "frozen_desktop": true,
+      "frozen_headless": true,
+      "resources_loaded": true,
+      "same_event_hash": true,
+      "same_state_hash": true,
+      "settings_saved": true,
+      "surface_saved": true
+    },
+    "passed": true,
+    "scope": "native display smoke",
+    "video_driver": "cocoa"
+  }
+}

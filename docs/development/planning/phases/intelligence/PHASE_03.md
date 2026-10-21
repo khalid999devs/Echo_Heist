@@ -1,6 +1,6 @@
 # P03 - Fair perception, navigation and active defenders
 
-Day 2, first block. Integrator: **Khalid**. Effort: Khalid 15, Suhita 9. Status: TODO. Prerequisite: P02. Feature anchors: EH-009, EH-010, EH-013, EH-014, EH-021. Source: PDF pp. 6-11, 16-18.
+Day 2, first block. Integrator: **Khalid**. Effort: Khalid 15, Suhita 9. Status: IN_PROGRESS (first Khalid Sentinel/perception subset; shared gate open). Prerequisite: P02. Feature anchors: EH-009, EH-010, EH-013, EH-014, EH-021. Source: PDF pp. 6-11, 16-18.
 
 ## Inputs
 

@@ -22,7 +22,7 @@ DANGER: Color = (255, 87, 84)
 OPERATIVE: Color = (52, 216, 241)
 DISABLED: Color = (104, 135, 145)
 BORDER: Color = (53, 94, 109)
-PANEL: tuple[int, int, int, int] = (5, 15, 25, 225)
+PANEL: tuple[int, int, int, int] = (5, 15, 25, 192)
 ZONE_FLOORS: dict[str, Color] = {
     "entry": (33, 49, 56),
     "service-wing": (31, 44, 53),

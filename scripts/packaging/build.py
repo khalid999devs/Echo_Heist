@@ -66,7 +66,7 @@ def main() -> int:
     ).stdout.strip()
     manifest = {
         "version": __version__,
-        "stage": "P02 Human mission draft; full V1 remains in development",
+        "stage": "Human stealth vertical slice; full V1 remains in development",
         "target": target,
         "python": platform.python_version(),
         "host_os": platform.platform(),

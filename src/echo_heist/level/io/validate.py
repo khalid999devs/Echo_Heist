@@ -16,9 +16,8 @@ def reachable(level: LevelData, starts: Iterable[Tile], avoid: frozenset[Tile]) 
     frontier = deque(tile for tile in starts if world_map.can_walk(tile) and tile not in avoid)
     seen = set(frontier)
     while frontier:
-        x, y = frontier.popleft()
-        for dx, dy in NEIGHBORS:
-            tile = (x + dx, y + dy)
+        current = frontier.popleft()
+        for tile in world_map.connections(current):
             if tile not in seen and tile not in avoid and world_map.can_walk(tile):
                 seen.add(tile)
                 frontier.append(tile)
@@ -210,9 +209,33 @@ def _interiors(level: LevelData) -> list[str]:
     return problems
 
 
+def _decks(level: LevelData) -> list[str]:
+    if not level.decks:
+        return ["stairs require declared decks"] if level.static_map.stairs else []
+    problems: list[str] = []
+    for deck in level.decks:
+        if (
+            deck.left + deck.width > level.static_map.width
+            or deck.top + deck.height > level.static_map.height
+        ):
+            problems.append(f"deck {deck.deck_id!r} extends outside the atlas")
+    for tile in level.floor_tiles:
+        if sum(deck.contains(tile) for deck in level.decks) != 1:
+            problems.append(f"floor tile {tile} must belong to exactly one deck")
+            break
+    for link in level.static_map.stairs:
+        if not level.static_map.can_walk(link.tile) or not level.static_map.can_walk(
+            link.destination
+        ):
+            problems.append(f"stair {link.object_id!r} has a blocked landing")
+        if level.deck_at(link.tile) == level.deck_at(link.destination):
+            problems.append(f"stair {link.object_id!r} must connect different decks")
+    return problems
+
+
 def check_level(level: LevelData) -> list[str]:
     """Return every playability problem; an empty list means the level is valid."""
-    problems = _zones(level) + _geometry(level) + _interiors(level)
+    problems = _zones(level) + _geometry(level) + _interiors(level) + _decks(level)
     if problems:
         return problems
     return _anchors(level) + _patrols(level) + _connectivity(level)

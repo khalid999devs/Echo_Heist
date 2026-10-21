@@ -71,8 +71,7 @@ def sound_reaches(
             return True
         if distance == radius:
             continue
-        for dx, dy in ((0, -1), (1, 0), (0, 1), (-1, 0)):
-            neighbor = tile[0] + dx, tile[1] + dy
+        for neighbor in world_map.connections(tile):
             if (
                 world_map.contains(neighbor)
                 and neighbor not in blockers

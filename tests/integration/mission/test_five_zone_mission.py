@@ -48,8 +48,25 @@ def drive(
                 pending.pop(0)
                 continue
             direction = ((dx > ARRIVE) - (dx < -ARRIVE), (dy > ARRIVE) - (dy < -ARRIVE))
-            action = Action(
-                level.operative_id, ActionKind.MOVE, observation.tick, direction, sprint=True
+            stair = next(
+                (
+                    link
+                    for link in level.static_map.stairs
+                    if link.tile == observation.own_status.tile and link.destination == pending[0]
+                ),
+                None,
+            )
+            action = (
+                Action(
+                    level.operative_id,
+                    ActionKind.INTERACT,
+                    observation.tick,
+                    target_id=stair.object_id,
+                )
+                if stair
+                else Action(
+                    level.operative_id, ActionKind.MOVE, observation.tick, direction, sprint=True
+                )
             )
         else:
             action = Action(level.operative_id, ActionKind.WAIT, observation.tick)

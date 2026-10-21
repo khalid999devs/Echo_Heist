@@ -161,6 +161,25 @@ def decide(
             break
         path = path[1:]
     memory = replace(memory, path=path)
+    stair = next(
+        (
+            link
+            for link in observation.map_static.stairs
+            if link.tile == own.tile and path and link.destination == path[0]
+        ),
+        None,
+    )
+    if stair is not None:
+        return GuardDecision(
+            Action(
+                observation.agent_id,
+                ActionKind.INTERACT,
+                observation.tick,
+                target_id=stair.object_id,
+            ),
+            memory,
+            own.facing,
+        )
     point = tile_center(path[0] if path else target)
     dx, dy = point[0] - position[0], point[1] - position[1]
     direction = (

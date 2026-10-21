@@ -52,13 +52,14 @@ def move_actor(
     world: WorldState, world_map: StaticMap, rules: GameRules, action: Action, emit: Emit
 ) -> None:
     actor = world.actors[action.actor_id]
+    sprint = action.sprint and actor.sprint_ready_at == 0 and actor.sprint_ticks_remaining > 0
     speed = {
         ActorKind.SENTINEL: rules.sentinel_speed_units_per_second,
         ActorKind.TRACKER: rules.tracker_speed_units_per_second,
         ActorKind.INTERCEPTOR: rules.interceptor_speed_units_per_second,
     }.get(
         actor.kind,
-        rules.sprint_speed_units_per_second if action.sprint else rules.walk_speed_units_per_second,
+        rules.sprint_speed_units_per_second if sprint else rules.walk_speed_units_per_second,
     )
     step = speed // rules.simulation_hz
     dx, dy = action.direction[0] * step, action.direction[1] * step
@@ -95,6 +96,11 @@ def move_actor(
         emit(EventKind.ACTION_REJECTED, actor.actor_id, (("reason", "blocked"),))
         return
     actor.facing = action.direction
+    actor.sprinting = sprint
+    if sprint:
+        actor.sprint_ticks_remaining -= 1
+        if actor.sprint_ticks_remaining == 0:
+            actor.sprint_ready_at = world.tick + rules.sprint_recharge_ticks
     emit(
         EventKind.ACTOR_MOVED, actor.actor_id, (("x", actor.position[0]), ("y", actor.position[1]))
     )
@@ -102,12 +108,12 @@ def move_actor(
         actor.kind in (ActorKind.OPERATIVE, ActorKind.COMPANION)
         and world.tick >= actor.next_footstep_tick
     ):
-        radius = rules.sprint_noise_radius_tiles if action.sprint else rules.walk_noise_radius_tiles
+        radius = rules.sprint_noise_radius_tiles if sprint else rules.walk_noise_radius_tiles
         emit(
             EventKind.NOISE_CREATED,
             actor.actor_id,
             (
-                ("kind", "SPRINT" if action.sprint else "FOOTSTEP"),
+                ("kind", "SPRINT" if sprint else "FOOTSTEP"),
                 ("x", actor.tile[0]),
                 ("y", actor.tile[1]),
                 ("radius_tiles", radius),

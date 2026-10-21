@@ -5,7 +5,7 @@ import re
 from dataclasses import dataclass, field
 from math import isfinite
 
-from echo_heist.core.contracts.world import ActorKind, MapObject, Scalar, StaticMap, Tile
+from echo_heist.core.contracts.world import ActorKind, MapObject, Scalar, StairLink, StaticMap, Tile
 from echo_heist.level.io.validate import check_level
 from echo_heist.level.model import (
     DETAIL_STYLES,
@@ -13,6 +13,7 @@ from echo_heist.level.model import (
     GUARD_KINDS,
     ROOM_STYLES,
     Chokepoint,
+    Deck,
     FloorDetail,
     GuardPost,
     LevelData,
@@ -29,7 +30,9 @@ OBJECT_KINDS = {
     "zones": frozenset({"Zone"}),
     "anchors": frozenset({"Spawn", "Exit", "Core"}),
     "patrols": frozenset({"PatrolRoute", "GuardSpawn"}),
-    "markers": frozenset({"Cover", "HideSpot", "Chokepoint", "Furniture", "Room", "FloorDetail"}),
+    "markers": frozenset(
+        {"Cover", "HideSpot", "Chokepoint", "Furniture", "Room", "FloorDetail", "Deck", "Stair"}
+    ),
 }
 GEOMETRY_FLAGS = ("blocks_movement", "blocks_vision", "blocks_sound")
 type Json = dict[str, object]
@@ -155,7 +158,7 @@ def _object(item: object, layer: str, raw: RawMap, where: str) -> RawObject | No
         raise MapFormatError(f"{where}: ID {object_id!r} must be lowercase letters/digits/-")
     x, y = _number(entry.get("x"), f"{where}.x"), _number(entry.get("y"), f"{where}.y")
     found = RawObject(object_id, kind, layer, _tile_at(x, y, raw, where), properties)
-    if kind in ("Zone", "Furniture", "Room", "FloorDetail"):
+    if kind in ("Zone", "Furniture", "Room", "FloorDetail", "Deck"):
         size = raw.tile_size
         if _number(entry.get("rotation", 0), f"{where}.rotation") != 0:
             raise MapFormatError(
@@ -319,7 +322,25 @@ def build_level(raw: RawMap) -> LevelData:
         zone_label = obj.properties.get("label", obj.object_id)
         zones.append(Zone(obj.object_id, str(zone_label), *obj.rect))
     blocked = raw.flags.get("blocks_movement", frozenset())
-    visible_kinds = ("Spawn", "Exit", "Core", "Cover", "HideSpot", "Chokepoint", "Furniture")
+    visible_kinds = (
+        "Spawn",
+        "Exit",
+        "Core",
+        "Cover",
+        "HideSpot",
+        "Chokepoint",
+        "Furniture",
+        "Stair",
+    )
+    stairs = {obj.object_id: obj for obj in of("Stair")}
+    links = []
+    for obj in stairs.values():
+        destination_id = _text(obj.properties.get("destination"), f"{obj.object_id!r} destination")
+        if destination_id not in stairs:
+            raise MapFormatError(f"{obj.object_id!r}: missing stair destination {destination_id!r}")
+        links.append(
+            StairLink(obj.object_id, obj.tile, destination_id, stairs[destination_id].tile)
+        )
     static_map = StaticMap(
         raw.map_id,
         raw.width,
@@ -337,6 +358,7 @@ def build_level(raw: RawMap) -> LevelData:
             if obj.kind in visible_kinds
         ),
         raw.tile_size,
+        tuple(links),
     )
     return LevelData(
         static_map,
@@ -356,11 +378,21 @@ def build_level(raw: RawMap) -> LevelData:
         raw.flags.get("blocks_sound", frozenset()),
         tuple(rooms),
         tuple(details),
+        tuple(
+            Deck(obj.object_id, _text(obj.properties.get("label"), "Deck label"), *obj.rect)
+            for obj in of("Deck")
+            if obj.rect is not None
+        ),
     )
 
 
 def load_tiled_map(payload: bytes | str, *, expected_map_id: str | None = None) -> LevelData:
-    level = build_level(parse_tiled(payload))
+    try:
+        level = build_level(parse_tiled(payload))
+    except MapFormatError:
+        raise
+    except ValueError as error:
+        raise MapFormatError(f"map: {error}") from error
     if expected_map_id is not None and level.static_map.map_id != expected_map_id:
         raise MapFormatError(
             f"map: expected map_id {expected_map_id!r}, found {level.static_map.map_id!r}"

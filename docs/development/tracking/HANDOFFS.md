@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested chapter/menu clarity and compact route balance | work/chapter-and-route-balance; implementation e92d96e | None; revision and native/CI checks complete | DONE for requested revision; shared P03 gate stays open |
+| Khalid | User-requested two-floor facility, atmosphere, ending and approved timed sprint | work/two-floor-atmosphere; baseline 2be5f61 | Level author/loader/contracts, simulation/input/HUD, scene/render/assets, focused tests and development records | IN_PROGRESS; existing P03 gate stays open |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | work/suhita-p02 at a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.

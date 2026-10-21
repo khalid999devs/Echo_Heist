@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TARGET = ROOT / "src/echo_heist/resources/data/maps/vault-five-zone.json"
-WIDTH, HEIGHT, SIZE = 64, 40, 32
+WIDTH, HEIGHT, SIZE = 64, 40, 48
 
 
 @dataclass(frozen=True)
@@ -142,6 +142,19 @@ class Facility:
 
 def architecture(facility: Facility) -> None:
     # Blueprint topology: Entry -> Service -> Security OR Research -> Core.
+    for name, label, rect in (
+        ("ground", "01 / SERVICE", (0, 0, 30, 40)),
+        ("upper", "02 / RESEARCH", (32, 0, 32, 40)),
+    ):
+        facility.object(
+            facility.markers,
+            name,
+            "Deck",
+            *rect[:2],
+            width=rect[2],
+            height=rect[3],
+            properties={"label": label},
+        )
     zones = (
         ("entry", "Entry / Extraction", 1, 12, 11, 16),
         ("service-wing", "Service Wing", 14, 7, 15, 27),
@@ -183,13 +196,11 @@ def architecture(facility: Facility) -> None:
         (20, 26, 1, 2),
         (23, 26, 1, 2),
         # Short, exposed Security approach, through a railed access gangway.
-        (29, 10, 3, 3),
         (35, 12, 2, 1),
         (43, 12, 2, 1),
         (32, 13, 20, 2),
         # Research winds through equipment stores, then a furnished laboratory.
         (27, 31, 2, 4),
-        (29, 33, 3, 3),
         (32, 28, 15, 3),
         (35, 31, 2, 1),
         (43, 31, 2, 1),
@@ -363,10 +374,18 @@ def furnish(facility: Facility) -> None:
         ("security-panel", "console", 32, 13, 2, 1),
     ):
         facility.furniture(name, style, x, y, width, height)
-    for name, y in (("security-steps", 10), ("research-steps", 33)):
-        facility.detail(name, "stairs", 29, y, 3, 3, 270)
-        facility.furniture(name + "-north-rail", "railing", 29, y, 3, 1)
-        facility.furniture(name + "-south-rail", "railing", 29, y + 2, 3, 1)
+    for name, y in (("security", 11), ("research", 34)):
+        for suffix, x, destination in (("up", 28, "down"), ("down", 32, "up")):
+            stair_id = f"stairs-{name}-{suffix}"
+            facility.object(
+                facility.markers,
+                stair_id,
+                "Stair",
+                x,
+                y,
+                properties={"destination": f"stairs-{name}-{destination}"},
+            )
+            facility.detail(stair_id + "-treads", "stairs", x, y, 1, 1, 270)
     for room in ROOMS:
         if room.style in ("server", "maintenance"):
             facility.detail(
@@ -416,8 +435,8 @@ def anchors_and_patrols(facility: Facility) -> None:
         )
     for name, tile, pair in (
         ("entry-service", (13, 19), "entry|service-wing"),
-        ("service-security", (30, 11), "service-wing|security-control"),
-        ("service-research", (30, 34), "service-wing|research-floor"),
+        ("service-security", (28, 11), "service-wing|security-control"),
+        ("service-research", (28, 34), "service-wing|research-floor"),
         ("cross-link", (38, 19), "security-control|research-floor"),
         ("security-core", (48, 14), "security-control|core-chamber"),
         ("research-core", (48, 30), "research-floor|core-chamber"),

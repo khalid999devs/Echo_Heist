@@ -34,6 +34,9 @@ class ActorState:
     next_footstep_tick: int = 0
     traversed_tiles: tuple[Tile, ...] = ()
     facing: Tile = (0, -1)
+    sprint_ticks_remaining: int = 0
+    sprint_ready_at: int = 0
+    sprinting: bool = False
 
     @property
     def tile(self) -> Tile:

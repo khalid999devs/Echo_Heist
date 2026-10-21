@@ -12,6 +12,8 @@ class GameRules:
     simulation_hz: int
     walk_speed_units_per_second: int
     sprint_speed_units_per_second: int
+    sprint_duration_ticks: int
+    sprint_recharge_ticks: int
     sentinel_speed_units_per_second: int
     tracker_speed_units_per_second: int
     interceptor_speed_units_per_second: int

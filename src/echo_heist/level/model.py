@@ -117,6 +117,22 @@ class FloorDetail:
 
 
 @dataclass(frozen=True, slots=True)
+class Deck:
+    deck_id: str
+    label: str
+    left: int
+    top: int
+    width: int
+    height: int
+
+    def contains(self, tile: Tile) -> bool:
+        return (
+            self.left <= tile[0] < self.left + self.width
+            and self.top <= tile[1] < self.top + self.height
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class LevelData:
     static_map: StaticMap
     operative_id: str
@@ -135,6 +151,10 @@ class LevelData:
     sound_blocking_tiles: frozenset[Tile]
     rooms: tuple[Room, ...] = ()
     floor_details: tuple[FloorDetail, ...] = ()
+    decks: tuple[Deck, ...] = ()
+
+    def deck_at(self, tile: Tile) -> Deck | None:
+        return next((deck for deck in self.decks if deck.contains(tile)), None)
 
     def spawns(self) -> tuple[ActorSpawn, ...]:
         operative = ActorSpawn(self.operative_id, self.spawn_tile, ActorKind.OPERATIVE)

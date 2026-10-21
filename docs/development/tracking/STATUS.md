@@ -33,8 +33,8 @@ Active target: complete working initial draft in **eight phases over four develo
 | P02 five-zone map/scene | DONE | Suhita's `a98548a` map/loader/flow retained; illustrated floor/bulkhead/props/actor strips and refined sci-fi UI; [integration verification](../quality/reports/phase02/integration/VERIFICATION.md) |
 | AI / Workshop / final scoring | IN_PROGRESS | One real Sentinel uses filtered sensors, BFS/FSM/fuzzy/search/report expiry; remaining advanced defenders, autonomous Companion, Workshop and final scoring are pending |
 | Local automated checks | DONE | Structure/lint/format/strict types and **89** focused cases pass on the stealth candidate; [current review](../quality/reports/phase02/presentation/REVIEW.md) |
-| Hosted CI | DONE for P02 code candidate | Run [39503129521](https://github.com/khalid999devs/Echo_Heist/actions/runs/39503129521) passed Linux checks and Windows/macOS checks/native builds/frozen dummy-video smoke at `4b9cc49` |
-| Native packaging | DONE for P02 local macOS | Clean `4b9cc49` illustrated app and freshly extracted ZIP pass all eight real-Cocoa frozen smoke checks; exact archive/hash in the combined report |
+| Hosted CI | PASS for current stealth code | [39561964479](https://github.com/khalid999devs/Echo_Heist/actions/runs/39561964479) passed Linux/Windows/macOS checks, native primary builds and frozen dummy-video smoke at `0dbf827` |
+| Native packaging | PASS for local macOS stealth slice | Clean `0dbf827` app and freshly extracted ZIP each pass all eight Cocoa frozen checks with audio ready; [exact archive/hash](../quality/reports/phase02/presentation/BUILD.json) |
 | V1 platform/hardware QA | NOT_RUN | Suhita's interactive Windows desktop/download QA, wider macOS/download behavior and full-game release matrix remain untested |
 | Assets and licensing | IN_PROGRESS | Original generated scene/tile/prop/actor art plus Oxanium/OFL recorded in [asset register](../assets/ASSETS.md); remaining production set and source license pending |
 | itch.io/video/submission | TODO | GitHub source is published; game distribution, gameplay video and academic submission are still pending |
@@ -54,4 +54,4 @@ Continue P03 from the [first stealth contracts](../architecture/integration/STEA
 
 These do not prevent preparing the local foundation. They must be resolved before the corresponding release claims or external actions. See the [risk register](RISKS_AND_DECISIONS.md).
 
-Current follow-up: [31 native screen captures and live playthrough evidence](../quality/reports/phase02/presentation/REVIEW.md). The final refreshed native archive and branch CI are being recorded in the current handoff; older P02 archive/CI rows above retain their original scope.
+Current follow-up: [31 native screen captures and live playthrough evidence](../quality/reports/phase02/presentation/REVIEW.md). The [runnable handoff](handoffs/khalid/day_02/STEALTH_SLICE.md) records the final archive and passing native/hosted checks. Full V1 and manual Windows QA remain open.

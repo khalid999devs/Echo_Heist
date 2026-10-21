@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-directed first stealth vertical slice, beginning P03-K1/K2 | work/stealth-vertical-slice | core/perception and security contracts/systems, ai/navigation and guards, ui/audio and compact scene/HUD, room data, audio/visual resources and milestone records | IN_PROGRESS; full P03 and later phases remain open |
+| Khalid | User-directed first stealth vertical slice, beginning P03-K1/K2 | work/stealth-vertical-slice | None; changed contracts/boundaries are recorded in the current handoff | First milestone DONE; claim released. Full P03 slices and later phases remain open |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | work/suhita-p02 at a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
@@ -55,3 +55,5 @@ Keep secrets and machine-local profile data out of the record. Include a seed/pr
 ## Shared task completion
 
 An owner can mark their named slice DONE when its behavior/checks pass. A shared EH task remains TODO/IN_PROGRESS until every required slice in its Backlog mapping is complete and its feature acceptance passes. The integrator marks P01-P08 DONE only on the combined build and records exact evidence in Status. Missing primary archives or gameplay functionality keep P08 incomplete; public release is tracked separately.
+
+- [Khalid / Day 2 / first stealth slice](handoffs/khalid/day_02/STEALTH_SLICE.md): one real Sentinel, physical room cluster, cinematic/compact UI, CC0 audio, 31 native screens, 89 tests and current native/CI build evidence. Shared P03 remains open.

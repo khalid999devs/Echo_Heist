@@ -29,7 +29,7 @@ The screenshot driver uses Cocoa, actual GameFlow/HumanInput actions and asserte
 | Outcomes | [Win](screens/outcomes/01-win.png), [Capture](screens/outcomes/02-captured.png), [Abort](screens/outcomes/03-aborted.png), [Retry hover](screens/outcomes/04-retry-hover.png), [Menu hover](screens/outcomes/05-menu-hover.png) | Factual unscored results and stable action focus |
 | Window sizes | [960×540](screens/display/01-small-window.png), [1024×800](screens/display/02-tall-window-letterbox.png) | Preserved aspect and visible controls |
 
-The earlier [seven-second cinematic clip](cinematic-preview.mp4) remains a title/gait sample from before the active Sentinel and compact HUD. It is not current gameplay/AI evidence.
+The current [12-second native clip](cinematic-preview.mp4) contains 360 frames at 30 fps: cinematic title/briefing, actual walk/sprint input, live Sentinel motion, compact HUD and the optional real AI Lab. It is a silent visual sample; the separate audio-enabled playthrough below verifies music/event routing.
 
 ## Actual verification
 
@@ -44,7 +44,9 @@ PASS: **89 cases**, Ruff lint/format, strict mypy over **72 source files**, 1,00
 
 An accelerated native audio-enabled playthrough at `8fd87db` completed WIN in 1,287 rendered frames, exercised all five music contexts from actual states, loaded all 16 audio assets and emitted 108 cues. Update/audio/draw averaged **7.77 ms**, p95 **8.43 ms**, excluding display/encoding. [Machine-readable result](NATIVE_PLAYTHROUGH.json). This is one local source measurement, not a complete FPS, minimum-hardware, subjective mix or final AI benchmark.
 
-A clean `8fd87db` macOS arm64 app and freshly extracted ZIP each passed all eight Cocoa frozen-smoke checks with audio ready and 16 assets loaded. Final small label refinements are being rebuilt; the exact latest archive/commit and hosted CI result are recorded in the handoff when complete. No Windows interactive or Linux native release claim is made.
+The final **clean `0dbf827`** macOS arm64 app and freshly extracted ZIP each passed all eight native Cocoa frozen checks with audio ready and 16 assets loaded. Archive: `dist/echo-heist-0.1.0a1-macos-arm64.zip`, **41,578,908 bytes**, SHA256 `4f2ad1550d818d3d8379a2b44c8e0ece65effbcc0448f3feb2a6031c84a748da`. Ad-hoc signed; not notarized. [Exact build and smoke record](BUILD.json).
+
+[GitHub CI 39561964479](https://github.com/khalid999devs/Echo_Heist/actions/runs/39561964479) PASS at that exact source commit: all checks on Linux/Windows/macOS plus native Windows/macOS build and frozen dummy-video smoke. This does not verify an interactive Windows desktop, speakers, Linux native release, or the full mission inside a frozen build.
 
 ## Remaining work
 

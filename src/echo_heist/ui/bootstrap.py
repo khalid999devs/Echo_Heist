@@ -3,6 +3,7 @@
 from dataclasses import replace
 from io import BytesIO
 from math import floor
+from os import environ
 from pathlib import Path
 
 import pygame
@@ -59,6 +60,9 @@ def run_desktop(
     settings = loaded.settings
     frames = 0
     try:
+        # SDL otherwise discards the click that focuses an inactive window.
+        # Respect an explicit environment override; this only affects this process.
+        environ.setdefault("SDL_MOUSE_FOCUS_CLICKTHROUGH", "1")
         pygame.display.init()
         pygame.font.init()
         flags = pygame.FULLSCREEN if settings.fullscreen else pygame.RESIZABLE

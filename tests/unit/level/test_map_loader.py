@@ -94,12 +94,12 @@ def _unknown_object(data: dict[str, Any]) -> None:
 
 
 def _patrol_through_crate(data: dict[str, Any]) -> None:
-    set_tile(data, "cover", (18, 8), 4)
+    set_tile(data, "cover", (22, 19), 4)
 
 
 def _core_outside_chamber(data: dict[str, Any]) -> None:
     core = named(data, "anchors", "vault-core")
-    core["x"], core["y"] = 40 * 32 + 16, 8 * 32 + 16
+    core["x"], core["y"] = 46 * 32 + 16, 14 * 32 + 16
 
 
 CASES: list[tuple[str, Edit, str]] = [
@@ -113,13 +113,18 @@ CASES: list[tuple[str, Edit, str]] = [
     ("misplaced core", _core_outside_chamber, "inside zone 'core-chamber'"),
     (
         "core unreachable",
-        wall_off((45, 12), (45, 13), (45, 22), (45, 23)),
+        wall_off((61, 20), (61, 21), (61, 35), (61, 36)),
         "Core is unreachable",
     ),
-    ("upper branch cut", wall_off((25, 7), (25, 8), (25, 9)), "upper branch"),
-    ("lower branch cut", wall_off((25, 26), (25, 27), (25, 28)), "lower branch"),
-    ("cross-link cut", wall_off((35, 17), (36, 17), (37, 17)), "cross-link"),
-    ("entry sealed", wall_off((11, 16), (11, 17), (11, 18)), "Core is unreachable"),
+    ("upper branch cut", wall_off((35, 10)), "upper branch"),
+    ("lower branch cut", wall_off((35, 44)), "lower branch"),
+    ("cross-link cut", wall_off((45, 26), (46, 26), (47, 26)), "cross-link"),
+    ("entry sealed", wall_off((15, 25), (15, 26)), "Core is unreachable"),
+    (
+        "optional room sealed",
+        wall_off((12, 14), (12, 15)),
+        "room 'screening' has inaccessible floor",
+    ),
 ]
 
 
@@ -140,7 +145,7 @@ def test_wrong_expected_map_id_is_rejected() -> None:
 def test_furniture_has_matching_physical_opaque_acoustic_footprints() -> None:
     level = load_tiled_map(resource_bytes(f"data/maps/{MAP_ID}.json"))
     fixtures = [obj for obj in level.static_map.objects if obj.kind == "Furniture"]
-    assert len(fixtures) == 9
+    assert len(fixtures) >= 100
     for fixture in fixtures:
         props = dict(fixture.properties)
         footprint = {
@@ -148,12 +153,12 @@ def test_furniture_has_matching_physical_opaque_acoustic_footprints() -> None:
             for x in range(fixture.tile[0], fixture.tile[0] + int(props["width_tiles"]))
             for y in range(fixture.tile[1], fixture.tile[1] + int(props["height_tiles"]))
         }
-        assert (
-            footprint
-            <= level.static_map.blocked_tiles
-            & level.static_map.opaque_tiles
-            & level.sound_blocking_tiles
-        )
+        for flag, tiles in (
+            ("blocks_movement", level.static_map.blocked_tiles),
+            ("blocks_vision", level.static_map.opaque_tiles),
+            ("blocks_sound", level.sound_blocking_tiles),
+        ):
+            assert footprint <= tiles if props[flag] else not footprint & tiles
 
     reordered = packaged()
     reordered["layers"].reverse()
@@ -163,7 +168,7 @@ def test_furniture_has_matching_physical_opaque_acoustic_footprints() -> None:
     assert reversed_level.sound_blocking_tiles == level.sound_blocking_tiles
 
 
-@pytest.mark.parametrize("invalid", ["overlap", "bounds", "untagged", "patrol"])
+@pytest.mark.parametrize("invalid", ["overlap", "bounds", "untagged", "patrol", "rotated"])
 def test_invalid_furniture_cannot_silently_break_physical_room(invalid: str) -> None:
     data = packaged()
     fixture = named(data, "markers", "entry-console")
@@ -175,7 +180,47 @@ def test_invalid_furniture_cannot_silently_break_physical_room(invalid: str) -> 
         fixture["properties"] = [
             prop for prop in fixture["properties"] if prop["name"] != "blocks_vision"
         ]
+    elif invalid == "rotated":
+        fixture["rotation"] = 90
     else:
-        fixture["x"], fixture["y"] = 18 * 32, 8 * 32
+        fixture["x"], fixture["y"] = 23 * 32, 19 * 32
+    with pytest.raises(MapFormatError):
+        load_tiled_map(json.dumps(data))
+
+
+def test_dense_rooms_and_stair_gangways_keep_accessible_aisles() -> None:
+    level = load_tiled_map(resource_bytes(f"data/maps/{MAP_ID}.json"))
+    assert len(level.rooms) >= 20
+    assert all(room.width <= 11 and room.height <= 10 for room in level.rooms)
+    assert (
+        len(
+            {
+                dict(obj.properties)["style"]
+                for obj in level.static_map.objects
+                if obj.kind == "Furniture"
+            }
+        )
+        >= 10
+    )
+    stairs = [detail for detail in level.floor_details if detail.style == "stairs"]
+    assert len(stairs) == 2
+    for detail in stairs:
+        for x in range(detail.left, detail.left + detail.width):
+            assert level.static_map.can_walk((x, detail.top + detail.height // 2))
+            assert not level.static_map.can_walk((x, detail.top))
+            assert not level.static_map.can_walk((x, detail.top + detail.height - 1))
+
+
+@pytest.mark.parametrize("invalid", ["room-bounds", "room-overlap", "detail-bounds"])
+def test_invalid_room_and_floor_detail_geometry_is_rejected(invalid: str) -> None:
+    data = packaged()
+    if invalid == "detail-bounds":
+        named(data, "markers", "security-steps")["width"] = 100 * 32
+    else:
+        room = named(data, "markers", "screening")
+        if invalid == "room-bounds":
+            room["width"] = 100 * 32
+        else:
+            room["y"] = 21 * 32
     with pytest.raises(MapFormatError):
         load_tiled_map(json.dumps(data))

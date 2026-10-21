@@ -51,7 +51,8 @@ def test_stale_and_future_actions_do_not_move_or_spend_stock(issued_tick: int) -
 
 def test_blocked_and_malformed_actions_are_rejected_without_side_effects() -> None:
     sim = simulation()
-    for _ in range(2):
+    # Push up to the wall before checking a blocked step; speed is tunable.
+    for _ in range(10):
         sim.step((Action("operative", ActionKind.MOVE, sim.tick, (1, 0)),))
     before = sim.observe("operative").own_status
     blocked = sim.step((Action("operative", ActionKind.MOVE, sim.tick, (1, 0)),))

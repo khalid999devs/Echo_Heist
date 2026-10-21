@@ -8,12 +8,17 @@ from math import isfinite
 from echo_heist.core.contracts.world import ActorKind, MapObject, Scalar, StaticMap, Tile
 from echo_heist.level.io.validate import check_level
 from echo_heist.level.model import (
+    DETAIL_STYLES,
+    FURNITURE_STYLES,
     GUARD_KINDS,
+    ROOM_STYLES,
     Chokepoint,
+    FloorDetail,
     GuardPost,
     LevelData,
     Marker,
     PatrolRoute,
+    Room,
     Zone,
 )
 
@@ -24,7 +29,7 @@ OBJECT_KINDS = {
     "zones": frozenset({"Zone"}),
     "anchors": frozenset({"Spawn", "Exit", "Core"}),
     "patrols": frozenset({"PatrolRoute", "GuardSpawn"}),
-    "markers": frozenset({"Cover", "HideSpot", "Chokepoint", "Furniture"}),
+    "markers": frozenset({"Cover", "HideSpot", "Chokepoint", "Furniture", "Room", "FloorDetail"}),
 }
 GEOMETRY_FLAGS = ("blocks_movement", "blocks_vision", "blocks_sound")
 type Json = dict[str, object]
@@ -150,8 +155,13 @@ def _object(item: object, layer: str, raw: RawMap, where: str) -> RawObject | No
         raise MapFormatError(f"{where}: ID {object_id!r} must be lowercase letters/digits/-")
     x, y = _number(entry.get("x"), f"{where}.x"), _number(entry.get("y"), f"{where}.y")
     found = RawObject(object_id, kind, layer, _tile_at(x, y, raw, where), properties)
-    if kind in ("Zone", "Furniture"):
+    if kind in ("Zone", "Furniture", "Room", "FloorDetail"):
         size = raw.tile_size
+        if _number(entry.get("rotation", 0), f"{where}.rotation") != 0:
+            raise MapFormatError(
+                f"{where}: physical rectangles must be axis-aligned; "
+                "use the rotation property for sprite orientation"
+            )
         w, h = _number(entry.get("width"), where), _number(entry.get("height"), where)
         if any(value % size for value in (x, y, w, h)) or w <= 0 or h <= 0:
             raise MapFormatError(f"{where}: {kind} {object_id!r} must align to whole tiles")
@@ -243,15 +253,11 @@ def _apply_furniture(raw: RawMap) -> None:
         )
         if footprint & raw.flags.get("blocks_movement", frozenset()):
             raise MapFormatError(f"{obj.object_id!r}: furniture overlaps existing solid geometry")
-        if obj.properties.get("style") not in (
-            "rack",
-            "console",
-            "tank",
-            "crates",
-            "plant",
-            "workbench",
-        ):
+        if obj.properties.get("style") not in FURNITURE_STYLES:
             raise MapFormatError(f"{obj.object_id!r}: unknown furniture style")
+        rotation = obj.properties.get("rotation", 0)
+        if type(rotation) is not int or rotation not in (0, 90, 180, 270):
+            raise MapFormatError(f"{obj.object_id!r}: unsupported furniture rotation")
         for flag in GEOMETRY_FLAGS:
             if type(obj.properties.get(flag)) is not bool:
                 raise MapFormatError(f"{obj.object_id!r}: furniture requires explicit {flag}")
@@ -275,6 +281,22 @@ def build_level(raw: RawMap) -> LevelData:
         return found[0]
 
     _apply_furniture(raw)
+    rooms: list[Room] = []
+    details: list[FloorDetail] = []
+    for obj in of("Room") + of("FloorDetail"):
+        assert obj.rect is not None
+        style = obj.properties.get("style")
+        choices = ROOM_STYLES if obj.kind == "Room" else DETAIL_STYLES
+        if style not in choices:
+            raise MapFormatError(f"{obj.object_id!r}: unsupported {obj.kind} style")
+        if obj.kind == "Room":
+            label = _text(obj.properties.get("label"), f"{obj.object_id!r} label")
+            rooms.append(Room(obj.object_id, label, str(style), *obj.rect))
+        else:
+            rotation = obj.properties.get("rotation", 0)
+            if type(rotation) is not int or rotation not in (0, 90, 180, 270):
+                raise MapFormatError(f"{obj.object_id!r}: unsupported floor detail rotation")
+            details.append(FloorDetail(obj.object_id, str(style), *obj.rect, rotation))
     spawn, exit_anchor, core = one("Spawn"), one("Exit"), one("Core")
     operative = _text(spawn.properties.get("actor_id", "operative"), "Spawn actor_id")
     guards: list[GuardPost] = []
@@ -294,8 +316,8 @@ def build_level(raw: RawMap) -> LevelData:
     zones: list[Zone] = []
     for obj in of("Zone"):
         assert obj.rect is not None
-        label = obj.properties.get("label", obj.object_id)
-        zones.append(Zone(obj.object_id, str(label), *obj.rect))
+        zone_label = obj.properties.get("label", obj.object_id)
+        zones.append(Zone(obj.object_id, str(zone_label), *obj.rect))
     blocked = raw.flags.get("blocks_movement", frozenset())
     visible_kinds = ("Spawn", "Exit", "Core", "Cover", "HideSpot", "Chokepoint", "Furniture")
     static_map = StaticMap(
@@ -332,6 +354,8 @@ def build_level(raw: RawMap) -> LevelData:
         raw.layers["glass"],
         raw.layers["cover"],
         raw.flags.get("blocks_sound", frozenset()),
+        tuple(rooms),
+        tuple(details),
     )
 
 

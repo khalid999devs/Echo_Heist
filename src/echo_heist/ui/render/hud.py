@@ -59,7 +59,7 @@ def draw_minimap(
             ),
             3,
         )
-    _label(canvas, fonts.micro, "TAB  Route / controls", theme.MUTED, (32, rect.bottom - 24))
+    _label(canvas, fonts.micro, "TAB  Facility map", theme.MUTED, (32, rect.bottom - 24))
 
 
 def _objective(

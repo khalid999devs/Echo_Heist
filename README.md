@@ -17,7 +17,7 @@ uv run --locked echo-heist --headless --seed 1042
 uv run --locked python scripts/checks/run.py
 ```
 
-The desktop entry opens the cinematic title, then a Human mission briefing and the actual five-zone heist. Select with mouse or arrows/Enter. In the mission, move with WASD/arrows, sprint with Shift, hold E near the Core, and return to the original Exit after lockdown. Q deploys Echo, F uses EMP, Space melees, Tab opens the route summary, and Escape pauses. Pause offers resume, same-seed retry and confirmed abort. Companion remains visibly unavailable until Phase 4.
+The desktop entry opens the cinematic title, then a Human mission briefing and the actual five-zone heist. Select with mouse or arrows/Enter. In the mission, move with WASD/arrows, sprint with Shift, hold E near the Core, and return to the original Exit after lockdown. Q deploys Echo, F uses EMP, Space melees, Tab opens the paused facility map, and Escape pauses. Pause offers resume, same-seed retry and confirmed abort. Companion remains visibly unavailable until Phase 4.
 
 The window preserves aspect ratio on resize and maps mouse input through its letterbox. `--mute` skips audio initialization; unavailable audio devices fall back silently. `--headless` repeats the small seeded foundation diagnostic without importing pygame.
 
@@ -27,7 +27,7 @@ The older diagnostic contact room is still available for focused core-rule inspe
 uv run --locked python -m echo_heist.diagnostics.human_preview
 ```
 
-The Entry/Service approach now has physical furniture and a live Sentinel. Three other posts retain P02 contact behavior while the remaining P03/P04 algorithms are developed. F3 opens real Sentinel telemetry; Tab opens the normal route/controls guide. Music and sound volumes are adjustable in Settings. See the [Phase 2 integration report](docs/development/quality/reports/phase02/integration/VERIFICATION.md) for actual map/scene checks and screenshots.
+The facility now has 23 smaller rooms, 104 physical furnishings, narrow corridors, two railed stair gangways and slower movement. Three other posts retain P02 contact behavior while the remaining P03/P04 algorithms are developed. F3 opens real Sentinel telemetry; Tab shows the room map and controls with mission time paused. Music and sound volumes are adjustable in Settings. See the [current facility review](docs/development/quality/reports/facility_density/REVIEW.md) for actual checks and screenshots.
 
 For an isolated window check:
 

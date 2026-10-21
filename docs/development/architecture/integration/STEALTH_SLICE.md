@@ -2,6 +2,8 @@
 
 2026-10-21, Khalid. User-directed extension of the accepted P02 baseline. This is a verified subset of P03-K1/K2/K3, not completion of shared P03. The [implementation brief](../../planning/references/IMPLEMENTATION_BRIEF.md) remains the full target.
 
+Subsequent environment revision: [furnished facility/movement contracts](FACILITY_DENSITY.md) supersede this checkpoint's nine-object layout, coordinates, speeds and text-only Tab guide. The remaining AI ownership and filtered-observation boundaries below still apply. The counts/evidence below describe the earlier checkpoint.
+
 ## Composition and ownership
 
 `HeistSession` activates the Sentinel nearest Entry (`guard-service`) from the existing validated patrol route. Three other P02 posts retain physical contact capture; their advanced algorithms are pending. `GameFlow(security_enabled=False)` is an explicit legacy diagnostic fixture; the shipped default is True. Suhita's P03 registry/dynamic revision adapter is still open. Do not build a second importer around this temporary composition choice.

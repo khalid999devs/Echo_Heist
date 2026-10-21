@@ -32,18 +32,18 @@ Active target: complete working initial draft in **eight phases over four develo
 | P02 core gameplay/input | DONE | Continuous physics, mission/capture/initial tools, Human input and objective presenter; [owner handoff](handoffs/khalid/day_01/P02.md) |
 | P02 five-zone map/scene | DONE | Suhita's `a98548a` map/loader/flow retained; illustrated floor/bulkhead/props/actor strips and refined sci-fi UI; [integration verification](../quality/reports/phase02/integration/VERIFICATION.md) |
 | AI / Workshop / final scoring | IN_PROGRESS | One real Sentinel uses filtered sensors, BFS/FSM/fuzzy/search/report expiry; remaining advanced defenders, autonomous Companion, Workshop and final scoring are pending |
-| Local automated checks | DONE | Structure/lint/format/strict types and **89** focused cases pass on the stealth candidate; [current review](../quality/reports/phase02/presentation/REVIEW.md) |
-| Hosted CI | PASS for current stealth code | [39561964479](https://github.com/khalid999devs/Echo_Heist/actions/runs/39561964479) passed Linux/Windows/macOS checks, native primary builds and frozen dummy-video smoke at `0dbf827` |
-| Native packaging | PASS for local macOS stealth slice | Clean `0dbf827` app and freshly extracted ZIP each pass all eight Cocoa frozen checks with audio ready; [exact archive/hash](../quality/reports/phase02/presentation/BUILD.json) |
+| Local automated checks | DONE | Structure/lint/format/strict types and **96** focused cases pass on the furnished facility revision; [current review](../quality/reports/facility_density/REVIEW.md) |
+| Hosted CI | PASS for furnished revision | [39587400106](https://github.com/khalid999devs/Echo_Heist/actions/runs/39587400106) at `764d8ff`: Linux/Windows/macOS checks, native primary builds and frozen dummy-video smoke |
+| Native packaging | PASS for local macOS furnished slice | Clean `764d8ff` app and fresh ZIP extraction each pass all eight Cocoa frozen checks with audio ready; [exact archive/hash](../quality/reports/facility_density/BUILD.json) |
 | V1 platform/hardware QA | NOT_RUN | Suhita's interactive Windows desktop/download QA, wider macOS/download behavior and full-game release matrix remain untested |
 | Assets and licensing | IN_PROGRESS | Original generated scene/tile/prop/actor art plus Oxanium/OFL recorded in [asset register](../assets/ASSETS.md); remaining production set and source license pending |
 | itch.io/video/submission | TODO | GitHub source is published; game distribution, gameplay video and academic submission are still pending |
 
-P02 is a playable Human draft, not the full V1 game. The standard app launches the actual five-zone scene; P03-P08 and public-release gates remain separate. Outcomes are unscored until P06. One Sentinel now patrols/senses/chases/searches; three other posts retain P02 contact behavior. Physical Entry/Service furnishings, compact HUD, CC0 context audio and persisted mix settings are connected. The 3D-style title art is an illustration; gameplay collision comes only from the validated Tiled map.
+P02 is a playable Human draft, not the full V1 game. The standard app launches the actual five-zone scene; P03-P08 and public-release gates remain separate. Outcomes are unscored until P06. One Sentinel now patrols/senses/chases/searches; three other posts retain P02 contact behavior. The furnished revision has 23 compact rooms, 104 physical furnishings, narrower bent corridors, two railed gangways, slower movement and a paused Tab map. Compact HUD, CC0 context audio and persisted mix settings remain connected. The 3D-style title art is an illustration; gameplay collision comes only from the validated Tiled map.
 
 ## Next action
 
-Continue P03 from the [first stealth contracts](../architecture/integration/STEALTH_SLICE.md) and [handoff](handoffs/khalid/day_02/STEALTH_SLICE.md). Shared registry, Tracker A* and remaining cues/fixtures are still required before the P03 gate can close. Suhita's interactive Windows x64 check remains useful platform evidence and must not be represented as complete until run on her machine.
+Continue P03 from the [first stealth contracts](../architecture/integration/STEALTH_SLICE.md) and [current furnished handoff](handoffs/khalid/day_02/FACILITY_DENSITY.md). Retrieve its [changed map/speed contract](../architecture/integration/FACILITY_DENSITY.md) before editing coordinates. Shared registry, Tracker A* and remaining cues/fixtures are still required before the P03 gate can close. Suhita's interactive Windows x64 check remains useful platform evidence and must not be represented as complete until run on her machine.
 
 ## Open inputs to resolve during development
 
@@ -54,4 +54,4 @@ Continue P03 from the [first stealth contracts](../architecture/integration/STEA
 
 These do not prevent preparing the local foundation. They must be resolved before the corresponding release claims or external actions. See the [risk register](RISKS_AND_DECISIONS.md).
 
-Current follow-up: [31 native screen captures and live playthrough evidence](../quality/reports/phase02/presentation/REVIEW.md). The [runnable handoff](handoffs/khalid/day_02/STEALTH_SLICE.md) records the final archive and passing native/hosted checks. Full V1 and manual Windows QA remain open.
+Current follow-up: [38 native screen states and both route wins](../quality/reports/facility_density/REVIEW.md). The [runnable handoff](handoffs/khalid/day_02/FACILITY_DENSITY.md) records the current archive, source commit and actual native/hosted status. Full V1 and manual Windows QA remain open.

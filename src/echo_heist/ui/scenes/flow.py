@@ -283,7 +283,7 @@ class GameFlow:
             f"{self.selected}:{self.hovered_result}",
             self.runs_started,
             phase=snapshot.phase if snapshot else None,
-            paused=self.session.paused if self.session else False,
+            paused=(self.session.paused or self.session.summary) if self.session else False,
             outcome=snapshot.mission_end.outcome if snapshot and snapshot.mission_end else None,
             alerted=any(
                 guard.state in (GuardState.CHASE, GuardState.SEARCH) for guard in snapshot.guards

@@ -46,7 +46,7 @@ Current runnable baseline: [P02 integrated handoff](tracking/handoffs/khalid/day
 
 Suhita's workstation entry: [Windows x64 setup and P02 handoff](workflow/setup/WINDOWS_SUHITA.md), including PowerShell clone/run/check/native-build commands and the P02-S1/S2 boundary.
 
-Next integration baseline: [Khalid's actual P02 handoff](tracking/handoffs/khalid/day_01/P02.md), with fixed-point/mission/input contracts, runnable diagnostic room and [45-test/native verification](quality/reports/phase02/khalid/VERIFICATION.md). This does not close the shared P02 gate or implement Suhita's map/scenes.
+Historical core baseline: [Khalid's P02 owner handoff](tracking/handoffs/khalid/day_01/P02.md), with fixed-point/mission/input contracts and the original diagnostic-room evidence. The subsequent P02 integration accepted both owners' work. Current map/movement consumers should retrieve the [furnished facility handoff](tracking/handoffs/khalid/day_02/FACILITY_DENSITY.md), which records the changed coordinates and actual current checks.
 
 ## Tracking rules
 
@@ -54,4 +54,4 @@ Use `TODO`, `IN_PROGRESS`, `BLOCKED`, and `DONE`. A task becomes DONE only when 
 
 At the end of each implementation batch, update your owner slice/handoff and relevant Backlog/Status/Changelog records without overwriting the other developer's changes. The phase integrator closes the shared gate only after combined verification. Store future QA reports under grouped `quality/reports/`, experiment summaries under `quality/experiments/`, and manifests under `release/manifests/`; create them only for real evidence and group before adding a seventh direct file. Keep large generated logs, captures/builds and experiment output outside version control, with durable artifact references in reports.
 
-Current revision: [first stealth runtime contracts](architecture/integration/STEALTH_SLICE.md), [audio integration](assets/AUDIO.md), and [updated screen review](quality/reports/phase02/presentation/REVIEW.md). The owner brief is being implemented in playable milestones; full V1 acceptance remains open.
+Current revision: [first stealth runtime contracts](architecture/integration/STEALTH_SLICE.md), [furnished map/movement contract](architecture/integration/FACILITY_DENSITY.md), [audio integration](assets/AUDIO.md), and [38-state native review](quality/reports/facility_density/REVIEW.md). The owner brief is being implemented in playable milestones; full V1 acceptance remains open.

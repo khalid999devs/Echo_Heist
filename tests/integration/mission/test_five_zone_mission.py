@@ -9,17 +9,13 @@ from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.results import MissionEnd, RunOutcome
 from echo_heist.core.contracts.world import tile_center
 from echo_heist.core.simulation.engine import Simulation
+from echo_heist.diagnostics.facility_routes import Branch, anchor, mission_path, walk_path
 from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 
 ARRIVE = 4_000
 type Step = tuple[int, int] | str
-UPPER: list[Step] = [(12, 17), (23, 17), (23, 8), (43, 8), (43, 12), (58, 12), (58, 16), "HOLD"]
-UPPER_BACK: list[Step] = [(58, 12), (43, 12), (43, 8), (23, 8), (23, 17), (12, 17), (2, 17)]
-LOWER: list[Step] = [(12, 17), (23, 17), (23, 27), (43, 27), (43, 23), (58, 23), (58, 18), "HOLD"]
-LOWER_BACK: list[Step] = [(58, 23), (43, 23), (43, 27), (23, 27), (23, 17), (12, 17), (2, 17)]
-CROSS: list[Step] = [(12, 17), (23, 17), (23, 8), (36, 8), (36, 24), (43, 24), (43, 23)]
 
 
 @pytest.fixture(scope="module")
@@ -28,7 +24,7 @@ def level() -> LevelData:
 
 
 def drive(
-    level: LevelData, rules: GameRules, steps: list[Step], limit: int = 3_000
+    level: LevelData, rules: GameRules, steps: list[Step], limit: int = 6_000
 ) -> tuple[MissionEnd | None, Counter[str], str]:
     simulation = Simulation(
         level.static_map, level.spawns(), rules=rules, mission=level.mission(), seed=1042
@@ -48,7 +44,7 @@ def drive(
         elif pending and isinstance(pending[0], tuple):
             target = tile_center(pending[0])
             dx, dy = target[0] - position[0], target[1] - position[1]
-            if abs(dx) < ARRIVE and abs(dy) < ARRIVE:
+            if abs(dx) <= ARRIVE and abs(dy) <= ARRIVE:
                 pending.pop(0)
                 continue
             direction = ((dx > ARRIVE) - (dx < -ARRIVE), (dy > ARRIVE) - (dy < -ARRIVE))
@@ -64,14 +60,15 @@ def drive(
     return None, counts, simulation.fingerprint()
 
 
-@pytest.mark.parametrize(
-    "route",
-    [UPPER + UPPER_BACK, LOWER + LOWER_BACK, [*CROSS, (58, 23), (58, 18), "HOLD", *UPPER_BACK]],
-    ids=["upper-branch", "lower-branch", "cross-link"],
-)
+@pytest.mark.parametrize("branch", ["upper", "lower", "cross"])
 def test_human_takes_core_once_and_extracts_at_original_exit(
-    level: LevelData, rules: GameRules, route: list[Step]
+    level: LevelData, rules: GameRules, branch: Branch
 ) -> None:
+    route: list[Step] = [
+        *mission_path(level, branch),
+        "HOLD",
+        *mission_path(level, "upper" if branch == "cross" else branch, returning=True),
+    ]
     end, counts, _ = drive(level, rules, route)
     assert end is not None and end.outcome == RunOutcome.WIN
     assert counts["CORE_TAKEN"] == counts["LOCKDOWN_STARTED"] == counts["MISSION_ENDED"] == 1
@@ -79,17 +76,30 @@ def test_human_takes_core_once_and_extracts_at_original_exit(
 
 
 def test_stationary_guard_post_captures_on_contact(level: LevelData, rules: GameRules) -> None:
-    end, counts, _ = drive(level, rules, [(12, 17), (16, 17), (16, 9)], limit=600)
+    post = next(post for post in level.guards if post.guard_id == "guard-service")
+    end, counts, _ = drive(
+        level, rules, list(walk_path(level, level.spawn_tile, post.tile)), limit=900
+    )
     assert end is not None and end.outcome == RunOutcome.CAPTURED
     assert end.capture_by == "guard-service"
     assert counts["CAPTURE_STARTED"] == counts["CAPTURE_COMPLETED"] == 1
 
 
 def test_exit_without_core_never_wins(level: LevelData, rules: GameRules) -> None:
-    end, counts, _ = drive(level, rules, [(12, 17), (2, 17)], limit=300)
+    end, counts, _ = drive(
+        level,
+        rules,
+        list(walk_path(level, level.spawn_tile, anchor(level, level.exit_id))),
+        limit=300,
+    )
     assert end is None and counts["MISSION_ENDED"] == 0
 
 
 def test_same_seed_retry_reproduces_the_same_run(level: LevelData, rules: GameRules) -> None:
-    first = drive(level, rules, UPPER + UPPER_BACK)
-    assert first == drive(level, rules, UPPER + UPPER_BACK)
+    route: list[Step] = [
+        *mission_path(level, "upper"),
+        "HOLD",
+        *mission_path(level, "upper", returning=True),
+    ]
+    first = drive(level, rules, route)
+    assert first == drive(level, rules, route)

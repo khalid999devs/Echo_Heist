@@ -1,20 +1,16 @@
 """Capture actual scene/input states for a native visual review; no forced outcomes."""
 
 import argparse
+import json
 from collections.abc import Callable
-from dataclasses import replace
 from pathlib import Path
 
 import pygame
 
-from echo_heist.ai.navigation.grid import bfs
 from echo_heist.core.contracts.results import RunOutcome
-from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
-from echo_heist.core.contracts.world import tile_center
+from echo_heist.diagnostics.facility_routes import mission_path, walk_path
+from echo_heist.diagnostics.human_driver import HumanDriver
 from echo_heist.ui.scenes.flow import GameFlow, Scene
-
-UPPER = ((12, 17), (23, 17), (23, 8), (43, 8), (43, 12), (58, 12), (58, 16))
-RETURN = ((58, 12), (43, 12), (43, 8), (23, 8), (23, 17), (12, 17), (2, 17))
 
 
 def key(value: int, *, release: bool = False) -> pygame.event.Event:
@@ -33,69 +29,24 @@ def drive(
     flow: GameFlow,
     route: tuple[tuple[int, int], ...],
     *,
-    use_emp: bool = False,
+    use_tools: bool = False,
     observer: Callable[[GameFlow], None] | None = None,
 ) -> None:
     assert flow.session is not None
-    held: set[int] = set()
+    driver = HumanDriver(flow.rules, use_tools=use_tools)
     for destination in route:
-        target = tile_center(destination)
         for _ in range(1000):
             observation = flow.session.simulation.observe(flow.level.operative_id)
-            own = observation.own_status
-            assert own.position is not None
-            dx, dy = target[0] - own.position[0], target[1] - own.position[1]
-            if abs(dx) < 4_000 and abs(dy) < 4_000:
+            if driver.arrived(observation, destination):
                 break
-            disabled_tiles = frozenset(
-                actor.tile
-                for actor in observation.visible_entities
-                if actor.disabled or actor.stunned
-            ) - {own.tile}
-            if use_emp and disabled_tiles:
-                # A disabled robot remains a physical body. Drive real input
-                # around it rather than pushing into it until the EMP expires.
-                route_map = replace(
-                    observation.map_static,
-                    blocked_tiles=observation.map_static.blocked_tiles | disabled_tiles,
-                )
-                path = bfs(route_map, own.tile, destination).path
-                if len(path) > 1:
-                    waypoint = tile_center(path[1])
-                    dx, dy = waypoint[0] - own.position[0], waypoint[1] - own.position[1]
-            direction = (
-                pygame.K_d
-                if dx > 4_000
-                else pygame.K_a
-                if dx < -4_000
-                else pygame.K_s
-                if dy > 4_000
-                else pygame.K_w
-            )
-            desired = {direction, pygame.K_LSHIFT}
-            nearby = any(
-                actor.actor_id != flow.level.operative_id
-                and actor.position is not None
-                and (actor.position[0] - own.position[0]) ** 2
-                + (actor.position[1] - own.position[1]) ** 2
-                <= (2 * UNIT) ** 2
-                for actor in flow.session.simulation.observe(
-                    flow.level.operative_id
-                ).visible_entities
-            )
-            if use_emp and nearby and own.inventory.emp_charges and pygame.K_f not in held:
-                desired.add(pygame.K_f)
-            events = [key(code, release=True) for code in sorted(held - desired)]
-            events.extend(key(code) for code in sorted(desired - held))
-            held = desired
-            flow.frame(events, 34)
+            flow.frame(driver.events(observation, destination), 34)
             if observer is not None:
                 observer(flow)
             if flow.scene == Scene.RESULTS:
                 return
         else:
             raise RuntimeError(f"Input route failed at {destination}")
-    flow.frame([key(code, release=True) for code in sorted(held)], 0)
+    flow.frame(driver.release(), 0)
 
 
 def main() -> int:
@@ -150,7 +101,8 @@ def main() -> int:
     shot(flow, "gameplay/01-entry")
     flow.frame([key(pygame.K_TAB)], 16)
     shot(flow, "gameplay/02-route-guide")
-    flow.frame([key(pygame.K_TAB), key(pygame.K_ESCAPE)], 16)
+    flow.frame([key(pygame.K_TAB)], 0)
+    flow.frame([key(pygame.K_ESCAPE)], 16)
     shot(flow, "gameplay/03-paused")
     flow.frame([key(pygame.K_x)], 16)
     shot(flow, "gameplay/04-confirm-abort")
@@ -169,19 +121,34 @@ def main() -> int:
 
     flow = mission()
     captured_states: set[str] = set()
+    captured_rooms: set[str] = set()
+    room_views = {
+        (30, 10): "01-service-servers",
+        (35, 10): "02-security-gangway",
+        (54, 18): "03-security-control",
+        (72, 26): "04-core-chamber",
+        (35, 44): "05-research-gangway",
+        (53, 34): "06-biology-lab",
+    }
 
     def observe_guard(current: GameFlow) -> None:
         assert current.session is not None
         snapshot = current.session.simulation.presentation_snapshot()
+        tile = current.session.simulation.observe(current.level.operative_id).own_status.tile
+        room_view = room_views.get(tile)
+        if room_view is not None and room_view not in captured_rooms:
+            captured_rooms.add(room_view)
+            shot(current, f"rooms/{room_view}")
         guard = snapshot.guards[0]
         actor = next(actor for actor in snapshot.actors if actor.actor_id == guard.actor_id)
         state = "DISABLED" if actor.disabled else guard.state.value
         if state not in captured_states:
             captured_states.add(state)
-            shot(current, f"stealth/{state.lower()}")
+            group = "awareness" if state in ("PATROL", "SPOTTED", "INVESTIGATE") else "response"
+            shot(current, f"stealth/{group}/{state.lower()}")
 
     observe_guard(flow)
-    drive(flow, UPPER, use_emp=True, observer=observe_guard)
+    drive(flow, mission_path(flow.level, "upper"), use_tools=True, observer=observe_guard)
     flow.frame([key(pygame.K_e)], 34)
     for _ in range(15):
         flow.frame([], 34)
@@ -190,19 +157,44 @@ def main() -> int:
         flow.frame([], 34)
     shot(flow, "gameplay/06-lockdown")
     flow.frame([key(pygame.K_e, release=True)], 0)
-    drive(flow, RETURN, use_emp=True, observer=observe_guard)
+    drive(
+        flow,
+        mission_path(flow.level, "upper", returning=True),
+        use_tools=True,
+        observer=observe_guard,
+    )
     assert flow.session is not None and flow.session.mission_end is not None
     assert flow.session.mission_end.outcome == RunOutcome.WIN
     shot(flow, "outcomes/01-win")
+    upper_ticks = flow.session.mission_end.elapsed_ticks
 
     flow = mission()
-    drive(flow, ((12, 17), (16, 17), (16, 9)))
+    drive(flow, mission_path(flow.level, "lower"), use_tools=True, observer=observe_guard)
+    flow.frame([key(pygame.K_e)], 34)
+    for _ in range(50):
+        flow.frame([], 34)
+    flow.frame([key(pygame.K_e, release=True)], 0)
+    drive(
+        flow,
+        mission_path(flow.level, "lower", returning=True),
+        use_tools=True,
+        observer=observe_guard,
+    )
+    assert flow.session is not None and flow.session.mission_end is not None
+    assert flow.session.mission_end.outcome == RunOutcome.WIN
+    lower_ticks = flow.session.mission_end.elapsed_ticks
+    assert captured_rooms == set(room_views.values())
+
+    flow = mission()
+    post = next(post for post in flow.level.guards if post.guard_id == "guard-service")
+    drive(flow, walk_path(flow.level, flow.level.spawn_tile, post.tile))
     for _ in range(300):
         flow.frame([], 34)
         if flow.scene == Scene.RESULTS:
             break
     assert flow.session is not None and flow.session.mission_end is not None
     assert flow.session.mission_end.outcome == RunOutcome.CAPTURED
+    capture_ticks = flow.session.mission_end.elapsed_ticks
     shot(flow, "outcomes/02-captured")
     flow.frame([pygame.event.Event(pygame.MOUSEMOTION, pos=(700, 610))], 16)
     shot(flow, "outcomes/04-retry-hover")
@@ -215,6 +207,18 @@ def main() -> int:
     shot(flow, "display/01-small-window")
     screen = pygame.display.set_mode((1024, 800), pygame.RESIZABLE)
     shot(flow, "display/02-tall-window-letterbox")
+    report = {
+        "video_driver": pygame.display.get_driver(),
+        "seed": flow.seed,
+        "input": "real HumanInput keyboard events; EMP and melee when needed",
+        "upper": {"outcome": "WIN", "ticks": upper_ticks},
+        "lower": {"outcome": "WIN", "ticks": lower_ticks},
+        "contact": {"outcome": "CAPTURED", "ticks": capture_ticks},
+        "rooms_captured": sorted(captured_rooms),
+        "guard_states_captured": sorted(captured_states),
+        "screenshots": len(list(args.output.rglob("*.png"))),
+    }
+    (args.output / "playthrough.json").write_text(json.dumps(report, indent=2) + "\n")
     print(
         f"Captured all scene states to {args.output}; video driver: {pygame.display.get_driver()}"
     )

@@ -3,13 +3,11 @@
 import pygame
 
 from echo_heist.core.contracts.results import RunOutcome
-from echo_heist.core.contracts.world import MissionPhase, tile_center
+from echo_heist.core.contracts.world import MissionPhase
+from echo_heist.diagnostics.facility_routes import mission_path, walk_path
+from echo_heist.diagnostics.human_driver import HumanDriver
 from echo_heist.ui.bootstrap import _logical_events
 from echo_heist.ui.scenes.flow import GameFlow, Scene
-
-UPPER = [(12, 17), (23, 17), (23, 8), (43, 8), (43, 12), (58, 12), (58, 16)]
-RETURN = [(58, 12), (43, 12), (43, 8), (23, 8), (23, 17), (12, 17), (2, 17)]
-ARRIVE = 4_000
 
 
 def key(event_type: int, value: int) -> pygame.event.Event:
@@ -32,42 +30,26 @@ def drive(
     *,
     take_core: bool = False,
     expected_end: RunOutcome | None = None,
+    use_tools: bool = False,
 ) -> None:
     assert flow.session is not None
-    held: set[int] = set()
+    driver = HumanDriver(flow.rules, use_tools=use_tools)
     pending = list(route)
-    until = flow.session.steps + 3_000
+    until = flow.session.steps + 4_000
     while pending and flow.session.steps < until:
         observation = flow.session.simulation.observe(flow.level.operative_id)
-        position = observation.own_status.position
-        assert position is not None
-        destination = tile_center(pending[0])
-        dx, dy = destination[0] - position[0], destination[1] - position[1]
-        if abs(dx) < ARRIVE and abs(dy) < ARRIVE:
+        if driver.arrived(observation, pending[0]):
             pending.pop(0)
             continue
-        direction = (
-            pygame.K_d
-            if dx > ARRIVE
-            else pygame.K_a
-            if dx < -ARRIVE
-            else pygame.K_s
-            if dy > ARRIVE
-            else pygame.K_w
-        )
-        desired = {direction, pygame.K_LSHIFT}
-        events = [key(pygame.KEYUP, code) for code in sorted(held - desired)]
-        events.extend(key(pygame.KEYDOWN, code) for code in sorted(desired - held))
-        held = desired
-        flow.frame(events, 34)
+        flow.frame(driver.events(observation, pending[0]), 34)
         if flow.scene == Scene.RESULTS:
-            assert expected_end is not None and len(pending) == 1
+            assert expected_end is not None
             assert flow.session.mission_end is not None
             assert flow.session.mission_end.outcome == expected_end
             return
         assert flow.scene == Scene.HEIST, "Unexpected mission end before reaching waypoint"
     assert not pending, "The real input adapter did not reach the route"
-    flow.frame([key(pygame.KEYUP, code) for code in sorted(held)], 0)
+    flow.frame(driver.release(), 0)
     if take_core:
         for count in range(50):
             events = [key(pygame.KEYDOWN, pygame.K_e)] if count == 0 else []
@@ -89,8 +71,10 @@ def test_keyboard_scene_pause_retry_and_full_win() -> None:
     flow.frame([key(pygame.KEYDOWN, pygame.K_r)], 0)
     assert flow.scene == Scene.HEIST and flow.runs_started == 2
     assert flow.session.simulation.tick == 0
-    drive(flow, UPPER, take_core=True)
-    drive(flow, RETURN, expected_end=RunOutcome.WIN)
+    drive(flow, list(mission_path(flow.level, "upper")), take_core=True)
+    drive(
+        flow, list(mission_path(flow.level, "upper", returning=True)), expected_end=RunOutcome.WIN
+    )
     assert flow.scene == Scene.RESULTS
     assert flow.session.mission_end is not None
     assert flow.session.mission_end.outcome == RunOutcome.WIN
@@ -101,7 +85,12 @@ def test_keyboard_scene_pause_retry_and_full_win() -> None:
 
 def test_real_scene_capture_reaches_result_and_retry() -> None:
     flow = start()
-    drive(flow, [(12, 17), (16, 17), (16, 9)], expected_end=RunOutcome.CAPTURED)
+    post = next(post for post in flow.level.guards if post.guard_id == "guard-service")
+    drive(
+        flow,
+        list(walk_path(flow.level, flow.level.spawn_tile, post.tile)),
+        expected_end=RunOutcome.CAPTURED,
+    )
     for _ in range(30):
         if flow.scene == Scene.RESULTS:
             break
@@ -130,7 +119,7 @@ def test_art_and_gait_follow_committed_movement_without_changing_simulation() ->
     flow = start()
     assert flow.session is not None
     art = flow.session.art
-    assert art.operative[0].get_size() == (52, 66)
+    assert art.operative[0].get_width() <= flow.level.static_map.tile_size_px + 4
     assert pygame.image.tobytes(art.operative[0], "RGBA") != pygame.image.tobytes(
         art.operative[3], "RGBA"
     )
@@ -149,12 +138,33 @@ def test_default_live_guard_allows_actual_lower_route_core_and_extraction() -> N
     assert flow.session is not None
     first = flow.session.simulation.presentation_snapshot()
     assert first.guards and first.guards[0].actor_id == "guard-service"
-    route = [(12, 17), (23, 17), (23, 27), (43, 27), (43, 23), (58, 23), (58, 18)]
-    back = [(58, 23), (43, 23), (43, 27), (23, 27), (23, 17), (12, 17), (2, 17)]
-    drive(flow, route, take_core=True)
+    route = list(mission_path(flow.level, "lower"))
+    back = list(mission_path(flow.level, "lower", returning=True))
+    drive(flow, route, take_core=True, use_tools=True)
     guard = flow.session.simulation.presentation_snapshot().guards[0]
     # Actual pursuit has finite memory; it does not track the hidden carrier forever.
     assert guard.last_seen_tick == -1
-    drive(flow, back, expected_end=RunOutcome.WIN)
+    drive(flow, back, expected_end=RunOutcome.WIN, use_tools=True)
     assert flow.session.mission_end is not None
     assert flow.session.mission_end.outcome == RunOutcome.WIN
+
+
+def test_facility_map_freezes_time_and_clears_held_movement() -> None:
+    flow = start(security_enabled=True)
+    assert flow.session is not None
+    flow.frame([key(pygame.KEYDOWN, pygame.K_d)], 34)
+    flow.frame([key(pygame.KEYDOWN, pygame.K_TAB)], 34)
+    before = flow.session.simulation.presentation_snapshot()
+    clock = flow.session.clock_ms
+    flow.frame([key(pygame.KEYDOWN, pygame.K_w)], 5_000)
+    assert flow.session.summary and not flow.session.paused
+    assert flow.session.simulation.presentation_snapshot() == before
+    assert flow.session.clock_ms == clock
+    flow.frame([key(pygame.KEYDOWN, pygame.K_ESCAPE)], 0)
+    assert not flow.session.summary and not flow.session.paused
+    flow.frame([], 34)
+    after = flow.session.simulation.presentation_snapshot()
+    assert after.tick > before.tick
+    old_player = next(actor for actor in before.actors if actor.actor_id == flow.level.operative_id)
+    new_player = next(actor for actor in after.actors if actor.actor_id == flow.level.operative_id)
+    assert new_player.position == old_player.position

@@ -156,6 +156,15 @@ def _connectivity(level: LevelData) -> list[str]:
         problems.append("Core is unreachable from the operative spawn")
     if exit_tile not in reachable(level, (core,), frozenset()):
         problems.append("lockdown return: Exit is unreachable from the Core")
+    for room in level.rooms:
+        interior = {
+            (x, y)
+            for x in range(room.left, room.left + room.width)
+            for y in range(room.top, room.top + room.height)
+            if level.static_map.can_walk((x, y))
+        }
+        if not interior or not interior <= from_spawn:
+            problems.append(f"room {room.room_id!r} has inaccessible floor")
     for zone in level.zones:
         if not zone_tiles(level, zone.zone_id) & from_spawn:
             problems.append(f"zone {zone.zone_id!r} is unreachable from the spawn")
@@ -178,9 +187,32 @@ def _connectivity(level: LevelData) -> list[str]:
     return problems
 
 
+def _interiors(level: LevelData) -> list[str]:
+    problems: list[str] = []
+    claimed: set[Tile] = set()
+    for room in level.rooms:
+        tiles = {
+            (x, y)
+            for x in range(room.left, room.left + room.width)
+            for y in range(room.top, room.top + room.height)
+        }
+        if any(not level.static_map.contains(tile) for tile in tiles):
+            problems.append(f"room {room.room_id!r} extends outside the map")
+        if claimed & tiles:
+            problems.append(f"room {room.room_id!r} overlaps another room")
+        claimed.update(tiles)
+    for detail in level.floor_details:
+        if (
+            detail.left + detail.width > level.static_map.width
+            or detail.top + detail.height > level.static_map.height
+        ):
+            problems.append(f"floor detail {detail.detail_id!r} extends outside the map")
+    return problems
+
+
 def check_level(level: LevelData) -> list[str]:
     """Return every playability problem; an empty list means the level is valid."""
-    problems = _zones(level) + _geometry(level)
+    problems = _zones(level) + _geometry(level) + _interiors(level)
     if problems:
         return problems
     return _anchors(level) + _patrols(level) + _connectivity(level)

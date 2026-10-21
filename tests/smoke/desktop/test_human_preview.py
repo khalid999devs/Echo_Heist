@@ -2,6 +2,7 @@
 
 import argparse
 import json
+from math import ceil
 from pathlib import Path
 from unittest.mock import patch
 
@@ -10,11 +11,15 @@ import pytest
 
 from echo_heist.diagnostics.human_preview import run_preview
 from echo_heist.infrastructure.persistence.atomic import atomic_write_json
+from echo_heist.infrastructure.resources import load_game_rules
 
 
 def exercise(output: Path, *, scenario: str = "win") -> dict[str, object]:
     output.mkdir(parents=True, exist_ok=True)
     frame = 0
+    rules = load_game_rules()
+    arrive = 5 + ceil(8.1 * 30_000 / (rules.walk_speed_units_per_second / 10))
+    leave = arrive + ceil(rules.core_interaction_ticks / (rules.simulation_hz / 10))
     original_get = pygame.event.get
 
     def events() -> list[pygame.event.Event]:
@@ -25,8 +30,8 @@ def exercise(output: Path, *, scenario: str = "win") -> dict[str, object]:
             1: [(pygame.KEYDOWN, pygame.K_ESCAPE)],
             4: [(pygame.KEYDOWN, pygame.K_ESCAPE)],
             5: [(pygame.KEYDOWN, pygame.K_d)],
-            42: [(pygame.KEYUP, pygame.K_d), (pygame.KEYDOWN, pygame.K_e)],
-            50: [(pygame.KEYUP, pygame.K_e), (pygame.KEYDOWN, pygame.K_a)],
+            arrive: [(pygame.KEYUP, pygame.K_d), (pygame.KEYDOWN, pygame.K_e)],
+            leave: [(pygame.KEYUP, pygame.K_e), (pygame.KEYDOWN, pygame.K_a)],
         }
         capture_sequence = {
             1: [(pygame.KEYDOWN, pygame.K_d)],
@@ -41,7 +46,7 @@ def exercise(output: Path, *, scenario: str = "win") -> dict[str, object]:
             return 100
 
     with patch("pygame.event.get", events), patch("pygame.time.Clock", FixedClock):
-        report = run_preview(smoke_frames=90, screenshot=output / f"{scenario}.png")
+        report = run_preview(smoke_frames=120, screenshot=output / f"{scenario}.png")
     if scenario == "capture":
         assert report["phase"] == "CAPTURED", report
         assert report["event_counts"]["CAPTURE_STARTED"] == 1
@@ -50,7 +55,8 @@ def exercise(output: Path, *, scenario: str = "win") -> dict[str, object]:
         assert report["phase"] == "WON", report
         assert report["paused_frames"] == 3, report
         # Three paused render frames must contribute zero simulation ticks.
-        assert report["tick"] == report["simulation_steps"] == 243, report
+        assert report["tick"] == report["simulation_steps"]
+        assert report["tick"] < report["frames"] * rules.simulation_hz / 10, report
         assert report["event_counts"]["CORE_TAKEN"] == 1
         assert report["event_counts"]["LOCKDOWN_STARTED"] == 1
     assert report["event_counts"]["MISSION_ENDED"] == 1

@@ -1,0 +1,20 @@
+{
+  "video_driver": "cocoa",
+  "audio_device_ready": true,
+  "frames": 2333,
+  "tracks_from_actual_states": [
+    "pulse",
+    "sector",
+    "title",
+    "transmission",
+    "urgent"
+  ],
+  "outcome": "WIN",
+  "paused_map_freezes_time_and_ducks_audio": true,
+  "audio": {
+    "music_track": "transmission",
+    "audio_assets_loaded": 16,
+    "audio_cues_played": 199
+  },
+  "scope": "Accelerated scripted native source run; not a subjective speaker/mix playtest"
+}

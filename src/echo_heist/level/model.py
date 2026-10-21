@@ -7,6 +7,26 @@ from echo_heist.core.contracts.world import ActorKind, ActorSpawn, StaticMap, Ti
 
 ZONE_IDS = ("entry", "service-wing", "security-control", "research-floor", "core-chamber")
 GUARD_KINDS = frozenset({ActorKind.SENTINEL, ActorKind.TRACKER, ActorKind.INTERCEPTOR})
+FURNITURE_STYLES = frozenset(
+    {
+        "rack",
+        "console",
+        "tank",
+        "crates",
+        "plant",
+        "workbench",
+        "desk",
+        "planter",
+        "labbench",
+        "pump",
+        "shelf",
+        "railing",
+    }
+)
+ROOM_STYLES = frozenset(
+    {"reception", "storage", "maintenance", "server", "office", "laboratory", "reactor"}
+)
+DETAIL_STYLES = frozenset({"stairs", "grate", "cables", "threshold"})
 
 
 @dataclass(frozen=True, slots=True)
@@ -69,6 +89,34 @@ class Marker:
 
 
 @dataclass(frozen=True, slots=True)
+class Room:
+    room_id: str
+    label: str
+    style: str
+    left: int
+    top: int
+    width: int
+    height: int
+
+    def contains(self, tile: Tile) -> bool:
+        return (
+            self.left <= tile[0] < self.left + self.width
+            and self.top <= tile[1] < self.top + self.height
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class FloorDetail:
+    detail_id: str
+    style: str
+    left: int
+    top: int
+    width: int
+    height: int
+    rotation: int = 0
+
+
+@dataclass(frozen=True, slots=True)
 class LevelData:
     static_map: StaticMap
     operative_id: str
@@ -85,6 +133,8 @@ class LevelData:
     glass_tiles: frozenset[Tile]
     cover_tiles: frozenset[Tile]
     sound_blocking_tiles: frozenset[Tile]
+    rooms: tuple[Room, ...] = ()
+    floor_details: tuple[FloorDetail, ...] = ()
 
     def spawns(self) -> tuple[ActorSpawn, ...]:
         operative = ActorSpawn(self.operative_id, self.spawn_tile, ActorKind.OPERATIVE)
@@ -96,3 +146,6 @@ class LevelData:
 
     def zone_at(self, tile: Tile) -> Zone | None:
         return next((zone for zone in self.zones if zone.contains(tile)), None)
+
+    def room_at(self, tile: Tile) -> Room | None:
+        return next((room for room in self.rooms if room.contains(tile)), None)

@@ -12,6 +12,7 @@ from echo_heist.core.contracts.world import (
     MapObject,
     MissionPhase,
     StaticMap,
+    tile_center,
 )
 from echo_heist.core.simulation.engine import Simulation
 
@@ -37,7 +38,9 @@ def mission(rules: GameRules, *, kind: ActorKind = ActorKind.OPERATIVE) -> Simul
 def test_real_carrier_theft_lockdown_and_original_exit(rules: GameRules, kind: ActorKind) -> None:
     sim = mission(rules, kind=kind)
     assert sim.step().mission_end is None  # starts at exit without core
-    for _ in range(55):
+    for _ in range(100):
+        if sim.observe("operative").interactions:
+            break
         sim.step((Action("operative", ActionKind.MOVE, sim.tick, (1, 0)),))
     assert sim.observe("operative").interactions
     for _ in range(rules.core_interaction_ticks - 1):
@@ -52,7 +55,7 @@ def test_real_carrier_theft_lockdown_and_original_exit(rules: GameRules, kind: A
     assert sim.observe("operative").own_status.inventory.core_held
     again = sim.step((Action("operative", ActionKind.INTERACT, sim.tick),))
     assert all(event.kind != EventKind.CORE_TAKEN for event in again.events)
-    for _ in range(80):
+    for _ in range(120):
         result = sim.step((Action("operative", ActionKind.MOVE, sim.tick, (-1, 0)),))
         if result.mission_end:
             break
@@ -67,7 +70,9 @@ def test_theft_requires_unbroken_valid_hold_and_correct_actor(rules: GameRules) 
     sim = mission(rules)
     out_of_range = sim.step((Action("operative", ActionKind.INTERACT, 0),))
     assert out_of_range.events[0].kind == EventKind.ACTION_REJECTED
-    for _ in range(55):
+    for _ in range(100):
+        if sim.observe("operative").interactions:
+            break
         sim.step((Action("operative", ActionKind.MOVE, sim.tick, (1, 0)),))
     for _ in range(12):
         sim.step((Action("operative", ActionKind.INTERACT, sim.tick),))
@@ -161,12 +166,17 @@ def test_second_actor_cannot_steal_or_extract_another_carriers_core(rules: GameR
     assert rejected.events[0].kind == EventKind.ACTION_REJECTED
     for _ in range(rules.core_interaction_ticks):
         sim.step((Action("operative", ActionKind.INTERACT, sim.tick),))
-    for _ in range(68):
-        result = sim.step((Action("other", ActionKind.MOVE, sim.tick, (-1, 0)),))
-        assert result.mission_end is None
-    for _ in range(12):
-        result = sim.step((Action("other", ActionKind.MOVE, sim.tick, (0, -1)),))
-        assert result.mission_end is None
+    for target, direction in (((1, 3), (-1, 0)), ((1, 2), (0, -1))):
+        expected = tile_center(target)
+        for _ in range(120):
+            position = sim.observe("other").own_status.position
+            assert position is not None
+            if max(abs(a - b) for a, b in zip(position, expected, strict=True)) < 2_000:
+                break
+            result = sim.step((Action("other", ActionKind.MOVE, sim.tick, direction),))
+            assert result.mission_end is None
+        else:
+            raise AssertionError("Second actor did not reach the actual exit")
     assert sim.observe("other").own_status.tile == (1, 2)
     assert sim.presentation_snapshot().core_owner == "operative"
 

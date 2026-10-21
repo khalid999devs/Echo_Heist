@@ -18,6 +18,7 @@ from echo_heist.ui.input.human import HumanInput, UiCommand
 from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.camera import Camera
+from echo_heist.ui.render.environment.overview import draw_overview
 from echo_heist.ui.render.hud import draw_dialog, draw_hud, panel
 from echo_heist.ui.render.motifs import ActorMotion
 from echo_heist.ui.render.theme import Fonts
@@ -30,15 +31,6 @@ from echo_heist.ui.render.world import (
 )
 
 MAX_CATCH_UP = 8_000  # At most eight 30 Hz ticks after a long frame.
-ROUTE_SUMMARY = (
-    ("1  Follow the amber CORE marker on the minimap.", theme.WARNING),
-    ("2  Take the upper Security or lower Research route.", theme.TEXT),
-    ("3  Hold E beside the Core until the link fills.", theme.TEXT),
-    ("4  Escape through the green Entry lift.", theme.ACCENT),
-    ("WASD move  /  Shift sprint  /  Q Echo decoy", theme.MUTED),
-    ("F EMP  /  Space melee  /  Esc pause", theme.MUTED),
-    ("Tab closes this guide", theme.ACCENT),
-)
 
 
 class HeistRequest(StrEnum):
@@ -123,6 +115,7 @@ class HeistSession:
 
     def pause(self) -> None:
         self.paused, self.confirm_abort, self.accumulator = True, False, 0
+        self.summary = False
         self.input.clear()
 
     def handle(self, events: Sequence[pygame.event.Event]) -> HeistRequest | None:
@@ -133,10 +126,16 @@ class HeistSession:
         commands = self.input.feed(events)
         if UiCommand.QUIT in commands:
             return HeistRequest.QUIT
-        if UiCommand.PAUSE in commands or UiCommand.FOCUS_LOST in commands:
+        if UiCommand.PAUSE in commands and self.summary:
+            self.summary = False
+            self.input.clear()
+        elif UiCommand.PAUSE in commands or UiCommand.FOCUS_LOST in commands:
             self.pause()
         if UiCommand.OBJECTIVE in commands:
             self.summary = not self.summary
+            self.input.clear()
+        elif self.summary:
+            self.input.clear()
         if UiCommand.LAB in commands:
             self.lab_note = not self.lab_note
         return None
@@ -164,10 +163,10 @@ class HeistSession:
         return None
 
     def update(self, elapsed_ms: int) -> None:
-        if not self.paused and self.mission_end is None:
+        if not self.paused and not self.summary and self.mission_end is None:
             self.clock_ms += elapsed_ms
             self.pulses = [pulse for pulse in self.pulses if self.clock_ms - pulse.started_ms < 650]
-        if self.paused or self.mission_end is not None:
+        if self.paused or self.summary or self.mission_end is not None:
             self.accumulator = 0
         else:
             hz = self.simulation.ticks_per_second
@@ -244,6 +243,9 @@ class HeistSession:
 
     def zone_label(self) -> str:
         observation = self.simulation.observe(self.level.operative_id)
+        room = self.level.room_at(observation.own_status.tile)
+        if room is not None:
+            return room.label
         zone = self.level.zone_at(observation.own_status.tile)
         return zone.label if zone is not None else "Corridor"
 
@@ -289,7 +291,9 @@ class HeistSession:
         if self.paused:
             self._draw_pause(canvas)
         elif self.summary:
-            draw_dialog(canvas, "Mission route", ROUTE_SUMMARY, self.fonts)
+            draw_overview(
+                canvas, self.level, operative_tile, snapshot.phase, self.camera, self.fonts
+            )
 
     def _draw_lab(self, canvas: pygame.Surface) -> None:
         snapshot = self.simulation.presentation_snapshot()

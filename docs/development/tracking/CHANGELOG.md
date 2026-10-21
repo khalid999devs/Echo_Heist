@@ -1,5 +1,13 @@
 # Development changelog
 
+## 2026-10-21 - Denser facility and slower movement
+
+- Rebuilt the actual five-zone layout as 23 compact rooms with 104 physical furnishings, narrower bent corridors and two railed stair gangways. Added original generated desk/planter/lab/pump/shelf/stair art, room floor treatments, signs, grates and cables.
+- Extended the existing importer with optional typed Room/FloorDetail metadata, quarter-turn furnishing orientation and whole-room reachability checks. Stable map/anchor/guard IDs remain; coordinates changed in the [consumer contract](../architecture/integration/FACILITY_DENSITY.md).
+- Reduced walk/sprint from 2.2/3.6 to 1.8/2.6 tiles/s, with proportional defender tuning. Preserved body radius, tools, capture and approved scoring. Tab now opens a paused room map, clears held input and ducks audio.
+- All 96 behavior cases, structure/Ruff/strict types pass. Both routes complete real native extractions with stock tools; deliberate guard contact captures. Inspected 38 native screenshots and removed overlapping room/zone signs. [Current review](../quality/reports/facility_density/REVIEW.md) records actual build/CI evidence as it becomes available.
+- P03 remains partial; user-deferred P05 environment mechanics and later full V1 systems remain open.
+
 ## 2026-10-21 - Illustrated gameplay and movement review
 
 - Added original generated floor/bulkhead textures, six facility props and operative/robot frame strips. Walking, sprinting and facing follow committed actor movement; visual animation never changes collision or sensing.

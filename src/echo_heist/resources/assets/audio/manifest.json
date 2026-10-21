@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "assets": [
+    {
+      "path": "music/title.ogg",
+      "author": "SRG774",
+      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "source_member": "ogg/title.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "b74814f52e99a59d1dce05e2340b51be6b0818e14e21e0c0b8dfdb1034141c5c",
+      "bytes": 7930448,
+      "modified": false
+    },
+    {
+      "path": "music/sector.ogg",
+      "author": "SRG774",
+      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "source_member": "ogg/sector.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "d5862627e6d0c424fc157eaffaa5421bae4f0bb177e7628d520bfb6a45aa9676",
+      "bytes": 817770,
+      "modified": false
+    },
+    {
+      "path": "music/pulse.ogg",
+      "author": "SRG774",
+      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "source_member": "ogg/pulse.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "6350f0e1ab342c0d358346094334dfb74ed842abda33d8e1653336c13dd530ae",
+      "bytes": 831824,
+      "modified": false
+    },
+    {
+      "path": "music/urgent.ogg",
+      "author": "SRG774",
+      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "source_member": "ogg/urgent.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "f8c36b37cac782f0d2b23b52b2c2736af3a748360b829212b415c07fc5d504e5",
+      "bytes": 828217,
+      "modified": false
+    },
+    {
+      "path": "music/transmission.ogg",
+      "author": "SRG774",
+      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "source_member": "ogg/transmission.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "5749841250bf836795f9f83334dc46bc1debf5cf13700a48ab3a873662f64d7e",
+      "bytes": 1785891,
+      "modified": false
+    },
+    {
+      "path": "ui/hover.ogg",
+      "author": "SRG774",
+      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "source_member": "ogg/hover.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "2dc56ac3f497d0cf16135ba0260a7bbd98557c4323cac37d528f9622279f31ee",
+      "bytes": 10866,
+      "modified": false
+    },
+    {
+      "path": "ui/victory.ogg",
+      "author": "SRG774",
+      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "source_member": "ogg/victory.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "9acde356c84b1d326a3e7b813e43e8849596a285796144f7fabed898f2c21007",
+      "bytes": 91504,
+      "modified": false
+    },
+    {
+      "path": "ui/confirm.ogg",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/50-cc0-sci-fi-sfx",
+      "source_member": "terminal_01.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "cde6464d6dc78ea0a96cd06e2d2777e98f202b30a82c3f5295dfee11a284446e",
+      "bytes": 12708,
+      "modified": false
+    },
+    {
+      "path": "tools/echo.ogg",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/50-cc0-sci-fi-sfx",
+      "source_member": "teleport_01.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "88d1d00c7d9180c6afd273cf19ee047ad072c112a5e4df17e2b55c0e5c767706",
+      "bytes": 14670,
+      "modified": false
+    },
+    {
+      "path": "tools/emp.ogg",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/50-cc0-sci-fi-sfx",
+      "source_member": "misc_08.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "ead905d88263a0a5ee2d452aa753d1e011b1588790dbb12c79b1e2bac8a8900e",
+      "bytes": 32544,
+      "modified": false
+    },
+    {
+      "path": "tools/melee.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "source_member": "Audio/impactMetal_heavy_000.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "e07045693e4a2b3d165c424e3dab4c781d9ff8880a386880ac89a51315d7f831",
+      "bytes": 6110,
+      "modified": false
+    },
+    {
+      "path": "signals/alert.ogg",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/50-cc0-sci-fi-sfx",
+      "source_member": "beep_02.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "fa895f4e6569d7bc30c78b54d7f366395b031b7affc012daa7962737f4c4ec37",
+      "bytes": 14033,
+      "modified": false
+    },
+    {
+      "path": "signals/alarm.ogg",
+      "author": "rubberduck",
+      "source": "https://opengameart.org/content/50-cc0-sci-fi-sfx",
+      "source_member": "beep_03.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "61f8eca45a0ea759a89798e8551b31cf33f101e84907095748ab42501295e94b",
+      "bytes": 13460,
+      "modified": false
+    },
+    {
+      "path": "world/step-0.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "source_member": "Audio/footstep_concrete_000.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "d7267e183067757c92c169de2a379abea592cfca6b39bb2e8feea15221ad79fe",
+      "bytes": 5808,
+      "modified": false
+    },
+    {
+      "path": "world/step-1.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "source_member": "Audio/footstep_concrete_001.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "507a75eb19b897087855a3be3cf11a12d7fa37d143ad535eeebe0b8031c7325d",
+      "bytes": 6308,
+      "modified": false
+    },
+    {
+      "path": "world/step-2.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/impact-sounds",
+      "source_member": "Audio/footstep_concrete_002.ogg",
+      "license": "CC0-1.0",
+      "downloaded": "2026-10-21",
+      "sha256": "b21fa546d74941196b25da8a20b7010abd8c05c4fcf93545d1f344e66a664e13",
+      "bytes": 6255,
+      "modified": false
+    }
+  ]
+}

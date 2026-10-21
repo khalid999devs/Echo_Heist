@@ -14,7 +14,7 @@ P01 foundation asset: [original SVG mark](../../../src/echo_heist/resources/asse
 | A04 | Mission anchors | Entry/exit beacon, core plinth idle/pickup/empty, carried-core indication | IN_PROGRESS; P02 reactor inset, extraction pad, animated beacons and carried-core light |
 | A05 | Interactions | Intact/shattered glass rack, rolling canister, doors and hiding feedback | TODO |
 | A06 | Effects | Echo ghost/trail, EMP ring, capture telegraph, clear suspicion/contact/lockdown states | IN_PROGRESS; P02 Echo/EMP event rings, capture telegraph and lockdown border; richer P03-P05 feedback later |
-| A07 | Audio | 6-10 gameplay cues, one loopable ambience/music layer, source event mapping and separate volumes | TODO |
+| A07 | Audio | 6-10 gameplay cues, one loopable ambience/music layer, source event mapping and separate volumes | IN_PROGRESS; five CC0 context tracks, eleven cues, event mapping and persisted mix controls; [actual audio integration](AUDIO.md), further in-game mix review pending |
 | A08 | Interface | Legible font, status icons, mode/Workshop/results panels, non-color cues and critical subtitles | IN_PROGRESS; bundled Oxanium family, P02 title/briefing/HUD/results and keyed minimap; Workshop/accessibility later |
 | A09 | Narrative | Short opening/contact/theft/win copy and replication-seed epilogue | TODO |
 | A10 | Release media | Icon, cover art, representative screenshots and gameplay video | IN_PROGRESS; P02 review screenshots only |

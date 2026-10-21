@@ -30,7 +30,10 @@ def draw_scene(
     clock_ms: int,
     *,
     text_side: str = "left",
+    reduced_motion: bool = False,
 ) -> None:
+    if reduced_motion:
+        clock_ms = 0
     drift_x = round(5 * sin(clock_ms / 7500))
     drift_y = round(3 * sin(clock_ms / 9400))
     scene = backdrop if text_side == "left" else _mirrored(backdrop)

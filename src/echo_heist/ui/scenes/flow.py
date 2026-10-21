@@ -7,9 +7,11 @@ from enum import StrEnum
 import pygame
 
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.infrastructure.persistence.settings import Settings
 from echo_heist.infrastructure.resources import load_game_rules, resource_bytes
 from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
+from echo_heist.ui.audio.model import AudioFrame
 from echo_heist.ui.render.surfaces.cinematic import draw_scene
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import WorldArt, build_map_surface
@@ -26,6 +28,7 @@ from echo_heist.ui.scenes.menus import (
     menu_hit,
     move_selection,
 )
+from echo_heist.ui.scenes.settings import OPTION_RECTS, adjust, click, draw_settings
 
 DEFAULT_MAP_ID = "vault-five-zone"
 CONFIRM_KEYS = (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE)
@@ -36,6 +39,7 @@ class Scene(StrEnum):
     MODE = "MODE"
     HEIST = "HEIST"
     RESULTS = "RESULTS"
+    SETTINGS = "SETTINGS"
 
 
 def load_level(map_id: str = DEFAULT_MAP_ID) -> LevelData:
@@ -51,10 +55,12 @@ class GameFlow:
         seed: int = 1042,
         level: LevelData | None = None,
         rules: GameRules | None = None,
+        settings: Settings | None = None,
     ) -> None:
         self.view_size, self.seed = view_size, seed
         self.level = level or load_level()
         self.rules = rules or load_game_rules()
+        self.settings = settings or Settings()
         self.fonts = Fonts()
         self.art = WorldArt.load()
         self.backdrop = load_backdrop(view_size)
@@ -79,6 +85,7 @@ class GameFlow:
             view_size=self.view_size,
             map_surface=self.map_surface,
             art=self.art,
+            reduced_flashing=self.settings.reduced_flashing,
         )
         self.runs_started += 1
         self.scene = Scene.HEIST
@@ -89,6 +96,9 @@ class GameFlow:
 
     def frame(self, events: Sequence[pygame.event.Event], elapsed_ms: int) -> None:
         self.ambient_ms += max(0, elapsed_ms)
+        if self.scene == Scene.SETTINGS:
+            self._settings_events(events)
+            return
         if self.scene == Scene.HEIST and self.session is not None:
             request = self.session.handle(events)
             if request == HeistRequest.QUIT:
@@ -143,10 +153,22 @@ class GameFlow:
     def _key(self, key: int) -> None:
         if self.scene == Scene.TITLE:
             self.selected = move_selection(self.selected, TITLE_ITEMS, key)
-            if key == pygame.K_ESCAPE or (key in CONFIRM_KEYS and self.selected == 1):
+            if key == pygame.K_ESCAPE or (key in CONFIRM_KEYS and self.selected == 5):
                 self.running = False
             elif key in CONFIRM_KEYS:
-                self._go(Scene.MODE)
+                if self.selected in (0, 1):
+                    companion = self.selected == 1
+                    self._go(Scene.MODE)
+                    self.selected = int(companion)
+                elif self.selected == 2:
+                    self.notice = "Workshop configuration is not available in this build."
+                elif self.selected == 3:
+                    if self.session is not None and self.session.mission_end is not None:
+                        self._go(Scene.RESULTS)
+                    else:
+                        self.notice = "Complete a mission to view its report."
+                elif self.selected == 4:
+                    self._go(Scene.SETTINGS)
         elif self.scene == Scene.MODE:
             self.selected = move_selection(self.selected, MODE_ITEMS, key)
             if key == pygame.K_ESCAPE:
@@ -163,6 +185,43 @@ class GameFlow:
             elif key == pygame.K_ESCAPE:
                 self.running = False
 
+    def _settings_events(self, events: Sequence[pygame.event.Event]) -> None:
+        for event in events:
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE or (
+                    event.key in CONFIRM_KEYS and self.selected == 4
+                ):
+                    self._go(Scene.TITLE)
+                    return
+                if event.key in (pygame.K_UP, pygame.K_DOWN):
+                    self.selected = (
+                        self.selected + (1 if event.key == pygame.K_DOWN else -1)
+                    ) % len(OPTION_RECTS)
+                elif event.key in (pygame.K_LEFT, pygame.K_RIGHT):
+                    self.settings = adjust(
+                        self.settings, self.selected, 1 if event.key == pygame.K_RIGHT else -1
+                    )
+                elif event.key in CONFIRM_KEYS and self.selected in (2, 3):
+                    self.settings = adjust(self.settings, self.selected, 1)
+            elif event.type in (pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN):
+                hit = next(
+                    (
+                        index
+                        for index, rect in enumerate(OPTION_RECTS)
+                        if rect.collidepoint(event.pos)
+                    ),
+                    None,
+                )
+                if hit is not None:
+                    self.selected = hit
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        if hit == 4:
+                            self._go(Scene.TITLE)
+                            return
+                        self.settings = click(self.settings, hit, event.pos)
+
     def draw(self, canvas: pygame.Surface) -> None:
         if self.scene == Scene.TITLE:
             draw_menu(
@@ -173,6 +232,7 @@ class GameFlow:
                 selected=self.selected,
                 notice=self.notice,
                 clock_ms=self.ambient_ms,
+                reduced_motion=self.settings.reduced_flashing,
             )
         elif self.scene == Scene.MODE:
             draw_menu(
@@ -183,12 +243,23 @@ class GameFlow:
                 selected=self.selected,
                 notice=self.notice,
                 clock_ms=self.ambient_ms,
+                reduced_motion=self.settings.reduced_flashing,
+            )
+        elif self.scene == Scene.SETTINGS:
+            draw_settings(
+                canvas, self.fonts, self.backdrop, self.settings, self.selected, self.ambient_ms
             )
         elif self.session is not None:
             self.session.draw(canvas)
             end = self.session.mission_end
             if self.scene == Scene.RESULTS and end is not None:
-                draw_scene(canvas, self.backdrop, self.ambient_ms, text_side="right")
+                draw_scene(
+                    canvas,
+                    self.backdrop,
+                    self.ambient_ms,
+                    text_side="right",
+                    reduced_motion=self.settings.reduced_flashing,
+                )
                 draw_results(
                     canvas,
                     end,
@@ -197,6 +268,21 @@ class GameFlow:
                     hovered=self.hovered_result,
                     clock_ms=self.ambient_ms,
                 )
+
+    def audio_frame(self) -> AudioFrame:
+        events = tuple(self.session.audio_events) if self.session is not None else ()
+        if self.session is not None:
+            self.session.audio_events.clear()
+        snapshot = self.session.simulation.presentation_snapshot() if self.session else None
+        return AudioFrame(
+            self.scene.value,
+            f"{self.selected}:{self.hovered_result}",
+            self.runs_started,
+            phase=snapshot.phase if snapshot else None,
+            paused=self.session.paused if self.session else False,
+            outcome=snapshot.mission_end.outcome if snapshot and snapshot.mission_end else None,
+            events=events,
+        )
 
     def report(self) -> dict[str, object]:
         return {

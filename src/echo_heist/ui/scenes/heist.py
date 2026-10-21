@@ -1,5 +1,6 @@
 """One heist run: feeds HumanInput into Simulation at fixed ticks and draws the result."""
 
+from collections import deque
 from collections.abc import Sequence
 from enum import StrEnum
 
@@ -53,6 +54,7 @@ class HeistSession:
         view_size: tuple[int, int],
         map_surface: pygame.Surface | None = None,
         art: WorldArt | None = None,
+        reduced_flashing: bool = False,
     ) -> None:
         self.level, self.seed, self.fonts, self.rules = level, seed, fonts, rules
         self.simulation = Simulation(
@@ -72,6 +74,8 @@ class HeistSession:
         }
         self.actor_motion: dict[str, ActorMotion] = {}
         self.pulses: list[VisualPulse] = []
+        self.audio_events: deque[GameEvent] = deque(maxlen=512)
+        self.reduced_flashing = reduced_flashing
         self.notice = ""
         self.notice_until_ms = 0
         self._follow(0.0, snap=True)
@@ -176,6 +180,7 @@ class HeistSession:
             self._last_positions[actor.actor_id] = current
 
     def _record_events(self, events: tuple[GameEvent, ...]) -> None:
+        self.audio_events.extend(events)
         actors = {actor.actor_id: actor for actor in self.simulation.presentation_snapshot().actors}
         for event in events:
             if event.kind == EventKind.CORE_TAKEN:
@@ -214,7 +219,7 @@ class HeistSession:
 
     def draw(self, canvas: pygame.Surface) -> None:
         snapshot = self.simulation.presentation_snapshot()
-        pulse = abs((self.clock_ms % 1000) - 500) / 500
+        pulse = 0.5 if self.reduced_flashing else abs((self.clock_ms % 1000) - 500) / 500
         draw_world(
             canvas,
             self.level,

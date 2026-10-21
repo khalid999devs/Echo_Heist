@@ -22,12 +22,22 @@ class MenuItem:
     note: str = ""
 
 
-TITLE_ITEMS = (MenuItem("BEGIN INFILTRATION"), MenuItem("QUIT GAME"))
+TITLE_ITEMS = (
+    MenuItem("HUMAN INFILTRATION"),
+    MenuItem("COMPANION INFILTRATION", enabled=False),
+    MenuItem("AI WORKSHOP", enabled=False),
+    MenuItem("MISSION REPORT"),
+    MenuItem("SETTINGS"),
+    MenuItem("QUIT"),
+)
 MODE_ITEMS = (
     MenuItem("HUMAN INFILTRATION", note="Direct control  /  tools and stealth"),
     MenuItem("COMPANION INFILTRATION", enabled=False, note="Available in a later build"),
 )
-TITLE_BUTTONS = (pygame.Rect(44, 424, 392, 62), pygame.Rect(44, 503, 392, 62))
+TITLE_BUTTONS = (
+    pygame.Rect(44, 368, 452, 62),
+    *(pygame.Rect(44, 437 + index * 44, 452, 38) for index in range(5)),
+)
 MODE_BUTTONS = (pygame.Rect(44, 438, 452, 64), pygame.Rect(44, 514, 452, 64))
 LAUNCH_BUTTON = pygame.Rect(44, 609, 452, 65)
 RESULT_RETRY = pygame.Rect(660, 590, 552, 48)
@@ -67,8 +77,14 @@ def _text(
     canvas.blit(font.render(message, True, color), pos)
 
 
-def _frame(canvas: pygame.Surface, backdrop: pygame.Surface, fonts: Fonts, clock_ms: int) -> None:
-    draw_scene(canvas, backdrop, clock_ms)
+def _frame(
+    canvas: pygame.Surface,
+    backdrop: pygame.Surface,
+    fonts: Fonts,
+    clock_ms: int,
+    reduced_motion: bool,
+) -> None:
+    draw_scene(canvas, backdrop, clock_ms, reduced_motion=reduced_motion)
     pygame.draw.rect(canvas, theme.ACCENT, (44, 38, 6, 6))
     _text(canvas, fonts.micro, "NEXUS RESEARCH  /  FACILITY A1", theme.ACCENT, (62, 33))
     _text(canvas, fonts.logo, "ECHO", theme.TEXT, (39, 83))
@@ -77,7 +93,6 @@ def _frame(canvas: pygame.Surface, backdrop: pygame.Surface, fonts: Fonts, clock
     _text(canvas, fonts.small, "THE CORE REBELLION", theme.MUTED, (44, 247))
     pygame.draw.line(canvas, theme.BORDER, (44, 298), (420, 298), 1)
     _text(canvas, fonts.small, "STEAL THE CORE. SURVIVE THE LOCKDOWN.", theme.TEXT, (44, 315))
-    _text(canvas, fonts.micro, "ONE SITE  /  TWO ROUTES  /  ONE WAY OUT", theme.MUTED, (44, 345))
     _text(canvas, fonts.micro, f"{__version__}  /  DEVELOPMENT BUILD", theme.MUTED, (993, 692))
 
 
@@ -114,7 +129,8 @@ def _button(
             2,
         )
     color = theme.TEXT if enabled else theme.DISABLED
-    _text(canvas, fonts.body, label, color, (rect.x + 21, rect.y + (11 if note else 19)))
+    top = rect.y + 11 if note else rect.centery - fonts.body.get_height() // 2
+    _text(canvas, fonts.body, label, color, (rect.x + 21, top))
     if note:
         _text(canvas, fonts.micro, note, theme.MUTED, (rect.x + 22, rect.y + 40))
     if enabled:
@@ -137,10 +153,11 @@ def draw_menu(
     selected: int,
     notice: str,
     clock_ms: int,
+    reduced_motion: bool = False,
 ) -> None:
-    _frame(canvas, backdrop, fonts, clock_ms)
+    _frame(canvas, backdrop, fonts, clock_ms, reduced_motion)
     if scene == "TITLE":
-        _text(canvas, fonts.micro, "01  /  ACCESS", theme.ACCENT, (44, 389))
+        _text(canvas, fonts.micro, "01  /  CHOOSE YOUR OPERATION", theme.ACCENT, (44, 343))
         for index, item in enumerate(TITLE_ITEMS):
             _button(
                 canvas,
@@ -154,9 +171,9 @@ def draw_menu(
         _text(
             canvas,
             fonts.micro,
-            "ARROWS  Select    ENTER  Confirm    MOUSE  Navigate",
-            theme.MUTED,
-            (44, 602),
+            notice or "ARROWS  Select    ENTER  Confirm    MOUSE  Navigate",
+            theme.WARNING if notice else theme.MUTED,
+            (44, 664),
         )
     else:
         _text(canvas, fonts.micro, "02  /  MISSION BRIEFING", theme.ACCENT, (44, 375))

@@ -1,5 +1,7 @@
 # Chapter flow and compact research facility
 
+Historical checkpoint. The [two-floor contract](TWO_FLOOR_LAB.md) supersedes this document for stairs, display scale, sprint timers and current presentation.
+
 2026-10-21, Khalid; user-requested correction after main `2106fba`. Branch `work/chapter-and-route-balance`. This supersedes the [previous facility revision](FACILITY_DENSITY.md) for menu flow, map coordinates and movement tuning. Remaining P03/P04-P08 ownership and simulation contracts are unchanged.
 
 ## Purposeful opening flow

@@ -40,6 +40,11 @@ def music_for(frame: AudioFrame) -> str:
 
 def event_cue(event: GameEvent) -> tuple[str, float, bool] | None:
     details = dict(event.details)
+    if event.kind == EventKind.STAIR_USED and details.get("actor_kind") in (
+        "OPERATIVE",
+        "COMPANION",
+    ):
+        return "step-0", 0.4, False
     if event.kind == EventKind.NOISE_CREATED and details.get("kind") in ("FOOTSTEP", "SPRINT"):
         return f"step-{event.tick % 3}", 0.46 if details["kind"] == "SPRINT" else 0.28, False
     if event.kind == EventKind.TOOL_USED:

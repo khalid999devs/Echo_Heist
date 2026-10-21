@@ -13,6 +13,8 @@ from echo_heist.level.model import LevelData
 from echo_heist.ui.render import motifs, theme
 from echo_heist.ui.render.camera import Camera
 from echo_heist.ui.render.environment.interiors import draw_details, draw_room_trim, room_floors
+from echo_heist.ui.render.environment.lighting import bake_lighting, draw_equipment
+from echo_heist.ui.render.surfaces.formats import opaque_surface
 from echo_heist.ui.render.surfaces.glass import alert_frame
 from echo_heist.ui.render.surfaces.vision import draw_vision
 from echo_heist.ui.render.theme import Fonts
@@ -42,8 +44,8 @@ class WorldArt:
         def image(path: str) -> pygame.Surface:
             return pygame.image.load(BytesIO(resource_bytes(path)), path)
 
-        floor = pygame.transform.smoothscale(image("assets/tiles/facility-floor.png"), (512, 512))
-        bulkhead = pygame.transform.smoothscale(image("assets/tiles/bulkhead.png"), (256, 256))
+        floor = pygame.transform.smoothscale(image("assets/tiles/facility-floor.png"), (768, 768))
+        bulkhead = pygame.transform.smoothscale(image("assets/tiles/bulkhead.png"), (384, 384))
         floor.fill((183, 193, 201), special_flags=pygame.BLEND_RGB_MULT)
         bulkhead.fill((160, 175, 185), special_flags=pygame.BLEND_RGB_MULT)
         atlas = image("assets/tiles/facility-props.png")
@@ -113,6 +115,7 @@ def _roof_tile(
             rect.x % texture.get_width(), rect.y % texture.get_height(), rect.w, rect.h
         )
         surface.blit(texture, rect.topleft, source)
+        return
     pygame.draw.line(surface, (21, 35, 44), rect.topleft, rect.topright, 1)
     pygame.draw.line(surface, (15, 28, 36), rect.topleft, rect.bottomleft, 1)
     if variant % 29 == 0:
@@ -234,7 +237,8 @@ def _draw_furniture(surface: pygame.Surface, level: LevelData, art: WorldArt) ->
         source = pygame.transform.rotate(art.props[styles[style]], rotation)
         prop = pygame.transform.smoothscale(source, footprint.inflate(-4, -4).size)
         prop.fill((205, 220, 232), special_flags=pygame.BLEND_RGB_MULT)
-        pygame.draw.rect(surface, (4, 13, 20), footprint.inflate(-1, -1), border_radius=5)
+        shadow = motifs.contact_shadow(footprint.width, max(12, footprint.height // 2), 115)
+        surface.blit(shadow, (footprint.left, footprint.centery))
         surface.blit(prop, footprint.move(2, 1))
 
 
@@ -243,7 +247,7 @@ def build_map_surface(
 ) -> pygame.Surface:
     """Prepaint the facility once; visual motifs never affect map collision tags."""
     world_map, size = level.static_map, level.static_map.tile_size_px
-    surface = pygame.Surface((world_map.width * size, world_map.height * size))
+    surface = opaque_surface((world_map.width * size, world_map.height * size))
     surface.fill(theme.BACKGROUND)
     roof_texture = art.bulkhead.copy() if art else None
     if roof_texture is not None:
@@ -295,6 +299,7 @@ def build_map_surface(
                 else:
                     _roof_tile(surface, rect, variant, roof_texture)
     _floor_shadows(surface, level)
+    bake_lighting(surface, level)
     draw_details(surface, level, art.props[11] if art else None)
     if art is not None:
         _decorate_cover(surface, level, art)
@@ -307,13 +312,22 @@ def build_map_surface(
     ):
         tile = anchors[object_id]
         painter(surface, ((tile[0] * size) + size // 2, (tile[1] * size) + size // 2))
+    for link in world_map.stairs:
+        up = link.destination_id.endswith("down")
+        label = fonts.micro.render("UP / 02" if up else "DOWN / 01", True, theme.ACCENT)
+        stair_label_point = ((link.tile[0] + 0.5) * size, link.tile[1] * size - 6)
+        rect = label.get_rect(midbottom=stair_label_point)
+        pygame.draw.rect(surface, (6, 21, 29), rect.inflate(8, 4), border_radius=3)
+        surface.blit(label, rect)
     for marker in level.markers:
-        if marker.kind == "HideSpot":
+        if marker.kind == "HideSpot" and not level.rooms:
             x, y = marker.tile
             rect = pygame.Rect(x * size + 7, y * size + 7, size - 14, size - 14)
             pygame.draw.rect(surface, theme.ACCENT_DIM, rect, 1, border_radius=3)
             pygame.draw.line(surface, theme.ACCENT_DIM, rect.topleft, rect.bottomright, 1)
     for point in level.chokepoints:
+        if any(link.tile == point.tile for link in level.static_map.stairs):
+            continue
         x, y = point.tile
         marker_rect = pygame.Rect(x * size + 6, y * size + 12, size - 12, 8)
         pygame.draw.rect(surface, theme.WARNING, marker_rect, 1)
@@ -423,10 +437,23 @@ def draw_world(
     clock_ms: int = 0,
     pulses: tuple[VisualPulse, ...] = (),
     art: WorldArt | None = None,
+    reduced_motion: bool = False,
 ) -> None:
     size = level.static_map.tile_size_px
     canvas.fill(theme.BACKGROUND)
-    canvas.blit(map_surface, camera.to_screen((0, 0)))
+    operative = next(actor for actor in snapshot.actors if actor.actor_id == level.operative_id)
+    deck = level.deck_at(operative.tile)
+    original_clip = canvas.get_clip()
+    if deck is not None:
+        bounds = pygame.Rect(
+            deck.left * size, deck.top * size, deck.width * size, deck.height * size
+        )
+        dest = camera.to_screen(bounds.topleft)
+        canvas.set_clip(pygame.Rect(dest, bounds.size).clip(original_clip))
+        canvas.blit(map_surface, dest, bounds)
+    else:
+        canvas.blit(map_surface, camera.to_screen((0, 0)))
+    draw_equipment(canvas, level, camera, 0 if reduced_motion else clock_ms, deck)
     if snapshot.phase == MissionPhase.LOCKDOWN:
         canvas.fill((244, 205, 212), special_flags=pygame.BLEND_RGB_MULT)
         for choke in level.chokepoints:
@@ -481,7 +508,7 @@ def draw_world(
         pygame.draw.circle(pulse_surface, (*color, alpha), (radius + 4, radius + 4), radius, 3)
         canvas.blit(pulse_surface, (point[0] - radius - 4, point[1] - radius - 4))
     for entity in snapshot.actors:
-        if entity.position is None:
+        if entity.position is None or (deck is not None and not deck.contains(entity.tile)):
             continue
         point = camera.to_screen(to_pixels(entity.position, size))
         if entity.kind == ActorKind.OPERATIVE:
@@ -506,8 +533,6 @@ def draw_world(
             ring = pygame.Rect(0, 0, 38, 38)
             ring.center = point
             pygame.draw.arc(canvas, theme.WARNING, ring, pi / 2, pi / 2 + 2 * pi * progress, 4)
-        if entity.kind != ActorKind.OPERATIVE and 150 < point[1] < canvas.get_height() - 65:
-            label = fonts.micro.render(entity.kind.value.upper(), True, theme.MUTED)
-            canvas.blit(label, (point[0] - label.get_width() // 2, point[1] + 14))
+    canvas.set_clip(original_clip)
     if snapshot.phase == MissionPhase.LOCKDOWN:
         canvas.blit(alert_frame(canvas.get_size()), (0, 0))

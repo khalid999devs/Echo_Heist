@@ -14,6 +14,7 @@ from echo_heist.infrastructure.persistence.settings import (
 )
 from echo_heist.infrastructure.resources import load_bootstrap_config, resource_bytes
 from echo_heist.ui.audio.director import AudioDirector
+from echo_heist.ui.render.surfaces.formats import opaque_surface
 from echo_heist.ui.scenes.flow import GameFlow
 
 
@@ -72,7 +73,7 @@ def run_desktop(
                 audio_state = "ready"
             except pygame.error:
                 audio_state = "unavailable; continuing silently"
-        canvas = pygame.Surface((config.logical_width, config.logical_height))
+        canvas = opaque_surface((config.logical_width, config.logical_height))
         flow = GameFlow((config.logical_width, config.logical_height), settings=settings)
         audio = AudioDirector(
             enabled=audio_state == "ready",

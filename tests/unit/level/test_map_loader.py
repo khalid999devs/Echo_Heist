@@ -100,7 +100,10 @@ def _patrol_through_crate(data: dict[str, Any]) -> None:
 
 def _core_outside_chamber(data: dict[str, Any]) -> None:
     core = named(data, "anchors", "vault-core")
-    core["x"], core["y"] = 46 * 32 + 16, 14 * 32 + 16
+    core["x"], core["y"] = (
+        46 * data["tilewidth"] + data["tilewidth"] // 2,
+        14 * data["tilewidth"] + data["tilewidth"] // 2,
+    )
 
 
 CASES: list[tuple[str, Edit, str]] = [
@@ -117,8 +120,8 @@ CASES: list[tuple[str, Edit, str]] = [
         wall_off((48, 14), (48, 13), (48, 29), (48, 30)),
         "Core is unreachable",
     ),
-    ("upper branch cut", wall_off((30, 11)), "upper branch"),
-    ("lower branch cut", wall_off((30, 34)), "lower branch"),
+    ("upper branch cut", wall_off((35, 12), (36, 12)), "upper branch"),
+    ("lower branch cut", wall_off((35, 31), (36, 31), (43, 31), (44, 31)), "lower branch"),
     ("cross-link cut", wall_off((38, 19)), "cross-link"),
     ("entry sealed", wall_off((13, 19), (13, 20)), "Core is unreachable"),
     (
@@ -176,7 +179,7 @@ def test_invalid_furniture_cannot_silently_break_physical_room(invalid: str) -> 
     if invalid == "overlap":
         fixture["x"] = 0
     elif invalid == "bounds":
-        fixture["width"] = 100 * 32
+        fixture["width"] = 100 * data["tilewidth"]
     elif invalid == "untagged":
         fixture["properties"] = [
             prop for prop in fixture["properties"] if prop["name"] != "blocks_vision"
@@ -184,7 +187,7 @@ def test_invalid_furniture_cannot_silently_break_physical_room(invalid: str) -> 
     elif invalid == "rotated":
         fixture["rotation"] = 90
     else:
-        fixture["x"], fixture["y"] = 17 * 32, 20 * 32
+        fixture["x"], fixture["y"] = 17 * data["tilewidth"], 20 * data["tilewidth"]
     with pytest.raises(MapFormatError):
         load_tiled_map(json.dumps(data))
 
@@ -214,24 +217,41 @@ def test_compact_facility_and_stair_gangways_keep_accessible_aisles() -> None:
         >= 10
     )
     stairs = [detail for detail in level.floor_details if detail.style == "stairs"]
-    assert len(stairs) == 2
-    for detail in stairs:
-        for x in range(detail.left, detail.left + detail.width):
-            assert level.static_map.can_walk((x, detail.top + detail.height // 2))
-            assert not level.static_map.can_walk((x, detail.top))
-            assert not level.static_map.can_walk((x, detail.top + detail.height - 1))
+    assert len(stairs) == len(level.static_map.stairs) == 4
+    assert len(level.decks) == 2
+    for link in level.static_map.stairs:
+        assert level.static_map.can_walk(link.tile)
+        assert level.deck_at(link.tile) != level.deck_at(link.destination)
+    assert not level.static_map.can_walk((30, 11))
+    assert not level.static_map.can_walk((30, 34))
 
 
 @pytest.mark.parametrize("invalid", ["room-bounds", "room-overlap", "detail-bounds"])
 def test_invalid_room_and_floor_detail_geometry_is_rejected(invalid: str) -> None:
     data = packaged()
     if invalid == "detail-bounds":
-        named(data, "markers", "security-steps")["width"] = 100 * 32
+        named(data, "markers", "stairs-security-up-treads")["width"] = 100 * data["tilewidth"]
     else:
         room = named(data, "markers", "screening")
         if invalid == "room-bounds":
-            room["width"] = 100 * 32
+            room["width"] = 100 * data["tilewidth"]
         else:
-            room["y"] = 21 * 32
+            room["y"] = 21 * data["tilewidth"]
+    with pytest.raises(MapFormatError):
+        load_tiled_map(json.dumps(data))
+
+
+@pytest.mark.parametrize("invalid", ["missing-destination", "one-way", "blocked", "deck-overlap"])
+def test_broken_stairs_and_decks_fail_at_import(invalid: str) -> None:
+    data = packaged()
+    if invalid in ("missing-destination", "one-way"):
+        stair = named(data, "markers", "stairs-security-up")
+        stair["properties"][0]["value"] = (
+            "missing" if invalid == "missing-destination" else "stairs-research-down"
+        )
+    elif invalid == "blocked":
+        set_tile(data, "walls", (28, 11), 2)
+    else:
+        named(data, "markers", "ground")["width"] = data["width"] * data["tilewidth"]
     with pytest.raises(MapFormatError):
         load_tiled_map(json.dumps(data))

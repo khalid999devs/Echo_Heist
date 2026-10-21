@@ -26,21 +26,31 @@ def draw_minimap(
     phase: MissionPhase,
     fonts: Fonts,
 ) -> None:
-    rect = pygame.Rect(20, canvas.get_height() - 162, 196, 142)
+    rect = pygame.Rect(20, canvas.get_height() - 202, 172, 182)
     panel(canvas, rect, fill=(5, 15, 25, 170))
-    _label(canvas, fonts.micro, "FACILITY A1", theme.ACCENT, (32, rect.y + 9))
-    width, height = level.static_map.width, level.static_map.height
-    scale = min(172 / width, 80 / height)
-    origin = rect.x + 12, rect.y + 33
-    for y in range(height):
-        for x in range(width):
+    deck = level.deck_at(operative_tile)
+    left, top = (deck.left, deck.top) if deck else (0, 0)
+    width, height = (
+        (deck.width, deck.height) if deck else (level.static_map.width, level.static_map.height)
+    )
+    _label(
+        canvas,
+        fonts.micro,
+        "FLOOR 01" if deck and deck.deck_id == "ground" else "FLOOR 02" if deck else "FACILITY A1",
+        theme.ACCENT,
+        (32, rect.y + 9),
+    )
+    scale = min(148 / width, 120 / height)
+    origin = rect.centerx - width * scale / 2, rect.y + 33
+    for y in range(top, top + height):
+        for x in range(left, left + width):
             if level.static_map.can_walk((x, y)):
                 pygame.draw.rect(
                     canvas,
                     (55, 86, 96),
                     (
-                        round(origin[0] + x * scale),
-                        round(origin[1] + y * scale),
+                        round(origin[0] + (x - left) * scale),
+                        round(origin[1] + (y - top) * scale),
                         max(1, round(scale)),
                         max(1, round(scale)),
                     ),
@@ -50,16 +60,25 @@ def draw_minimap(
     if phase == MissionPhase.INFILTRATE:
         markers.append((anchors[level.core_id], theme.WARNING))
     for tile, color in markers:
+        if deck and not deck.contains(tile):
+            continue
         pygame.draw.circle(
             canvas,
             color,
             (
-                round(origin[0] + (tile[0] + 0.5) * scale),
-                round(origin[1] + (tile[1] + 0.5) * scale),
+                round(origin[0] + (tile[0] - left + 0.5) * scale),
+                round(origin[1] + (tile[1] - top + 0.5) * scale),
             ),
             3,
         )
-    _label(canvas, fonts.micro, "TAB  Facility map", theme.MUTED, (32, rect.bottom - 24))
+    for link in level.static_map.stairs:
+        if deck and deck.contains(link.tile):
+            point = (
+                round(origin[0] + (link.tile[0] - left + 0.5) * scale),
+                round(origin[1] + (link.tile[1] - top + 0.5) * scale),
+            )
+            pygame.draw.rect(canvas, theme.ACCENT, (*point, 4, 4), 1)
+    _label(canvas, fonts.micro, "TAB  Map", theme.MUTED, (32, rect.bottom - 24))
 
 
 def _objective(
@@ -84,6 +103,16 @@ def _objective(
     )
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
     target = anchors[level.exit_id if view.core_held else level.core_id]
+    deck = level.deck_at(operative_tile)
+    if deck and not deck.contains(target):
+        links = [link for link in level.static_map.stairs if deck.contains(link.tile)]
+        if links:
+            target = min(
+                links,
+                key=lambda link: (
+                    abs(link.tile[0] - operative_tile[0]) + abs(link.tile[1] - operative_tile[1])
+                ),
+            ).tile
     angle = atan2(target[1] - operative_tile[1], target[0] - operative_tile[0])
     center = 51, 56
     pygame.draw.circle(canvas, color, center, 19, 1)
@@ -92,7 +121,7 @@ def _objective(
         for r, a in ((12, 0), (9, 2.5), (4, 3.14), (9, -2.5))
     ]
     pygame.draw.polygon(canvas, color, points)
-    prompt = view.warning or ("Hold E to recover Core" if view.interaction else "")
+    prompt = view.warning or view.interaction
     if prompt:
         panel(
             canvas,
@@ -122,6 +151,9 @@ def draw_hud(
     notice: str = "",
     guards: tuple[GuardView, ...] = (),
     unavailable_guards: frozenset[str] = frozenset(),
+    sprint_duration_ticks: int = 90,
+    sprint_recharge_ticks: int = 120,
+    ticks_per_second: int = 30,
 ) -> None:
     _objective(canvas, view, zone_label, level, operative_tile, phase, fonts)
     status = pygame.Rect(canvas.get_width() - 236, 20, 216, 72)
@@ -155,6 +187,29 @@ def draw_hud(
     _label(canvas, fonts.body, view.elapsed, theme.TEXT, (status.x + 13, 54))
     _label(canvas, fonts.micro, alert, color, (status.x + 98, 62))
     draw_minimap(canvas, level, operative_tile, phase, fonts)
+    boost = pygame.Rect(canvas.get_width() - 372, canvas.get_height() - 140, 346, 34)
+    panel(canvas, boost, fill=(5, 15, 25, 175), border=theme.BORDER)
+    recharge = view.sprint_recharge_remaining
+    fraction = (
+        (1 - recharge / max(1, sprint_recharge_ticks))
+        if recharge
+        else view.sprint_ticks_remaining / max(1, sprint_duration_ticks)
+    )
+    label = f"READY IN  {recharge / max(1, ticks_per_second):.1f}s" if recharge else "SHIFT  Sprint"
+    _label(
+        canvas,
+        fonts.micro,
+        label,
+        theme.MUTED if recharge else theme.ACCENT,
+        (boost.x + 10, boost.y + 7),
+    )
+    pygame.draw.rect(canvas, theme.BORDER, (boost.x + 158, boost.y + 14, 174, 4), border_radius=2)
+    pygame.draw.rect(
+        canvas,
+        theme.MUTED if recharge else theme.ACCENT,
+        (boost.x + 158, boost.y + 14, round(174 * max(0, min(1, fraction))), 4),
+        border_radius=2,
+    )
     for index, (key, name, count) in enumerate(
         (
             ("Q", "ECHO", str(view.echo_charges)),
@@ -171,7 +226,7 @@ def draw_hud(
         _label(canvas, fonts.micro, count, color, (left + 10, rect.y + 53))
     if notice:
         width = min(620, fonts.small.size(notice)[0] + 30)
-        banner = pygame.Rect(0, canvas.get_height() - 144, width, 36)
+        banner = pygame.Rect(0, canvas.get_height() - 194, width, 36)
         banner.centerx = canvas.get_width() // 2
         panel(canvas, banner, border=theme.WARNING)
         _label(canvas, fonts.small, notice, theme.TEXT, (banner.x + 15, banner.y + 8))

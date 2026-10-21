@@ -43,6 +43,9 @@ class OwnStatus:
     facing: Tile = (0, -1)
     disabled: bool = False
     stunned: bool = False
+    sprint_ticks_remaining: int = 0
+    sprint_recharge_remaining: int = 0
+    sprinting: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "tile", immutable_tile(self.tile))

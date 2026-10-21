@@ -9,6 +9,7 @@ from echo_heist.core.contracts.observations import InteractionHint
 from echo_heist.core.contracts.results import MissionEnd, MissionSpec, RunOutcome
 from echo_heist.core.contracts.world import MapObject, MissionPhase, StaticMap, tile_center
 from echo_heist.core.simulation.systems.motion import clear_reach, distance_squared
+from echo_heist.core.simulation.systems.traversal import stair_hints
 from echo_heist.core.simulation.world import Emit, WorldState
 
 
@@ -26,6 +27,9 @@ def interaction_hints(
     mission: MissionSpec | None,
     actor_id: str,
 ) -> tuple[InteractionHint, ...]:
+    stairs = stair_hints(world, world_map, actor_id)
+    if stairs:
+        return stairs
     if mission is None or actor_id != mission.operative_id or world.core_owner is not None:
         return ()
     if world.mission_end is not None:

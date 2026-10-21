@@ -61,10 +61,33 @@ def test_interaction_and_objective_follow_committed_own_values(rules: GameRules)
     adapter.feed([press(pygame.K_e)])
     original = sim.observe("operative")
     view = build_objective_view(original, ticks_per_second=rules.simulation_hz)
-    assert view.interaction == "Hold E - Recover core (0%)"
+    assert view.interaction == "Hold E  Recover core"
     for _ in range(rules.core_interaction_ticks):
         sim.step((adapter.action_for(sim.observe("operative")),))
     updated = build_objective_view(sim.observe("operative"), ticks_per_second=rules.simulation_hz)
     assert updated.objective == "Return to Entry extraction"
     assert updated.interaction == "" and "Core YES" in updated.inventory
     assert original.own_status.inventory.core_held is False
+
+
+def test_held_interact_never_bounces_between_stair_landings(rules: GameRules) -> None:
+    from echo_heist.core.contracts.world import StairLink
+
+    world = StaticMap(
+        "stairs",
+        8,
+        8,
+        stairs=(
+            StairLink("up", (2, 2), "down", (5, 5)),
+            StairLink("down", (5, 5), "up", (2, 2)),
+        ),
+    )
+    sim = Simulation(world, (ActorSpawn("operative", (2, 2)),), rules=rules)
+    adapter = HumanInput("operative")
+    adapter.feed([press(pygame.K_e)])
+    for _ in range(10):
+        sim.step((adapter.action_for(sim.observe("operative")),))
+    assert sim.observe("operative").own_status.tile == (5, 5)
+    adapter.feed([pygame.event.Event(pygame.KEYUP, key=pygame.K_e), press(pygame.K_e)])
+    sim.step((adapter.action_for(sim.observe("operative")),))
+    assert sim.observe("operative").own_status.tile == (2, 2)

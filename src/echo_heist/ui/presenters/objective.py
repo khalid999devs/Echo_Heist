@@ -19,6 +19,8 @@ class ObjectiveView:
     echo_charges: int = 0
     emp_charges: int = 0
     core_held: bool = False
+    sprint_ticks_remaining: int = 0
+    sprint_recharge_remaining: int = 0
 
 
 def build_objective_view(observation: Observation, *, ticks_per_second: int) -> ObjectiveView:
@@ -35,9 +37,9 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
     interaction_progress = None
     if observation.interactions:
         hint = observation.interactions[0]
-        progress = 100 * hint.progress_ticks // max(1, hint.required_ticks)
-        interaction = f"Hold E - Recover core ({progress}%)"
-        interaction_progress = hint.progress_ticks, hint.required_ticks
+        interaction = "E  Use stairs" if hint.kind == "Stair" else "Hold E  Recover core"
+        if hint.kind != "Stair":
+            interaction_progress = hint.progress_ticks, hint.required_ticks
     inventory = observation.own_status.inventory
     seconds = observation.tick // ticks_per_second
     remaining = observation.own_status.capture_ticks_remaining
@@ -52,6 +54,8 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
         inventory.echo_charges,
         inventory.emp_charges,
         inventory.core_held,
+        observation.own_status.sprint_ticks_remaining,
+        observation.own_status.sprint_recharge_remaining,
     )
 
 

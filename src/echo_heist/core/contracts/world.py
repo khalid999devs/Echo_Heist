@@ -73,6 +73,18 @@ class MapObject:
 
 
 @dataclass(frozen=True, slots=True)
+class StairLink:
+    object_id: str
+    tile: Tile
+    destination_id: str
+    destination: Tile
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "tile", immutable_tile(self.tile))
+        object.__setattr__(self, "destination", immutable_tile(self.destination))
+
+
+@dataclass(frozen=True, slots=True)
 class StaticMap:
     map_id: str
     width: int
@@ -81,6 +93,7 @@ class StaticMap:
     opaque_tiles: frozenset[Tile] = frozenset()
     objects: tuple[MapObject, ...] = ()
     tile_size_px: int = 32
+    stairs: tuple[StairLink, ...] = ()
 
     def __post_init__(self) -> None:
         if self.width <= 0 or self.height <= 0 or self.tile_size_px <= 0:
@@ -93,6 +106,27 @@ class StaticMap:
         object.__setattr__(self, "objects", tuple(self.objects))
         if any(not self.contains(obj.tile) for obj in self.objects):
             raise ValueError("Map object is outside the map")
+        object.__setattr__(self, "stairs", tuple(self.stairs))
+        links = {link.object_id: link for link in self.stairs}
+        if len(links) != len(self.stairs) or len({s.tile for s in self.stairs}) != len(links):
+            raise ValueError("Stair IDs and landing tiles must be unique")
+        for link in self.stairs:
+            other = links.get(link.destination_id)
+            if (
+                other is None
+                or other.destination_id != link.object_id
+                or other.tile != link.destination
+                or other.destination != link.tile
+                or link.tile == link.destination
+                or not self.contains(link.tile)
+                or not self.contains(link.destination)
+            ):
+                raise ValueError("Stairs need reciprocal, distinct in-bounds landings")
+
+    def connections(self, tile: Tile) -> tuple[Tile, ...]:
+        x, y = tile
+        steps = ((x, y - 1), (x + 1, y), (x, y + 1), (x - 1, y))
+        return steps + tuple(link.destination for link in self.stairs if link.tile == tile)
 
     def contains(self, tile: Tile) -> bool:
         return 0 <= tile[0] < self.width and 0 <= tile[1] < self.height

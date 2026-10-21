@@ -53,12 +53,14 @@ class HumanInput:
         self._held: set[int] = set()
         self._tools: deque[ActionKind] = deque()
         self._last_action: Action | None = None
+        self._interact_armed = False
 
     def clear(self) -> None:
         """Call on pause, scene switch, restart or focus loss."""
         self._held.clear()
         self._tools.clear()
         self._last_action = None
+        self._interact_armed = False
 
     def feed(self, events: Iterable[pygame.event.Event]) -> tuple[UiCommand, ...]:
         commands: list[UiCommand] = []
@@ -76,6 +78,8 @@ class HumanInput:
                 self._held.add(event.key)
                 if not fresh:
                     continue
+                if event.key in self.bindings.interact:
+                    self._interact_armed = True
                 for name, kind in (
                     ("echo", ActionKind.ECHO),
                     ("emp", ActionKind.EMP),
@@ -113,8 +117,11 @@ class HumanInput:
         elif direction != (0, 0):
             kind, sprint = ActionKind.MOVE, held(self.bindings.sprint)
         elif held(self.bindings.interact):
-            kind = ActionKind.INTERACT
-            target = observation.interactions[0].target_id if observation.interactions else None
+            hint = observation.interactions[0] if observation.interactions else None
+            if hint is None or hint.kind != "Stair" or self._interact_armed:
+                kind = ActionKind.INTERACT
+                target = hint.target_id if hint else None
+            self._interact_armed = False
         self._last_action = Action(
             self.actor_id,
             kind,

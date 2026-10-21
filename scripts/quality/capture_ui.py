@@ -10,6 +10,7 @@ import pygame
 from echo_heist.core.contracts.results import RunOutcome
 from echo_heist.diagnostics.facility_routes import mission_path, walk_path
 from echo_heist.diagnostics.human_driver import HumanDriver
+from echo_heist.ui.render.surfaces.formats import opaque_surface
 from echo_heist.ui.scenes.flow import GameFlow, Scene
 from echo_heist.ui.scenes.menus import MODE_BUTTONS, TITLE_BUTTONS
 
@@ -57,7 +58,7 @@ def main() -> int:
     pygame.display.init()
     pygame.font.init()
     screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
-    canvas = pygame.Surface((1280, 720))
+    canvas = opaque_surface((1280, 720))
 
     def shot(flow: GameFlow, path: str) -> None:
         flow.draw(canvas)
@@ -125,10 +126,10 @@ def main() -> int:
     captured_rooms: set[str] = set()
     room_views = {
         (27, 11): "01-service-servers",
-        (30, 11): "02-security-gangway",
+        (32, 11): "02-security-gangway",
         (44, 13): "03-security-control",
         (56, 21): "04-core-chamber",
-        (30, 34): "05-research-gangway",
+        (32, 34): "05-research-gangway",
         (44, 30): "06-biology-lab",
     }
 
@@ -193,7 +194,7 @@ def main() -> int:
     flow = mission()
     post = next(post for post in flow.level.guards if post.guard_id == "guard-service")
     drive(flow, walk_path(flow.level, flow.level.spawn_tile, post.tile))
-    for _ in range(300):
+    for _ in range(1200):
         flow.frame([], 34)
         if flow.scene == Scene.RESULTS:
             break

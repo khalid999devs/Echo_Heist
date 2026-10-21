@@ -1,6 +1,7 @@
 """Small deterministic facility and actor motifs; art never defines collision."""
 
 from dataclasses import dataclass
+from functools import lru_cache
 from math import atan2, cos, degrees, pi, sin
 
 import pygame
@@ -205,12 +206,27 @@ def light_pool(
     surface: pygame.Surface, point: tuple[int, int], color: theme.Color, radius: int
 ) -> None:
     """Soft presentation light with no effect on sight, hearing or collision."""
+    surface.blit(_soft_light(radius, color), (point[0] - radius, point[1] - radius))
+
+
+@lru_cache(maxsize=24)
+def _soft_light(radius: int, color: theme.Color) -> pygame.Surface:
     layer = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
-    layer.fill((0, 0, 0, 0))
-    center = radius, radius
-    for fraction, alpha in ((1.0, 8), (0.78, 16), (0.52, 28), (0.28, 60)):
-        pygame.draw.circle(layer, (*color, alpha), center, int(radius * fraction))
-    surface.blit(layer, (point[0] - radius, point[1] - radius))
+    for distance in range(radius, 0, -1):
+        alpha = round(32 * (1 - distance / radius) ** 2)
+        pygame.draw.circle(layer, (*color, alpha), (radius, radius), distance)
+    return layer
+
+
+@lru_cache(maxsize=32)
+def contact_shadow(width: int, height: int, strength: int = 100) -> pygame.Surface:
+    """Feathered elliptical ground contact, with transparent corners."""
+    layer = pygame.Surface((width, height), pygame.SRCALPHA)
+    for inset in range(max(1, height // 2)):
+        fraction = inset / max(1, height / 2)
+        rect = layer.get_rect().inflate(-round(inset * width / height), -2 * inset)
+        pygame.draw.ellipse(layer, (0, 3, 6, round(strength * fraction**1.7)), rect)
+    return layer
 
 
 def actor(
@@ -246,7 +262,7 @@ def actor(
     cycle = clock_ms / 1000 * (17 if motion.sprinting else 11)
     stride = round(4 * sin(cycle)) if active else 0
     bob = round(abs(sin(cycle)) * 2) if active else round(sin(clock_ms / 530) * 0.5)
-    pygame.draw.ellipse(canvas, (1, 6, 9), (x - 15, y + 6, 30, 12))
+    canvas.blit(contact_shadow(42, 20, 105), (x - 21, y + 4))
     if active and motion.sprinting:
         dx, dy = motion.direction
         trail = pygame.Surface((64, 64), pygame.SRCALPHA)
@@ -271,9 +287,6 @@ def actor(
             halo = pygame.Surface(frame.get_size(), pygame.SRCALPHA)
             pygame.draw.lines(halo, (*accent, 85), True, contour, 1)
             canvas.blit(halo, frame_rect)
-        contact = pygame.Surface((42, 18), pygame.SRCALPHA)
-        pygame.draw.ellipse(contact, (*accent, 95), (2, 2, 38, 14), 1)
-        canvas.blit(contact, (x - 21, y + 17))
         canvas.blit(frame, frame_rect)
         if carries_core:
             pygame.draw.circle(canvas, theme.WARNING, (x + 12, y - 12), 4 + int(pulse), 2)

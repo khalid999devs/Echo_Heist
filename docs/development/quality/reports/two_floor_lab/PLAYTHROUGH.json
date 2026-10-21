@@ -1,0 +1,35 @@
+{
+  "video_driver": "cocoa",
+  "seed": 1042,
+  "input": "real HumanInput keyboard events; EMP and melee when needed",
+  "upper": {
+    "outcome": "WIN",
+    "ticks": 1507
+  },
+  "lower": {
+    "outcome": "WIN",
+    "ticks": 1568
+  },
+  "contact": {
+    "outcome": "CAPTURED",
+    "ticks": 698
+  },
+  "rooms_captured": [
+    "01-service-servers",
+    "02-security-gangway",
+    "03-security-control",
+    "04-core-chamber",
+    "05-research-gangway",
+    "06-biology-lab"
+  ],
+  "guard_states_captured": [
+    "CHASE",
+    "DISABLED",
+    "INVESTIGATE",
+    "PATROL",
+    "RETURN",
+    "SEARCH",
+    "SPOTTED"
+  ],
+  "screenshots": 38
+}

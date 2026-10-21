@@ -31,6 +31,7 @@ from echo_heist.core.simulation.systems.mission import (
     update_theft,
 )
 from echo_heist.core.simulation.systems.motion import body_fits, move_actor, remember_paths
+from echo_heist.core.simulation.systems.traversal import stair_hints, update_sprint, use_stair
 from echo_heist.core.simulation.world import GUARD_KINDS, ActorState, WorldState
 
 TOOL_ACTIONS = frozenset({ActionKind.ECHO, ActionKind.EMP, ActionKind.MELEE})
@@ -67,6 +68,7 @@ class Simulation:
                     spawn.kind,
                     tile_center(spawn.tile),
                     path=[tile_center(spawn.tile)],
+                    sprint_ticks_remaining=rules.sprint_duration_ticks,
                 )
                 for spawn in sorted(spawns, key=lambda value: value.actor_id)
             }
@@ -196,6 +198,15 @@ class Simulation:
         if self._security is not None:
             guard_security.apply_decisions(self._world, self._security, choices, emit)
         advance_echoes(self._world)
+        update_sprint(
+            self._world,
+            self._rules,
+            frozenset(
+                action.actor_id
+                for action in accepted
+                if action.kind == ActionKind.MOVE and action.sprint
+            ),
+        )
         for action, reason in rejected:
             emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
         for action in accepted:
@@ -212,7 +223,20 @@ class Simulation:
                     self._world, self._map, self._rules, self._mission, action
                 )
                 if reason is None:
-                    interactions.append(action)
+                    stairs = stair_hints(self._world, self._map, action.actor_id)
+                    if stairs and (
+                        action.target_id is None or action.target_id == stairs[0].target_id
+                    ):
+                        use_stair(
+                            self._world,
+                            self._map,
+                            self._rules,
+                            action.actor_id,
+                            stairs[0].target_id,
+                            emit,
+                        )
+                    else:
+                        interactions.append(action)
                 else:
                     emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
             elif action.kind in TOOL_ACTIONS:
@@ -275,7 +299,10 @@ class Simulation:
             return "unexpected_movement_payload"
         if action.kind == ActionKind.WAIT:
             return None
-        if actor.kind in GUARD_KINDS:
+        if actor.kind in GUARD_KINDS and (
+            action.kind != ActionKind.INTERACT
+            or not stair_hints(self._world, self._map, action.actor_id)
+        ):
             return "intruder_only_action"
         if action.kind == ActionKind.HIDE:
             return "environment_system_not_connected"
@@ -286,7 +313,7 @@ class Simulation:
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 3,
+            "schema_version": 4,
             "seed": self._seed,
             "rules": asdict(self._rules),
             "mission": asdict(self._mission) if self._mission else None,
@@ -306,6 +333,7 @@ class Simulation:
                 "blocked": sorted(self._map.blocked_tiles),
                 "opaque": sorted(self._map.opaque_tiles),
                 "objects": [asdict(obj) for obj in self._map.objects],
+                "stairs": [asdict(link) for link in self._map.stairs],
             },
         }
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False)

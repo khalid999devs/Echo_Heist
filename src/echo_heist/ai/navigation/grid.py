@@ -33,7 +33,7 @@ def bfs(world_map: StaticMap, start: Tile, goal: Tile) -> PathResult:
                 reverse.append(previous)
                 previous = parent[previous]
             return PathResult(tuple(reversed(reverse)), expanded)
-        for tile in neighbors(current):
+        for tile in world_map.connections(current):
             if world_map.can_walk(tile) and tile not in parent:
                 parent[tile] = current
                 pending.append(tile)

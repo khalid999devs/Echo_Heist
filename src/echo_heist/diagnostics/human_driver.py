@@ -64,6 +64,11 @@ class HumanDriver:
     def events(self, observation: Observation, goal: Tile) -> list[pygame.event.Event]:
         position = observation.own_status.position
         assert position is not None
+        if any(
+            link.tile == observation.own_status.tile and link.destination == goal
+            for link in observation.map_static.stairs
+        ):
+            return self._changes({pygame.K_e} if pygame.K_e not in self.held else set())
         target = tile_center(goal)
         bodies = self._bodies(observation)
         if self.use_tools and bodies:

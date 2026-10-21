@@ -7,6 +7,7 @@ from enum import StrEnum
 import pygame
 
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.results import RunOutcome
 from echo_heist.core.contracts.security.model import GuardState
 from echo_heist.infrastructure.persistence.settings import Settings
 from echo_heist.infrastructure.resources import load_game_rules, resource_bytes
@@ -14,6 +15,7 @@ from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.ui.audio.model import AudioFrame
 from echo_heist.ui.render.surfaces.cinematic import draw_scene
+from echo_heist.ui.render.surfaces.glass import edge_veil
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import WorldArt, build_map_surface
 from echo_heist.ui.scenes.heist import HeistRequest, HeistSession
@@ -66,6 +68,7 @@ class GameFlow:
         self.fonts = Fonts()
         self.art = WorldArt.load()
         self.backdrop = load_backdrop(view_size)
+        self.extraction_backdrop = load_backdrop(view_size, "assets/scenes/extraction-dawn.png")
         self.map_surface = build_map_surface(self.level, self.fonts, self.art)
         self.scene = Scene.TITLE
         self.selected = 0
@@ -254,16 +257,23 @@ class GameFlow:
                 canvas, self.fonts, self.backdrop, self.settings, self.selected, self.ambient_ms
             )
         elif self.session is not None:
-            self.session.draw(canvas)
             end = self.session.mission_end
             if self.scene == Scene.RESULTS and end is not None:
-                draw_scene(
-                    canvas,
-                    self.backdrop,
-                    self.ambient_ms,
-                    text_side="right",
-                    reduced_motion=self.settings.reduced_flashing,
-                )
+                if end.outcome == RunOutcome.WIN:
+                    draw_scene(
+                        canvas,
+                        self.extraction_backdrop,
+                        self.ambient_ms,
+                        text_side="right",
+                        reduced_motion=self.settings.reduced_flashing,
+                        mirror_for_text=False,
+                        reactor_glow=False,
+                    )
+                else:
+                    self.session.draw(canvas)
+                    small = pygame.transform.smoothscale(canvas, (320, 180))
+                    canvas.blit(pygame.transform.smoothscale(small, self.view_size), (0, 0))
+                    canvas.blit(edge_veil(self.view_size, "right"), (0, 0))
                 draw_results(
                     canvas,
                     end,
@@ -272,6 +282,8 @@ class GameFlow:
                     hovered=self.hovered_result,
                     clock_ms=self.ambient_ms,
                 )
+            else:
+                self.session.draw(canvas)
 
     def audio_frame(self) -> AudioFrame:
         events = tuple(self.session.audio_events) if self.session is not None else ()

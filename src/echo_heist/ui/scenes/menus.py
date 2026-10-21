@@ -34,12 +34,12 @@ MODE_ITEMS = (
     MenuItem("LAUNCH MISSION"),
     MenuItem("BACK"),
 )
-CHAPTER_CARD = pygame.Rect(44, 238, 456, 274)
+CHAPTER_CARD = pygame.Rect(44, 238, 456, 242)
 TITLE_BUTTONS = (
-    pygame.Rect(60, 449, 424, 46),
-    pygame.Rect(44, 542, 160, 48),
-    pygame.Rect(216, 542, 160, 48),
-    pygame.Rect(388, 542, 112, 48),
+    pygame.Rect(60, 417, 424, 46),
+    pygame.Rect(44, 510, 160, 48),
+    pygame.Rect(216, 510, 160, 48),
+    pygame.Rect(388, 510, 112, 48),
 )
 LAUNCH_BUTTON = pygame.Rect(620, 548, 576, 54)
 BACK_BUTTON = pygame.Rect(44, 650, 130, 42)
@@ -53,11 +53,11 @@ RESULT_RETRY = pygame.Rect(660, 590, 552, 48)
 RESULT_MENU = pygame.Rect(660, 648, 552, 48)
 
 
-def load_backdrop(size: tuple[int, int]) -> pygame.Surface:
+def load_backdrop(
+    size: tuple[int, int], path: str = "assets/scenes/title-facility.png"
+) -> pygame.Surface:
     """Perspective 3D-rendered chamber artwork bundled with the game."""
-    art = pygame.image.load(
-        BytesIO(resource_bytes("assets/scenes/title-facility.png")), "title.png"
-    )
+    art = pygame.image.load(BytesIO(resource_bytes(path)), path)
     return pygame.transform.smoothscale(
         art, (size[0] + 2 * BACKDROP_PAD, size[1] + 2 * BACKDROP_PAD)
     )
@@ -107,7 +107,7 @@ def _frame(
     )
     if not briefing:
         _text(canvas, fonts.small, "Steal the Core. Survive the lockdown.", theme.TEXT, (44, 195))
-        _text(canvas, fonts.micro, f"{__version__}  /  DEVELOPMENT BUILD", theme.MUTED, (993, 692))
+        _text(canvas, fonts.micro, __version__, theme.MUTED, (1160, 692))
 
 
 def _button(
@@ -164,13 +164,11 @@ def _chapter_card(
 ) -> None:
     panel(canvas, CHAPTER_CARD, fill=(6, 20, 30, 224), border=theme.ACCENT_DIM)
     source = pygame.Rect(round(backdrop.get_width() * 0.59), 65, 450, 350)
-    thumb = pygame.transform.smoothscale(backdrop.subsurface(source), (128, 100))
+    thumb = pygame.transform.smoothscale(backdrop.subsurface(source), (128, 128))
     canvas.blit(thumb, (60, 254))
     _text(canvas, fonts.micro, "CHAPTER 01", theme.ACCENT, (206, 258))
     _text(canvas, fonts.body, "The Core", theme.TEXT, (204, 282))
     _text(canvas, fonts.body, "Rebellion", theme.TEXT, (204, 309))
-    _text(canvas, fonts.micro, "NEXUS RESEARCH FACILITY", theme.MUTED, (60, 370))
-    _text(canvas, fonts.small, "Infiltrate. Recover. Get out.", theme.TEXT, (60, 395))
     _button(
         canvas,
         TITLE_BUTTONS[0],
@@ -183,7 +181,8 @@ def _chapter_card(
 
 
 def _route_diagram(canvas: pygame.Surface, fonts: Fonts) -> None:
-    _text(canvas, fonts.micro, "TWO WAYS IN. TWO WAYS OUT.", theme.MUTED, (620, 354))
+    _text(canvas, fonts.micro, "01 / SERVICE", theme.MUTED, (620, 354))
+    _text(canvas, fonts.micro, "02 / RESEARCH", theme.MUTED, (1028, 354))
     boxes = (
         ("ENTRY", pygame.Rect(620, 416, 92, 40)),
         ("SERVICE", pygame.Rect(732, 416, 100, 40)),
@@ -208,7 +207,7 @@ def _route_diagram(canvas: pygame.Surface, fonts: Fonts) -> None:
     _text(
         canvas,
         fonts.micro,
-        "Security: direct / exposed     Research: longer / cover",
+        "A  Security / exposed       B  Research / cover",
         theme.MUTED,
         (620, 510),
     )
@@ -220,11 +219,10 @@ def _briefing(
     panel(canvas, pygame.Rect(44, 184, 520, 440), fill=(5, 18, 28, 227), border=theme.BORDER)
     _text(canvas, fonts.micro, "CHAPTER 01", theme.ACCENT, (64, 204))
     _text(canvas, fonts.heading, "The Core Rebellion", theme.TEXT, (62, 229))
-    _text(canvas, fonts.small, "A single heist at Nexus Research Site A1.", theme.MUTED, (64, 275))
     steps = (
-        ("01  INFILTRATE", "Enter through the Service Wing."),
+        ("01  INFILTRATE", "Take either stairway to the upper floor."),
         ("02  RECOVER", "Hold E beside the experimental Core."),
-        ("03  EXTRACT", "Theft starts lockdown. Return to Entry."),
+        ("03  EXTRACT", "Escape lockdown. Return downstairs."),
     )
     for index, (label, description) in enumerate(steps):
         y = 323 + index * 67
@@ -234,14 +232,14 @@ def _briefing(
     _text(
         canvas,
         fonts.micro,
-        "WASD / ARROWS  Move     SHIFT  Sprint     TAB  Map",
+        "WASD  Move    SHIFT  Sprint burst    E  Stairs / Core",
         theme.MUTED,
         (64, 546),
     )
     _text(
         canvas,
         fonts.micro,
-        "Q  Echo     F  EMP     SPACE  Stun     ESC  Pause",
+        "Q  Echo    F  EMP    SPACE  Stun    TAB  Map",
         theme.MUTED,
         (64, 578),
     )
@@ -260,11 +258,12 @@ def _briefing(
         _text(
             canvas,
             fonts.micro,
-            "SELECTED" if chosen else "COMING LATER",
+            "DIRECT CONTROL" if chosen else "COMING LATER",
             border,
             (rect.x + 16, rect.y + 49),
         )
-        _text(canvas, fonts.micro, item.note, theme.MUTED, (rect.x + 16, rect.y + 78))
+        if index == 0:
+            _text(canvas, fonts.micro, "Tools and stealth", theme.MUTED, (rect.x + 16, rect.y + 78))
         if selected == index:
             pygame.draw.rect(canvas, theme.TEXT, rect.inflate(-6, -6), 1, border_radius=4)
     _route_diagram(canvas, fonts)
@@ -349,25 +348,24 @@ def draw_results(
 ) -> None:
     """Report only committed mission facts; final score/rank is a P06 rule."""
     seconds = end.elapsed_ticks // max(1, ticks_per_second)
-    title, color, detail = {
-        RunOutcome.WIN: ("MISSION COMPLETE", theme.ACCENT, "Core secured  /  operative extracted"),
-        RunOutcome.CAPTURED: (
-            "OPERATIVE CAPTURED",
-            theme.DANGER,
-            "Security intercepted the operative.",
-        ),
-        RunOutcome.ABORTED: ("MISSION ABORTED", theme.WARNING, "Operation ended by operative"),
+    color = {
+        RunOutcome.WIN: theme.ACCENT,
+        RunOutcome.CAPTURED: theme.DANGER,
+        RunOutcome.ABORTED: theme.WARNING,
     }[end.outcome]
     if end.outcome == RunOutcome.CAPTURED:
         warning = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
         warning.fill((75, 8, 10, 28))
         canvas.blit(warning, (0, 0))
-    _text(canvas, fonts.micro, "NEXUS RESEARCH  /  AFTER ACTION REPORT", color, (660, 55))
-    pygame.draw.line(canvas, color, (660, 88), (1212, 88), 2)
-    _text(canvas, fonts.logo, "ECHO HEIST", theme.TEXT, (655, 115))
-    _text(canvas, fonts.small, "THE CORE REBELLION", theme.MUTED, (660, 187))
-    _text(canvas, fonts.heading, title, color, (658, 249))
-    _text(canvas, fonts.body, detail, theme.TEXT, (660, 304))
+    _text(canvas, fonts.micro, "CHAPTER 01  /  MISSION REPORT", color, (660, 115))
+    pygame.draw.line(canvas, color, (660, 148), (1212, 148), 2)
+    headline = {
+        RunOutcome.WIN: ("CORE", "EXTRACTED"),
+        RunOutcome.CAPTURED: ("OPERATIVE", "CAPTURED"),
+        RunOutcome.ABORTED: ("MISSION", "ABORTED"),
+    }[end.outcome]
+    _text(canvas, fonts.title, headline[0], theme.TEXT, (655, 185))
+    _text(canvas, fonts.title, headline[1], color, (655, 246))
     pygame.draw.line(canvas, theme.BORDER, (660, 359), (1212, 359), 1)
     _text(canvas, fonts.micro, "MISSION TIME", theme.MUTED, (662, 383))
     _text(canvas, fonts.stat, f"{seconds // 60:02d}:{seconds % 60:02d}", theme.TEXT, (658, 410))
@@ -377,7 +375,11 @@ def draw_results(
     _text(
         canvas,
         fonts.small,
-        "Your next attempt uses the same facility layout.",
+        "The core is safe. You made it out."
+        if end.outcome == RunOutcome.WIN
+        else "Break line of sight. Choose another route."
+        if end.outcome == RunOutcome.CAPTURED
+        else "Ready when you are.",
         theme.MUTED,
         (662, 511),
     )

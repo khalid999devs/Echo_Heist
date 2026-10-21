@@ -6,8 +6,9 @@ import pytest
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind
+from echo_heist.core.contracts.results import MissionSpec
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
-from echo_heist.core.contracts.world import ActorKind, ActorSpawn, StaticMap, tile_center
+from echo_heist.core.contracts.world import ActorKind, ActorSpawn, MapObject, StaticMap, tile_center
 from echo_heist.core.simulation.engine import Simulation
 
 
@@ -89,3 +90,40 @@ def test_invalid_rules_and_spawn_fail_at_boundary(rules: GameRules) -> None:
         Simulation(
             StaticMap("bad", 2, 2, frozenset({(0, 0)})), (ActorSpawn("a", (0, 0)),), rules=rules
         )
+
+
+def test_lockdown_accelerates_actual_guard_motion_without_buffing_player(rules: GameRules) -> None:
+    tuned = replace(rules, core_interaction_ticks=1)
+    world = StaticMap(
+        "lockdown-speed",
+        20,
+        20,
+        objects=(MapObject("core", "Core", (2, 2)), MapObject("exit", "Exit", (1, 1))),
+    )
+    spawns = (ActorSpawn("operative", (2, 2)), ActorSpawn("guard", (8, 8), ActorKind.SENTINEL))
+    sim = Simulation(world, spawns, rules=tuned, mission=MissionSpec("operative", "core", "exit"))
+    sim.step((Action("operative", ActionKind.INTERACT, 0, target_id="core"),))
+    old_guard, old_player = (
+        sim.observe("guard").own_status.position,
+        sim.observe("operative").own_status.position,
+    )
+    assert old_guard is not None and old_player is not None
+    sim.step(
+        (
+            Action("guard", ActionKind.MOVE, sim.tick, (1, 0)),
+            Action("operative", ActionKind.MOVE, sim.tick, (1, 0)),
+        )
+    )
+    guard, player = (
+        sim.observe("guard").own_status.position,
+        sim.observe("operative").own_status.position,
+    )
+    assert guard is not None and player is not None
+    assert (
+        guard[0] - old_guard[0]
+        == rules.sentinel_speed_units_per_second
+        * rules.lockdown_guard_speed_percent
+        // 100
+        // rules.simulation_hz
+    )
+    assert player[0] - old_player[0] == rules.walk_speed_units_per_second // rules.simulation_hz

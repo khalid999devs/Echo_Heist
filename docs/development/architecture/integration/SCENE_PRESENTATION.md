@@ -1,0 +1,24 @@
+# Complete scene presentation pass
+
+Khalid, 2026-10-21, user-directed visual/navigation refinement on `work/complete-visual-scenes`, baseline main `1d34f3b`. Existing [two-floor contract](TWO_FLOOR_LAB.md) remains the foundation. The user explicitly requests all scene designs now, with remaining AI/profile/scoring logic later. This does not close P03-P08 or change approved scoring. Deferred glass/doors/hiding/canister mechanics remain deferred.
+
+## Scope
+
+- Reliable pointer/keyboard routes through title, briefing, Workshop design, Companion/Lab presentation, algorithm guide, settings, pause/abort, real results and extraction epilogue. All visible controls must act or clearly explain availability. Preview AI screens must be labeled; do not fabricate controller decisions, ranks, statistics or deployed AI.
+- Workshop edits are a local presentation draft for later policy integration; no claim of implemented policy persistence, NEXUS reset or deployment. Real Human gameplay, results and settings remain connected.
+- Fresh directional operative art and sharper lab fittings; preserve image proportions, avoid repeated resampling, keep static work cached. Existing title/extraction art stays context-specific.
+- Timed stair traversal and a staged climbing presentation, using Simulation-owned state and the same legal rules for guards. Pause/map freeze timers; blocked destinations cannot overlap actors. Traversal is interruptible so transition art cannot conceal an unavoidable grab.
+- Owner-requested lockdown: a continuing siren layer, smooth red warning-light cycle and actual guard speed/search-duty increase. No omniscient chasing; sight, hearing, capture and route availability remain fair. Reduced flashing keeps the warning steady; audio follows pause, mute, SFX volume and scene exit.
+- Verify pointer scaling, drag, full click regions, focus/input cleanup, visual preview boundaries, stair/replay/capture rules and audio lifecycle. Capture each final screen and record actual native/build results under `quality/reports/scene_presentation/`.
+
+## Implemented consumer contracts
+
+- `GameRules` adds required positive `stair_travel_ticks=24` (0.8 seconds at 30 Hz) and `lockdown_guard_speed_percent=120`. `ActorState` owns a stair source ID/arrival tick; immutable `OwnStatus.stair_ticks_remaining` exposes only the actor's own progress. Presentation-only `StairView` carries source/destination/remaining/total ticks; never pass it to controllers.
+- Stair Interact emits `STAIR_STARTED`, then `STAIR_USED` only after the timer and a second landing occupancy/body-fit check. Move or a valid tool action interrupts with `STAIR_CANCELED`; incapacity cancels. Source position remains physical until arrival, with normal sensor/capture rules. Guard controllers wait during their own climb. Pause/map/settings preserve timers. Fingerprint schema is now **5**, so old hashes must not be compared as the same schema.
+- Guard motion during lockdown is 120% of its configured kind speed. Sentinel pause is halved and search duration is 130%; evidence expiry, LOS, hearing and identification remain unchanged. This does not add Tracker/Interceptor controllers or NEXUS.
+- Siren loops on dedicated mixer channel 2, separate from UI/critical cues (0/1) and ordinary effects (3-9). SFX volume/mute/pause apply; leaving live lockdown stops it. Existing licensed alarm asset is reused. Smooth emergency light cycle has a steady reduced-flashing variant.
+- `Scene` adds WORKSHOP/LAB/GUIDE/EPILOGUE. `SceneDesigns` owns only local draft/presentation/navigation state. Balanced/Rush emergency choices match blueprint p. 14 (EMP / Melee). Companion mode opens Workshop, never launches a fake simulation. Deployment stays disconnected with an explicit reason. Lab has draggable detailed floor previews and unavailable live-data fields.
+- Chapter-card clicks and scene changes consume the current input batch, avoiding a second accidental activation. Pause/map/abort/settings buttons share drawing/hit rectangles. Settings slider drag owns its pointer until release/focus loss; returns from pause to the same frozen session. Pointer mapping uses actual window coordinates, preserving negative letterbox positions rather than rounding them onto an edge control.
+- Directional operative frames use N/E/S/W rows with gait columns, without rotating the entire human figure. Distinct defender rows are mapped by kind; Companion art is ready for later controller work. Lab props preserve aspect ratio and are baked once into map surfaces. Native RGB compositing and soft alpha contact shadows remain in place.
+
+Verification is recorded in the [scene review](../../quality/reports/scene_presentation/REVIEW.md) and [runnable handoff](../../tracking/handoffs/khalid/day_02/SCENE_PRESENTATION.md). Those records distinguish completed presentation from remaining gameplay and platform gates.

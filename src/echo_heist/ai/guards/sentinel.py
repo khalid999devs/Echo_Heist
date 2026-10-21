@@ -14,7 +14,7 @@ from echo_heist.core.contracts.security.model import (
     SensorRules,
 )
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
-from echo_heist.core.contracts.world import ActorKind, Tile, tile_center
+from echo_heist.core.contracts.world import ActorKind, MissionPhase, Tile, tile_center
 
 
 def distance(first: Tile, second: Tile) -> int:
@@ -49,6 +49,14 @@ def decide(
         )
 
     wait = Action(observation.agent_id, ActionKind.WAIT, observation.tick)
+    if own.stair_ticks_remaining:
+        return GuardDecision(wait, memory, own.facing)
+    if observation.phase == MissionPhase.LOCKDOWN:
+        rules = replace(
+            rules,
+            patrol_pause_ticks=max(1, rules.patrol_pause_ticks // 2),
+            search_ticks=rules.search_ticks * 130 // 100,
+        )
     if own.disabled or own.stunned:
         return GuardDecision(wait, replace(memory, identity_ticks=0), own.facing)
     intruder = next(

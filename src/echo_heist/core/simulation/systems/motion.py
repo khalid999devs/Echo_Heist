@@ -8,7 +8,13 @@ from echo_heist.core.contracts.events import EventKind
 from echo_heist.core.contracts.world import (
     POSITION_UNITS_PER_TILE as UNIT,
 )
-from echo_heist.core.contracts.world import ActorKind, Position, StaticMap, position_tile
+from echo_heist.core.contracts.world import (
+    ActorKind,
+    MissionPhase,
+    Position,
+    StaticMap,
+    position_tile,
+)
 from echo_heist.core.simulation.world import Emit, WorldState
 
 
@@ -61,6 +67,11 @@ def move_actor(
         actor.kind,
         rules.sprint_speed_units_per_second if sprint else rules.walk_speed_units_per_second,
     )
+    if (
+        actor.kind not in (ActorKind.OPERATIVE, ActorKind.COMPANION)
+        and world.phase == MissionPhase.LOCKDOWN
+    ):
+        speed = speed * rules.lockdown_guard_speed_percent // 100
     step = speed // rules.simulation_hz
     dx, dy = action.direction[0] * step, action.direction[1] * step
     if dx and dy:

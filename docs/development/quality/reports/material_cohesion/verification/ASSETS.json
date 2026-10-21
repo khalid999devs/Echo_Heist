@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-22",
+  "tool": "built-in imagegen",
+  "reference": {
+    "path": "src/echo_heist/resources/assets/characters/operative-directions.png",
+    "sha256": "bbda5c2fb7b3b9e78f87ca7e36a8cfd5522097bdb1940ae3659e46515bc41d72"
+  },
+  "assets": [
+    {
+      "path": "src/echo_heist/resources/assets/characters/operative/crouch.png",
+      "original": "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a/exec-9f8b2dca-06a3-4e6d-a205-2802e6aea991.png",
+      "mode": "edit with operative-directions.png",
+      "bytes": 1225162,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "c9bde4bd8769fc43dd0aa9f386f91135d4be7ae70af03ce418b097de59ddc779",
+      "original_preserved": true,
+      "selected_png_unchanged": true
+    },
+    {
+      "path": "src/echo_heist/resources/assets/tiles/laboratory/hiding-desk.png",
+      "original": "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a/exec-d1368801-25dc-46fa-bce5-2ab6b64c1715.png",
+      "mode": "new transparent",
+      "bytes": 1602768,
+      "dimensions": [
+        1983,
+        793
+      ],
+      "sha256": "45fc268a59f099bf7a357c8474800fa044ed12706885271c0ec3a61d9321ab8c",
+      "original_preserved": true,
+      "selected_png_unchanged": true
+    },
+    {
+      "path": "src/echo_heist/resources/assets/tiles/materials/mineral-floor.png",
+      "original": "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a/exec-43edb966-fc84-438c-9726-cc3c9bda980b.png",
+      "mode": "new opaque material",
+      "bytes": 3564073,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "sha256": "254799c7f2565dbdc56dff9161d7476805e1ec0a4f966fd8b0a052e7d004e888",
+      "original_preserved": true,
+      "selected_png_unchanged": true
+    }
+  ]
+}

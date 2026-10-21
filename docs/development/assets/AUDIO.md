@@ -1,6 +1,10 @@
 # Music and event cue integration
 
-## Current facility mix (2026-10-22)
+## Current material/crouch revision
+
+Title and exploration now use SRG774's original ambient Title/Airy OGGs, gains 0.32/0.24 before the music preference. Pursuit/lockdown retain Alexander Ehlers' higher tension tracks. Hover is Kenney select_001. Explicit pointer-entry/activation serials play hover at 0.26 and click at 0.48, including already-selected buttons, without retriggering stable hover. Crouch uses the existing filtered walking WAVs at 0.045 and 24-tick cadence; walking/sprint remain 0.09/0.42 and Simulation hearing stays authoritative. [Native playback/levels and current build evidence](../quality/reports/material_cohesion/REVIEW.md), [packaged manifest](../../../src/echo_heist/resources/assets/audio/manifest.json). All 29 hashes match. Native pointer review plays ten cues with audio ready; subjective device listening remains an owner check.
+
+## Earlier facility mix (2026-10-22)
 
 29 recordings now ship with the game. Four original CC0 tracks by Alexander Ehlers/tricksntraps from [T&T Free Cyberpunk Pack 2](https://opengameart.org/content/t-t-free-cyberpunk-pack-2) provide title, infiltration, pursuit and lockdown music; SRG774 transmission remains for results. The former sector bed is low room ventilation. Kenney [Interface Sounds](https://kenney.nl/assets/interface-sounds) adds back/toggle/adjustment, stair, core, recharge, unavailable-action and visible-suspicion cues. Walking uses three 2400Hz low-pass WAV derivatives at gain 0.09; sprint uses the original steps at 0.42. Four music OGGs remain unmodified original bytes.
 

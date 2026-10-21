@@ -1,8 +1,10 @@
 # Audio sources
 
+Current material/crouch revision (2026-10-22): title and infiltration use SRG774's original Title/Airy OGGs for a quieter ambient default; Alexander Ehlers' pursuit/lockdown tracks remain. Hover is now Kenney Interface Sounds `select_001.ogg`, with explicit hover-entry/click playback rather than selection-change-only feedback. The per-file manifest is the current packaged selection; the earlier revision history below preserves its sources. Crouched footsteps reuse the documented filtered walking samples at lower gain and slower Simulation-owned cadence.
+
 All selected recordings are offered by their authors under CC0 1.0. Original recordings remain unmodified except the explicitly documented low-pass walking variants; their sources and processing are recorded in the manifest. The full CC0 legal code is bundled as `CC0.txt`; Kenney's original notice is retained as `KENNEY_LICENSE.txt`. Exact filenames, source pages, download date, SHA256 and byte counts are in `manifest.json`.
 
-- SRG774, [Dark Sci-Fi Audio Pack](https://opengameart.org/content/dark-sci-fi-audio-pack): transmission outcome music, ventilation bed, hover and victory cues.
+- SRG774, [Dark Sci-Fi Audio Pack](https://opengameart.org/content/dark-sci-fi-audio-pack): ambient title/Airy exploration, transmission outcome music, ventilation bed and victory cue.
 - rubberduck, [50 CC0 Sci-Fi SFX](https://opengameart.org/content/50-cc0-sci-fi-sfx): terminal confirmation, hologram deployment, electrical EMP and security alert tones.
 - Kenney, [Impact Sounds](https://kenney.nl/assets/impact-sounds), version 1.0: three concrete footstep variants and one metal impact for the emergency stun.
 

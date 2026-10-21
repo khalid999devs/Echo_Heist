@@ -3,26 +3,26 @@
   "assets": [
     {
       "path": "music/title.ogg",
-      "author": "Alexander Ehlers / tricksntraps",
-      "source": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2",
-      "download_url": "https://opengameart.org/sites/default/files/new_factory_129bpm_0.ogg",
-      "source_member": "new_factory_129bpm_0.ogg",
+      "author": "SRG774",
+      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "download_url": "https://opengameart.org/sites/default/files/ogg.zip",
+      "source_member": "ogg/title.ogg",
       "license": "CC0-1.0",
       "downloaded": "2026-10-22",
-      "sha256": "3365dd3d25697a54e843678d75f49732cd0bc88bfd3ccb574b39f0ed65fa7291",
-      "bytes": 7322355,
+      "sha256": "b74814f52e99a59d1dce05e2340b51be6b0818e14e21e0c0b8dfdb1034141c5c",
+      "bytes": 7930448,
       "modified": false
     },
     {
       "path": "music/sector.ogg",
-      "author": "Alexander Ehlers / tricksntraps",
-      "source": "https://opengameart.org/content/t-t-free-cyberpunk-pack-2",
-      "download_url": "https://opengameart.org/sites/default/files/strange_experiments_80bpm.ogg",
-      "source_member": "strange_experiments_80bpm.ogg",
+      "author": "SRG774",
+      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
+      "download_url": "https://opengameart.org/sites/default/files/ogg.zip",
+      "source_member": "ogg/airy.ogg",
       "license": "CC0-1.0",
       "downloaded": "2026-10-22",
-      "sha256": "2e38cfcdc0d44bf6d67d95a2ba33883cf3d316d650f6e9352914afb956bcd14e",
-      "bytes": 13071885,
+      "sha256": "ce86ac7d78b0b3257b5242fa7de4fb378616a7a85cb4ea4a17b5a74f76a7d003",
+      "bytes": 1117106,
       "modified": false
     },
     {
@@ -62,14 +62,15 @@
     },
     {
       "path": "ui/hover.ogg",
-      "author": "SRG774",
-      "source": "https://opengameart.org/content/dark-sci-fi-audio-pack",
-      "source_member": "ogg/hover.ogg",
+      "author": "Kenney",
+      "source": "https://kenney.nl/assets/interface-sounds",
+      "source_member": "Audio/select_001.ogg",
       "license": "CC0-1.0",
-      "downloaded": "2026-10-21",
-      "sha256": "2dc56ac3f497d0cf16135ba0260a7bbd98557c4323cac37d528f9622279f31ee",
-      "bytes": 10866,
-      "modified": false
+      "downloaded": "2026-10-22",
+      "sha256": "aec0c31ea934a35936ae0d2ab8fac8123c93aa5647f935853a58dbaf90278b7a",
+      "bytes": 5468,
+      "modified": false,
+      "download_url": "https://kenney.nl/media/pages/assets/interface-sounds/fa43c1dd4d-1677589452/kenney_interface-sounds.zip"
     },
     {
       "path": "ui/victory.ogg",

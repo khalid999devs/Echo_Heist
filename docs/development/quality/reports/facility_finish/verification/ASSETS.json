@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-22",
+  "generated_output_directory": "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a",
+  "assets": [
+    {
+      "path": "src/echo_heist/resources/assets/tiles/laboratory/instruments.png",
+      "sha256": "30284557b51cccbd34ef1430d1229210410e2bfbbebcfcd4f18cd396558dc9a2",
+      "bytes": 2273151,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "selected_output": "exec-45c341f1-170c-492d-8195-f16570998cb6.png",
+      "initial_output": "exec-37ceaf43-1d1d-45d7-8244-01207fd9d521.png",
+      "tool": "built-in imagegen",
+      "original_output_unchanged": true,
+      "corner_alpha": 0
+    },
+    {
+      "path": "src/echo_heist/resources/assets/tiles/laboratory/utility.png",
+      "sha256": "f6553f303046d181586af3435b1c78daf95fb7d60e629b2779b0e876dc4c2c80",
+      "bytes": 2204608,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "selected_output": "exec-b8b71421-fd7b-4c5d-b3e2-0d13a185affe.png",
+      "initial_output": "exec-d001070f-4da1-4dd9-8e04-a20e35c271ee.png",
+      "tool": "built-in imagegen",
+      "original_output_unchanged": true,
+      "corner_alpha": 0
+    },
+    {
+      "path": "src/echo_heist/resources/assets/tiles/laboratory/dual-console.png",
+      "sha256": "32d748158afb7c3bcf82018aa37764a6600062c0e9ac04e9623a9ce2042a8383",
+      "bytes": 1353756,
+      "dimensions": [
+        1665,
+        944
+      ],
+      "selected_output": "exec-3726af51-b504-4b4b-b8f5-23023609837d.png",
+      "initial_output": null,
+      "tool": "built-in imagegen",
+      "original_output_unchanged": true,
+      "corner_alpha": 0
+    },
+    {
+      "path": "src/echo_heist/resources/assets/tiles/laboratory/aftermath.png",
+      "sha256": "3241afae5702bdeff78278fcb25c6fd06954008532e1d67b85e7f9a8bc18737b",
+      "bytes": 2674944,
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "selected_output": "exec-94f4720e-ce63-40e2-84e2-02e9ad9898ae.png",
+      "initial_output": null,
+      "tool": "built-in imagegen",
+      "original_output_unchanged": true,
+      "corner_alpha": 0
+    },
+    {
+      "path": "src/echo_heist/resources/assets/tiles/laboratory/hiding-recess.png",
+      "sha256": "95da444e72ccbcd10da3854f94022b14457e560dba80d0563e17d9428d6d7326",
+      "bytes": 1166612,
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "selected_output": "exec-8240d3be-7669-491f-808d-c67376b9e073.png",
+      "initial_output": null,
+      "tool": "built-in imagegen",
+      "original_output_unchanged": true,
+      "corner_alpha": 0
+    }
+  ]
+}

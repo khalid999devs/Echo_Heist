@@ -1,0 +1,106 @@
+{
+  "build": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 46287058,
+    "archive_sha256": "2a91cced913430b643e3dfc540f44ed3c53a69a3f41bffe90c08d64cc32ebbc6",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "123225bfda7698f505705436521cc09023118d02",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "scope": "Clean 123225b source. Native app and fresh ZIP extraction pass Cocoa frozen smoke; full source missions are separate evidence. Interactive Windows/download quarantine and full frozen mission input are not tested.",
+  "built_app": {
+    "smoke": {
+      "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/dist/Echo Heist.app/Contents/MacOS/EchoHeist",
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "surface_saved": true
+      },
+      "passed": true,
+      "scope": "native display smoke",
+      "video_driver": "cocoa"
+    },
+    "desktop": {
+      "audio": "ready",
+      "audio_assets_loaded": 16,
+      "music_track": "title",
+      "frames": 12,
+      "map_id": "vault-five-zone",
+      "resources_loaded": true,
+      "runtime": {
+        "architecture": "arm64",
+        "frozen": true,
+        "python": "3.13.16"
+      },
+      "scene": "TITLE",
+      "video_driver": "cocoa"
+    }
+  },
+  "extracted_zip": {
+    "smoke": {
+      "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/two-floor-lab/extracted-123225b/Echo Heist.app/Contents/MacOS/EchoHeist",
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "surface_saved": true
+      },
+      "passed": true,
+      "scope": "native display smoke",
+      "video_driver": "cocoa"
+    },
+    "desktop": {
+      "audio": "ready",
+      "audio_assets_loaded": 16,
+      "music_track": "title",
+      "frames": 12,
+      "map_id": "vault-five-zone",
+      "resources_loaded": true,
+      "runtime": {
+        "architecture": "arm64",
+        "frozen": true,
+        "python": "3.13.16"
+      },
+      "scene": "MODE",
+      "video_driver": "cocoa"
+    }
+  },
+  "hosted_ci": {
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39608091170",
+    "source_commit": "123225bfda7698f505705436521cc09023118d02",
+    "conclusion": "PENDING; Linux and Windows passed, hosted macOS runner in startup with no steps reported at integration",
+    "scope": "Native primary builds and dummy-video frozen smoke, not interactive hardware QA",
+    "jobs": [
+      {
+        "name": "headless-checks",
+        "conclusion": "success"
+      },
+      {
+        "name": "windows-x64",
+        "conclusion": "success"
+      },
+      {
+        "name": "macos-arm64",
+        "conclusion": "PENDING"
+      }
+    ]
+  }
+}

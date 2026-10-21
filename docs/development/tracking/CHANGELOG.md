@@ -1,5 +1,13 @@
 # Development changelog
 
+## 2026-10-21 - Two-floor lab and timed sprint
+
+- Preserved the original two-route/cross-link topology across real downstairs/upper decks, connected through two reciprocal Simulation-owned stair pairs. E transfers at a landing; guards, BFS, acoustics and validation share those edges. Destination occupancy and held-E protection prevent overlap/bouncing.
+- Implemented the owner's approved three-second sprint/four-second recharge with responsive walking, authoritative tick timers, real louder sprint noise and a compact readiness display. Pause/map freeze recovery; blocked requests consume no charge. Approved scoring is unchanged.
+- Improved lab light/material depth, natural furniture/actor contact shadows, equipment animation, closer presentation, floor camera/map, minimal menu/settings/pause copy and a separate original extraction cinematic. Kept the existing title image.
+- Found and corrected a native Mac alpha-compositing defect that produced rectangular backgrounds around actors/props. Explicit RGB targets and a layered-alpha regression verify the actual fix; all 38 native states were recaptured/reviewed.
+- 111 behavior cases, strict types over 80 source files, Ruff/structure pass. Actual upper/lower wins, capture/abort and five audio contexts pass. Clean `123225b` Mac app and extracted ZIP each pass native smoke. [Review/build evidence](../quality/reports/two_floor_lab/REVIEW.md) and [runnable owner handoff](handoffs/khalid/day_02/TWO_FLOOR_LAB.md). Full P03/P04-P08 and Windows interactive QA remain open.
+
 ## 2026-10-21 - Clear chapter flow and compact research routes
 
 - Replaced the crowded opening with a Chapter 01 card, one Play action and separate Report/Settings/Quit. Briefing now explains objectives and routes; mode choice is separate from Launch. Added real Back behavior and Audio/Display settings groups.

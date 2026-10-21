@@ -12,6 +12,7 @@ from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.level.model import LevelData
 from echo_heist.ui.render import motifs, theme
 from echo_heist.ui.render.camera import Camera
+from echo_heist.ui.render.environment.art import laboratory_props, sprite_grid
 from echo_heist.ui.render.environment.interiors import draw_details, draw_room_trim, room_floors
 from echo_heist.ui.render.environment.lighting import bake_lighting, draw_equipment
 from echo_heist.ui.render.surfaces.formats import opaque_surface
@@ -38,6 +39,7 @@ class WorldArt:
     props: tuple[pygame.Surface, ...]
     operative: tuple[pygame.Surface, ...]
     guard: tuple[pygame.Surface, ...]
+    companion: tuple[pygame.Surface, ...]
 
     @classmethod
     def load(cls) -> "WorldArt":
@@ -69,29 +71,13 @@ class WorldArt:
         )
         props += tuple(cell.subsurface(cell.get_bounding_rect(min_alpha=32)) for cell in interiors)
 
-        def frames(path: str, size: tuple[int, int]) -> tuple[pygame.Surface, ...]:
-            sheet = image(path)
-            width = sheet.get_width() // 4
-            cells = tuple(
-                sheet.subsurface(pygame.Rect(index * width, 0, width, sheet.get_height()))
-                for index in range(4)
-            )
-            bounds = cells[0].get_bounding_rect(min_alpha=32)
-            for cell in cells[1:]:
-                bounds.union_ip(cell.get_bounding_rect(min_alpha=32))
-            result = []
-            for cell in cells:
-                frame = pygame.transform.smoothscale(cell.subsurface(bounds), size)
-                frame.fill((28, 34, 39), special_flags=pygame.BLEND_RGB_ADD)
-                result.append(frame)
-            return tuple(result)
-
         return cls(
             floor,
             bulkhead,
-            props,
-            frames("assets/characters/operative-motion.png", (36, 46)),
-            frames("assets/characters/guard-motion.png", (36, 46)),
+            props + laboratory_props(),
+            sprite_grid("assets/characters/operative-directions.png", 4, 4, (44, 58)),
+            sprite_grid("assets/characters/defenders.png", 4, 3, (44, 54)),
+            sprite_grid("assets/characters/companion.png", 2, 2, (40, 48)),
         )
 
 
@@ -212,16 +198,16 @@ def _furniture_rects(level: LevelData) -> tuple[tuple[pygame.Rect, str, int], ..
 
 def _draw_furniture(surface: pygame.Surface, level: LevelData, art: WorldArt) -> None:
     styles = {
-        "rack": 0,
-        "console": 1,
-        "tank": 2,
+        "rack": 15,
+        "console": 14,
+        "tank": 13,
         "crates": 3,
         "plant": 4,
         "workbench": 5,
-        "desk": 6,
-        "planter": 7,
-        "labbench": 8,
-        "pump": 9,
+        "desk": 14,
+        "planter": 17,
+        "labbench": 12,
+        "pump": 16,
         "shelf": 10,
     }
     for footprint, style, rotation in _furniture_rects(level):
@@ -235,11 +221,11 @@ def _draw_furniture(surface: pygame.Surface, level: LevelData, art: WorldArt) ->
             pygame.draw.line(surface, theme.WARNING, footprint.midleft, footprint.midright, 2)
             continue
         source = pygame.transform.rotate(art.props[styles[style]], rotation)
-        prop = pygame.transform.smoothscale(source, footprint.inflate(-4, -4).size)
-        prop.fill((205, 220, 232), special_flags=pygame.BLEND_RGB_MULT)
+        fitted = source.get_rect().fit(footprint.inflate(-4, -4))
+        prop = pygame.transform.smoothscale(source, fitted.size)
         shadow = motifs.contact_shadow(footprint.width, max(12, footprint.height // 2), 115)
         surface.blit(shadow, (footprint.left, footprint.centery))
-        surface.blit(prop, footprint.move(2, 1))
+        surface.blit(prop, fitted)
 
 
 def build_map_surface(
@@ -455,12 +441,21 @@ def draw_world(
         canvas.blit(map_surface, camera.to_screen((0, 0)))
     draw_equipment(canvas, level, camera, 0 if reduced_motion else clock_ms, deck)
     if snapshot.phase == MissionPhase.LOCKDOWN:
-        canvas.fill((244, 205, 212), special_flags=pygame.BLEND_RGB_MULT)
+        cycle = 0.55 if reduced_motion else (1 + sin(clock_ms / 440)) / 2
+        canvas.fill(
+            (255, round(244 - 64 * cycle), round(246 - 64 * cycle)),
+            special_flags=pygame.BLEND_RGB_MULT,
+        )
         for choke in level.chokepoints:
             screen_point = camera.to_screen(
                 ((choke.tile[0] + 0.5) * size, (choke.tile[1] + 0.5) * size)
             )
-            motifs.light_pool(canvas, screen_point, theme.DANGER, 90)
+            motifs.light_pool(canvas, screen_point, (round(130 + 125 * cycle), 30, 28), 110)
+        for room in level.rooms:
+            lamp = camera.to_screen(((room.left + room.width / 2) * size, (room.top + 0.2) * size))
+            color = (round(140 + 115 * cycle), round(30 + 18 * cycle), 32)
+            motifs.light_pool(canvas, lamp, color, 155)
+            pygame.draw.line(canvas, color, (lamp[0] - 22, lamp[1]), (lamp[0] + 22, lamp[1]), 3)
     draw_vision(canvas, level.static_map, snapshot, camera)
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
     _anchor(
@@ -523,7 +518,17 @@ def draw_world(
             pulse=pulse,
             motion=(actor_motion or {}).get(entity.actor_id, motifs.ActorMotion()),
             clock_ms=clock_ms,
-            sprites=(art.operative if entity.kind == ActorKind.OPERATIVE else art.guard)
+            sprites=(
+                art.operative
+                if entity.kind == ActorKind.OPERATIVE
+                else art.companion
+                if entity.kind == ActorKind.COMPANION
+                else art.guard[4:8]
+                if entity.kind == ActorKind.TRACKER
+                else art.guard[8:12]
+                if entity.kind == ActorKind.INTERCEPTOR
+                else art.guard[:4]
+            )
             if art is not None
             else None,
         )

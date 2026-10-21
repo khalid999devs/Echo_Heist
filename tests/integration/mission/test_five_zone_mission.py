@@ -37,7 +37,9 @@ def drive(
         if pending and pending[0] == "HOLD" and observation.phase.value == "LOCKDOWN":
             pending.pop(0)
             continue
-        if pending and pending[0] == "HOLD":
+        if observation.own_status.stair_ticks_remaining:
+            action = Action(level.operative_id, ActionKind.WAIT, observation.tick)
+        elif pending and pending[0] == "HOLD":
             action = Action(
                 level.operative_id, ActionKind.INTERACT, observation.tick, target_id=level.core_id
             )

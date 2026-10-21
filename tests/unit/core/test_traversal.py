@@ -42,13 +42,31 @@ def test_reachable_stair_commits_travel_and_rejects_remote_target(rules: GameRul
     sim = Simulation(atlas(), (ActorSpawn("operative", (3, 3)),), rules=rules)
     assert sim.observe("operative").interactions[0].kind == "Stair"
     result = sim.step((Action("operative", ActionKind.INTERACT, 0, target_id="up"),))
-    assert [event.kind for event in result.events] == [EventKind.STAIR_USED]
+    assert [event.kind for event in result.events] == [EventKind.STAIR_STARTED]
+    assert sim.observe("operative").own_status.tile == (3, 3)
+    for _ in range(rules.stair_travel_ticks):
+        result = sim.step()
+    assert EventKind.STAIR_USED in [event.kind for event in result.events]
     assert sim.observe("operative").own_status.tile == (6, 3)
     result = sim.step((Action("operative", ActionKind.INTERACT, sim.tick, target_id="up"),))
     assert dict(result.events[0].details)["reason"] == "invalid_interaction_target"
     assert sim.observe("operative").own_status.tile == (6, 3)
     sim.step((Action("operative", ActionKind.INTERACT, sim.tick, target_id="down"),))
+    for _ in range(rules.stair_travel_ticks):
+        sim.step()
     assert sim.observe("operative").own_status.tile == (3, 3)
+
+
+def test_movement_interrupts_climb_and_clears_progress(rules: GameRules) -> None:
+    sim = Simulation(atlas(), (ActorSpawn("operative", (3, 3)),), rules=rules)
+    sim.step((Action("operative", ActionKind.INTERACT, 0, target_id="up"),))
+    assert sim.observe("operative").own_status.stair_ticks_remaining > 0
+    result = sim.step((Action("operative", ActionKind.MOVE, sim.tick, (-1, 0)),))
+    assert EventKind.STAIR_CANCELED in [event.kind for event in result.events]
+    for _ in range(rules.stair_travel_ticks):
+        sim.step()
+    assert not sim.observe("operative").own_status.stair_ticks_remaining
+    assert sim.observe("operative").own_status.tile[0] < 4
 
 
 def test_stairs_never_overlap_an_occupied_destination(rules: GameRules) -> None:
@@ -58,6 +76,28 @@ def test_stairs_never_overlap_an_occupied_destination(rules: GameRules) -> None:
     result = sim.step((Action("operative", ActionKind.INTERACT, 0, target_id="up"),))
     assert dict(result.events[0].details)["reason"] == "stair_landing_occupied"
     assert sim.observe("operative").own_status.tile == (3, 3)
+
+
+def test_landing_is_rechecked_when_a_body_arrives_during_travel(rules: GameRules) -> None:
+    sim = Simulation(
+        atlas(),
+        (ActorSpawn("operative", (3, 3)), ActorSpawn("other", (6, 4), ActorKind.COMPANION)),
+        rules=rules,
+    )
+    sim.step((Action("operative", ActionKind.INTERACT, 0, target_id="up"),))
+    for _ in range(12):
+        sim.step((Action("other", ActionKind.MOVE, sim.tick, (0, -1)),))
+    assert sim.observe("other").own_status.tile == (6, 3)
+    events = []
+    for _ in range(rules.stair_travel_ticks):
+        events.extend(sim.step().events)
+    assert any(
+        event.kind == EventKind.ACTION_REJECTED
+        and dict(event.details).get("reason") == "stair_landing_occupied"
+        for event in events
+    )
+    assert sim.observe("operative").own_status.tile == (3, 3)
+    assert not sim.presentation_snapshot().stairs
 
 
 def test_autonomous_sentinel_uses_same_stair_and_replays(rules: GameRules) -> None:

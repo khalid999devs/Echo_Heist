@@ -280,7 +280,12 @@ def actor(
             frame_index = 1 + (clock_ms // 180) % 2
         else:
             frame_index = 0
-        frame = pygame.transform.rotate(sprites[frame_index], angle)
+        if len(sprites) == 16:
+            row = (1 if dx > 0 else 3) if abs(dx) > abs(dy) else (0 if dy < 0 else 2)
+            frame_index += row * 4
+        # Directional humans use authored viewpoints. Robots keep their upright
+        # three-quarter silhouette rather than rotating their feet overhead.
+        frame = sprites[frame_index]
         frame_rect = frame.get_rect(center=(x, y - bob))
         contour = pygame.mask.from_surface(frame, 96).outline(every=2)
         if len(contour) > 2:

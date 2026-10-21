@@ -85,9 +85,11 @@ def test_held_interact_never_bounces_between_stair_landings(rules: GameRules) ->
     sim = Simulation(world, (ActorSpawn("operative", (2, 2)),), rules=rules)
     adapter = HumanInput("operative")
     adapter.feed([press(pygame.K_e)])
-    for _ in range(10):
+    for _ in range(rules.stair_travel_ticks + 10):
         sim.step((adapter.action_for(sim.observe("operative")),))
     assert sim.observe("operative").own_status.tile == (5, 5)
     adapter.feed([pygame.event.Event(pygame.KEYUP, key=pygame.K_e), press(pygame.K_e)])
     sim.step((adapter.action_for(sim.observe("operative")),))
+    for _ in range(rules.stair_travel_ticks):
+        sim.step((adapter.action_for(sim.observe("operative")),))
     assert sim.observe("operative").own_status.tile == (2, 2)

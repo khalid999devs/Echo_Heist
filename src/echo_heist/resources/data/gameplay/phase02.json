@@ -5,6 +5,8 @@
   "sprint_speed_units_per_second": 111000,
   "sprint_duration_ticks": 90,
   "sprint_recharge_ticks": 120,
+  "stair_travel_ticks": 24,
+  "lockdown_guard_speed_percent": 120,
   "sentinel_speed_units_per_second": 54000,
   "tracker_speed_units_per_second": 72000,
   "interceptor_speed_units_per_second": 84000,

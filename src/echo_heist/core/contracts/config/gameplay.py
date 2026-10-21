@@ -14,6 +14,8 @@ class GameRules:
     sprint_speed_units_per_second: int
     sprint_duration_ticks: int
     sprint_recharge_ticks: int
+    stair_travel_ticks: int
+    lockdown_guard_speed_percent: int
     sentinel_speed_units_per_second: int
     tracker_speed_units_per_second: int
     interceptor_speed_units_per_second: int

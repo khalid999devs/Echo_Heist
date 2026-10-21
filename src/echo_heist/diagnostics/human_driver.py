@@ -62,6 +62,8 @@ class HumanDriver:
         return self._changes(set())
 
     def events(self, observation: Observation, goal: Tile) -> list[pygame.event.Event]:
+        if observation.own_status.stair_ticks_remaining:
+            return self._changes(set())
         position = observation.own_status.position
         assert position is not None
         if any(

@@ -96,8 +96,8 @@ def main() -> int:
     assert flow.scene == Scene.MODE
     shot(flow, "menus/03-human-briefing")
     flow.frame([click(MODE_BUTTONS[1])], 16)
-    assert flow.scene == Scene.MODE and flow.runs_started == 0 and flow.mode_choice == 0
-    shot(flow, "menus/04-companion-unavailable")
+    assert flow.scene == Scene.WORKSHOP and flow.runs_started == 0 and flow.mode_choice == 0
+    shot(flow, "menus/04-workshop")
 
     flow = mission()
     shot(flow, "gameplay/01-entry")

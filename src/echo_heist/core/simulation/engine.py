@@ -31,7 +31,13 @@ from echo_heist.core.simulation.systems.mission import (
     update_theft,
 )
 from echo_heist.core.simulation.systems.motion import body_fits, move_actor, remember_paths
-from echo_heist.core.simulation.systems.traversal import stair_hints, update_sprint, use_stair
+from echo_heist.core.simulation.systems.traversal import (
+    advance_stairs,
+    cancel_stair,
+    stair_hints,
+    update_sprint,
+    use_stair,
+)
 from echo_heist.core.simulation.world import GUARD_KINDS, ActorState, WorldState
 
 TOOL_ACTIONS = frozenset({ActionKind.ECHO, ActionKind.EMP, ActionKind.MELEE})
@@ -211,6 +217,7 @@ class Simulation:
             emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
         for action in accepted:
             if action.kind == ActionKind.MOVE:
+                cancel_stair(self._world, action.actor_id, emit)
                 move_actor(self._world, self._map, self._rules, action, emit)
             elif action.kind == ActionKind.WAIT:
                 emit(EventKind.ACTION_ACCEPTED, action.actor_id)
@@ -242,10 +249,12 @@ class Simulation:
             elif action.kind in TOOL_ACTIONS:
                 reason = tool_reason(self._world, self._map, self._rules, action)
                 if reason is None:
+                    cancel_stair(self._world, action.actor_id, emit)
                     use_tool(self._world, self._map, self._rules, action, emit)
                 else:
                     emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
         update_theft(self._world, self._rules, self._mission, tuple(interactions), emit)
+        advance_stairs(self._world, self._map, self._rules, emit)
         if self._security is not None:
             guard_security.refresh(self._world, self._map, self._security, tuple(events))
         # Tools precede capture; completed contact capture precedes extraction.
@@ -313,7 +322,7 @@ class Simulation:
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 4,
+            "schema_version": 5,
             "seed": self._seed,
             "rules": asdict(self._rules),
             "mission": asdict(self._mission) if self._mission else None,

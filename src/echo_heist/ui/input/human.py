@@ -116,7 +116,7 @@ class HumanInput:
             kind = self._tools.popleft()
         elif direction != (0, 0):
             kind, sprint = ActionKind.MOVE, held(self.bindings.sprint)
-        elif held(self.bindings.interact):
+        elif held(self.bindings.interact) and not observation.own_status.stair_ticks_remaining:
             hint = observation.interactions[0] if observation.interactions else None
             if hint is None or hint.kind != "Stair" or self._interact_armed:
                 kind = ActionKind.INTERACT

@@ -12,7 +12,7 @@ def stair_hints(
     world: WorldState, world_map: StaticMap, actor_id: str
 ) -> tuple[InteractionHint, ...]:
     actor = world.actors[actor_id]
-    if world.mission_end is not None:
+    if world.mission_end is not None or actor.stair_source_id is not None:
         return ()
     return tuple(
         InteractionHint(link.object_id, "Stair", 1)
@@ -41,10 +41,10 @@ def use_stair(
     ):
         emit(EventKind.ACTION_REJECTED, actor_id, (("reason", "stair_landing_occupied"),))
         return
-    actor.position = destination
-    actor.traversed_tiles = (link.tile, link.destination)
+    actor.stair_source_id = link.object_id
+    actor.stair_arrives_at = world.tick + rules.stair_travel_ticks
     emit(
-        EventKind.STAIR_USED,
+        EventKind.STAIR_STARTED,
         actor_id,
         (
             ("stair_id", link.object_id),
@@ -52,6 +52,46 @@ def use_stair(
             ("actor_kind", actor.kind.value),
         ),
     )
+
+
+def cancel_stair(world: WorldState, actor_id: str, emit: Emit) -> None:
+    actor = world.actors[actor_id]
+    if actor.stair_source_id is not None:
+        actor.stair_source_id, actor.stair_arrives_at = None, 0
+        emit(EventKind.STAIR_CANCELED, actor_id, ())
+
+
+def advance_stairs(world: WorldState, world_map: StaticMap, rules: GameRules, emit: Emit) -> None:
+    for actor in world.actors.values():
+        if actor.stair_source_id is None:
+            continue
+        if actor.incapacitated(world.tick):
+            cancel_stair(world, actor.actor_id, emit)
+            continue
+        if world.tick < actor.stair_arrives_at:
+            continue
+        link = next(link for link in world_map.stairs if link.object_id == actor.stair_source_id)
+        actor.stair_source_id, actor.stair_arrives_at = None, 0
+        destination = tile_center(link.destination)
+        occupied = any(
+            other.actor_id != actor.actor_id
+            and distance_squared(other.position, destination) < (2 * rules.actor_radius_units) ** 2
+            for other in world.actors.values()
+        )
+        if occupied or not body_fits(world_map, destination, rules.actor_radius_units):
+            emit(EventKind.ACTION_REJECTED, actor.actor_id, (("reason", "stair_landing_occupied"),))
+            continue
+        actor.position = destination
+        actor.traversed_tiles = (link.tile, link.destination)
+        emit(
+            EventKind.STAIR_USED,
+            actor.actor_id,
+            (
+                ("stair_id", link.object_id),
+                ("destination_id", link.destination_id),
+                ("actor_kind", actor.kind.value),
+            ),
+        )
 
 
 def update_sprint(world: WorldState, rules: GameRules, requested: frozenset[str]) -> None:

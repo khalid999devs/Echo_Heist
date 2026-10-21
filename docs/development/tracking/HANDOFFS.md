@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested two-floor facility, atmosphere, ending and approved timed sprint | work/two-floor-atmosphere; baseline 2be5f61 | None; implementation 123225b and native source/archive checks complete | DONE for requested revision; native and all three hosted jobs passed; shared P03 gate stays open |
+| Khalid | User-requested scene presentation | work/complete-visual-scenes; runtime 19b454b | None; [runnable handoff](handoffs/khalid/day_02/SCENE_PRESENTATION.md) | DONE; 117 checks, native 48-state review, app/ZIP smoke and three-platform source CI PASS; later phases remain open |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | work/suhita-p02 at a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.

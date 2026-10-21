@@ -1,0 +1,67 @@
+[
+  {
+    "path": "src/echo_heist/resources/assets/characters/operative-directions.png",
+    "sha256": "bbda5c2fb7b3b9e78f87ca7e36a8cfd5522097bdb1940ae3659e46515bc41d72",
+    "bytes": 982258,
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "origin": "original imagegen generation; unmodified PNG",
+    "original_library_folder": "01a14ef6-d91a-7fb3-bc50-12047aa1b20a",
+    "original_filename": "exec-38aed697-2acf-4585-b279-ed413dd050e8.png",
+    "transparent_background_requested": true
+  },
+  {
+    "path": "src/echo_heist/resources/assets/characters/defenders.png",
+    "sha256": "fb09dc7e0c17c2bf1911d0fddf3a2dd02620b5b6b843e6448445b38b74a3636e",
+    "bytes": 1656937,
+    "dimensions": [
+      1448,
+      1086
+    ],
+    "origin": "original imagegen generation; unmodified PNG",
+    "original_library_folder": "01a14ef6-d91a-7fb3-bc50-12047aa1b20a",
+    "original_filename": "exec-38d10870-96ad-47da-bce3-414906b04949.png",
+    "transparent_background_requested": true
+  },
+  {
+    "path": "src/echo_heist/resources/assets/characters/companion.png",
+    "sha256": "28da58de1a10eed458a93dd37866b833a6d4694b523f6270f19881ca87e79abf",
+    "bytes": 1231370,
+    "dimensions": [
+      1254,
+      1254
+    ],
+    "origin": "original imagegen generation; unmodified PNG",
+    "original_library_folder": "01a14ef6-d91a-7fb3-bc50-12047aa1b20a",
+    "original_filename": "exec-672d9646-244f-4eb0-84ba-4c7a7f6819c5.png",
+    "transparent_background_requested": true
+  },
+  {
+    "path": "src/echo_heist/resources/assets/tiles/laboratory-props.png",
+    "sha256": "d139fcd61c0237cdae6e64dd869553ec760b54033e70f7ed15d72e73ac73f136",
+    "bytes": 2324636,
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "origin": "original imagegen generation; unmodified PNG",
+    "original_library_folder": "01a14ef6-d91a-7fb3-bc50-12047aa1b20a",
+    "original_filename": "exec-80534d26-2323-441a-a68e-7153fb15e630.png",
+    "transparent_background_requested": true
+  },
+  {
+    "path": "src/echo_heist/resources/assets/scenes/stairwell.png",
+    "sha256": "3602cec67e8d22b3379c06be4e84751c8c2c2913f0b17f4cb94955a02ec2ebf2",
+    "bytes": 2978413,
+    "dimensions": [
+      1672,
+      941
+    ],
+    "origin": "original imagegen generation; unmodified PNG",
+    "original_library_folder": "01a14ef6-d91a-7fb3-bc50-12047aa1b20a",
+    "original_filename": "exec-18ed1cca-dcde-44de-a201-0b7798d0738b.png",
+    "transparent_background_requested": false
+  }
+]

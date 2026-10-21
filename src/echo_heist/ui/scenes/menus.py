@@ -27,10 +27,11 @@ TITLE_ITEMS = (
     MenuItem("MISSION REPORT"),
     MenuItem("SETTINGS"),
     MenuItem("QUIT"),
+    MenuItem("FIELD GUIDE"),
 )
 MODE_ITEMS = (
     MenuItem("HUMAN", note="Direct control. Tools and stealth."),
-    MenuItem("COMPANION", enabled=False, note="Watch your AI infiltrate."),
+    MenuItem("COMPANION", note="Configure your AI companion."),
     MenuItem("LAUNCH MISSION"),
     MenuItem("BACK"),
 )
@@ -40,6 +41,7 @@ TITLE_BUTTONS = (
     pygame.Rect(44, 510, 160, 48),
     pygame.Rect(216, 510, 160, 48),
     pygame.Rect(388, 510, 112, 48),
+    pygame.Rect(44, 576, 456, 48),
 )
 LAUNCH_BUTTON = pygame.Rect(620, 548, 576, 54)
 BACK_BUTTON = pygame.Rect(44, 650, 130, 42)
@@ -51,6 +53,7 @@ MODE_BUTTONS = (
 )
 RESULT_RETRY = pygame.Rect(660, 590, 552, 48)
 RESULT_MENU = pygame.Rect(660, 648, 552, 48)
+RESULT_STORY = pygame.Rect(660, 532, 552, 42)
 
 
 def load_backdrop(
@@ -72,6 +75,8 @@ def move_selection(index: int, items: tuple[MenuItem, ...], key: int) -> int:
 
 
 def menu_hit(scene: str, pos: tuple[int, int]) -> int | None:
+    if scene == "TITLE" and CHAPTER_CARD.collidepoint(pos):
+        return 0
     buttons = TITLE_BUTTONS if scene == "TITLE" else MODE_BUTTONS
     return next((index for index, rect in enumerate(buttons) if rect.collidepoint(pos)), None)
 
@@ -258,7 +263,7 @@ def _briefing(
         _text(
             canvas,
             fonts.micro,
-            "DIRECT CONTROL" if chosen else "COMING LATER",
+            "DIRECT CONTROL" if index == 0 else "WORKSHOP PREVIEW",
             border,
             (rect.x + 16, rect.y + 49),
         )
@@ -308,13 +313,22 @@ def draw_menu(
                 enabled=index != 1 or report_available,
                 clock_ms=clock_ms,
             )
+        _button(
+            canvas,
+            TITLE_BUTTONS[4],
+            "FIELD GUIDE",
+            fonts,
+            selected=selected == 4,
+            enabled=True,
+            clock_ms=clock_ms,
+        )
         message = notice or (
             "Finish a mission to unlock its report."
             if selected == 1 and not report_available
             else ""
         )
         if message:
-            _text(canvas, fonts.micro, message, theme.WARNING if notice else theme.MUTED, (44, 612))
+            _text(canvas, fonts.micro, message, theme.WARNING if notice else theme.MUTED, (44, 638))
         _text(
             canvas,
             fonts.micro,
@@ -381,9 +395,19 @@ def draw_results(
         if end.outcome == RunOutcome.CAPTURED
         else "Ready when you are.",
         theme.MUTED,
-        (662, 511),
+        (662, 492),
     )
     glow = round(8 * (1 + sin(clock_ms / 280))) if hovered == "RETRY" else 0
+    if end.outcome == RunOutcome.WIN:
+        _button(
+            canvas,
+            RESULT_STORY,
+            "C  ENCRYPTED TRANSMISSION",
+            fonts,
+            selected=hovered == "STORY",
+            enabled=True,
+            clock_ms=clock_ms,
+        )
     panel(canvas, RESULT_RETRY, fill=(5, 42 + glow, 56 + glow, 185), border=theme.ACCENT)
     _text(canvas, fonts.small, "R  RETRY MISSION", theme.ACCENT, (678, 605))
     panel(
@@ -393,4 +417,4 @@ def draw_results(
         border=theme.ACCENT if hovered == "MENU" else theme.BORDER,
     )
     _text(canvas, fonts.small, "ENTER  MAIN MENU", theme.TEXT, (678, 663))
-    _text(canvas, fonts.micro, "ESC QUIT", theme.MUTED, (1127, 666))
+    _text(canvas, fonts.micro, "ESC MENU", theme.MUTED, (1127, 666))

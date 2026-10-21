@@ -55,6 +55,8 @@ Use `dist/EchoHeist/EchoHeist.exe` on Windows. The smoke helper runs the frozen 
 
 See the [P01 handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md) and [Phase 2 evidence](docs/development/quality/reports/phase02/integration/VERIFICATION.md). P03 is in progress; P04-P08 remain in the development plan.
 
+Latest visual pass: [scene review and screenshots](docs/development/quality/reports/scene_presentation/REVIEW.md). Mouse navigation, draggable audio sliders, timed climbing, continuous lockdown siren and directional character art are connected. Companion opens a clearly marked Workshop/scene design preview; its AI deployment is later work. The Field Guide opens from the title. A real extraction unlocks the encrypted epilogue. [Runnable developer handoff](docs/development/tracking/handoffs/khalid/day_02/SCENE_PRESENTATION.md).
+
 ## Development plan
 
 Start with [AGENTS.md](AGENTS.md), the [development hub](docs/development/README.md), and your owner guide. The eight-phase plan splits work between Khalid and Suhita; Phase 1 belongs to Khalid. All authored files are limited to 1,000 lines, with six maintained direct files per directory and useful tests grouped under root `tests/`.

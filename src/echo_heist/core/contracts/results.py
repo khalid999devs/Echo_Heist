@@ -6,7 +6,7 @@ from enum import StrEnum
 from echo_heist.core.contracts.events import GameEvent
 from echo_heist.core.contracts.observations import EntityView, Observation
 from echo_heist.core.contracts.security.model import GuardView
-from echo_heist.core.contracts.world import MissionPhase, Position, StaticMap, immutable_tile
+from echo_heist.core.contracts.world import MissionPhase, Position, StaticMap, Tile, immutable_tile
 
 
 class RunOutcome(StrEnum):
@@ -52,6 +52,15 @@ class CaptureView:
 
 
 @dataclass(frozen=True, slots=True)
+class StairView:
+    actor_id: str
+    source: Tile
+    destination: Tile
+    remaining_ticks: int
+    total_ticks: int
+
+
+@dataclass(frozen=True, slots=True)
 class RunResult:
     mode: str
     seed: int
@@ -91,3 +100,4 @@ class PresentationSnapshot:
     core_owner: str | None = None
     mission_end: MissionEnd | None = None
     guards: tuple[GuardView, ...] = ()
+    stairs: tuple[StairView, ...] = ()

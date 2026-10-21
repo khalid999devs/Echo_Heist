@@ -184,8 +184,9 @@ def test_mode_selection_does_not_launch_and_back_does_not_start_a_run() -> None:
     click(TITLE_BUTTONS[0])
     assert flow.scene == Scene.MODE and flow.selected == 2
     click(MODE_BUTTONS[1])
-    assert flow.notice and flow.scene == Scene.MODE
+    assert flow.scene == Scene.WORKSHOP
     assert flow.mode_choice == 0 and flow.runs_started == 0
+    flow.frame([key(pygame.KEYDOWN, pygame.K_ESCAPE)], 0)
     click(MODE_BUTTONS[0])
     assert flow.mode_choice == 0 and flow.selected == 2
     assert flow.scene == Scene.MODE and flow.session is None

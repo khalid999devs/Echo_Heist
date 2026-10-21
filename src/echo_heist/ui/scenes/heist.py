@@ -19,7 +19,8 @@ from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.camera import Camera
 from echo_heist.ui.render.environment.overview import draw_overview
-from echo_heist.ui.render.hud import draw_dialog, draw_hud, panel
+from echo_heist.ui.render.environment.stairwell import Stairwell
+from echo_heist.ui.render.hud import draw_hud, panel
 from echo_heist.ui.render.motifs import ActorMotion
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import (
@@ -29,6 +30,13 @@ from echo_heist.ui.render.world import (
     draw_world,
     to_pixels,
 )
+from echo_heist.ui.scenes.navigation.controls import (
+    ABORT_BUTTONS,
+    MAP_CLOSE,
+    PAUSE_BUTTONS,
+    button,
+    hit,
+)
 
 MAX_CATCH_UP = 8_000  # At most eight 30 Hz ticks after a long frame.
 
@@ -36,6 +44,7 @@ MAX_CATCH_UP = 8_000  # At most eight 30 Hz ticks after a long frame.
 class HeistRequest(StrEnum):
     QUIT = "QUIT"
     RETRY = "RETRY"
+    SETTINGS = "SETTINGS"
 
 
 class HeistSession:
@@ -102,6 +111,8 @@ class HeistSession:
         self.notice_until_ms = 0
         self.deck_id: str | None = None
         self.floor_changed_ms = -1000
+        self.stairwell = Stairwell()
+        self.pause_selected = 0
         self._follow(0.0, snap=True)
 
     @property
@@ -131,12 +142,22 @@ class HeistSession:
         self.paused, self.confirm_abort, self.accumulator = True, False, 0
         self.summary = False
         self.input.clear()
+        self.pause_selected = 0
 
     def handle(self, events: Sequence[pygame.event.Event]) -> HeistRequest | None:
         if self.mission_end is not None:
             return None
         if self.paused:
             return self._handle_paused(events)
+        if self.summary and any(
+            event.type == pygame.MOUSEBUTTONDOWN
+            and event.button == 1
+            and MAP_CLOSE.collidepoint(event.pos)
+            for event in events
+        ):
+            self.summary = False
+            self.input.clear()
+            return None
         commands = self.input.feed(events)
         if UiCommand.QUIT in commands:
             return HeistRequest.QUIT
@@ -158,22 +179,57 @@ class HeistSession:
         for event in events:
             if event.type == pygame.QUIT:
                 return HeistRequest.QUIT
+            if event.type in (pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN):
+                targets = ABORT_BUTTONS if self.confirm_abort else PAUSE_BUTTONS
+                selected = hit(targets, event.pos)
+                if selected is not None:
+                    self.pause_selected = selected
+                if (
+                    event.type == pygame.MOUSEBUTTONDOWN
+                    and event.button == 1
+                    and selected is not None
+                ):
+                    return self._pause_action(selected)
             if event.type != pygame.KEYDOWN or getattr(event, "repeat", False):
                 continue
             if self.confirm_abort:
-                if event.key == pygame.K_x:
-                    # Voluntary abort is recorded by Simulation, not decided by the UI.
-                    self.simulation.step(abort=True)
-                    self.paused = self.confirm_abort = False
+                if event.key in (pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN):
+                    self.pause_selected = 1 - min(1, self.pause_selected)
+                elif event.key in (pygame.K_x, pygame.K_RETURN, pygame.K_KP_ENTER):
+                    return self._pause_action(0 if event.key == pygame.K_x else self.pause_selected)
                 elif event.key == pygame.K_ESCAPE:
                     self.confirm_abort = False
             elif event.key in (pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_KP_ENTER):
-                self.paused = False
-                self.input.clear()  # Players repress held movement after resuming.
+                return self._pause_action(
+                    0 if event.key == pygame.K_ESCAPE else self.pause_selected
+                )
+            elif event.key in (pygame.K_UP, pygame.K_DOWN):
+                self.pause_selected = (
+                    self.pause_selected + (1 if event.key == pygame.K_DOWN else -1)
+                ) % 4
             elif event.key == pygame.K_x:
                 self.confirm_abort = True
             elif event.key == pygame.K_r:
                 return HeistRequest.RETRY
+        return None
+
+    def _pause_action(self, index: int) -> HeistRequest | None:
+        if self.confirm_abort:
+            if index == 0:
+                self.simulation.step(abort=True)
+                self.paused = self.confirm_abort = False
+            else:
+                self.confirm_abort = False
+        elif index == 0:
+            self.paused = False
+            self.input.clear()
+        elif index == 1:
+            return HeistRequest.RETRY
+        elif index == 2:
+            return HeistRequest.SETTINGS
+        else:
+            self.confirm_abort = True
+            self.pause_selected = 1
         return None
 
     def update(self, elapsed_ms: int) -> None:
@@ -295,6 +351,17 @@ class HeistSession:
             fade = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
             fade.fill((3, 10, 18, round(170 * (1 - age / 240))))
             canvas.blit(fade, (0, 0))
+        travel = next(
+            (stair for stair in snapshot.stairs if stair.actor_id == self.level.operative_id), None
+        )
+        self.stairwell.draw(
+            canvas,
+            travel,
+            self.art.operative,
+            self.fonts,
+            self.clock_ms,
+            reduced_motion=self.reduced_flashing,
+        )
         view = build_objective_view(
             self.simulation.observe(self.level.operative_id),
             ticks_per_second=self.simulation.ticks_per_second,
@@ -327,6 +394,7 @@ class HeistSession:
             draw_overview(
                 canvas, self.level, operative_tile, snapshot.phase, self.camera, self.fonts
             )
+            button(canvas, MAP_CLOSE, "CLOSE", self.fonts)
 
     def _draw_lab(self, canvas: pygame.Surface) -> None:
         snapshot = self.simulation.presentation_snapshot()
@@ -357,16 +425,21 @@ class HeistSession:
             )
 
     def _draw_pause(self, canvas: pygame.Surface) -> None:
+        veil = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
+        veil.fill((2, 8, 14, 185))
+        canvas.blit(veil, (0, 0))
+        panel(canvas, pygame.Rect(420, 205, 440, 370), fill=(5, 17, 27, 245))
+        title = "ABORT RUN?" if self.confirm_abort else "PAUSED"
+        canvas.blit(self.fonts.heading.render(title, True, theme.TEXT), (452, 238))
         if self.confirm_abort:
-            lines = (
-                ("Ending now marks this attempt unsuccessful.", theme.TEXT),
-                ("X: confirm abort    Esc: keep playing", theme.WARNING),
+            canvas.blit(
+                self.fonts.micro.render("This attempt will be unsuccessful.", True, theme.MUTED),
+                (452, 335),
             )
-            draw_dialog(canvas, "Abort this run?", lines, self.fonts, title_color=theme.DANGER)
+            for index, label in enumerate(("ABORT", "KEEP PLAYING")):
+                button(
+                    canvas, ABORT_BUTTONS[index], label, self.fonts, self.pause_selected == index
+                )
             return
-        menu = (
-            ("Esc / Enter: resume", theme.TEXT),
-            ("R: restart mission", theme.TEXT),
-            ("X: abort run", theme.TEXT),
-        )
-        draw_dialog(canvas, "PAUSED", menu, self.fonts, title_color=theme.WARNING)
+        for index, label in enumerate(("RESUME", "RESTART MISSION", "SETTINGS", "ABORT RUN")):
+            button(canvas, PAUSE_BUTTONS[index], label, self.fonts, self.pause_selected == index)

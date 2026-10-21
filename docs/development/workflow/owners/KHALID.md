@@ -29,6 +29,8 @@ The latest user-directed two-floor revision is recorded in the [current contract
 
 ## How to collaborate
 
+The latest [scene presentation handoff](../../tracking/handoffs/khalid/day_02/SCENE_PRESENTATION.md) supersedes immediate stair travel and the previous menu layout. Workshop/Companion/Guide/epilogue designs are navigable; AI deployment, persistence and scoring remain later work. Retrieve that contract before implementing the next controller or profile consumer.
+
 You own core strategy but do not own every backend module: Suhita owns map importing/validation, registry adapters, NEXUS/director protocols, environment object systems and profile/policy logic. Your simulation must invoke those systems through agreed data/actions rather than duplicating them.
 
 For your frontend slices, create the agreed adapter/presenter and give Suhita the connection point. Do not rewrite her scene architecture. For a shared contract change, update the contract and explain the consumer effect in the handoff before integration.

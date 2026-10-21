@@ -37,6 +37,8 @@ class ActorState:
     sprint_ticks_remaining: int = 0
     sprint_ready_at: int = 0
     sprinting: bool = False
+    stair_source_id: str | None = None
+    stair_arrives_at: int = 0
 
     @property
     def tile(self) -> Tile:

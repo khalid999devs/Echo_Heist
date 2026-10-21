@@ -27,6 +27,8 @@ def interaction_hints(
     mission: MissionSpec | None,
     actor_id: str,
 ) -> tuple[InteractionHint, ...]:
+    if world.actors[actor_id].stair_source_id is not None:
+        return ()
     stairs = stair_hints(world, world_map, actor_id)
     if stairs:
         return stairs

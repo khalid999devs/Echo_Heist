@@ -1,5 +1,7 @@
 # Two-floor laboratory and timed movement
 
+Follow-up: [scene presentation contract](SCENE_PRESENTATION.md) supersedes immediate stair transfer, fingerprint schema 4 and the earlier menu/lockdown presentation. It adds timed interruptible travel and all navigable screen designs; existing map/deck/route/sprint geometry below remains valid.
+
 Khalid, 2026-10-21; user-directed refinement of `2be5f61` on `work/two-floor-atmosphere`. Supersedes CHAPTER_AND_ROUTES for stairs, presentation and sprint. P03 and later shared gates stay open. Scoring is unchanged. Glass, doors, hiding and canisters remain P05.
 
 ## Contracts being implemented

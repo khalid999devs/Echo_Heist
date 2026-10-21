@@ -30,9 +30,7 @@ def draw_overview(
         border=theme.ACCENT_DIM,
     )
     canvas.blit(fonts.body.render("FACILITY MAP", True, theme.TEXT), (50, 35))
-    canvas.blit(
-        fonts.micro.render("PAUSED  /  TAB OR ESC TO RETURN", True, theme.ACCENT), (927, 43)
-    )
+    canvas.blit(fonts.micro.render("PAUSED / TAB OR ESC TO RETURN", True, theme.ACCENT), (768, 43))
     world = level.static_map
     decks = level.decks or (Deck("facility", "FACILITY A1", 0, 0, world.width, world.height),)
     current = level.deck_at(tile)

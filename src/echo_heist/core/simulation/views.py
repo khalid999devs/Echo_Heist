@@ -7,6 +7,7 @@ from echo_heist.core.contracts.results import (
     EchoView,
     MissionSpec,
     PresentationSnapshot,
+    StairView,
 )
 from echo_heist.core.contracts.security.model import GuardView, SecuritySpec
 from echo_heist.core.contracts.world import StaticMap
@@ -46,6 +47,7 @@ def observe(
             sprint_ticks_remaining=actor.sprint_ticks_remaining,
             sprint_recharge_remaining=max(0, actor.sprint_ready_at - world.tick),
             sprinting=actor.sprinting,
+            stair_ticks_remaining=max(0, actor.stair_arrives_at - world.tick),
         ),
         visible_entities=world.visible_entities.get(actor_id, ()),
         heard_events=world.heard_cues.get(actor_id, ()),
@@ -109,4 +111,17 @@ def presentation(
         )
         if security is not None
         else (),
+        stairs=tuple(
+            StairView(
+                actor.actor_id,
+                link.tile,
+                link.destination,
+                max(0, actor.stair_arrives_at - world.tick),
+                rules.stair_travel_ticks,
+            )
+            for actor in world.actors.values()
+            if actor.stair_source_id is not None
+            for link in world_map.stairs
+            if link.object_id == actor.stair_source_id
+        ),
     )

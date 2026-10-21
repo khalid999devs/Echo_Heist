@@ -19,6 +19,12 @@ from echo_heist.ui.render.actors.model import (
     position_at,
 )
 from echo_heist.ui.render.camera import Camera
+from echo_heist.ui.render.environment.architecture.materials import material_floor
+from echo_heist.ui.render.environment.architecture.sections import (
+    paint_mounts,
+    wall_section,
+    wall_skin,
+)
 from echo_heist.ui.render.environment.art import (
     clinical_props,
     laboratory_props,
@@ -56,15 +62,15 @@ class WorldArt:
     companion: tuple[pygame.Surface, ...]
     operative_walk: tuple[pygame.Surface, ...]
     operative_run: tuple[pygame.Surface, ...]
+    operative_crouch: tuple[pygame.Surface, ...] = ()
 
     @classmethod
     def load(cls) -> "WorldArt":
         def image(path: str) -> pygame.Surface:
             return pygame.image.load(BytesIO(resource_bytes(path)), path)
 
-        floor = pygame.transform.smoothscale(image("assets/tiles/facility-floor.png"), (768, 768))
+        floor = material_floor("corridor")
         bulkhead = pygame.transform.smoothscale(image("assets/tiles/bulkhead.png"), (384, 384))
-        floor.fill((183, 193, 201), special_flags=pygame.BLEND_RGB_MULT)
         bulkhead.fill((160, 175, 185), special_flags=pygame.BLEND_RGB_MULT)
         atlas = image("assets/tiles/facility-props.png")
         # This illustrated atlas has irregular padding; explicit regions prevent
@@ -114,6 +120,7 @@ class WorldArt:
                 OPERATIVE_SIZE,
                 row_edges=(0, 239, 449, 670, 887),
             ),
+            sprite_grid("assets/characters/operative/crouch.png", 4, 4, (110, 86)),
         )
 
 
@@ -180,7 +187,7 @@ def _floor_shadows(surface: pygame.Surface, level: LevelData) -> None:
                 continue
             left, top = x * size, y * size
             for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-                if world_map.can_walk((x + dx, y + dy)):
+                if (x + dx, y + dy) in level.floor_tiles:
                     continue
                 for offset in range(9):
                     color = (0, 5, 9, round(83 * (1 - offset / 9) ** 2))
@@ -224,9 +231,8 @@ def build_map_surface(
     world_map, size = level.static_map, level.static_map.tile_size_px
     surface = opaque_surface((world_map.width * size, world_map.height * size))
     surface.fill(theme.BACKGROUND)
-    roof_texture = art.bulkhead.copy() if art else None
-    if roof_texture is not None:
-        roof_texture.fill((88, 108, 125), special_flags=pygame.BLEND_RGB_MULT)
+    roof_texture = wall_skin(size * 4).copy()
+    roof_texture.fill((118, 125, 120), special_flags=pygame.BLEND_RGB_MULT)
     furniture_tiles = {
         (x, y)
         for rect, _, _ in _furniture_rects(level)
@@ -267,17 +273,11 @@ def build_map_surface(
                     for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))
                 )
                 if adjacent_walk:
-                    motifs.wall_tile(
-                        surface,
-                        rect,
-                        edge=world_map.can_walk((x, y + 1)),
-                        beacon=(x + 2 * y) % 6 == 0,
-                        variant=variant,
-                        texture=art.bulkhead if art else None,
-                    )
+                    wall_section(surface, level, tile)
                 else:
                     _roof_tile(surface, rect, variant, roof_texture)
     _floor_shadows(surface, level)
+    paint_mounts(surface, level)
     bake_lighting(surface, level)
     draw_details(surface, level, art.props[11] if art else None)
     paint_room_story(surface, level)
@@ -316,6 +316,8 @@ def build_map_surface(
             2,
         )
     for zone in level.zones:
+        if level.rooms:
+            continue  # Detailed room luminaires already use the floor-only mask.
         center = (
             int((zone.left + zone.width / 2) * size),
             int((zone.top + zone.height / 2) * size),
@@ -326,8 +328,6 @@ def build_map_surface(
             else theme.WARNING
         )
         motifs.light_pool(surface, center, color, min(185, max(90, zone.width * size // 3)))
-        if level.rooms:
-            continue  # Room signs already identify the detailed interiors.
         position = (zone.left * size + 9, zone.top * size + 8)
         title = fonts.small.render(zone.label.upper(), True, theme.MUTED)
         badge = pygame.Surface((title.get_width() + 18, title.get_height() + 7), pygame.SRCALPHA)
@@ -514,6 +514,13 @@ def draw_world(
                 render_position[1] * size / POSITION_UNITS_PER_TILE,
             )
         )
+        if entity.concealed:
+            # Match the shallow ground-depth projection of the desk opening.
+            # Blend from zero at its front edge, preserving smooth entry/exit;
+            # this is an art socket, not a different authoritative position.
+            front = (entity.tile[1] + 1) * POSITION_UNITS_PER_TILE
+            depth = max(0, min(POSITION_UNITS_PER_TILE, front - render_position[1]))
+            point = (point[0], point[1] + round(depth * size * 0.8 / POSITION_UNITS_PER_TILE))
         motifs.actor(
             canvas,
             point,
@@ -541,6 +548,9 @@ def draw_world(
             if art is not None and entity.kind == ActorKind.OPERATIVE
             else (),
             run=art.operative_run if art is not None and entity.kind == ActorKind.OPERATIVE else (),
+            crouch=art.operative_crouch
+            if art is not None and entity.kind == ActorKind.OPERATIVE
+            else (),
             fraction=fraction,
         )
         capture = captures.get(entity.actor_id)

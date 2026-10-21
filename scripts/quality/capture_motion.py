@@ -34,12 +34,15 @@ def main() -> int:
     assert flow.session is not None
     clock = pygame.time.Clock()
     timings: list[float] = []
-    phases: dict[str, set[int]] = {"walk": set(), "run": set()}
+    phases: dict[str, set[int]] = {"walk": set(), "run": set(), "crouch": set()}
     directions: set[tuple[int, int]] = set()
     frame_number = 0
     # All four facings, turns, passing poses, rest and sprint recharge on real
     # collision geometry. Inputs never write positions or bypass Simulation.
-    for label, sprint in (("walk", False), ("run", True)):
+    for label, sprint in (("walk", False), ("run", True), ("crouch", False)):
+        if label == "crouch":
+            flow.frame([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c)], 34)
+            flow.frame([pygame.event.Event(pygame.KEYUP, key=pygame.K_c)], 34)
         driver = HumanDriver(flow.rules, sprint=sprint)
         for target in ((7, 23), (7, 25), (4, 25), (4, 23)):
             for _ in range(600):
@@ -58,7 +61,8 @@ def main() -> int:
                 pygame.display.flip()
                 motion = flow.session.actor_motion.get(flow.level.operative_id)
                 if motion is not None and motion.moving:
-                    phases[label].add(int(motion.phase * 8) % 8)
+                    count = 4 if label == "crouch" else 8
+                    phases[label].add(int(motion.phase * count) % count)
                     directions.add(motion.direction)
                 pygame.image.save(canvas, str(frames / f"{frame_number:05d}.png"))
                 frame_number += 1
@@ -71,6 +75,31 @@ def main() -> int:
             flow.frame([], 17)
         flow.draw(canvas)
         pygame.image.save(canvas, str(args.output / f"{label}-rest.png"))
+    driver = HumanDriver(flow.rules)
+    for target in ((3, 23), (3, 22), (3, 21)):
+        for _ in range(600):
+            observation = flow.session.simulation.observe(flow.level.operative_id)
+            if driver.arrived(observation, target):
+                break
+            flow.frame(driver.events(observation, target), 17)
+        else:
+            raise RuntimeError(f"Crouch input stalled before {target}")
+    flow.frame(driver.release(), 34)
+    assert flow.session.simulation.observe(flow.level.operative_id).own_status.concealed
+    flow.draw(canvas)
+    pygame.image.save(canvas, str(args.output / "under-desk.png"))
+    flow.frame([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c)], 34)
+    flow.frame([pygame.event.Event(pygame.KEYUP, key=pygame.K_c)], 34)
+    assert flow.session.simulation.observe(flow.level.operative_id).own_status.crouched
+    flow.draw(canvas)
+    pygame.image.save(canvas, str(args.output / "low-headroom.png"))
+    for _ in range(100):
+        observation = flow.session.simulation.observe(flow.level.operative_id)
+        flow.frame(driver.events(observation, (3, 23)), 17)
+    flow.frame(driver.release(), 34)
+    flow.frame([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_c)], 34)
+    flow.frame([pygame.event.Event(pygame.KEYUP, key=pygame.K_c)], 34)
+    assert not flow.session.simulation.observe(flow.level.operative_id).own_status.crouched
     # Architectural inspection uses presentation-only camera views. These are
     # explicitly previews, not evidence that the operative visited each room.
     room_output = args.output / "room-previews"
@@ -110,6 +139,8 @@ def main() -> int:
         "animation_frames_seen": {key: sorted(value) for key, value in phases.items()},
         "directions": sorted(directions),
         "simulation_fingerprint_preserved_on_every_draw": True,
+        "under_desk_input_entry_concealed": True,
+        "standing_refused_beneath_desk_and_allowed_after_exit": True,
         "tile_size_px": flow.level.static_map.tile_size_px,
         "viewport_tiles": [1280 / size, 720 / size],
         "architectural_preview_rooms": len(flow.level.rooms),

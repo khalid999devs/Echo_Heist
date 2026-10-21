@@ -101,9 +101,13 @@ def decide(
             if observation.heard_events:
                 heard = max(observation.heard_events, key=lambda cue: (cue.tick, cue.event_id))
                 cue_tile = heard.tile
-                salience = {"FOOTSTEP": 0.25, "SPRINT": 0.75, "EMP": 1.0, "MELEE": 1.0}.get(
-                    heard.kind, 0.5
-                )
+                salience = {
+                    "CROUCH": 0.15,
+                    "FOOTSTEP": 0.25,
+                    "SPRINT": 0.75,
+                    "EMP": 1.0,
+                    "MELEE": 1.0,
+                }.get(heard.kind, 0.5)
             elif observation.visual_cues:
                 cue_tile = observation.visual_cues[-1].tile
                 visibility = 0.5
@@ -153,6 +157,17 @@ def decide(
                 index = memory.search_index + int(arrived(target))
                 target = options[index % len(options)]
                 memory = replace(memory, search_index=index)
+    if target is not None and not observation.map_static.can_walk(target):
+        # A heard cue can originate beneath a desk. Investigate a reachable
+        # edge of that physical cover; never walk through it or infer identity.
+        approaches = [
+            result.path
+            for tile in neighbors(target)
+            if observation.map_static.can_walk(tile)
+            and (result := bfs(observation.map_static, own.tile, tile)).path
+        ]
+        if approaches:
+            target = min(approaches, key=lambda path: (len(path), path[-1]))[-1]
     memory = replace(memory, target=target)
     if target is None:
         return GuardDecision(wait, memory, own.facing)

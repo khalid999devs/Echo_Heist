@@ -22,8 +22,8 @@ GUIDE_COPY = (
         ),
         (
             "LISTEN TO YOUR FOOTSTEPS",
-            "Sprint is quick and loud. Walk near security.",
-            "Echo draws attention; EMP opens a brief escape window.",
+            "Sprint is loud. C toggles a slower, quieter crouch.",
+            "Crouch beneath open desks. Leave the low space before standing.",
         ),
     ),
     (

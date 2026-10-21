@@ -1,6 +1,6 @@
 # Khalid's agent guide
 
-Latest user-directed scene handoff: [responsive display, facility and audio](../../tracking/handoffs/khalid/presentation/SCENE_FINISH.md). It supersedes prior fixed-aspect/audio/HideSpot coordinates; [actual evidence](../../quality/reports/facility_finish/REVIEW.md) records what was verified. Resume remaining P03 from this baseline; presentation completion does not close the shared phase gate.
+Latest user-directed handoff: [grounded materials and crouch](../../tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md), with [actual evidence](../../quality/reports/material_cohesion/REVIEW.md). Retrieve posture/under-desk clearance, fingerprint-6 and UI-feedback contracts. This explicitly requested early P05 subset does not close the shared phase gates; resume remaining P03 from this baseline.
 
 Identity: Khalid, the project owner in this conversation. Focus: software architecture, system design, core/AI strategy and logic, with real input/diagnostics/result presentation work. Estimated workload: 80 of 160 points. P01 is entirely yours.
 

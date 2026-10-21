@@ -1,8 +1,10 @@
 # P05 - Complete tools, interactive environment and feedback
 
-Day 3, first block. Integrator: **Suhita**. Effort: Khalid 7, Suhita 13. Status: TODO. Prerequisite: P04. Feature anchors: completion of EH-019, EH-020 and environment part of EH-025. Source: PDF pp. 4-8, 15, 17, 19.
+Day 3, first block. Integrator: **Suhita**. Effort: Khalid 7, Suhita 13. Status: IN_PROGRESS (early owner-requested crouch subset only). Prerequisite for the full phase: P04. Feature anchors: completion of EH-019, EH-020 and environment part of EH-025. Source: PDF pp. 4-8, 15, 17, 19.
 
 ## Inputs
+
+User-directed early subset, 2026-10-22: Khalid implemented crouch/creep and three physical under-desk clearances during the presentation refinement. [Actual handoff](../../../tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). This does not complete S1/S2 or bypass the full phase gate. Suhita retains remaining locker HideSpot entry/exit, glass, doors, canisters and their lifecycle/effects. Reuse the authoritative posture/clearance contract rather than duplicating it; approved scoring remains unchanged.
 
 Read P04's actual run, action legality and event handoff, the [ability defaults](../../../architecture/DATA_CONTRACTS.md), [asset register](../../../assets/ASSETS.md) and T05 in the [test plan](../../../quality/TEST_PLAN.md). Keep real event/noise semantics tied to visible effects.
 

@@ -8,6 +8,7 @@ import pygame
 from echo_heist.level.model import LevelData
 from echo_heist.ui.render.actors.shadows import GroundShadow, cast_shadow
 from echo_heist.ui.render.camera import Camera
+from echo_heist.ui.render.environment.architecture.materials import room_grade
 
 APPEARANCE_SOURCES = {
     "centrifuge": 27,
@@ -28,6 +29,7 @@ APPEARANCE_SOURCES = {
     "broken-console": 43,
     "wilted-plant": 44,
     "unfinished-bench": 45,
+    "hiding-desk": 47,
 }
 
 
@@ -134,12 +136,8 @@ def prepare_furniture(
                 indicators.append((fitted.x + round(fitted.w * u), fitted.y + round(fitted.h * v)))
             elif style == "tank":
                 indicators.append((fitted.centerx, fitted.y + round(fitted.h * 0.65)))
-        grade = {
-            "kept": (225, 233, 229),
-            "used": (207, 219, 217),
-            "dusty": (188, 200, 196),
-            "interrupted": (202, 209, 201),
-        }[condition]
+        room = level.room_at(obj.tile)
+        grade = room_grade(room.style if room else "corridor", condition)
         sprite.fill((*grade, 255), special_flags=pygame.BLEND_RGBA_MULT)
         shadow = cast_shadow(sprite)
         result.append(

@@ -30,6 +30,7 @@ class KeyBindings:
     echo: tuple[int, ...] = (pygame.K_q,)
     emp: tuple[int, ...] = (pygame.K_f,)
     melee: tuple[int, ...] = (pygame.K_SPACE,)
+    crouch: tuple[int, ...] = (pygame.K_c,)
     pause: tuple[int, ...] = (pygame.K_ESCAPE,)
     objective: tuple[int, ...] = (pygame.K_TAB,)
     lab: tuple[int, ...] = (pygame.K_F3,)
@@ -84,6 +85,7 @@ class HumanInput:
                     ("echo", ActionKind.ECHO),
                     ("emp", ActionKind.EMP),
                     ("melee", ActionKind.MELEE),
+                    ("crouch", ActionKind.CROUCH),
                 ):
                     if event.key in getattr(self.bindings, name) and len(self._tools) < 8:
                         self._tools.append(kind)

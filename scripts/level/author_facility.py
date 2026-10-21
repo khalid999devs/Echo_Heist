@@ -437,6 +437,9 @@ def furnish(facility: Facility) -> None:
 def dress_research(facility: Facility) -> None:
     """Authored station roles and interrupted work, separate from physical layout."""
     appearances = {
+        "entry-console": "hiding-desk",
+        "electronics-2": "hiding-desk",
+        "coolant-4": "hiding-desk",
         "screening-1": "security-console",
         "screening-equipment-2": "broken-console",
         "power-equipment-2": "broken-console",
@@ -499,6 +502,16 @@ def dress_research(facility: Facility) -> None:
             for prop in obj["properties"]:
                 if prop["name"] in ("blocks_vision", "blocks_sound"):
                     prop["value"] = False
+    for desk_name in ("entry-console", "electronics-2", "coolant-4"):
+        desk = next(obj for obj in facility.markers if obj["name"] == desk_name)
+        facility.object(
+            facility.markers,
+            "under-" + desk_name,
+            "UnderDesk",
+            desk["x"] // SIZE + 1,
+            desk["y"] // SIZE,
+            properties={"furniture_id": desk_name},
+        )
     for name, x, y, width, height in (
         ("entry-disruption", 7, 24, 2, 2),
         ("screening-scuffle", 5, 15, 2, 2),

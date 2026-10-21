@@ -1,0 +1,27 @@
+{
+  "stage": "Source and native scenes verified; clean packaging/hosted runs pending",
+  "local_checks": {
+    "tests": 135,
+    "mypy_source_files": 101,
+    "ruff": "PASS",
+    "structure": "PASS"
+  },
+  "map": {
+    "standing_geometry_preserved_from_687dbf3": true,
+    "floor_tiles": 914,
+    "under_desk_tiles": [
+      [
+        3,
+        21
+      ],
+      [
+        44,
+        33
+      ],
+      [
+        52,
+        15
+      ]
+    ]
+  }
+}

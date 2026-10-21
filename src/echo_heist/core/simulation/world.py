@@ -39,6 +39,7 @@ class ActorState:
     sprinting: bool = False
     stair_source_id: str | None = None
     stair_arrives_at: int = 0
+    crouched: bool = False
 
     @property
     def tile(self) -> Tile:

@@ -12,7 +12,7 @@ from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.ui.audio.model import AudioFrame
 
 MUSIC = ("title", "sector", "pulse", "urgent", "transmission")
-MUSIC_GAINS = {"title": 0.44, "sector": 0.30, "pulse": 0.38, "urgent": 0.42, "transmission": 0.32}
+MUSIC_GAINS = {"title": 0.32, "sector": 0.24, "pulse": 0.32, "urgent": 0.36, "transmission": 0.30}
 CUES = {
     "hover": "ui/hover.ogg",
     "confirm": "ui/confirm.ogg",
@@ -60,9 +60,14 @@ def event_cue(event: GameEvent) -> tuple[str, float, bool] | None:
             0.18,
             False,
         )
-    if event.kind == EventKind.NOISE_CREATED and details.get("kind") in ("FOOTSTEP", "SPRINT"):
+    if event.kind == EventKind.NOISE_CREATED and details.get("kind") in (
+        "FOOTSTEP",
+        "SPRINT",
+        "CROUCH",
+    ):
         sprint = details["kind"] == "SPRINT"
-        return f"{'step' if sprint else 'walk'}-{event.tick % 3}", 0.42 if sprint else 0.09, False
+        gain = 0.42 if sprint else 0.045 if details["kind"] == "CROUCH" else 0.09
+        return f"{'step' if sprint else 'walk'}-{event.tick % 3}", gain, False
     if event.kind == EventKind.CORE_TAKEN:
         return "core", 0.3, False
     if event.kind == EventKind.STAIR_CANCELED:
@@ -72,6 +77,7 @@ def event_cue(event: GameEvent) -> tuple[str, float, bool] | None:
         "emp_empty",
         "no_reachable_guard",
         "stair_landing_occupied",
+        "low_headroom",
     ):
         return "unavailable", 0.15, False
     if event.kind == EventKind.TOOL_USED:
@@ -176,8 +182,18 @@ class AudioDirector:
             self.seen.clear()
             self.seen_order.clear()
             self.footstep_index = 0
+        if previous is None and frame.ui_feedback_serial:
+            self.play(
+                frame.ui_feedback_cue, 0.26 if frame.ui_feedback_cue == "hover" else 0.48, ui=True
+            )
         if previous is not None:
-            if frame.scene != previous.scene or frame.paused != previous.paused:
+            if frame.ui_feedback_serial != previous.ui_feedback_serial:
+                self.play(
+                    frame.ui_feedback_cue,
+                    0.26 if frame.ui_feedback_cue == "hover" else 0.48,
+                    ui=True,
+                )
+            elif frame.scene != previous.scene or frame.paused != previous.paused:
                 self.play("back" if frame.paused else "confirm", 0.22, ui=True)
             elif frame.scene == "SETTINGS" and frame.settings_values != previous.settings_values:
                 if frame.settings_values[2:] != previous.settings_values[2:]:
@@ -186,7 +202,7 @@ class AudioDirector:
                     self.play("adjust", 0.09, ui=True)
                     self.last_adjust_ms = self.clock_ms
             elif frame.selection != previous.selection:
-                self.play("hover", 0.12, ui=True)
+                self.play("hover", 0.26, ui=True)
             if frame.scene == "HEIST" and frame.suspicious and not previous.suspicious:
                 self.play("discovery", 0.12)
             if (

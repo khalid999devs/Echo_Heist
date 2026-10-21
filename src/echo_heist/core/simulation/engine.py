@@ -210,7 +210,9 @@ class Simulation:
             frozenset(
                 action.actor_id
                 for action in accepted
-                if action.kind == ActionKind.MOVE and action.sprint
+                if action.kind == ActionKind.MOVE
+                and action.sprint
+                and not self._world.actors[action.actor_id].crouched
             ),
         )
         for action, reason in rejected:
@@ -221,6 +223,15 @@ class Simulation:
                 move_actor(self._world, self._map, self._rules, action, emit)
             elif action.kind == ActionKind.WAIT:
                 emit(EventKind.ACTION_ACCEPTED, action.actor_id)
+            elif action.kind == ActionKind.CROUCH:
+                cancel_stair(self._world, action.actor_id, emit)
+                actor = self._world.actors[action.actor_id]
+                actor.crouched = not actor.crouched
+                emit(
+                    EventKind.ACTION_ACCEPTED,
+                    action.actor_id,
+                    (("posture", "crouched" if actor.crouched else "standing"),),
+                )
         # Revalidate interaction/tool reach after ALL movements, before effects.
         # Thus actor-ID ordering cannot make a distant melee hit after a guard moved.
         interactions: list[Action] = []
@@ -313,6 +324,12 @@ class Simulation:
             or not stair_hints(self._world, self._map, action.actor_id)
         ):
             return "intruder_only_action"
+        if action.kind == ActionKind.CROUCH:
+            if actor.crouched and not body_fits(
+                self._map, actor.position, self._rules.actor_radius_units
+            ):
+                return "low_headroom"
+            return None
         if action.kind == ActionKind.HIDE:
             return "environment_system_not_connected"
         if action.kind == ActionKind.INTERACT:
@@ -322,7 +339,7 @@ class Simulation:
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 5,
+            "schema_version": 6,
             "seed": self._seed,
             "rules": asdict(self._rules),
             "mission": asdict(self._mission) if self._mission else None,
@@ -341,6 +358,7 @@ class Simulation:
                 "tile_size_px": self._map.tile_size_px,
                 "blocked": sorted(self._map.blocked_tiles),
                 "opaque": sorted(self._map.opaque_tiles),
+                "crouch_tiles": sorted(self._map.crouch_tiles),
                 "objects": [asdict(obj) for obj in self._map.objects],
                 "stairs": [asdict(link) for link in self._map.stairs],
             },

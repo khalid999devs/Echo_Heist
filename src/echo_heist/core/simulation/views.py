@@ -36,6 +36,7 @@ def observe(
         own_status=OwnStatus(
             actor.tile,
             actor.inventory,
+            concealed=actor.crouched and actor.tile in world_map.crouch_tiles,
             position=actor.position,
             interaction_progress_ticks=world.interaction_ticks
             if world.interaction_actor == actor_id
@@ -48,6 +49,7 @@ def observe(
             sprint_recharge_remaining=max(0, actor.sprint_ready_at - world.tick),
             sprinting=actor.sprinting,
             stair_ticks_remaining=max(0, actor.stair_arrives_at - world.tick),
+            crouched=actor.crouched,
         ),
         visible_entities=world.visible_entities.get(actor_id, ()),
         heard_events=world.heard_cues.get(actor_id, ()),
@@ -72,6 +74,8 @@ def presentation(
                 world.tick < actor.disabled_until,
                 world.tick < actor.stunned_until,
                 actor.facing,
+                actor.crouched,
+                actor.crouched and actor.tile in world_map.crouch_tiles,
             )
             for actor in world.actors.values()
         ),

@@ -275,3 +275,15 @@ def test_broken_stairs_and_decks_fail_at_import(invalid: str) -> None:
         named(data, "markers", "ground")["width"] = data["width"] * data["tilewidth"]
     with pytest.raises(MapFormatError):
         load_tiled_map(json.dumps(data))
+
+
+@pytest.mark.parametrize("invalid", ["owner", "opening"])
+def test_under_desk_opening_cannot_be_detached_from_its_physical_desk(invalid: str) -> None:
+    data = packaged()
+    marker = named(data, "markers", "under-entry-console")
+    if invalid == "owner":
+        next(p for p in marker["properties"] if p["name"] == "furniture_id")["value"] = "entry-exit"
+    else:
+        marker["x"] -= data["tilewidth"]
+    with pytest.raises(MapFormatError, match=r"under-desk|opening"):
+        load_tiled_map(json.dumps(data))

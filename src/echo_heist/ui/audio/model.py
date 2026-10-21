@@ -23,3 +23,5 @@ class AudioFrame:
     sprint_recharge_remaining: int = 0
     settings_values: tuple[float, float, bool, bool] = (0.5, 0.7, False, False)
     suspicious: bool = False
+    ui_feedback_serial: int = 0
+    ui_feedback_cue: str = "hover"

@@ -94,6 +94,7 @@ class StaticMap:
     objects: tuple[MapObject, ...] = ()
     tile_size_px: int = 32
     stairs: tuple[StairLink, ...] = ()
+    crouch_tiles: frozenset[Tile] = frozenset()
 
     def __post_init__(self) -> None:
         if self.width <= 0 or self.height <= 0 or self.tile_size_px <= 0:
@@ -104,6 +105,10 @@ class StaticMap:
                 raise ValueError("Map flags contain an out-of-bounds tile")
             object.__setattr__(self, field, tiles)
         object.__setattr__(self, "objects", tuple(self.objects))
+        crouch_tiles = frozenset(immutable_tile(tile) for tile in self.crouch_tiles)
+        if not crouch_tiles <= self.blocked_tiles & self.opaque_tiles:
+            raise ValueError("Under-desk space must be inside solid, opaque furniture")
+        object.__setattr__(self, "crouch_tiles", crouch_tiles)
         if any(not self.contains(obj.tile) for obj in self.objects):
             raise ValueError("Map object is outside the map")
         object.__setattr__(self, "stairs", tuple(self.stairs))
@@ -131,8 +136,10 @@ class StaticMap:
     def contains(self, tile: Tile) -> bool:
         return 0 <= tile[0] < self.width and 0 <= tile[1] < self.height
 
-    def can_walk(self, tile: Tile) -> bool:
-        return self.contains(tile) and tile not in self.blocked_tiles
+    def can_walk(self, tile: Tile, *, crouched: bool = False) -> bool:
+        return self.contains(tile) and (
+            tile not in self.blocked_tiles or (crouched and tile in self.crouch_tiles)
+        )
 
 
 @dataclass(frozen=True, slots=True)

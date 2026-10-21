@@ -1,5 +1,7 @@
 # ECHO HEIST development hub
 
+Latest refinement: [grounded materials, crouch and ambient UI audio](quality/reports/material_cohesion/REVIEW.md), [runnable consumer handoff](tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). The owner explicitly requested the early crouch/under-desk subset; full P03/P05 and later gates remain open. See its separate build record for actual native/hosted results.
+
 Current scene baseline: [responsive facility and sound review](quality/reports/facility_finish/REVIEW.md), [runnable owner handoff](tracking/handoffs/khalid/presentation/SCENE_FINISH.md). Covers full-display layout/pointer fixes, interrupted research, prepared hiding recesses and the 29-asset audio mix. Exact builds/platform results are in that review; full V1 phase gates remain open.
 
 Created: 2026-10-18. Stage: P01 and complete Human P02 integrated; first P03 stealth slice in progress; P04-P08 pending. Day 1 implementation started on 2026-10-18; P02 was accepted on 2026-10-20.

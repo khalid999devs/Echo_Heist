@@ -17,19 +17,22 @@ def bake_lighting(surface: pygame.Surface, level: LevelData) -> None:
         rect = pygame.Rect(room.left * size, room.top * size, room.width * size, room.height * size)
         light.set_clip(rect)
         clinical = room.style in ("laboratory", "office", "reception")
-        color = (203, 229, 223) if clinical else (122, 179, 207)
+        color = (188, 218, 211) if clinical else (220, 187, 130)
         radius = max(95, min(rect.width, rect.height))
         light_pool(light, rect.center, color, radius)
         if clinical:
             light_pool(light, (rect.centerx, rect.top + size), (199, 231, 223), radius)
         # Wall-mounted linear luminaires, with a reflected wash rather than a neon grid.
-        for x in (rect.left + 12, rect.right - 16):
-            fixture = pygame.Rect(x, rect.top + 10, 4, max(18, min(size, rect.height // 3)))
+        for x in (rect.left - 6, rect.right + 2):
+            fixture = pygame.Rect(x, rect.top + size // 3, 4, size // 2)
+            tile = (fixture.centerx // size, fixture.centery // size)
+            if tile in level.floor_tiles or not level.static_map.contains(tile):
+                continue
             pygame.draw.rect(surface, (13, 30, 38), fixture.inflate(6, 6), border_radius=3)
             pygame.draw.rect(
-                surface, (181, 222, 220) if clinical else (76, 161, 195), fixture, border_radius=2
+                surface, (170, 214, 206) if clinical else (218, 179, 108), fixture, border_radius=2
             )
-            light_pool(light, fixture.center, color, 78)
+            light_pool(light, fixture.center, color, size * 2)
         if room.style == "laboratory":
             # Pale wall caps and a second clean edge give the laboratory a physical depth.
             pygame.draw.line(

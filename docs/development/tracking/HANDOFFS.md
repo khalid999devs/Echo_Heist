@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested fullscreen/layout, sound and complete facility scene refinement | Runtime 28aff88; integration to main | None; [runnable handoff](handoffs/khalid/presentation/SCENE_FINISH.md) | DONE; 127 checks, actual native/hosted builds pass; P03-P08 and scoring gates unchanged |
+| Khalid | User-requested material/perspective coherence, crouch/under-desk movement and ambience/UI audio | work/materials-and-crouch; baseline 687dbf3 | Render/environment/assets, map validation/authoring, Simulation posture/movement and input/audio consumers | IN_PROGRESS; owner explicitly requests this crouch/under-desk subset now; remaining P05 systems and scoring unchanged |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | main includes original source a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.

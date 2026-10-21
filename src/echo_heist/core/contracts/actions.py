@@ -14,6 +14,7 @@ class ActionKind(StrEnum):
     EMP = "EMP"
     MELEE = "MELEE"
     HIDE = "HIDE"
+    CROUCH = "CROUCH"
 
 
 @dataclass(frozen=True, slots=True)

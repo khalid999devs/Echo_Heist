@@ -152,6 +152,7 @@ def refresh(
                         world.tick < other.disabled_until,
                         world.tick < other.stunned_until,
                         other.facing,
+                        crouched=other.crouched,
                     )
                 )
         world.visible_entities[actor_id] = tuple(visible)

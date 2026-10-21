@@ -46,11 +46,15 @@ def clear_reach(
     return True
 
 
-def body_fits(world_map: StaticMap, position: Position, radius: int) -> bool:
+def body_fits(
+    world_map: StaticMap, position: Position, radius: int, *, crouched: bool = False
+) -> bool:
     left, top = (position[0] - radius) // UNIT, (position[1] - radius) // UNIT
     right, bottom = (position[0] + radius - 1) // UNIT, (position[1] + radius - 1) // UNIT
     return all(
-        world_map.can_walk((x, y)) for x in range(left, right + 1) for y in range(top, bottom + 1)
+        world_map.can_walk((x, y), crouched=crouched)
+        for x in range(left, right + 1)
+        for y in range(top, bottom + 1)
     )
 
 
@@ -58,7 +62,12 @@ def move_actor(
     world: WorldState, world_map: StaticMap, rules: GameRules, action: Action, emit: Emit
 ) -> None:
     actor = world.actors[action.actor_id]
-    sprint = action.sprint and actor.sprint_ready_at == 0 and actor.sprint_ticks_remaining > 0
+    sprint = (
+        action.sprint
+        and not actor.crouched
+        and actor.sprint_ready_at == 0
+        and actor.sprint_ticks_remaining > 0
+    )
     speed = {
         ActorKind.SENTINEL: rules.sentinel_speed_units_per_second,
         ActorKind.TRACKER: rules.tracker_speed_units_per_second,
@@ -73,6 +82,8 @@ def move_actor(
     ):
         speed = speed * rules.lockdown_guard_speed_percent // 100
     step = speed // rules.simulation_hz
+    if actor.crouched:
+        step = step * rules.crouch_speed_percent // 100
     dx, dy = action.direction[0] * step, action.direction[1] * step
     if dx and dy:
         # Integer sqrt keeps diagonal normalization independent of floating point.
@@ -98,7 +109,10 @@ def move_actor(
                 and distance_squared(target, other.position) < (2 * rules.actor_radius_units) ** 2
                 for other in world.actors.values()
             )
-            if body_fits(world_map, target, rules.actor_radius_units) and not occupied:
+            if (
+                body_fits(world_map, target, rules.actor_radius_units, crouched=actor.crouched)
+                and not occupied
+            ):
                 actor.position = target
         if actor.tile != visited[-1]:
             visited.append(actor.tile)
@@ -124,13 +138,17 @@ def move_actor(
             EventKind.NOISE_CREATED,
             actor.actor_id,
             (
-                ("kind", "SPRINT" if sprint else "FOOTSTEP"),
+                ("kind", "CROUCH" if actor.crouched else "SPRINT" if sprint else "FOOTSTEP"),
                 ("x", actor.tile[0]),
                 ("y", actor.tile[1]),
                 ("radius_tiles", radius),
             ),
         )
-        actor.next_footstep_tick = world.tick + rules.footstep_interval_ticks
+        actor.next_footstep_tick = world.tick + (
+            rules.crouch_footstep_interval_ticks
+            if actor.crouched
+            else rules.footstep_interval_ticks
+        )
 
 
 def remember_paths(world: WorldState, rules: GameRules) -> None:

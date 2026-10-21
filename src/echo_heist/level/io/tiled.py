@@ -33,7 +33,17 @@ OBJECT_KINDS = {
     "anchors": frozenset({"Spawn", "Exit", "Core"}),
     "patrols": frozenset({"PatrolRoute", "GuardSpawn"}),
     "markers": frozenset(
-        {"Cover", "HideSpot", "Chokepoint", "Furniture", "Room", "FloorDetail", "Deck", "Stair"}
+        {
+            "Cover",
+            "HideSpot",
+            "UnderDesk",
+            "Chokepoint",
+            "Furniture",
+            "Room",
+            "FloorDetail",
+            "Deck",
+            "Stair",
+        }
     ),
 }
 GEOMETRY_FLAGS = ("blocks_movement", "blocks_vision", "blocks_sound")
@@ -290,6 +300,28 @@ def build_level(raw: RawMap) -> LevelData:
         return found[0]
 
     _apply_furniture(raw)
+    for space in of("UnderDesk"):
+        owner = next(
+            (
+                obj
+                for obj in of("Furniture")
+                if obj.object_id == space.properties.get("furniture_id")
+            ),
+            None,
+        )
+        if (
+            owner is None
+            or owner.rect is None
+            or owner.properties.get("appearance") != "hiding-desk"
+        ):
+            raise MapFormatError(
+                f"{space.object_id!r}: under-desk space requires its hiding-desk furniture"
+            )
+        left, top, width, height = owner.rect
+        if not (width >= 3 and height == 1 and space.tile == (left + width // 2, top)):
+            raise MapFormatError(
+                f"{space.object_id!r}: opening must be the middle of a wide single-depth desk"
+            )
     rooms: list[Room] = []
     details: list[FloorDetail] = []
     for obj in of("Room") + of("FloorDetail"):
@@ -334,6 +366,7 @@ def build_level(raw: RawMap) -> LevelData:
         "Core",
         "Cover",
         "HideSpot",
+        "UnderDesk",
         "Chokepoint",
         "Furniture",
         "Stair",
@@ -365,6 +398,7 @@ def build_level(raw: RawMap) -> LevelData:
         ),
         raw.tile_size,
         tuple(links),
+        frozenset(obj.tile for obj in of("UnderDesk")),
     )
     return LevelData(
         static_map,
@@ -377,7 +411,10 @@ def build_level(raw: RawMap) -> LevelData:
         tuple(PatrolRoute(obj.object_id, obj.polyline) for obj in of("PatrolRoute")),
         tuple(guards),
         tuple(chokepoints),
-        tuple(Marker(obj.object_id, obj.kind, obj.tile) for obj in of("Cover") + of("HideSpot")),
+        tuple(
+            Marker(obj.object_id, obj.kind, obj.tile)
+            for obj in of("Cover") + of("HideSpot") + of("UnderDesk")
+        ),
         raw.layers["floor"],
         raw.layers["glass"],
         raw.layers["cover"],

@@ -154,6 +154,8 @@ def draw_hud(
     sprint_duration_ticks: int = 90,
     sprint_recharge_ticks: int = 120,
     ticks_per_second: int = 30,
+    crouched: bool = False,
+    concealed: bool = False,
 ) -> None:
     _objective(canvas, view, zone_label, level, operative_tile, phase, fonts)
     status = pygame.Rect(canvas.get_width() - 236, 20, 216, 72)
@@ -196,6 +198,8 @@ def draw_hud(
         else view.sprint_ticks_remaining / max(1, sprint_duration_ticks)
     )
     label = f"READY IN  {recharge / max(1, ticks_per_second):.1f}s" if recharge else "SHIFT  Sprint"
+    if crouched:
+        label = "UNDER DESK" if concealed else "C  Crouched"
     _label(
         canvas,
         fonts.micro,
@@ -231,7 +235,7 @@ def draw_hud(
         panel(canvas, banner, border=theme.WARNING)
         _label(canvas, fonts.small, notice, theme.TEXT, (banner.x + 15, banner.y + 8))
     elif clock_ms < 7_000:
-        hint = "WASD  Move     SHIFT  Sprint     ESC  Pause"
+        hint = "WASD  Move    C  Crouch    SHIFT  Sprint    ESC  Pause"
         _label(
             canvas,
             fonts.micro,

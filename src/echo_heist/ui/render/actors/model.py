@@ -15,6 +15,7 @@ class ActorMotion:
     phase: float = 0.0
     phase_step: float = 0.0
     previous_position: tuple[int, int] | None = None
+    crouched: bool = False
 
 
 def position_at(

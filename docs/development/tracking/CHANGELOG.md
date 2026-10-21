@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-10-22 - Grounded materials and crouch
+
+- Replaced the blue technical floor grid with restrained neutral mineral/epoxy materials; matched cutaway wall caps/fronts, structural lights, room grade, bolted equipment bases and short services. Attached high-ceiling contact/cast shadows replace the detached projection. Standing geometry, 914 floor tiles and routes remain unchanged.
+- Implemented the owner's early crouch/creep/three under-desk subset in Simulation, with real clearance, low-headroom refusal, quiet cadence, sprint conservation, filtered visibility and retained guard memory. Heard cover cues lead to reachable approaches. Fingerprint schema 6; scoring unchanged.
+- Connected sixteen crouch poses and C input/HUD/guide feedback. Default title/exploration is ambient; explicit hover/click events now sound even on selected controls. Asset originals, CC0 notices and hashes preserved.
+- 135 tests, strict types over 101 source files, all native scene/route/capture checks, 782 movement review frames, real under-desk entry/refusal/exit and full-display layout checks pass. [Review/build evidence](../quality/reports/material_cohesion/REVIEW.md), [consumer handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). Shared P03/P05/later phase gates and physical Windows QA remain open.
+
 ## 2026-10-22 - Responsive display and interrupted research
 
 - Filled native fullscreen/resized displays with a variable viewport and proportionate interface safe area; corrected briefing padding and shared pointer mapping, including paused Settings/map navigation.

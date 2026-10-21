@@ -156,4 +156,6 @@ def research_props() -> tuple[pygame.Surface, ...]:
                 special_flags=pygame.BLEND_RGBA_MULT,
             )
             result.append(clean.subsurface(clean.get_bounding_rect(min_alpha=32)))
+    desk = image("assets/tiles/laboratory/hiding-desk.png")
+    result.append(desk.subsurface(desk.get_bounding_rect(min_alpha=32)))
     return tuple(result)

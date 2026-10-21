@@ -13,6 +13,7 @@ from echo_heist.infrastructure.persistence.settings import Settings
 from echo_heist.infrastructure.resources import load_game_rules, resource_bytes
 from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
+from echo_heist.ui.audio.feedback import UiFeedback
 from echo_heist.ui.audio.model import AudioFrame
 from echo_heist.ui.render.environment.furnishings.catalogue import prepare_furniture
 from echo_heist.ui.render.layout.viewport import interface_canvas, interface_events
@@ -23,10 +24,13 @@ from echo_heist.ui.render.world import WorldArt, build_map_surface
 from echo_heist.ui.scenes.design.screens import SceneDesigns
 from echo_heist.ui.scenes.heist import HeistRequest, HeistSession
 from echo_heist.ui.scenes.menus import (
+    CHAPTER_CARD,
+    MODE_BUTTONS,
     MODE_ITEMS,
     RESULT_MENU,
     RESULT_RETRY,
     RESULT_STORY,
+    TITLE_BUTTONS,
     TITLE_ITEMS,
     draw_menu,
     draw_results,
@@ -34,6 +38,7 @@ from echo_heist.ui.scenes.menus import (
     menu_hit,
     move_selection,
 )
+from echo_heist.ui.scenes.navigation.controls import ABORT_BUTTONS, MAP_CLOSE, PAUSE_BUTTONS
 from echo_heist.ui.scenes.settings import OPTION_RECTS, adjust, click, draw_settings
 
 DEFAULT_MAP_ID = "vault-five-zone"
@@ -92,6 +97,25 @@ class GameFlow:
         self.settings_return = Scene.TITLE
         self.dragging_slider: int | None = None
         self.designs = SceneDesigns()
+        self.ui_feedback = UiFeedback()
+
+    def _feedback_rects(self) -> tuple[pygame.Rect, ...]:
+        if self.scene == Scene.TITLE:
+            return (*TITLE_BUTTONS, CHAPTER_CARD)
+        if self.scene == Scene.MODE:
+            return MODE_BUTTONS
+        if self.scene == Scene.SETTINGS:
+            return OPTION_RECTS
+        if self.scene == Scene.RESULTS:
+            return (RESULT_RETRY, RESULT_MENU, RESULT_STORY)
+        if self.scene in (Scene.WORKSHOP, Scene.LAB, Scene.GUIDE, Scene.EPILOGUE):
+            return self.designs.controls(self.scene.value)
+        if self.session is not None:
+            if self.session.summary:
+                return (MAP_CLOSE,)
+            if self.session.paused:
+                return ABORT_BUTTONS if self.session.confirm_abort else PAUSE_BUTTONS
+        return ()
 
     def _start_run(self) -> None:
         self.hovered_result = None
@@ -127,6 +151,7 @@ class GameFlow:
 
     def frame(self, events: Sequence[pygame.event.Event], elapsed_ms: int) -> None:
         events = interface_events(events, self.view_size)
+        self.ui_feedback.feed(events, self.scene.value, self._feedback_rects())
         self.ambient_ms += max(0, elapsed_ms)
         if self.scene in (Scene.WORKSHOP, Scene.LAB, Scene.GUIDE, Scene.EPILOGUE):
             if any(event.type == pygame.QUIT for event in events):
@@ -400,6 +425,8 @@ class GameFlow:
             else False,
             events=events,
             listener_id=self.level.operative_id,
+            ui_feedback_serial=self.ui_feedback.serial,
+            ui_feedback_cue=self.ui_feedback.cue,
             audible_event_ids=frozenset(cue.event_id for cue in observation.heard_events)
             if observation
             else frozenset(),

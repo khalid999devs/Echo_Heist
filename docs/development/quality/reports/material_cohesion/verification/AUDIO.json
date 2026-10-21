@@ -1,0 +1,67 @@
+{
+  "assets": 29,
+  "all_manifest_hashes_match": true,
+  "native_decoder_and_context_scope": "capture_scenes; native packaged initialization recorded in BUILD.json",
+  "default_gains": {
+    "music_title": 0.32,
+    "music_infiltration": 0.24,
+    "hover": 0.26,
+    "click": 0.48,
+    "walk": 0.09,
+    "crouch": 0.045,
+    "sprint": 0.42
+  },
+  "recording_levels_dbfs": {
+    "ui/hover.ogg": {
+      "mean_volume": -17.3,
+      "max_volume": -1.1
+    },
+    "ui/confirm.ogg": {
+      "mean_volume": -24.0,
+      "max_volume": -5.3
+    },
+    "music/title.ogg": {
+      "mean_volume": -21.9,
+      "max_volume": -0.9
+    },
+    "music/sector.ogg": {
+      "mean_volume": -15.8,
+      "max_volume": -0.9
+    }
+  },
+  "source_title_and_airy": "SRG774 CC0 original OGGs; unchanged",
+  "hover": "Kenney Interface Sounds select_001.ogg; unchanged",
+  "speaker_mix_approval": "NOT_CLAIMED; native device initialization/real cue playback and numerical levels only",
+  "native_bootstrap_hover_click_review": {
+    "diagnostic": "phase-2-game-scenes",
+    "version": "0.1.0a1",
+    "frames": 85,
+    "video_driver": "cocoa",
+    "window_size": [
+      1280,
+      720
+    ],
+    "logical_viewport": [
+      1280,
+      720
+    ],
+    "fullscreen": false,
+    "audio": "ready",
+    "music_track": "title",
+    "audio_assets_loaded": 29,
+    "audio_cues_played": 10,
+    "lockdown_alarm_active": false,
+    "room_ambience_active": false,
+    "resources_loaded": true,
+    "scene": "TITLE",
+    "map_id": "vault-five-zone",
+    "seed": 1042,
+    "runs_started": 0,
+    "outcomes": {},
+    "simulation_steps": 0,
+    "settings_saved": true,
+    "settings_notice": null,
+    "settings_path": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/materials-and-crouch/ui-profile/settings.json"
+  },
+  "native_input_scope": "Injected actual window-coordinate mouse events; title/briefing/settings including already-selected controls; native audio ready and at least ten cues played"
+}

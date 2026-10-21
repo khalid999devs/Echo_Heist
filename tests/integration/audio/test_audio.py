@@ -10,6 +10,39 @@ from echo_heist.core.contracts.world import MissionPhase
 from echo_heist.ui.audio.director import AudioDirector, event_cue
 from echo_heist.ui.audio.model import AudioFrame
 from echo_heist.ui.scenes.flow import GameFlow, Scene
+from echo_heist.ui.scenes.menus import MODE_BUTTONS, TITLE_BUTTONS
+
+
+def test_hover_and_click_on_already_selected_buttons_are_audible(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SDL_AUDIODRIVER", "dummy")
+    pygame.font.init()
+    pygame.mixer.init()
+    try:
+        flow = GameFlow((1280, 720))
+        audio = AudioDirector(enabled=True)
+        audio.update(flow.audio_frame(), 0)
+        count = audio.cues_played
+        point = TITLE_BUTTONS[0].center
+        flow.frame([pygame.event.Event(pygame.MOUSEMOTION, pos=point)], 0)
+        audio.update(flow.audio_frame(), 20)
+        assert audio.cues_played == count + 1
+        assert pygame.mixer.Channel(0).get_volume() > 0.15
+        flow.frame([pygame.event.Event(pygame.MOUSEMOTION, pos=point)], 0)
+        audio.update(flow.audio_frame(), 20)
+        assert audio.cues_played == count + 1  # no repeated sound while staying inside
+        flow.frame([pygame.event.Event(pygame.MOUSEBUTTONDOWN, pos=point, button=1)], 0)
+        audio.update(flow.audio_frame(), 20)
+        assert flow.scene == Scene.MODE and audio.cues_played == count + 2
+        # Human is selected already; a click still needs its own confirmation.
+        flow.frame(
+            [pygame.event.Event(pygame.MOUSEBUTTONDOWN, pos=MODE_BUTTONS[0].center, button=1)], 0
+        )
+        audio.update(flow.audio_frame(), 20)
+        assert flow.scene == Scene.MODE and audio.cues_played == count + 3
+    finally:
+        pygame.mixer.quit()
 
 
 def test_shipped_audio_context_deduplication_pause_and_mix(monkeypatch: pytest.MonkeyPatch) -> None:

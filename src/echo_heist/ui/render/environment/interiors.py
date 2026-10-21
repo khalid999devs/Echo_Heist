@@ -4,35 +4,8 @@ import pygame
 
 from echo_heist.level.model import LevelData
 from echo_heist.ui.render import theme
+from echo_heist.ui.render.environment.architecture.materials import room_floors as room_floors
 from echo_heist.ui.render.theme import Fonts
-
-
-def room_floors(texture: pygame.Surface) -> dict[str, pygame.Surface]:
-    result = {}
-    for style, tint in {
-        "reception": (222, 224, 210),
-        "storage": (201, 195, 168),
-        "maintenance": (192, 198, 201),
-        "server": (166, 203, 222),
-        "office": (211, 216, 220),
-        "laboratory": (211, 238, 229),
-        "reactor": (155, 213, 225),
-    }.items():
-        floor = texture.copy()
-        floor.fill(tint, special_flags=pygame.BLEND_RGB_MULT)
-        if style == "laboratory":
-            floor.fill((43, 51, 49), special_flags=pygame.BLEND_RGB_ADD)
-            # Seamless clinical panels distinguish research from service decks.
-            # Paint once at native map resolution, without blurring the texture.
-            for y in range(0, floor.get_height(), 96):
-                for x in range(0, floor.get_width(), 96):
-                    rect = pygame.Rect(x + 2, y + 2, 92, 92)
-                    pygame.draw.rect(floor, (83, 112, 119), rect, 1, border_radius=3)
-                    pygame.draw.line(floor, (122, 149, 151), (x + 8, y + 4), (x + 88, y + 4))
-        elif style in ("office", "reception"):
-            floor.fill((12, 15, 16), special_flags=pygame.BLEND_RGB_ADD)
-        result[style] = floor
-    return result
 
 
 def draw_details(surface: pygame.Surface, level: LevelData, stair: pygame.Surface | None) -> None:

@@ -25,5 +25,7 @@
   "walk_noise_radius_tiles": 1,
   "sprint_noise_radius_tiles": 3,
   "emp_noise_radius_tiles": 5,
-  "melee_noise_radius_tiles": 6
+  "melee_noise_radius_tiles": 6,
+  "crouch_speed_percent": 55,
+  "crouch_footstep_interval_ticks": 24
 }

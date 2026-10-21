@@ -21,7 +21,10 @@ def cast_shadow(sprite: pygame.Surface) -> GroundShadow:
     # Rotating the complete flattened picture turns a broad desk sideways and
     # produces an implausibly long diagonal shadow.
     width, height = sprite.get_size()
-    depth, sideways = max(10, height // 3), max(8, height // 5)
+    # Ceiling light is high: keep the cast short and attached to the feet/base.
+    # The former long projection separated the broad top of equipment from its
+    # narrow legs, making cabinets and chairs appear to hover above the floor.
+    depth, sideways = max(5, height // 11), max(4, height // 13)
     padded = pygame.Surface((width + sideways + 12, depth + 12), pygame.SRCALPHA)
     for row in range(height):
         distance = (height - 1 - row) / max(1, height - 1)
@@ -31,6 +34,11 @@ def cast_shadow(sprite: pygame.Surface) -> GroundShadow:
             (6 + round(sideways * distance), 6 + round(depth * distance)),
             special_flags=pygame.BLEND_RGBA_MAX,
         )
+    contact = pygame.mask.from_surface(sprite, 60).to_surface(
+        setcolor=(0, 2, 4, 110), unsetcolor=(0, 0, 0, 0)
+    )
+    base = contact.subsurface((0, height * 3 // 4, width, height - height * 3 // 4))
+    padded.blit(pygame.transform.smoothscale(base, (width, 6)), (6, 3))
     pivot = (width // 2 + 6, 6)
     return GroundShadow(pygame.transform.gaussian_blur(padded, 2), pivot)
 

@@ -96,8 +96,12 @@ def _anchors(level: LevelData) -> list[str]:
     if anchors[level.exit_id].tile == anchors[level.core_id].tile:
         problems.append("Exit and Core must use different tiles")
     for marker in level.markers:
-        if not world_map.can_walk(marker.tile):
+        if not world_map.can_walk(marker.tile, crouched=marker.kind == "UnderDesk"):
             problems.append(f"{marker.kind} {marker.marker_id!r} at {marker.tile} is not walkable")
+        if marker.kind == "UnderDesk" and not world_map.can_walk(
+            (marker.tile[0], marker.tile[1] + 1)
+        ):
+            problems.append(f"under-desk {marker.marker_id!r} has no open front approach")
         if marker.kind == "HideSpot" and not any(
             (marker.tile[0] + dx, marker.tile[1] + dy) in world_map.opaque_tiles
             for dx, dy in NEIGHBORS
@@ -168,7 +172,13 @@ def _connectivity(level: LevelData) -> list[str]:
         if not zone_tiles(level, zone.zone_id) & from_spawn:
             problems.append(f"zone {zone.zone_id!r} is unreachable from the spawn")
     for kind, tiles in (
-        ("marker", [marker.tile for marker in level.markers]),
+        (
+            "marker",
+            [
+                (marker.tile[0], marker.tile[1] + 1) if marker.kind == "UnderDesk" else marker.tile
+                for marker in level.markers
+            ],
+        ),
         ("chokepoint", [point.tile for point in level.chokepoints]),
         ("guard", [post.tile for post in level.guards]),
     ):

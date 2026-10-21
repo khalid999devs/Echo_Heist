@@ -35,6 +35,8 @@ class GameRules:
     sprint_noise_radius_tiles: int
     emp_noise_radius_tiles: int
     melee_noise_radius_tiles: int
+    crouch_speed_percent: int = 55
+    crouch_footstep_interval_ticks: int = 24
 
     def __post_init__(self) -> None:
         for field in fields(self):
@@ -49,6 +51,8 @@ class GameRules:
             raise ValueError("Actor radius must be smaller than half a tile")
         if self.sprint_speed_units_per_second < self.walk_speed_units_per_second:
             raise ValueError("Sprint must not be slower than walking")
+        if not 10 <= self.crouch_speed_percent <= 90:
+            raise ValueError("Crouch speed must stay below walking speed")
 
     @classmethod
     def from_payload(cls, payload: object) -> Self:

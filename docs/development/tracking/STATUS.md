@@ -1,5 +1,7 @@
 # Current development status
 
+Current material/crouch refinement: [actual scene review](../quality/reports/material_cohesion/REVIEW.md), [runnable handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). 135 behavior cases, strict types over 101 source files, both real route wins/capture, 48 native scene states, 782 walk/run/creep review frames, real under-desk entry/refusal/exit and 30 native layout captures pass. Its packaging/hosted results are tracked separately in [BUILD.json](../quality/reports/material_cohesion/verification/BUILD.json); older build rows below name their exact previous revisions. Approved scoring and remaining shared gates are unchanged.
+
 Latest 2026-10-22 scene refinement: [responsive display, facility and audio](../quality/reports/facility_finish/REVIEW.md), [runnable handoff](handoffs/khalid/presentation/SCENE_FINISH.md). 127 behavior cases, strict types over 97 source files, native route/capture sweep, 30 responsive states and 19 room/recess previews pass. Clean runtime `28aff88` Mac app/fresh ZIP each pass eight native checks with audio ready; all three hosted platform jobs pass. [Exact archive/hash and actual build results](../quality/reports/facility_finish/verification/BUILD.json). P03-P08 and Windows interactive QA remain open.
 
 Updated: 2026-10-22, Asia/Dhaka.
@@ -14,7 +16,7 @@ Active target: complete working initial draft in **eight phases over four develo
 | 1 / P02 | Five-zone scene, complete Human loop and basic tools | Suhita planned; Khalid completed integration review | DONE; both owner slices accepted on actual map with Human win/capture/pause/retry evidence |
 | 2 / P03 | Fair sensors, active defenders, BFS/A*/fuzzy and replay | Khalid | IN_PROGRESS; one Sentinel/perception subset, Tracker/shared registry gate open |
 | 2 / P04 | Autonomous Companion/MCTS, Interceptor/minimax and NEXUS | Khalid | TODO |
-| 3 / P05 | Complete tools/props and scene/audio feedback | Suhita | TODO |
+| 3 / P05 | Complete tools/props and scene/audio feedback | Suhita | IN_PROGRESS; owner-requested early crouch/under-desk subset implemented; full environment/tools gate pending |
 | 3 / P06 | Workshop/profiles, scoring, settings/full UI and ending | Suhita | TODO |
 | 4 / P07 | Full integration/fairness/evidence and usability | Khalid | TODO |
 | 4 / P08 | Complete functional audit, primary archives and runnable draft handoff | Khalid | TODO |

@@ -1,0 +1,131 @@
+{
+  "video_driver": "cocoa",
+  "layouts": [
+    {
+      "requested": [
+        1280,
+        720
+      ],
+      "actual": [
+        1280,
+        720
+      ],
+      "logical": [
+        1280,
+        720
+      ],
+      "fullscreen": false,
+      "screens": [
+        "title",
+        "settings",
+        "briefing",
+        "gameplay",
+        "pause",
+        "map"
+      ],
+      "click_routes": "PASS",
+      "frozen_mission_preserved": true
+    },
+    {
+      "requested": [
+        1440,
+        900
+      ],
+      "actual": [
+        1440,
+        820
+      ],
+      "logical": [
+        1280,
+        729
+      ],
+      "fullscreen": false,
+      "screens": [
+        "title",
+        "settings",
+        "briefing",
+        "gameplay",
+        "pause",
+        "map"
+      ],
+      "click_routes": "PASS",
+      "frozen_mission_preserved": true
+    },
+    {
+      "requested": [
+        1024,
+        768
+      ],
+      "actual": [
+        1024,
+        768
+      ],
+      "logical": [
+        1280,
+        960
+      ],
+      "fullscreen": false,
+      "screens": [
+        "title",
+        "settings",
+        "briefing",
+        "gameplay",
+        "pause",
+        "map"
+      ],
+      "click_routes": "PASS",
+      "frozen_mission_preserved": true
+    },
+    {
+      "requested": [
+        1920,
+        820
+      ],
+      "actual": [
+        1470,
+        820
+      ],
+      "logical": [
+        1291,
+        720
+      ],
+      "fullscreen": false,
+      "screens": [
+        "title",
+        "settings",
+        "briefing",
+        "gameplay",
+        "pause",
+        "map"
+      ],
+      "click_routes": "PASS",
+      "frozen_mission_preserved": true
+    },
+    {
+      "requested": [
+        0,
+        0
+      ],
+      "actual": [
+        1470,
+        923
+      ],
+      "logical": [
+        1280,
+        804
+      ],
+      "fullscreen": true,
+      "screens": [
+        "title",
+        "settings",
+        "briefing",
+        "gameplay",
+        "pause",
+        "map"
+      ],
+      "click_routes": "PASS",
+      "frozen_mission_preserved": true
+    }
+  ],
+  "scope": "Native display surfaces and shared pointer pipeline; real OS hand clicks remain a human check."
+}

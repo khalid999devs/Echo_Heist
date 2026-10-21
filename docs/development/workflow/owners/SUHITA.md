@@ -1,6 +1,6 @@
 # Suhita's agent guide
 
-Current presentation consumer baseline: [responsive facility and audio handoff](../../tracking/handoffs/khalid/presentation/SCENE_FINISH.md), [actual review/build evidence](../../quality/reports/facility_finish/REVIEW.md). Fetch main before a fresh owner branch and retrieve its updated HideSpot, equipment and full-window pointer contracts. Native Windows builds/frozen dummy-video checks pass in the linked CI run; interactive Windows display/audio QA still needs your machine. Owner phase assignments remain unchanged.
+Current consumer baseline: [grounded materials and crouch handoff](../../tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md), [actual evidence](../../quality/reports/material_cohesion/REVIEW.md). Fetch main before a fresh owner branch; retrieve its UnderDesk/posture/fingerprint-6 contract and existing full-window pointer/HideSpot contracts. The user brought this crouch subset forward; remaining locker/glass/door/canister lifecycle stays in your P05 queue. Native build results are recorded separately; interactive Windows display/audio QA still needs your machine.
 
 Identity: Suhita. Focus: game scene/level architecture, visual composition, presentation and interface flow, with substantive map/NEXUS/environment/policy backend work. Estimated workload: 80 of 160 points. **P01 setup belongs entirely to Khalid.**
 

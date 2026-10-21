@@ -44,7 +44,7 @@ def floor_tile(
         pygame.draw.circle(surface, shade(base, 16), (rect.right - 5, rect.bottom - 5), 1)
     if texture is None and variant % 23 == 0:
         pygame.draw.rect(surface, shade(base, -14), rect.inflate(-12, -13), 1)
-    if variant % 19 == 0:
+    if texture is None and variant % 19 == 0:
         pygame.draw.line(
             surface, theme.ACCENT_DIM, (rect.x + 4, rect.y + 24), (rect.x + 17, rect.y + 24), 1
         )
@@ -229,6 +229,7 @@ def actor(
     sprites: tuple[pygame.Surface, ...] | None = None,
     walk: tuple[pygame.Surface, ...] = (),
     run: tuple[pygame.Surface, ...] = (),
+    crouch: tuple[pygame.Surface, ...] = (),
     fraction: float = 1.0,
 ) -> None:
     """Animate a facing armored silhouette without changing actor location or hitbox."""
@@ -245,6 +246,7 @@ def actor(
             pulse=pulse,
             walk=walk,
             run=run,
+            crouch=crouch,
             fraction=fraction,
         )
         return

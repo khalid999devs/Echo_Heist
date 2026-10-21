@@ -20,13 +20,17 @@ def draw_actor(
     pulse: float,
     walk: tuple[pygame.Surface, ...] = (),
     run: tuple[pygame.Surface, ...] = (),
+    crouch: tuple[pygame.Surface, ...] = (),
     fraction: float = 1.0,
 ) -> None:
     active = motion.moving and not (disabled or stunned)
     dx, dy = motion.direction
     row = (1 if dx > 0 else 3) if abs(dx) > abs(dy) else (0 if dy < 0 else 2)
     phase = (motion.phase - motion.phase_step * (1 - fraction)) % 1
-    if active and walk:
+    if motion.crouched and crouch:
+        frame = crouch[row * 4 + (int(phase * 4) % 4 if active else 0)]
+        pivot = (frame.get_width() // 2, frame.get_height())
+    elif active and walk:
         poses = run if motion.sprinting and run else walk
         index = int(phase * 8) % 8
         frame = poses[row * 8 + index]

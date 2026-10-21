@@ -295,7 +295,9 @@ class HeistSession:
                 dx, dy = current[0] - previous[0], current[1] - previous[1]
                 moving = dx != 0 or dy != 0
                 if abs(dx) + abs(dy) > 2 * POSITION_UNITS_PER_TILE:
-                    self.actor_motion[actor.actor_id] = ActorMotion(actor.facing)
+                    self.actor_motion[actor.actor_id] = ActorMotion(
+                        actor.facing, crouched=actor.crouched
+                    )
                     self._last_positions[actor.actor_id] = current
                     continue
                 direction = (
@@ -316,6 +318,7 @@ class HeistSession:
                     (old_motion.phase + phase_step) % 1,
                     phase_step,
                     previous,
+                    actor.crouched,
                 )
             self._last_positions[actor.actor_id] = current
 
@@ -328,6 +331,12 @@ class HeistSession:
             elif event.kind == EventKind.CORE_TAKEN:
                 self.notice = "CORE SECURED  /  RETURN TO THE GREEN EXIT"
                 self.notice_until_ms = self.clock_ms + 4200
+            elif (
+                event.kind == EventKind.ACTION_REJECTED
+                and dict(event.details).get("reason") == "low_headroom"
+            ):
+                self.notice = "LOW CLEARANCE / CROUCH OUT FIRST"
+                self.notice_until_ms = self.clock_ms + 1800
             elif event.kind == EventKind.CAPTURE_STARTED:
                 self.notice = "GUARD GRAB INCOMING  /  BREAK RANGE"
                 self.notice_until_ms = self.clock_ms + 1800
@@ -422,6 +431,8 @@ class HeistSession:
                     actor.actor_id for actor in snapshot.actors if actor.disabled or actor.stunned
                 ),
                 sprint_duration_ticks=self.rules.sprint_duration_ticks,
+                crouched=self.simulation.observe(self.level.operative_id).own_status.crouched,
+                concealed=self.simulation.observe(self.level.operative_id).own_status.concealed,
                 sprint_recharge_ticks=self.rules.sprint_recharge_ticks,
                 ticks_per_second=self.rules.simulation_hz,
             )

@@ -30,6 +30,7 @@ DETAIL_STYLES = frozenset({"stairs", "grate", "cables", "threshold", "aftermath"
 FURNITURE_APPEARANCES = frozenset(
     {
         "standard",
+        "hiding-desk",
         "centrifuge",
         "spectrometer",
         "fume-hood",

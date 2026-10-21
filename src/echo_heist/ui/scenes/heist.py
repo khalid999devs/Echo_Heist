@@ -27,6 +27,7 @@ from echo_heist.ui.render.environment.furnishings.catalogue import (
 from echo_heist.ui.render.environment.overview import draw_overview
 from echo_heist.ui.render.environment.stairwell import Stairwell
 from echo_heist.ui.render.hud import draw_hud, panel
+from echo_heist.ui.render.layout.viewport import interface_canvas
 from echo_heist.ui.render.motifs import ActorMotion
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import (
@@ -159,6 +160,10 @@ class HeistSession:
     @property
     def render_fraction(self) -> float:
         return 1.0 if self.paused or self.summary or self.mission_end else self.accumulator / 1000
+
+    def resize(self, view_size: tuple[int, int]) -> None:
+        self.camera.view_width, self.camera.view_height = view_size
+        self._follow(0, snap=True)
 
     def pause(self) -> None:
         self.paused, self.confirm_abort, self.accumulator = True, False, 0
@@ -425,6 +430,7 @@ class HeistSession:
         if self.paused:
             self._draw_pause(canvas)
         elif self.summary:
+            canvas = interface_canvas(canvas)
             draw_overview(
                 canvas, self.level, operative_tile, snapshot.phase, self.camera, self.fonts
             )
@@ -462,6 +468,7 @@ class HeistSession:
         veil = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
         veil.fill((2, 8, 14, 185))
         canvas.blit(veil, (0, 0))
+        canvas = interface_canvas(canvas)
         panel(canvas, pygame.Rect(420, 205, 440, 370), fill=(5, 17, 27, 245))
         title = "ABORT RUN?" if self.confirm_abort else "PAUSED"
         canvas.blit(self.fonts.heading.render(title, True, theme.TEXT), (452, 238))

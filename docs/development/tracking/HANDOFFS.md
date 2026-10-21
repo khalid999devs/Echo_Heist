@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested closer camera, grounded animation and denser lab | Runtime ac2edfe; [actual handoff](handoffs/khalid/day_02/CLOSE_CAMERA.md) | None; implementation and verification complete | DONE; 117 checks, native scenes/routes/motion, Mac app/ZIP and hosted platform builds pass; shared phases unchanged |
+| Khalid | User-requested fullscreen/layout, sound and complete facility scene refinement | work/close-camera-detail; verified runtime ac2edfe | Responsive presentation, audio mix, room equipment/cover presentation, authored fixtures and verification | IN_PROGRESS; prior closer-camera pass verified, expanded owner feedback being implemented; scoring unchanged |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | main includes original source a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.

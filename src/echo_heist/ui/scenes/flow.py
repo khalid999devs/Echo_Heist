@@ -15,6 +15,7 @@ from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.ui.audio.model import AudioFrame
 from echo_heist.ui.render.environment.furnishings.catalogue import prepare_furniture
+from echo_heist.ui.render.layout.viewport import interface_canvas, interface_events
 from echo_heist.ui.render.surfaces.cinematic import draw_scene
 from echo_heist.ui.render.surfaces.glass import edge_veil
 from echo_heist.ui.render.theme import Fonts
@@ -109,6 +110,14 @@ class GameFlow:
         self.runs_started += 1
         self.scene = Scene.HEIST
 
+    def resize(self, view_size: tuple[int, int]) -> None:
+        self.view_size = view_size
+        self.backdrop = load_backdrop(view_size)
+        self.extraction_backdrop = load_backdrop(view_size, "assets/scenes/extraction-dawn.png")
+        self.dragging_slider = None
+        if self.session is not None:
+            self.session.resize(view_size)
+
     def _go(self, scene: Scene) -> None:
         self.scene, self.selected, self.notice = scene, 2 if scene == Scene.MODE else 0, ""
         self.hovered_result = None
@@ -117,6 +126,7 @@ class GameFlow:
         self.designs.notice = ""
 
     def frame(self, events: Sequence[pygame.event.Event], elapsed_ms: int) -> None:
+        events = interface_events(events, self.view_size)
         self.ambient_ms += max(0, elapsed_ms)
         if self.scene in (Scene.WORKSHOP, Scene.LAB, Scene.GUIDE, Scene.EPILOGUE):
             if any(event.type == pygame.QUIT for event in events):
@@ -291,9 +301,36 @@ class GameFlow:
                         self.settings = click(self.settings, hit, event.pos)
 
     def draw(self, canvas: pygame.Surface) -> None:
+        if self.scene == Scene.HEIST and self.session is not None:
+            self.session.draw(canvas)
+            return
+        end = self.session.mission_end if self.session is not None else None
+        ending = self.scene == Scene.EPILOGUE or (
+            self.scene == Scene.RESULTS and end is not None and end.outcome == RunOutcome.WIN
+        )
+        if self.scene == Scene.RESULTS and self.session is not None and not ending:
+            self.session.draw(canvas)
+            small = pygame.transform.smoothscale(canvas, (320, 180))
+            canvas.blit(pygame.transform.smoothscale(small, canvas.get_size()), (0, 0))
+            canvas.blit(edge_veil(canvas.get_size(), "right"), (0, 0))
+            if end is not None and end.outcome == RunOutcome.CAPTURED:
+                warning = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
+                warning.fill((75, 8, 10, 28))
+                canvas.blit(warning, (0, 0))
+        else:
+            draw_scene(
+                canvas,
+                self.extraction_backdrop if ending else self.backdrop,
+                self.ambient_ms,
+                text_side="right" if ending else "left",
+                reduced_motion=self.settings.reduced_flashing,
+                mirror_for_text=False,
+                reactor_glow=not ending,
+            )
+        content = interface_canvas(canvas)
         if self.scene in (Scene.WORKSHOP, Scene.LAB, Scene.GUIDE, Scene.EPILOGUE):
             self.designs.draw(
-                canvas,
+                content,
                 self.scene.value,
                 self.fonts,
                 self.backdrop,
@@ -303,72 +340,55 @@ class GameFlow:
                 self.level,
                 self.map_surface,
                 self.furnishings,
+                paint_background=False,
             )
-        elif self.scene == Scene.TITLE:
+        elif self.scene in (Scene.TITLE, Scene.MODE):
             draw_menu(
-                canvas,
+                content,
                 self.fonts,
                 self.backdrop,
-                scene="TITLE",
-                selected=self.selected,
-                notice=self.notice,
-                clock_ms=self.ambient_ms,
-                reduced_motion=self.settings.reduced_flashing,
-                report_available=self.session is not None and self.session.mission_end is not None,
-            )
-        elif self.scene == Scene.MODE:
-            draw_menu(
-                canvas,
-                self.fonts,
-                self.backdrop,
-                scene="MODE",
+                scene=self.scene.value,
                 selected=self.selected,
                 notice=self.notice,
                 clock_ms=self.ambient_ms,
                 reduced_motion=self.settings.reduced_flashing,
                 mode_choice=self.mode_choice,
+                report_available=end is not None,
+                paint_background=False,
             )
         elif self.scene == Scene.SETTINGS:
             draw_settings(
-                canvas, self.fonts, self.backdrop, self.settings, self.selected, self.ambient_ms
+                content,
+                self.fonts,
+                self.backdrop,
+                self.settings,
+                self.selected,
+                self.ambient_ms,
+                paint_background=False,
             )
-        elif self.session is not None:
-            end = self.session.mission_end
-            if self.scene == Scene.RESULTS and end is not None:
-                if end.outcome == RunOutcome.WIN:
-                    draw_scene(
-                        canvas,
-                        self.extraction_backdrop,
-                        self.ambient_ms,
-                        text_side="right",
-                        reduced_motion=self.settings.reduced_flashing,
-                        mirror_for_text=False,
-                        reactor_glow=False,
-                    )
-                else:
-                    self.session.draw(canvas)
-                    small = pygame.transform.smoothscale(canvas, (320, 180))
-                    canvas.blit(pygame.transform.smoothscale(small, self.view_size), (0, 0))
-                    canvas.blit(edge_veil(self.view_size, "right"), (0, 0))
-                draw_results(
-                    canvas,
-                    end,
-                    self.fonts,
-                    ticks_per_second=self.rules.simulation_hz,
-                    hovered=self.hovered_result,
-                    clock_ms=self.ambient_ms,
-                )
-            else:
-                self.session.draw(canvas)
+        elif self.scene == Scene.RESULTS and end is not None:
+            draw_results(
+                content,
+                end,
+                self.fonts,
+                ticks_per_second=self.rules.simulation_hz,
+                hovered=self.hovered_result,
+                clock_ms=self.ambient_ms,
+            )
 
     def audio_frame(self) -> AudioFrame:
         events = tuple(self.session.audio_events) if self.session is not None else ()
         if self.session is not None:
             self.session.audio_events.clear()
         snapshot = self.session.simulation.presentation_snapshot() if self.session else None
+        observation = (
+            self.session.simulation.observe(self.level.operative_id) if self.session else None
+        )
+        room = self.level.room_at(observation.own_status.tile) if observation else None
         return AudioFrame(
             self.scene.value,
-            f"{self.selected}:{self.hovered_result}",
+            f"{self.selected}:{self.hovered_result}:{self.designs.selected}:"
+            f"{self.designs.draft.choices}:{self.designs.guide_tab}:{self.designs.lab_floor}",
             self.runs_started,
             phase=snapshot.phase if snapshot else None,
             paused=(self.session.paused or self.session.summary) if self.session else False,
@@ -379,6 +399,28 @@ class GameFlow:
             if snapshot
             else False,
             events=events,
+            listener_id=self.level.operative_id,
+            audible_event_ids=frozenset(cue.event_id for cue in observation.heard_events)
+            if observation
+            else frozenset(),
+            room_style=room.style if room else "",
+            sprint_recharge_remaining=observation.own_status.sprint_recharge_remaining
+            if observation
+            else 0,
+            settings_values=(
+                self.settings.music_volume,
+                self.settings.sfx_volume,
+                self.settings.reduced_flashing,
+                self.settings.fullscreen,
+            ),
+            suspicious=any(
+                guard.state in (GuardState.SPOTTED, GuardState.INVESTIGATE)
+                and observation is not None
+                and guard.actor_id in {entity.actor_id for entity in observation.visible_entities}
+                for guard in snapshot.guards
+            )
+            if snapshot
+            else False,
         )
 
     def report(self) -> dict[str, object]:

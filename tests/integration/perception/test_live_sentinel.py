@@ -22,6 +22,19 @@ def simulation(
     )
 
 
+def test_timed_sprint_is_audible_while_light_walk_stays_local(rules: GameRules) -> None:
+    walk = simulation(rules, (3, 6))
+    run = simulation(rules, (3, 6))
+    walk.step((Action("operative", ActionKind.MOVE, 0, direction=(0, 1)),))
+    run.step((Action("operative", ActionKind.MOVE, 0, direction=(0, 1), sprint=True),))
+    assert not walk.observe("sentinel").heard_events
+    heard = run.observe("sentinel").heard_events
+    assert any(cue.kind == "SPRINT" and cue.tile == (3, 6) for cue in heard)
+    run.step()  # controller consumes the last committed observation on its next tick
+    guard = run.presentation_snapshot().guards[0]
+    assert guard.state == GuardState.INVESTIGATE
+
+
 def test_bfs_patrol_is_physical_and_unseen_position_cannot_change_decisions(
     rules: GameRules,
 ) -> None:

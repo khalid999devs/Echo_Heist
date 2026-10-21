@@ -19,8 +19,14 @@ from echo_heist.ui.render.actors.model import (
     position_at,
 )
 from echo_heist.ui.render.camera import Camera
-from echo_heist.ui.render.environment.art import clinical_props, laboratory_props, sprite_grid
+from echo_heist.ui.render.environment.art import (
+    clinical_props,
+    laboratory_props,
+    research_props,
+    sprite_grid,
+)
 from echo_heist.ui.render.environment.furnishings.catalogue import FurnitureVisual, draw_instrument
+from echo_heist.ui.render.environment.furnishings.story import paint_room_story
 from echo_heist.ui.render.environment.interiors import draw_details, draw_room_trim, room_floors
 from echo_heist.ui.render.environment.lighting import bake_lighting, draw_equipment
 from echo_heist.ui.render.surfaces.formats import opaque_surface
@@ -84,7 +90,7 @@ class WorldArt:
         return cls(
             floor,
             bulkhead,
-            props + laboratory_props() + clinical_props(),
+            props + laboratory_props() + clinical_props() + research_props(),
             sprite_grid(
                 "assets/characters/operative-directions.png",
                 4,
@@ -161,17 +167,6 @@ def _roof_tile(
             (rect.right - 8, rect.top + 11),
             1,
         )
-
-
-def _decorate_cover(surface: pygame.Surface, level: LevelData, art: WorldArt) -> None:
-    """Illustrate physical cover cells without placing furnishings on closed roofs."""
-    size = level.static_map.tile_size_px
-    for x, y in sorted(level.cover_tiles):
-        rect = pygame.Rect(x * size, y * size, size, size).inflate(-4, -4)
-        fitted = art.props[3].get_rect().fit(rect)
-        fitted.midbottom = rect.midbottom
-        prop = pygame.transform.smoothscale(art.props[3], fitted.size)
-        surface.blit(prop, fitted)
 
 
 def _floor_shadows(surface: pygame.Surface, level: LevelData) -> None:
@@ -260,7 +255,10 @@ def build_map_surface(
                 motifs.floor_tile(surface, rect, zone_id, variant, texture=floor_texture)
                 motifs.glass_tile(surface, rect)
             elif tile in level.cover_tiles:
-                motifs.cover_tile(surface, rect, variant)
+                if art:
+                    motifs.floor_tile(surface, rect, zone_id, variant, texture=floor_texture)
+                else:
+                    motifs.cover_tile(surface, rect, variant)
             elif world_map.can_walk(tile):
                 motifs.floor_tile(surface, rect, zone_id, variant, texture=floor_texture)
             else:
@@ -282,8 +280,7 @@ def build_map_surface(
     _floor_shadows(surface, level)
     bake_lighting(surface, level)
     draw_details(surface, level, art.props[11] if art else None)
-    if art is not None:
-        _decorate_cover(surface, level, art)
+    paint_room_story(surface, level)
     draw_room_trim(surface, level, fonts)
     anchors = {obj.object_id: obj.tile for obj in world_map.objects}
     for object_id, painter in (

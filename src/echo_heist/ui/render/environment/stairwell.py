@@ -7,6 +7,7 @@ import pygame
 from echo_heist.core.contracts.results import StairView
 from echo_heist.ui.render.environment.art import image
 from echo_heist.ui.render.hud import panel
+from echo_heist.ui.render.layout.viewport import interface_canvas
 from echo_heist.ui.render.theme import ACCENT, MUTED, TEXT, Fonts
 
 
@@ -39,6 +40,7 @@ class Stairwell:
         shade = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
         shade.fill((2, 9, 15, 145))
         canvas.blit(shade, (0, 0))
+        canvas = interface_canvas(canvas)
         panel(canvas, rect.inflate(4, 4), border=ACCENT)
         canvas.blit(self.scene, rect)
         ascending = current.destination[0] > current.source[0]

@@ -50,8 +50,11 @@ def draw_settings(
     settings: Settings,
     selected: int,
     clock_ms: int,
+    *,
+    paint_background: bool = True,
 ) -> None:
-    draw_scene(canvas, backdrop, clock_ms, reduced_motion=settings.reduced_flashing)
+    if paint_background:
+        draw_scene(canvas, backdrop, clock_ms, reduced_motion=settings.reduced_flashing)
     canvas.blit(fonts.micro.render("ECHO HEIST / PREFERENCES", True, theme.ACCENT), (44, 35))
     canvas.blit(fonts.title.render("SETTINGS", True, theme.TEXT), (40, 69))
     panel(canvas, pygame.Rect(44, 184, 520, 440), fill=(5, 18, 28, 227), border=theme.BORDER)

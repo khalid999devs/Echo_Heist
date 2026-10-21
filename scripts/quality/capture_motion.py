@@ -76,11 +76,18 @@ def main() -> int:
     room_output = args.output / "room-previews"
     room_output.mkdir(exist_ok=True)
     size = flow.level.static_map.tile_size_px
-    for room in flow.level.rooms:
+    preview_targets = [
+        (room.room_id, room.label, room.left + room.width / 2, room.top + room.height / 2)
+        for room in flow.level.rooms
+    ]
+    preview_targets.extend(
+        (marker.marker_id, "Prepared hiding recess / P05 interaction pending", *marker.tile)
+        for marker in flow.level.markers
+        if marker.kind == "HideSpot"
+    )
+    for preview_id, label, x, y in preview_targets:
         camera = Camera(1280, 720, *flow.map_surface.get_size())
-        camera.follow(
-            ((room.left + room.width / 2) * size, (room.top + room.height / 2) * size), 0, snap=True
-        )
+        camera.follow((x * size, y * size), 0, snap=True)
         canvas.blit(flow.map_surface, camera.to_screen((0, 0)))
         for item in flow.furnishings:
             feet = camera.to_screen(item.footprint.midbottom)
@@ -91,12 +98,12 @@ def main() -> int:
         for item in flow.furnishings:
             draw_instrument(canvas, item, camera, 0)
         canvas.blit(
-            flow.fonts.small.render("ROOM ART REVIEW / " + room.label, True, (230, 244, 247)),
+            flow.fonts.small.render("ROOM ART REVIEW / " + label, True, (230, 244, 247)),
             (24, 24),
         )
         screen.blit(canvas, (0, 0))
         pygame.display.flip()
-        pygame.image.save(canvas, str(room_output / f"{room.room_id}.png"))
+        pygame.image.save(canvas, str(room_output / f"{preview_id}.png"))
     report = {
         "video_driver": pygame.display.get_driver(),
         "frames": frame_number,
@@ -106,6 +113,7 @@ def main() -> int:
         "tile_size_px": flow.level.static_map.tile_size_px,
         "viewport_tiles": [1280 / size, 720 / size],
         "architectural_preview_rooms": len(flow.level.rooms),
+        "prepared_hiding_previews": len(preview_targets) - len(flow.level.rooms),
         "draw_ms": {"median": round(median(timings), 2), "max": round(max(timings), 2)},
         "scope": "Native visual fixture with security disabled; mission wins use capture_scenes.",
     }

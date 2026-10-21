@@ -172,7 +172,9 @@ def test_furniture_has_matching_physical_opaque_acoustic_footprints() -> None:
     assert reversed_level.sound_blocking_tiles == level.sound_blocking_tiles
 
 
-@pytest.mark.parametrize("invalid", ["overlap", "bounds", "untagged", "patrol", "rotated"])
+@pytest.mark.parametrize(
+    "invalid", ["overlap", "bounds", "untagged", "patrol", "rotated", "appearance", "condition"]
+)
 def test_invalid_furniture_cannot_silently_break_physical_room(invalid: str) -> None:
     data = packaged()
     fixture = named(data, "markers", "entry-console")
@@ -186,10 +188,28 @@ def test_invalid_furniture_cannot_silently_break_physical_room(invalid: str) -> 
         ]
     elif invalid == "rotated":
         fixture["rotation"] = 90
+    elif invalid in ("appearance", "condition"):
+        fixture["properties"].append({"name": invalid, "type": "string", "value": "unknown"})
     else:
         fixture["x"], fixture["y"] = 17 * data["tilewidth"], 20 * data["tilewidth"]
     with pytest.raises(MapFormatError):
         load_tiled_map(json.dumps(data))
+
+
+def test_prepared_hide_recesses_have_access_and_stay_off_patrol_lanes() -> None:
+    level = load_tiled_map(resource_bytes(f"data/maps/{MAP_ID}.json"))
+    from echo_heist.ai.navigation.grid import bfs
+
+    patrol = {tile for route in level.routes for tile in route.tiles()}
+    spots = [marker for marker in level.markers if marker.kind == "HideSpot"]
+    assert len(spots) == 5
+    for spot in spots:
+        assert spot.tile not in patrol
+        assert bfs(level.static_map, level.spawn_tile, spot.tile).path
+        assert any(
+            (spot.tile[0] + dx, spot.tile[1] + dy) in level.static_map.opaque_tiles
+            for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0))
+        )
 
 
 def test_compact_facility_and_stair_gangways_keep_accessible_aisles() -> None:

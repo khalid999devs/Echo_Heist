@@ -1,5 +1,7 @@
 # Current development status
 
+Latest 2026-10-22 scene refinement: [responsive display, facility and audio](../quality/reports/facility_finish/REVIEW.md), [runnable handoff](handoffs/khalid/presentation/SCENE_FINISH.md). 127 behavior cases, strict types over 97 source files, native route/capture sweep, 30 responsive states and 19 room/recess previews pass. Final packaging/hosted results for this expanded scope are recorded independently in [BUILD.json](../quality/reports/facility_finish/verification/BUILD.json); earlier build rows below describe their exact older revisions until superseded. P03-P08 and Windows interactive QA remain open.
+
 Updated: 2026-10-22, Asia/Dhaka.
 
 Active target: complete working initial draft in **eight phases over four development days**. Day 1 implementation started on 2026-10-18. Owners: Khalid and Suhita; estimated allocation 80 points each. P01 and the complete Human P02 gate are DONE after user-directed integration review of Suhita's branch. A first P03 Sentinel/perception subset is now implemented; shared P03 and P04-P08 remain open.

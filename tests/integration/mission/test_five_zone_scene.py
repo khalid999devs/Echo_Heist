@@ -104,16 +104,25 @@ def test_real_scene_capture_reaches_result_and_retry() -> None:
     assert flow.scene == Scene.HEIST and flow.session.simulation.tick == 0
 
 
-def test_mouse_menu_and_letterbox_coordinates() -> None:
+def test_mouse_menu_and_responsive_coordinates() -> None:
     pygame.font.init()
-    flow = GameFlow((1280, 720))
+    flow = GameFlow((1280, 1440))
     target = TITLE_BUTTONS[0].center
     click = pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(target[0], target[1] + 360))
-    mapped = _logical_events([click], (1280, 1440), (1280, 720))
-    assert mapped[0].pos == target
+    mapped = _logical_events([click], (1280, 1440), (1280, 1440))
+    assert mapped[0].pos == (target[0], target[1] + 360)
     flow.frame(mapped, 0)
     assert flow.scene == Scene.MODE
-    flow.frame([pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=LAUNCH_BUTTON.center)], 0)
+    flow.frame(
+        [
+            pygame.event.Event(
+                pygame.MOUSEBUTTONDOWN,
+                button=1,
+                pos=(LAUNCH_BUTTON.centerx, LAUNCH_BUTTON.centery + 360),
+            )
+        ],
+        0,
+    )
     assert flow.scene == Scene.HEIST
 
 

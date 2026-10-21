@@ -46,8 +46,8 @@ TITLE_BUTTONS = (
 LAUNCH_BUTTON = pygame.Rect(620, 548, 576, 54)
 BACK_BUTTON = pygame.Rect(44, 650, 130, 42)
 MODE_BUTTONS = (
-    pygame.Rect(620, 212, 280, 114),
-    pygame.Rect(916, 212, 280, 114),
+    pygame.Rect(620, 236, 280, 104),
+    pygame.Rect(916, 236, 280, 104),
     LAUNCH_BUTTON,
     BACK_BUTTON,
 )
@@ -61,9 +61,14 @@ def load_backdrop(
 ) -> pygame.Surface:
     """Perspective 3D-rendered chamber artwork bundled with the game."""
     art = pygame.image.load(BytesIO(resource_bytes(path)), path)
-    return pygame.transform.smoothscale(
-        art, (size[0] + 2 * BACKDROP_PAD, size[1] + 2 * BACKDROP_PAD)
+    target = size[0] + 2 * BACKDROP_PAD, size[1] + 2 * BACKDROP_PAD
+    scale = max(target[0] / art.get_width(), target[1] / art.get_height())
+    fitted = pygame.transform.smoothscale(
+        art, (round(art.get_width() * scale), round(art.get_height() * scale))
     )
+    return fitted.subsurface(
+        fitted.get_rect().inflate(target[0] - fitted.get_width(), target[1] - fitted.get_height())
+    ).copy()
 
 
 def move_selection(index: int, items: tuple[MenuItem, ...], key: int) -> int:
@@ -99,8 +104,10 @@ def _frame(
     reduced_motion: bool,
     *,
     briefing: bool,
+    paint_background: bool = True,
 ) -> None:
-    draw_scene(canvas, backdrop, clock_ms, reduced_motion=reduced_motion)
+    if paint_background:
+        draw_scene(canvas, backdrop, clock_ms, reduced_motion=reduced_motion)
     _text(canvas, fonts.micro, "NEXUS RESEARCH  /  SITE A1", theme.ACCENT, (44, 35))
     _text(canvas, fonts.title, "ECHO HEIST", theme.TEXT, (40, 69))
     _text(
@@ -249,7 +256,7 @@ def _briefing(
         (64, 578),
     )
     panel(canvas, pygame.Rect(600, 184, 616, 440), fill=(5, 18, 28, 219), border=theme.BORDER)
-    _text(canvas, fonts.micro, "PLAY MODE", theme.MUTED, (620, 187))
+    _text(canvas, fonts.micro, "PLAY MODE", theme.MUTED, (620, 204))
     for index, item in enumerate(MODE_ITEMS[:2]):
         rect = MODE_BUTTONS[index]
         chosen = index == mode_choice
@@ -298,9 +305,18 @@ def draw_menu(
     reduced_motion: bool = False,
     mode_choice: int = 0,
     report_available: bool = False,
+    paint_background: bool = True,
 ) -> None:
     briefing = scene == "MODE"
-    _frame(canvas, backdrop, fonts, clock_ms, reduced_motion, briefing=briefing)
+    _frame(
+        canvas,
+        backdrop,
+        fonts,
+        clock_ms,
+        reduced_motion,
+        briefing=briefing,
+        paint_background=paint_background,
+    )
     if not briefing:
         _chapter_card(canvas, fonts, backdrop, selected, clock_ms)
         for index, label in enumerate(("REPORT", "SETTINGS", "QUIT"), 1):
@@ -367,10 +383,6 @@ def draw_results(
         RunOutcome.CAPTURED: theme.DANGER,
         RunOutcome.ABORTED: theme.WARNING,
     }[end.outcome]
-    if end.outcome == RunOutcome.CAPTURED:
-        warning = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
-        warning.fill((75, 8, 10, 28))
-        canvas.blit(warning, (0, 0))
     _text(canvas, fonts.micro, "CHAPTER 01  /  MISSION REPORT", color, (660, 115))
     pygame.draw.line(canvas, color, (660, 148), (1212, 148), 2)
     headline = {

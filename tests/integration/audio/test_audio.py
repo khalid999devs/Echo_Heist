@@ -7,7 +7,7 @@ import pytest
 
 from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.world import MissionPhase
-from echo_heist.ui.audio.director import AudioDirector
+from echo_heist.ui.audio.director import AudioDirector, event_cue
 from echo_heist.ui.audio.model import AudioFrame
 from echo_heist.ui.scenes.flow import GameFlow, Scene
 
@@ -17,7 +17,7 @@ def test_shipped_audio_context_deduplication_pause_and_mix(monkeypatch: pytest.M
     pygame.mixer.init()
     try:
         audio = AudioDirector(enabled=True)
-        assert audio.report()["audio_assets_loaded"] == 16
+        assert audio.report()["audio_assets_loaded"] == 29
         assert all(sound.get_length() > 0 for sound in audio.sounds.values())
         frame = AudioFrame("TITLE", "0", 0)
         audio.update(frame, 0)
@@ -41,14 +41,50 @@ def test_shipped_audio_context_deduplication_pause_and_mix(monkeypatch: pytest.M
         assert pygame.mixer.Channel(2).get_volume() == 0
         audio.update(replace(heist, paused=True), 20)
         assert 0 < pygame.mixer.music.get_volume() < normal_music
-        audio.update(replace(heist, run_id=2), 20)
-        assert audio.cues_played == count + 3  # event IDs may recur in a genuinely new attempt
+        before_reset = audio.cues_played
+        audio.update(replace(heist, run_id=2, paused=True), 20)
+        assert audio.cues_played == before_reset + 3  # new attempt may reuse event IDs
         audio.volumes(0.0, 0.7)
         audio.update(replace(heist, run_id=2), 20)
         assert pygame.mixer.music.get_volume() == 0
         audio.update(AudioFrame("WORKSHOP", "0", 2, MissionPhase.LOCKDOWN), 300)
         assert not pygame.mixer.Channel(2).get_busy()
         assert audio.current_music == "title"
+    finally:
+        pygame.mixer.quit()
+
+
+def test_quiet_walk_loud_sprint_and_unheard_events_do_not_leak(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    walk = GameEvent("w", 1, EventKind.NOISE_CREATED, "operative", (("kind", "FOOTSTEP"),))
+    sprint = replace(walk, event_id="s", details=(("kind", "SPRINT"),))
+    walk_cue, sprint_cue = event_cue(walk), event_cue(sprint)
+    assert walk_cue is not None and sprint_cue is not None
+    assert walk_cue[0].startswith("walk-") and sprint_cue[1] > 4 * walk_cue[1]
+    monkeypatch.setenv("SDL_AUDIODRIVER", "dummy")
+    pygame.mixer.init()
+    try:
+        audio = AudioDirector(enabled=True)
+        frame = AudioFrame("HEIST", "0", 1, MissionPhase.INFILTRATE)
+        audio.update(frame, 0)
+        hidden = replace(sprint, event_id="foreign-1", actor_id="companion")
+        before = audio.cues_played
+        audio.update(replace(frame, events=(hidden,)), 20)
+        assert audio.cues_played == before
+        heard = replace(hidden, event_id="foreign-2")
+        audio.update(
+            replace(frame, events=(heard,), audible_event_ids=frozenset({heard.event_id})), 20
+        )
+        assert audio.cues_played == before + 1
+        audio.update(replace(frame, sprint_recharge_remaining=1), 20)
+        audio.update(frame, 20)
+        ready_count = audio.cues_played
+        assert ready_count == before + 2
+        audio.update(frame, 100)
+        assert audio.cues_played == ready_count
+        audio.update(replace(frame, scene="TITLE"), 300)
+        assert not pygame.mixer.Channel(3).get_busy()
     finally:
         pygame.mixer.quit()
 

@@ -26,7 +26,31 @@ FURNITURE_STYLES = frozenset(
 ROOM_STYLES = frozenset(
     {"reception", "storage", "maintenance", "server", "office", "laboratory", "reactor"}
 )
-DETAIL_STYLES = frozenset({"stairs", "grate", "cables", "threshold"})
+DETAIL_STYLES = frozenset({"stairs", "grate", "cables", "threshold", "aftermath", "utility"})
+FURNITURE_APPEARANCES = frozenset(
+    {
+        "standard",
+        "centrifuge",
+        "spectrometer",
+        "fume-hood",
+        "freezer",
+        "vacuum",
+        "robot-arm",
+        "cable-cabinet",
+        "screen",
+        "sample-drawers",
+        "coolant",
+        "security-console",
+        "reagents",
+        "displaced-chair",
+        "abandoned-station",
+        "sample-cart",
+        "broken-console",
+        "wilted-plant",
+        "unfinished-bench",
+    }
+)
+FURNITURE_CONDITIONS = frozenset({"kept", "used", "dusty", "interrupted"})
 
 
 @dataclass(frozen=True, slots=True)

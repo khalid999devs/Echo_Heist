@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-10-22 - Responsive display and interrupted research
+
+- Filled native fullscreen/resized displays with a variable viewport and proportionate interface safe area; corrected briefing padding and shared pointer mapping, including paused Settings/map navigation.
+- Added purpose-specific scientific equipment, one-keyboard dual-monitor desks, abandoned stations, selective clutter/scuffs/dust, varied plants and perimeter services. Prepared five off-patrol hiding recesses without inventing P05 concealment. Cached sheared shadows retain realistic floor width.
+- Replaced four music contexts with licensed CC0 cyberpunk tracks, softened walking, kept sprint clearly louder and connected bounded micro feedback/ventilation. Foreign tactical audio respects heard observations; sprint hearing leads to real suspicion. Scoring and later phase gates are unchanged.
+- 127 behavior cases, strict types over 97 source files, native 48-state route/capture sweep, 30 responsive states, 378 motion frames and 19 room/recess previews pass. [Review/build evidence](../quality/reports/facility_finish/REVIEW.md), [runnable handoff](handoffs/khalid/presentation/SCENE_FINISH.md).
+
 ## 2026-10-22 - Closer camera and grounded lab detail
 
 - Tightened native gameplay to 13⅓×7½ tiles, enlarged the operative, added distance-driven directional walk/run cycles, render interpolation and foot-pivot shadows. Simulation speeds/ranges/scoring remain unchanged.

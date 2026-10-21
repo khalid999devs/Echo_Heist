@@ -16,6 +16,7 @@ from echo_heist.infrastructure.persistence.settings import (
 )
 from echo_heist.infrastructure.resources import load_bootstrap_config, resource_bytes
 from echo_heist.ui.audio.director import AudioDirector
+from echo_heist.ui.render.layout.viewport import logical_size_for
 from echo_heist.ui.render.surfaces.formats import opaque_surface
 from echo_heist.ui.scenes.flow import GameFlow
 
@@ -25,14 +26,9 @@ def _logical_events(
     window_size: tuple[int, int],
     logical_size: tuple[int, int],
 ) -> list[pygame.event.Event]:
-    """Translate pointer coordinates through the letterbox used for rendering."""
+    """Map window coordinates into the full responsive render surface."""
     width, height = window_size
     logical_width, logical_height = logical_size
-    scale = min(width / logical_width, height / logical_height)
-    rendered_width = max(1, int(logical_width * scale))
-    rendered_height = max(1, int(logical_height * scale))
-    offset_x = (width - rendered_width) // 2
-    offset_y = (height - rendered_height) // 2
     mapped: list[pygame.event.Event] = []
     for event in events:
         if event.type not in (pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP):
@@ -40,8 +36,8 @@ def _logical_events(
             continue
         x, y = event.pos
         point = (
-            floor((x - offset_x) * logical_width / rendered_width),
-            floor((y - offset_y) * logical_height / rendered_height),
+            floor(x * logical_width / max(1, width)),
+            floor(y * logical_height / max(1, height)),
         )
         mapped.append(pygame.event.Event(event.type, {**event.dict, "pos": point}))
     return mapped
@@ -66,7 +62,10 @@ def run_desktop(
         pygame.display.init()
         pygame.font.init()
         flags = pygame.FULLSCREEN if settings.fullscreen else pygame.RESIZABLE
-        screen = pygame.display.set_mode((settings.window_width, settings.window_height), flags)
+        screen = pygame.display.set_mode(
+            (0, 0) if settings.fullscreen else (settings.window_width, settings.window_height),
+            flags,
+        )
         pygame.display.set_caption(config.title)
         mark = pygame.image.load(BytesIO(resource_bytes("assets/branding/mark.svg")), "mark.svg")
         pygame.display.set_icon(mark)
@@ -78,8 +77,9 @@ def run_desktop(
                 audio_state = "ready"
             except pygame.error:
                 audio_state = "unavailable; continuing silently"
-        canvas = opaque_surface((config.logical_width, config.logical_height))
-        flow = GameFlow((config.logical_width, config.logical_height), settings=settings)
+        logical_size = logical_size_for(screen.get_size())
+        canvas = opaque_surface(logical_size)
+        flow = GameFlow(logical_size, settings=settings)
         audio = AudioDirector(
             enabled=audio_state == "ready",
             music_volume=settings.music_volume,
@@ -89,7 +89,11 @@ def run_desktop(
         clock = pygame.time.Clock()
         elapsed_ms = 0
         while flow.running:
-            logical_size = (config.logical_width, config.logical_height)
+            new_size = logical_size_for(screen.get_size())
+            if new_size != logical_size:
+                logical_size = new_size
+                canvas = opaque_surface(logical_size)
+                flow.resize(logical_size)
             events = _logical_events(
                 pygame.event.get(), pygame.display.get_window_size(), logical_size
             )
@@ -106,17 +110,16 @@ def run_desktop(
                 screen = pygame.display.set_mode(
                     dimensions, pygame.FULLSCREEN if display_fullscreen else pygame.RESIZABLE
                 )
+                logical_size = logical_size_for(screen.get_size())
+                canvas = opaque_surface(logical_size)
+                flow.resize(logical_size)
             flow.draw(canvas)
             width, height = screen.get_size()
-            scale = min(width / config.logical_width, height / config.logical_height)
-            size = (
-                max(1, int(config.logical_width * scale)),
-                max(1, int(config.logical_height * scale)),
-            )
-            screen.fill(config.background)
             screen.blit(
-                canvas if size == logical_size else pygame.transform.smoothscale(canvas, size),
-                ((width - size[0]) // 2, (height - size[1]) // 2),
+                canvas
+                if (width, height) == logical_size
+                else pygame.transform.smoothscale(canvas, (width, height)),
+                (0, 0),
             )
             pygame.display.flip()
             frames += 1
@@ -130,10 +133,15 @@ def run_desktop(
             )
             pygame.image.save(rgb, str(screenshot))
         actual_size = screen.get_size()
+        windowed_size = (
+            (flow.settings.window_width, flow.settings.window_height)
+            if display_fullscreen
+            else actual_size
+        )
         saved_settings = replace(
             flow.settings,
-            window_width=max(MIN_WINDOW_SIZE[0], min(actual_size[0], MAX_WINDOW_SIZE[0])),
-            window_height=max(MIN_WINDOW_SIZE[1], min(actual_size[1], MAX_WINDOW_SIZE[1])),
+            window_width=max(MIN_WINDOW_SIZE[0], min(windowed_size[0], MAX_WINDOW_SIZE[0])),
+            window_height=max(MIN_WINDOW_SIZE[1], min(windowed_size[1], MAX_WINDOW_SIZE[1])),
         )
         saved = store.save(saved_settings)
         return {
@@ -142,6 +150,8 @@ def run_desktop(
             "frames": frames,
             "video_driver": pygame.display.get_driver(),
             "window_size": list(actual_size),
+            "logical_viewport": list(logical_size),
+            "fullscreen": pygame.display.is_fullscreen(),
             "audio": audio_state,
             **audio.report(),
             "resources_loaded": True,

@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 from functools import lru_cache
-from math import cos, radians, sin
 
 import pygame
 
@@ -18,22 +17,21 @@ def cast_shadow(sprite: pygame.Surface) -> GroundShadow:
     silhouette = pygame.mask.from_surface(sprite, 50).to_surface(
         setcolor=(0, 3, 7, 85), unsetcolor=(0, 0, 0, 0)
     )
-    # Project the upright silhouette onto the ground, away from the key light.
-    ground = pygame.transform.smoothscale(
-        silhouette, (sprite.get_width(), max(10, sprite.get_height() // 3))
-    )
-    # The sprite's feet are at bottom-centre. Flip the flattened silhouette so
-    # that its feet are at top-centre before turning it away from the key light.
-    angle = 55
-    projected = pygame.transform.rotate(pygame.transform.flip(ground, False, True), angle)
-    padded = pygame.Surface(
-        (projected.get_width() + 12, projected.get_height() + 12), pygame.SRCALPHA
-    )
-    padded.blit(projected, (6, 6))
-    pivot = (
-        round(projected.get_width() / 2 - ground.get_height() / 2 * sin(radians(angle))) + 6,
-        round(projected.get_height() / 2 - ground.get_height() / 2 * cos(radians(angle))) + 6,
-    )
+    # Shear height onto the floor while preserving horizontal ground width.
+    # Rotating the complete flattened picture turns a broad desk sideways and
+    # produces an implausibly long diagonal shadow.
+    width, height = sprite.get_size()
+    depth, sideways = max(10, height // 3), max(8, height // 5)
+    padded = pygame.Surface((width + sideways + 12, depth + 12), pygame.SRCALPHA)
+    for row in range(height):
+        distance = (height - 1 - row) / max(1, height - 1)
+        strip = silhouette.subsurface((0, row, width, 1))
+        padded.blit(
+            strip,
+            (6 + round(sideways * distance), 6 + round(depth * distance)),
+            special_flags=pygame.BLEND_RGBA_MAX,
+        )
+    pivot = (width // 2 + 6, 6)
     return GroundShadow(pygame.transform.gaussian_blur(padded, 2), pivot)
 
 

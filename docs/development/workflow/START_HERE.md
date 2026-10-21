@@ -1,5 +1,7 @@
 # Start or resume developer work
 
+Latest presentation baseline: [responsive facility handoff](../tracking/handoffs/khalid/presentation/SCENE_FINISH.md), [actual review/build evidence](../quality/reports/facility_finish/REVIEW.md). Retrieve its variable viewport/pointer, appearance/condition, hiding-marker and audio contracts before modifying scene consumers. Remaining phase gates are unchanged.
+
 This is the operational entry point for either developer's coding agent. The goal is a complete working initial V1 draft in eight phases over four development days. P01 and P02 are implemented; retrieve the [actual P02 integrated handoff](../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md). P03 has a first verified Sentinel subset; P04-P08 are pending; inspect current tracking/code before assuming later modules exist.
 
 ## Resolve the developer once

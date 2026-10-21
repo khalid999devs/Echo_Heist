@@ -102,3 +102,58 @@ def laboratory_props() -> tuple[pygame.Surface, ...]:
     )
     cells = (sheet.subsurface(rect) for rect in regions)
     return tuple(cell.subsurface(cell.get_bounding_rect(min_alpha=24)) for cell in cells)
+
+
+def research_props() -> tuple[pygame.Surface, ...]:
+    """Measured transparent source regions; keep large equipment fully inside its crop."""
+    kits = (
+        (
+            "instruments",
+            (
+                (0, 0, 455, 480),
+                (455, 0, 600, 480),
+                (1055, 0, 481, 480),
+                (40, 480, 400, 544),
+                (465, 480, 565, 544),
+                (1030, 480, 506, 544),
+            ),
+        ),
+        (
+            "utility",
+            (
+                (0, 0, 520, 490),
+                (520, 0, 535, 490),
+                (1055, 0, 481, 490),
+                (0, 490, 450, 534),
+                (450, 490, 560, 534),
+                (1010, 490, 526, 534),
+            ),
+        ),
+        ("dual-console", None),
+        (
+            "aftermath",
+            (
+                (0, 0, 455, 510),
+                (455, 0, 630, 510),
+                (1085, 0, 451, 510),
+                (0, 510, 550, 514),
+                (550, 510, 410, 514),
+                (960, 510, 576, 514),
+            ),
+        ),
+        ("hiding-recess", None),
+    )
+    result = []
+    for name, regions in kits:
+        sheet = image(f"assets/tiles/laboratory/{name}.png")
+        cells = [sheet] if regions is None else [sheet.subsurface(rect) for rect in regions]
+        for cell in cells:
+            mask = pygame.mask.from_surface(cell, 64).connected_component()
+            clean = cell.copy()
+            clean.blit(
+                mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0, 0, 0, 0)),
+                (0, 0),
+                special_flags=pygame.BLEND_RGBA_MULT,
+            )
+            result.append(clean.subsurface(clean.get_bounding_rect(min_alpha=32)))
+    return tuple(result)

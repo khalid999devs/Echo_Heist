@@ -9,6 +9,8 @@ from echo_heist.core.contracts.world import ActorKind, MapObject, Scalar, StairL
 from echo_heist.level.io.validate import check_level
 from echo_heist.level.model import (
     DETAIL_STYLES,
+    FURNITURE_APPEARANCES,
+    FURNITURE_CONDITIONS,
     FURNITURE_STYLES,
     GUARD_KINDS,
     ROOM_STYLES,
@@ -258,6 +260,10 @@ def _apply_furniture(raw: RawMap) -> None:
             raise MapFormatError(f"{obj.object_id!r}: furniture overlaps existing solid geometry")
         if obj.properties.get("style") not in FURNITURE_STYLES:
             raise MapFormatError(f"{obj.object_id!r}: unknown furniture style")
+        if obj.properties.get("appearance", "standard") not in FURNITURE_APPEARANCES:
+            raise MapFormatError(f"{obj.object_id!r}: unknown furniture appearance")
+        if obj.properties.get("condition", "used") not in FURNITURE_CONDITIONS:
+            raise MapFormatError(f"{obj.object_id!r}: unknown furniture condition")
         rotation = obj.properties.get("rotation", 0)
         if type(rotation) is not int or rotation not in (0, 90, 180, 270):
             raise MapFormatError(f"{obj.object_id!r}: unsupported furniture rotation")

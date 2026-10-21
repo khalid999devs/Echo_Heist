@@ -434,6 +434,95 @@ def furnish(facility: Facility) -> None:
             )
 
 
+def dress_research(facility: Facility) -> None:
+    """Authored station roles and interrupted work, separate from physical layout."""
+    appearances = {
+        "screening-1": "security-console",
+        "screening-equipment-2": "broken-console",
+        "power-equipment-2": "broken-console",
+        "power-1": "vacuum",
+        "repair-1": "cable-cabinet",
+        "repair-equipment-2": "coolant",
+        "repair-equipment-3": "displaced-chair",
+        "logistics-1": "sample-drawers",
+        "logistics-3": "cable-cabinet",
+        "checkpoint-1": "security-console",
+        "checkpoint-3": "security-console",
+        "control-1": "security-console",
+        "control-2": "abandoned-station",
+        "control-3": "security-console",
+        "control-equipment-3": "broken-console",
+        "wet-lab-2": "fume-hood",
+        "wet-lab-3": "unfinished-bench",
+        "wet-lab-equipment-1": "spectrometer",
+        "wet-lab-equipment-2": "centrifuge",
+        "bio-lab-1": "reagents",
+        "bio-lab-equipment-1": "abandoned-station",
+        "bio-lab-equipment-2": "freezer",
+        "lab-stores-1": "sample-drawers",
+        "lab-stores-2": "freezer",
+        "lab-stores-equipment-2": "sample-cart",
+        "electronics-1": "robot-arm",
+        "electronics-3": "spectrometer",
+        "electronics-equipment-2": "displaced-chair",
+        "coolant-2": "vacuum",
+        "coolant-equipment-2": "coolant",
+        "reactor-1": "security-console",
+        "reactor-equipment-4": "sample-cart",
+        "reception-4": "wilted-plant",
+        "power-4": "wilted-plant",
+        "lab-stores-4": "wilted-plant",
+        "electronics-4": "wilted-plant",
+    }
+    for obj in facility.markers:
+        if obj["type"] != "Furniture":
+            continue
+        name = obj["name"]
+        appearance = appearances.get(name, "standard")
+        condition = (
+            "kept"
+            if name.startswith(("reception", "entry", "checkpoint"))
+            else "interrupted"
+            if appearance
+            in ("abandoned-station", "unfinished-bench", "broken-console", "displaced-chair")
+            else "dusty"
+            if name.startswith(("power", "repair", "lab-stores"))
+            else "used"
+        )
+        obj["properties"].extend(
+            (
+                {"name": "appearance", "type": "string", "value": appearance},
+                {"name": "condition", "type": "string", "value": condition},
+            )
+        )
+        if appearance == "displaced-chair":
+            for prop in obj["properties"]:
+                if prop["name"] in ("blocks_vision", "blocks_sound"):
+                    prop["value"] = False
+    for name, x, y, width, height in (
+        ("entry-disruption", 7, 24, 2, 2),
+        ("screening-scuffle", 5, 15, 2, 2),
+        ("repair-unfinished", 17, 26, 2, 2),
+        ("control-abandoned", 42, 9, 2, 2),
+        ("analysis-spill", 34, 25, 2, 2),
+        ("biology-interrupted", 43, 24, 2, 2),
+        ("archive-notes", 34, 35, 2, 1),
+        ("instrument-work", 43, 34, 2, 2),
+        ("core-scuffs", 54, 24, 2, 2),
+        ("coolant-work", 58, 14, 2, 2),
+    ):
+        facility.detail(name, "aftermath", x, y, width, height)
+    for name, x, y, width, height in (
+        ("power-trunk", 15, 8, 1, 8),
+        ("repair-trunk", 15, 23, 1, 8),
+        ("analysis-return", 32, 21, 1, 7),
+        ("biology-return", 40, 21, 1, 7),
+        ("containment-supply", 51, 16, 10, 1),
+        ("core-supply", 51, 28, 10, 1),
+    ):
+        facility.detail(name, "utility", x, y, width, height)
+
+
 def anchors_and_patrols(facility: Facility) -> None:
     for name, kind, tile in (
         ("entry-spawn", "Spawn", (5, 24)),
@@ -480,11 +569,11 @@ def anchors_and_patrols(facility: Facility) -> None:
     # Stable marker IDs for P05, beside actual cover rather than decorative walls.
     for index, (cover, hide) in enumerate(
         (
-            ((20, 19), (20, 20)),
-            ((26, 25), (26, 26)),
-            ((36, 15), (36, 14)),
+            ((20, 19), (20, 18)),
+            ((26, 25), (29, 26)),
+            ((36, 15), (35, 15)),
             ((44, 28), (44, 29)),
-            ((53, 23), (53, 24)),
+            ((53, 23), (50, 24)),
         ),
         1,
     ):
@@ -609,6 +698,7 @@ def main() -> None:
     facility = Facility()
     architecture(facility)
     furnish(facility)
+    dress_research(facility)
     anchors_and_patrols(facility)
     write_map(export(facility))
     print(f"Authored {len(ROOMS)} rooms; exported {TARGET.relative_to(ROOT)}")

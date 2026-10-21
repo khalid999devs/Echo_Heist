@@ -1,5 +1,7 @@
 # Khalid's agent guide
 
+Latest user-directed scene handoff: [responsive display, facility and audio](../../tracking/handoffs/khalid/presentation/SCENE_FINISH.md). It supersedes prior fixed-aspect/audio/HideSpot coordinates; [actual evidence](../../quality/reports/facility_finish/REVIEW.md) records what was verified. Resume remaining P03 from this baseline; presentation completion does not close the shared phase gate.
+
 Identity: Khalid, the project owner in this conversation. Focus: software architecture, system design, core/AI strategy and logic, with real input/diagnostics/result presentation work. Estimated workload: 80 of 160 points. P01 is entirely yours.
 
 Follow [startup/context retrieval](../START_HERE.md) and [code rules](../CODE_RULES.md). Check [Status](../../tracking/STATUS.md), [claims/handoffs](../../tracking/HANDOFFS.md) and actual prerequisite evidence. P01 is complete; source and its [runnable handoff](../../tracking/handoffs/khalid/day_01/P01.md) now exist.

@@ -2,6 +2,8 @@
 
 A Python + pygame-ce desktop stealth game with Human and autonomous Companion modes.
 
+Latest scene pass: fullscreen fills the display, the closer camera follows a larger animated operative, laboratories show distinct equipment and interrupted research, and quiet walking contrasts with the louder timed sprint. [Verified scene/build record](docs/development/quality/reports/facility_finish/REVIEW.md) and [runnable handoff](docs/development/tracking/handoffs/khalid/presentation/SCENE_FINISH.md).
+
 Current development: **Phase 2 Human mission complete** (`0.1.0a1`). The five-zone facility, title/briefing/game/results flow, Core theft, lockdown, extraction, capture and basic tools are playable. The first P03 stealth slice adds one active Sentinel with fair sight/hearing, BFS patrol, investigation/chase/search, compact HUD, event audio and Settings. Companion, the remaining advanced defenders, Workshop and scoring are pending. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
 
 ## Development setup

@@ -181,16 +181,19 @@ class SceneDesigns:
         level: LevelData,
         map_surface: pygame.Surface,
         furnishings: tuple[FurnitureVisual, ...],
+        *,
+        paint_background: bool = True,
     ) -> None:
-        draw_scene(
-            canvas,
-            extraction if scene == "EPILOGUE" else backdrop,
-            clock_ms,
-            reduced_motion=reduced_motion,
-            text_side="right" if scene == "EPILOGUE" else "left",
-            mirror_for_text=False,
-            reactor_glow=scene != "EPILOGUE",
-        )
+        if paint_background:
+            draw_scene(
+                canvas,
+                extraction if scene == "EPILOGUE" else backdrop,
+                clock_ms,
+                reduced_motion=reduced_motion,
+                text_side="right" if scene == "EPILOGUE" else "left",
+                mirror_for_text=False,
+                reactor_glow=scene != "EPILOGUE",
+            )
         if scene == "EPILOGUE":
             canvas.blit(
                 fonts.micro.render("ENCRYPTED TRANSMISSION", True, theme.ACCENT), (720, 230)

@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-22",
+  "assets": 29,
+  "all_manifest_hashes_and_sizes_match": true,
+  "native_bootstrap": {
+    "audio": "ready",
+    "audio_assets_loaded": 29,
+    "audio_cues_played": 0,
+    "diagnostic": "phase-2-game-scenes",
+    "frames": 12,
+    "fullscreen": true,
+    "lockdown_alarm_active": false,
+    "logical_viewport": [
+      1280,
+      804
+    ],
+    "map_id": "vault-five-zone",
+    "music_track": "title",
+    "outcomes": {},
+    "resources_loaded": true,
+    "room_ambience_active": false,
+    "runs_started": 0,
+    "runtime": {
+      "architecture": "arm64",
+      "frozen": false,
+      "python": "3.13.16"
+    },
+    "scene": "TITLE",
+    "seed": 1042,
+    "settings_notice": null,
+    "settings_path": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/responsive-facility/fullscreen-profile/settings.json",
+    "settings_saved": true,
+    "simulation_steps": 0,
+    "version": "0.1.0a1",
+    "video_driver": "cocoa",
+    "window_size": [
+      1470,
+      923
+    ]
+  },
+  "playback_gain": {
+    "walk": 0.09,
+    "sprint": 0.42
+  },
+  "hearing_radius_tiles": {
+    "walk": 1,
+    "sprint": 3
+  },
+  "scope": "Native initialization/context sweep plus regression coverage, not subjective mix approval; interactive Windows listening NOT_RUN.",
+  "native_settings_fullscreen_round_trip": {
+    "report": {
+      "diagnostic": "phase-2-game-scenes",
+      "version": "0.1.0a1",
+      "frames": 65,
+      "video_driver": "cocoa",
+      "window_size": [
+        1470,
+        923
+      ],
+      "logical_viewport": [
+        1280,
+        804
+      ],
+      "fullscreen": true,
+      "audio": "ready",
+      "music_track": "title",
+      "audio_assets_loaded": 29,
+      "audio_cues_played": 5,
+      "lockdown_alarm_active": false,
+      "room_ambience_active": false,
+      "resources_loaded": true,
+      "scene": "TITLE",
+      "map_id": "vault-five-zone",
+      "seed": 1042,
+      "runs_started": 0,
+      "outcomes": {},
+      "simulation_steps": 0,
+      "settings_saved": true,
+      "settings_notice": null,
+      "settings_path": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/responsive-facility/toggle-profile/settings.json"
+    },
+    "modes": [
+      {
+        "frame": 5,
+        "fullscreen": false,
+        "size": [
+          1280,
+          720
+        ]
+      },
+      {
+        "frame": 10,
+        "fullscreen": true,
+        "size": [
+          1470,
+          923
+        ]
+      },
+      {
+        "frame": 25,
+        "fullscreen": false,
+        "size": [
+          1470,
+          820
+        ]
+      },
+      {
+        "frame": 40,
+        "fullscreen": true,
+        "size": [
+          1470,
+          923
+        ]
+      },
+      {
+        "frame": 55,
+        "fullscreen": true,
+        "size": [
+          1470,
+          923
+        ]
+      }
+    ],
+    "scope": "Actual bootstrap loop with injected window-coordinate mouse presses"
+  }
+}

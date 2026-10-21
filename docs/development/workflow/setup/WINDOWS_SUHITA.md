@@ -1,5 +1,7 @@
 # Suhita: Windows setup and first implementation handoff
 
+Update 2026-10-21: the [latest scene presentation handoff](../../tracking/handoffs/khalid/day_02/SCENE_PRESENTATION.md) adds timed stairs, new scene names, Workshop/Companion designs and current Windows/Mac build evidence. Read it and Status before continuing. The older P02 prompts below remain historical; do not reimplement completed P02 work or treat preview AI deployment as implemented.
+
 Update 2026-10-20: the original P02 branch/start prompts below are historical. The [integrated P02 handoff](../../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) is the current gameplay baseline; read [Status](../../tracking/STATUS.md) before claiming P03 work. The PowerShell environment, build and smoke commands remain useful for Windows x64 checks.
 
 Prepared by Khalid on 2026-10-18. Repository: [khalid999devs/Echo_Heist](https://github.com/khalid999devs/Echo_Heist). Platform: **Windows x64**, using PowerShell and native Windows Python, not WSL. P01 is complete. Your first assignment is **P02-S1 and P02-S2**; P02-K1/K2 belong to Khalid. This guide prepares your workstation; it does not transfer P01 implementation ownership to you.

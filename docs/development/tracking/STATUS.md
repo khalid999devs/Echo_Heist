@@ -33,8 +33,8 @@ Active target: complete working initial draft in **eight phases over four develo
 | P02 five-zone map/scene | DONE | Suhita's `a98548a` map/loader/flow retained; illustrated floor/bulkhead/props/actor strips and refined sci-fi UI; [integration verification](../quality/reports/phase02/integration/VERIFICATION.md) |
 | AI / Workshop / final scoring | IN_PROGRESS | One real Sentinel uses filtered sensors, BFS/FSM/fuzzy/search/report expiry; remaining advanced defenders, autonomous Companion, Workshop and final scoring are pending |
 | Local automated checks | DONE | Structure/lint/format/strict types and **117** focused cases pass on the scene-presentation revision; [current review](../quality/reports/scene_presentation/REVIEW.md) |
-| Hosted CI | PASS for two-floor revision | [39610664321](https://github.com/khalid999devs/Echo_Heist/actions/runs/39610664321) at `8d551d8`: all Linux/Windows/macOS checks, native primary builds and frozen dummy-video smoke |
-| Native packaging | PASS for local macOS furnished slice | Clean `123225b` app and fresh ZIP extraction each pass all eight Cocoa frozen checks with audio ready; [exact archive/hash](../quality/reports/two_floor_lab/BUILD.json) |
+| Hosted CI | PASS for scene-presentation runtime | [39634968086](https://github.com/khalid999devs/Echo_Heist/actions/runs/39634968086) at `19b454b`: Linux/Windows/macOS checks, native primary builds and frozen dummy-video smoke |
+| Native packaging | PASS for local macOS scene revision | Clean `19b454b` app and fresh ZIP extraction each pass eight Cocoa frozen checks with audio ready; [exact current archive/hash](../quality/reports/scene_presentation/BUILD.json) |
 | V1 platform/hardware QA | NOT_RUN | Suhita's interactive Windows desktop/download QA, wider macOS/download behavior and full-game release matrix remain untested |
 | Assets and licensing | IN_PROGRESS | Original generated scene/tile/prop/actor art plus Oxanium/OFL recorded in [asset register](../assets/ASSETS.md); remaining production set and source license pending |
 | itch.io/video/submission | TODO | GitHub source is published; game distribution, gameplay video and academic submission are still pending |
@@ -43,7 +43,7 @@ P02 is a playable Human draft, not the full V1 game. The standard app launches t
 
 ## Next action
 
-Continue P03 from the [first stealth contracts](../architecture/integration/STEALTH_SLICE.md) and [current two-floor handoff](handoffs/khalid/day_02/TWO_FLOOR_LAB.md). Retrieve its [changed stair/sprint/map contract](../architecture/integration/TWO_FLOOR_LAB.md) before editing coordinates. Shared registry, Tracker A* and remaining cues/fixtures are still required before the P03 gate can close. Suhita's interactive Windows x64 check remains useful platform evidence and must not be represented as complete until run on her machine.
+Continue P03 from the [first stealth contracts](../architecture/integration/STEALTH_SLICE.md) and [latest scene handoff](handoffs/khalid/day_02/SCENE_PRESENTATION.md). Retrieve the [timed stair/lockdown/scene contract](../architecture/integration/SCENE_PRESENTATION.md) plus original deck/sprint geometry before editing consumers. Shared registry, Tracker A* and remaining cues/fixtures are still required before the P03 gate can close. Suhita's interactive Windows x64 check remains useful platform evidence and must not be represented as complete until run on her machine.
 
 ## Open inputs to resolve during development
 
@@ -54,4 +54,4 @@ Continue P03 from the [first stealth contracts](../architecture/integration/STEA
 
 These do not prevent preparing the local foundation. They must be resolved before the corresponding release claims or external actions. See the [risk register](RISKS_AND_DECISIONS.md).
 
-Current follow-up: [48 native screen states and both route wins](../quality/reports/scene_presentation/REVIEW.md). The [runnable handoff](handoffs/khalid/day_02/SCENE_PRESENTATION.md) records new navigation, timed stairs, crisp art and continuous lockdown alarm. Workshop/Companion/Guide/epilogue presentation designs are connected; AI deployment, saved policies and scoring remain pending. [Build evidence](../quality/reports/scene_presentation/BUILD.json) records actual new artifact/hosted results; older packaging rows above are historical until superseded there. Full V1 and interactive Windows QA remain open.
+Current follow-up: [48 native screen states and both route wins](../quality/reports/scene_presentation/REVIEW.md). The [runnable handoff](handoffs/khalid/day_02/SCENE_PRESENTATION.md) records navigation, timed stairs, crisp art and continuous lockdown alarm. Workshop/Companion/Guide/epilogue designs are connected; AI deployment, saved policies and scoring remain pending. [Build evidence](../quality/reports/scene_presentation/BUILD.json) records actual current artifacts and hosted results. Full V1 and interactive Windows QA remain open.

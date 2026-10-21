@@ -36,6 +36,12 @@ All 48 layouts were reviewed through six contact sheets plus full-size checks of
 
 ## Build boundary
 
-Native archive/frozen checks and hosted CI are recorded separately in BUILD.json after execution. Previous two-floor archives do not include this revision. Interactive Windows hardware/audio/download, Linux native packaging, minimum hardware and quarantined download acceptance remain separate checks.
+Clean runtime commit **`19b454bdc3a34ef6c5e3a60bac2cc23c6931e953`** built successfully. Native Mac app and fresh ZIP extraction each PASS all eight frozen Cocoa checks with audio ready. Archive `dist/echo-heist-0.1.0a1-macos-arm64.zip`: **55,313,813 bytes**, SHA256 **`d2696bb0c916166645afc9ea5b8777f6ffc3aa30be09cb9fa0c32175875f66c6`**. Python 3.13.16 / PyInstaller 6.22.3 / macOS 26.4.1 arm64; ad-hoc signed, not notarized. [Exact manifest/smoke records](BUILD.json).
+
+[CI 39634968086](https://github.com/khalid999devs/Echo_Heist/actions/runs/39634968086) PASS at that runtime commit: Linux checks, Windows/macOS checks, native primary builds and frozen dummy-video smoke. Source 407be30 also passed its earlier run; the final runtime adds only the documented startup focus hint. Subsequent handoff commits change records only. Previous two-floor archives do not include this revision.
+
+The matching Windows CI ZIP was retrieved, its SHA256 verified, and copied to `dist/echo-heist-0.1.0a1-windows-x64.zip`: **56,619,251 bytes**, SHA256 **`2008d37b35e552202f8c03526bc0b2f9cf01ff375d2b10aa1aeb042c5dae156a`**. Its downloaded frozen report passes all eight dummy-video checks; it is unsigned. This is hosted Windows execution, not Suhita's interactive hardware/audio test.
+
+Native pointer mapping also passed at actual 960×540, 1024×800 and 1920×820 window sizes; the OS clamped the requested 1920×1080 height, so this is not a full-HD hardware claim. [Small window](screens/display/960x540.png), [tall letterbox](screens/display/1024x800.png). Interactive Windows hardware/audio/download, Linux native packaging, minimum hardware, subjective speaker mix and quarantined download acceptance remain separate checks.
 
 This finishes the requested presentation/navigation pass, not P03-P08 or the full V1. Tracker/Interceptor strategy, Companion/MCTS, NEXUS, saved Workshop profiles, approved score/encounter counting and P05 environment interactions remain assigned work. Upcoming scoring and policy consumers have real layouts to connect; their backend completion must still be verified.

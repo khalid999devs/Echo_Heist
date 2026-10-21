@@ -9,13 +9,13 @@ P01 foundation asset: [original SVG mark](../../../src/echo_heist/resources/asse
 | ID | Asset group | Minimum content | Status |
 | --- | --- | --- | --- |
 | A01 | Facility tiles | Five zones, floors, opaque walls, tagged glass, cover, doors, cabinets, upper/lower route cues | IN_PROGRESS; P02 illustrated floor/bulkhead/room props, glass/cover motifs; doors and interactive effects later |
-| A02 | Intruders | Operative and Companion silhouettes; idle/move/hide/tool/strike/core/captured states; shared collision dimensions | IN_PROGRESS; Human top-down idle/walk/sprint frame strip with facing and dossier portrait; remaining states later |
+| A02 | Intruders | Operative and Companion silhouettes; idle/move/hide/tool/strike/core/captured states; shared collision dimensions | IN_PROGRESS; directional Human idle/walk/run atlas and four Companion poses/portrait; remaining interaction-specific poses later |
 | A03 | Defenders | Distinct Sentinel, Tracker, Interceptor; move/scan/alert/disabled/stun/grab cues | IN_PROGRESS; distinct rendered roster rows now connected by kind; one active Sentinel, remaining specialized controllers/poses later |
 | A04 | Mission anchors | Entry/exit beacon, core plinth idle/pickup/empty, carried-core indication | IN_PROGRESS; P02 reactor inset, extraction pad, animated beacons and carried-core light |
 | A05 | Interactions | Intact/shattered glass rack, rolling canister, doors and hiding feedback | TODO |
 | A06 | Effects | Echo ghost/trail, EMP ring, capture telegraph, clear suspicion/contact/lockdown states | IN_PROGRESS; P02 Echo/EMP event rings, capture telegraph and lockdown border; richer P03-P05 feedback later |
 | A07 | Audio | 6-10 gameplay cues, one loopable ambience/music layer, source event mapping and separate volumes | IN_PROGRESS; five CC0 context tracks, eleven cues, event mapping and persisted mix controls; [actual audio integration](AUDIO.md), further in-game mix review pending |
-| A08 | Interface | Legible font, status icons, mode/Workshop/results panels, non-color cues and critical subtitles | IN_PROGRESS; bundled Oxanium family, P02 title/briefing/HUD/results and keyed minimap; Workshop/accessibility later |
+| A08 | Interface | Legible font, status icons, mode/Workshop/results panels, non-color cues and critical subtitles | IN_PROGRESS; Oxanium, title/briefing/HUD/results, reduced flashing, Workshop/Companion/guide/epilogue designs and working navigation; policy/scoring consumers later |
 | A09 | Narrative | Short opening/contact/theft/win copy and replication-seed epilogue | IN_PROGRESS; extraction transmission now opens the source's replication-seed epilogue; remaining event subtitles later |
 | A10 | Release media | Icon, cover art, representative screenshots and gameplay video | IN_PROGRESS; P02 review screenshots only |
 

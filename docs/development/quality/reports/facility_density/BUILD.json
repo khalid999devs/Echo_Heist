@@ -1,0 +1,97 @@
+{
+  "build": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 44047151,
+    "archive_sha256": "5dd7bebe99cd21308f1601141714cd9ba06c9aab106a02be86f833da5e3c7c8e",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "764d8ff17ec8b83081b69b86510f2d8580bd7ba0",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "built_app": {
+    "smoke": {
+      "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/dist/Echo Heist.app/Contents/MacOS/EchoHeist",
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "surface_saved": true
+      },
+      "passed": true,
+      "scope": "native display smoke",
+      "video_driver": "cocoa"
+    },
+    "desktop": {
+      "audio": "ready",
+      "audio_assets_loaded": 16,
+      "music_track": "title",
+      "frames": 12,
+      "map_id": "vault-five-zone",
+      "resources_loaded": true,
+      "runtime": {
+        "architecture": "arm64",
+        "frozen": true,
+        "python": "3.13.16"
+      },
+      "scene": "TITLE",
+      "video_driver": "cocoa"
+    }
+  },
+  "extracted_zip": {
+    "smoke": {
+      "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/density/extracted-764d8ff/Echo Heist.app/Contents/MacOS/EchoHeist",
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "surface_saved": true
+      },
+      "passed": true,
+      "scope": "native display smoke",
+      "video_driver": "cocoa"
+    },
+    "desktop": {
+      "audio": "ready",
+      "audio_assets_loaded": 16,
+      "music_track": "title",
+      "frames": 12,
+      "map_id": "vault-five-zone",
+      "resources_loaded": true,
+      "runtime": {
+        "architecture": "arm64",
+        "frozen": true,
+        "python": "3.13.16"
+      },
+      "scene": "TITLE",
+      "video_driver": "cocoa"
+    }
+  },
+  "scope": "Clean source 764d8ff; native Cocoa app/ZIP smoke with audio; source playthroughs recorded separately. Download quarantine and full frozen mission interaction not tested.",
+  "hosted_ci": {
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39587400106",
+    "source_commit": "764d8ff17ec8b83081b69b86510f2d8580bd7ba0",
+    "conclusion": "success",
+    "jobs": [
+      "headless-checks",
+      "windows-x64",
+      "macos-arm64"
+    ],
+    "native_platforms": "Windows x64 and macOS arm64 builds and frozen SDL dummy-video smoke; not interactive hardware QA"
+  }
+}

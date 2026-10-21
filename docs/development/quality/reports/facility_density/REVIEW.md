@@ -39,7 +39,9 @@ The cinematic title/briefing/settings/results share the existing illustrated 3D 
 
 ## Build and remaining boundary
 
-Current revision's clean native packaging and hosted CI are pending at this source checkpoint. The earlier macOS ZIP is stale until rebuilt; do not represent its old manifest as this map revision. Actual results will be attached here after the clean build.
+Clean implementation commit **`764d8ff`** produced the current macOS arm64 app and ZIP. Both the app and a fresh ZIP extraction PASS all eight native Cocoa frozen smoke checks, audio ready / 16 assets loaded. Archive `dist/echo-heist-0.1.0a1-macos-arm64.zip`, **44,047,151 bytes**, SHA256 **`5dd7bebe99cd21308f1601141714cd9ba06c9aab106a02be86f833da5e3c7c8e`**. Python 3.13.16 / PyInstaller 6.22.3 / macOS 26.4.1 arm64; ad-hoc signed, not notarized. [Exact build/smoke record](BUILD.json). The build manifest's original smoke reminder is retained; the separate recorded executions show actual PASS results.
+
+[Hosted CI 39587400106](https://github.com/khalid999devs/Echo_Heist/actions/runs/39587400106) **PASS** at `764d8ff`: all checks on Linux, Windows x64 and macOS arm64, plus native primary builds and frozen dummy-video smoke. Later handoff changes are documentation only; runtime/build paths still match `764d8ff`. Frozen smoke covers startup/resources/settings/headless hashes; it does not claim a complete frozen mission, downloaded quarantine behavior or interactive Windows hardware acceptance.
 
 The original CC0 music/cue sources remain unchanged. [Audio integration](../../../assets/AUDIO.md) records the five context tracks and eleven cues. The map now uses the same pause ducking. No new audio downloads were needed for this environment revision.
 

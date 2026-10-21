@@ -25,6 +25,8 @@ P01 and the full P02 are DONE. [Original P02 owner handoff](../../tracking/hando
 
 Hand Suhita actual commands, import paths, map/action/scene/event interfaces and a known-good build. Do not leave her a documentation-only scaffold or require her to repair your environment setup. P02 integrates both owners on that foundation.
 
+The user-directed density/speed revision is recorded in the [current furnished handoff](../../tracking/handoffs/khalid/day_02/FACILITY_DENSITY.md). Retrieve its map/schema/tuning changes before continuing P03; stable IDs now have different coordinates. The revision does not close the remaining shared AI gate.
+
 ## How to collaborate
 
 You own core strategy but do not own every backend module: Suhita owns map importing/validation, registry adapters, NEXUS/director protocols, environment object systems and profile/policy logic. Your simulation must invoke those systems through agreed data/actions rather than duplicating them.

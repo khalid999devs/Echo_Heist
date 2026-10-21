@@ -6,6 +6,7 @@
 - Extended the existing importer with optional typed Room/FloorDetail metadata, quarter-turn furnishing orientation and whole-room reachability checks. Stable map/anchor/guard IDs remain; coordinates changed in the [consumer contract](../architecture/integration/FACILITY_DENSITY.md).
 - Reduced walk/sprint from 2.2/3.6 to 1.8/2.6 tiles/s, with proportional defender tuning. Preserved body radius, tools, capture and approved scoring. Tab now opens a paused room map, clears held input and ducks audio.
 - All 96 behavior cases, structure/Ruff/strict types pass. Both routes complete real native extractions with stock tools; deliberate guard contact captures. Inspected 38 native screenshots and removed overlapping room/zone signs. [Current review](../quality/reports/facility_density/REVIEW.md) records actual build/CI evidence as it becomes available.
+- Clean `764d8ff` macOS build and fresh ZIP extraction pass native Cocoa smoke with audio ready. [Hosted CI 39587400106](https://github.com/khalid999devs/Echo_Heist/actions/runs/39587400106) passes all three platform checks, Windows/macOS native builds and frozen dummy-video smoke. [Runnable handoff](handoffs/khalid/day_02/FACILITY_DENSITY.md) records the exact archive/hash and remaining boundaries.
 - P03 remains partial; user-deferred P05 environment mechanics and later full V1 systems remain open.
 
 ## 2026-10-21 - Illustrated gameplay and movement review

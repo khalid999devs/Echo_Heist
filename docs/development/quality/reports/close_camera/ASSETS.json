@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-21",
+  "origin": "OpenAI built-in imagegen; generated original assets",
+  "third_party_bitmap_downloads": false,
+  "transparent_background": true,
+  "source_pngs_modified": false,
+  "records": [
+    {
+      "runtime": "assets/characters/operative/walk.png",
+      "original_output": "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a/exec-7134de9f-662c-4539-870e-2172e63b2de3.png",
+      "sha256": "9a47ba5a15723145ce148cd961a2ff682c7db6bc1ad3cbc3090ee245769338c8",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "bytes": 1427870,
+      "mode": "Edit of initial walk atlas; original operative-directions identity reference"
+    },
+    {
+      "runtime": "assets/characters/operative/run.png",
+      "original_output": "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a/exec-c78214e5-5ded-4905-abc2-4fc64f6c70a5.png",
+      "sha256": "7733fdb3f034c2b552dcdd2d19ce4573b2af58fcf501c1b7bce0f7aca54b1310",
+      "dimensions": [
+        1774,
+        887
+      ],
+      "bytes": 1336437,
+      "mode": "Edit using operative-directions identity reference"
+    },
+    {
+      "runtime": "assets/tiles/clinical-topdown-props.png",
+      "original_output": "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a/exec-64df63bc-fd67-4f35-9ec4-50d66a57d469.png",
+      "sha256": "0279a63bbb4d35af8dfb012ab0dc5d819da3f7b7fc8220b80ac3e903f3339864",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "bytes": 1547087,
+      "mode": "Alpha refinement of original nine-instrument generation"
+    }
+  ],
+  "intermediate_originals": [
+    "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a/exec-830a596c-4dc4-40e8-9401-e0197e2edc3a.png",
+    "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a/exec-afe31124-8d69-4057-b7a5-011496a13a41.png"
+  ],
+  "runtime_processing": "Measured crop regions; largest connected alpha silhouettes; prop mask edge tightening; shared scale per animation cycle; fit proportions once at load. No cumulative frame rescaling.",
+  "review": "Native screenshot and distance-driven walk/run review recorded separately; public-release owner/licensing review remains pending."
+}

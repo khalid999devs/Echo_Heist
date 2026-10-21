@@ -18,7 +18,6 @@ from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import WorldArt, build_map_surface
 from echo_heist.ui.scenes.heist import HeistRequest, HeistSession
 from echo_heist.ui.scenes.menus import (
-    LAUNCH_BUTTON,
     MODE_ITEMS,
     RESULT_MENU,
     RESULT_RETRY,
@@ -70,6 +69,7 @@ class GameFlow:
         self.map_surface = build_map_surface(self.level, self.fonts, self.art)
         self.scene = Scene.TITLE
         self.selected = 0
+        self.mode_choice = 0
         self.notice = ""
         self.hovered_result: str | None = None
         self.running = True
@@ -95,7 +95,7 @@ class GameFlow:
         self.scene = Scene.HEIST
 
     def _go(self, scene: Scene) -> None:
-        self.scene, self.selected, self.notice = scene, 0, ""
+        self.scene, self.selected, self.notice = scene, 2 if scene == Scene.MODE else 0, ""
         self.hovered_result = None
 
     def frame(self, events: Sequence[pygame.event.Event], elapsed_ms: int) -> None:
@@ -151,36 +151,34 @@ class GameFlow:
                 if clicked is not None:
                     self.selected = clicked
                     self._key(pygame.K_RETURN)
-                elif self.scene == Scene.MODE and LAUNCH_BUTTON.collidepoint(event.pos):
-                    self._key(pygame.K_RETURN)
 
     def _key(self, key: int) -> None:
         if self.scene == Scene.TITLE:
             self.selected = move_selection(self.selected, TITLE_ITEMS, key)
-            if key == pygame.K_ESCAPE or (key in CONFIRM_KEYS and self.selected == 5):
+            if key == pygame.K_ESCAPE or (key in CONFIRM_KEYS and self.selected == 3):
                 self.running = False
             elif key in CONFIRM_KEYS:
-                if self.selected in (0, 1):
-                    companion = self.selected == 1
+                if self.selected == 0:
                     self._go(Scene.MODE)
-                    self.selected = int(companion)
-                elif self.selected == 2:
-                    self.notice = "Workshop configuration is not available in this build."
-                elif self.selected == 3:
+                elif self.selected == 1:
                     if self.session is not None and self.session.mission_end is not None:
                         self._go(Scene.RESULTS)
                     else:
                         self.notice = "Complete a mission to view its report."
-                elif self.selected == 4:
+                elif self.selected == 2:
                     self._go(Scene.SETTINGS)
         elif self.scene == Scene.MODE:
             self.selected = move_selection(self.selected, MODE_ITEMS, key)
-            if key == pygame.K_ESCAPE:
+            if key == pygame.K_ESCAPE or (key in CONFIRM_KEYS and self.selected == 3):
                 self._go(Scene.TITLE)
-            elif key in CONFIRM_KEYS and MODE_ITEMS[self.selected].enabled:
-                self._start_run()
             elif key in CONFIRM_KEYS:
-                self.notice = "Companion deployment is unavailable in this build."
+                if self.selected == 2:
+                    self._start_run()
+                elif MODE_ITEMS[self.selected].enabled:
+                    self.mode_choice = self.selected
+                    self.selected, self.notice = 2, ""
+                else:
+                    self.notice = "Companion mode is coming later. Human mode remains selected."
         elif self.scene == Scene.RESULTS:
             if key == pygame.K_r:
                 self._start_run()
@@ -237,6 +235,7 @@ class GameFlow:
                 notice=self.notice,
                 clock_ms=self.ambient_ms,
                 reduced_motion=self.settings.reduced_flashing,
+                report_available=self.session is not None and self.session.mission_end is not None,
             )
         elif self.scene == Scene.MODE:
             draw_menu(
@@ -248,6 +247,7 @@ class GameFlow:
                 notice=self.notice,
                 clock_ms=self.ambient_ms,
                 reduced_motion=self.settings.reduced_flashing,
+                mode_choice=self.mode_choice,
             )
         elif self.scene == Scene.SETTINGS:
             draw_settings(

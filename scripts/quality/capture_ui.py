@@ -11,6 +11,7 @@ from echo_heist.core.contracts.results import RunOutcome
 from echo_heist.diagnostics.facility_routes import mission_path, walk_path
 from echo_heist.diagnostics.human_driver import HumanDriver
 from echo_heist.ui.scenes.flow import GameFlow, Scene
+from echo_heist.ui.scenes.menus import MODE_BUTTONS, TITLE_BUTTONS
 
 
 def key(value: int, *, release: bool = False) -> pygame.event.Event:
@@ -74,27 +75,27 @@ def main() -> int:
         rgb = pygame.image.frombytes(pygame.image.tobytes(screen, "RGB"), screen.get_size(), "RGB")
         pygame.image.save(rgb, str(target))
 
+    def click(rect: pygame.Rect) -> pygame.event.Event:
+        return pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=rect.center)
+
     flow = GameFlow((1280, 720))
     flow.frame([], 2400)
     shot(flow, "menus/01-title")
-    flow.frame([key(pygame.K_DOWN)] * 5, 16)
+    flow.frame([pygame.event.Event(pygame.MOUSEMOTION, pos=TITLE_BUTTONS[3].center)], 16)
     shot(flow, "menus/02-title-quit-selected")
-    flow.frame([key(pygame.K_UP)], 16)
-    flow.frame([key(pygame.K_RETURN)], 16)
+    flow.frame([click(TITLE_BUTTONS[2])], 16)
     shot(flow, "menus/05-settings")
     flow.frame([key(pygame.K_RIGHT), key(pygame.K_DOWN), key(pygame.K_LEFT)], 16)
     shot(flow, "menus/06-settings-adjusted")
     flow.frame([key(pygame.K_ESCAPE)], 16)
-    flow.frame([key(pygame.K_DOWN)] * 2 + [key(pygame.K_RETURN)], 16)
-    assert flow.scene == Scene.TITLE and flow.notice
-    shot(flow, "unavailable/workshop")
-    flow.frame([key(pygame.K_DOWN), key(pygame.K_RETURN)], 16)
+    flow.frame([click(TITLE_BUTTONS[1])], 16)
     assert flow.scene == Scene.TITLE and flow.notice
     shot(flow, "unavailable/empty-report")
-    flow.frame([key(pygame.K_UP)] * 3 + [key(pygame.K_RETURN)], 16)
+    flow.frame([click(TITLE_BUTTONS[0])], 16)
     assert flow.scene == Scene.MODE
     shot(flow, "menus/03-human-briefing")
-    flow.frame([key(pygame.K_DOWN), key(pygame.K_RETURN)], 16)
+    flow.frame([click(MODE_BUTTONS[1])], 16)
+    assert flow.scene == Scene.MODE and flow.runs_started == 0 and flow.mode_choice == 0
     shot(flow, "menus/04-companion-unavailable")
 
     flow = mission()
@@ -123,12 +124,12 @@ def main() -> int:
     captured_states: set[str] = set()
     captured_rooms: set[str] = set()
     room_views = {
-        (30, 10): "01-service-servers",
-        (35, 10): "02-security-gangway",
-        (54, 18): "03-security-control",
-        (72, 26): "04-core-chamber",
-        (35, 44): "05-research-gangway",
-        (53, 34): "06-biology-lab",
+        (27, 11): "01-service-servers",
+        (30, 11): "02-security-gangway",
+        (44, 13): "03-security-control",
+        (56, 21): "04-core-chamber",
+        (30, 34): "05-research-gangway",
+        (44, 30): "06-biology-lab",
     }
 
     def observe_guard(current: GameFlow) -> None:
@@ -167,6 +168,10 @@ def main() -> int:
     assert flow.session.mission_end.outcome == RunOutcome.WIN
     shot(flow, "outcomes/01-win")
     upper_ticks = flow.session.mission_end.elapsed_ticks
+    flow.frame([key(pygame.K_RETURN)], 0)
+    shot(flow, "outcomes/06-report-unlocked")
+    flow.frame([click(TITLE_BUTTONS[1])], 0)
+    assert flow.scene == Scene.RESULTS and flow.session.mission_end.outcome == RunOutcome.WIN
 
     flow = mission()
     drive(flow, mission_path(flow.level, "lower"), use_tools=True, observer=observe_guard)

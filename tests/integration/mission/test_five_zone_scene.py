@@ -8,6 +8,7 @@ from echo_heist.diagnostics.facility_routes import mission_path, walk_path
 from echo_heist.diagnostics.human_driver import HumanDriver
 from echo_heist.ui.bootstrap import _logical_events
 from echo_heist.ui.scenes.flow import GameFlow, Scene
+from echo_heist.ui.scenes.menus import LAUNCH_BUTTON, MODE_BUTTONS, TITLE_BUTTONS
 
 
 def key(event_type: int, value: int) -> pygame.event.Event:
@@ -106,12 +107,12 @@ def test_real_scene_capture_reaches_result_and_retry() -> None:
 def test_mouse_menu_and_letterbox_coordinates() -> None:
     pygame.font.init()
     flow = GameFlow((1280, 720))
-    click = pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(88, 784))
+    click = pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(88, 826))
     mapped = _logical_events([click], (1280, 1440), (1280, 720))
-    assert mapped[0].pos == (88, 424)
+    assert mapped[0].pos == (88, 466)
     flow.frame(mapped, 0)
     assert flow.scene == Scene.MODE
-    flow.frame([pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(70, 640))], 0)
+    flow.frame([pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=LAUNCH_BUTTON.center)], 0)
     assert flow.scene == Scene.HEIST
 
 
@@ -168,3 +169,25 @@ def test_facility_map_freezes_time_and_clears_held_movement() -> None:
     old_player = next(actor for actor in before.actors if actor.actor_id == flow.level.operative_id)
     new_player = next(actor for actor in after.actors if actor.actor_id == flow.level.operative_id)
     assert new_player.position == old_player.position
+
+
+def test_mode_selection_does_not_launch_and_back_does_not_start_a_run() -> None:
+    pygame.font.init()
+    flow = GameFlow((1280, 720))
+
+    def click(rect: pygame.Rect) -> None:
+        flow.frame([pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=rect.center)], 0)
+
+    click(TITLE_BUTTONS[0])
+    assert flow.scene == Scene.MODE and flow.selected == 2
+    click(MODE_BUTTONS[1])
+    assert flow.notice and flow.scene == Scene.MODE
+    assert flow.mode_choice == 0 and flow.runs_started == 0
+    click(MODE_BUTTONS[0])
+    assert flow.mode_choice == 0 and flow.selected == 2
+    assert flow.scene == Scene.MODE and flow.session is None
+    click(MODE_BUTTONS[3])
+    assert flow.scene == Scene.TITLE and flow.runs_started == 0
+    click(TITLE_BUTTONS[0])
+    click(LAUNCH_BUTTON)
+    assert flow.scene == Scene.HEIST and flow.runs_started == 1

@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested facility density and movement tuning | work/facility-density; implementation 764d8ff | None; implementation/native review complete | DONE for requested revision; hosted CI PASS; full P03 gate stays open |
+| Khalid | User-requested chapter/menu clarity and compact route balance | work/chapter-and-route-balance; implementation e92d96e | None; revision and native/CI checks complete | DONE for requested revision; shared P03 gate stays open |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | work/suhita-p02 at a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
@@ -58,3 +58,5 @@ An owner can mark their named slice DONE when its behavior/checks pass. A shared
 
 - [Khalid / Day 2 / first stealth slice](handoffs/khalid/day_02/STEALTH_SLICE.md): one real Sentinel, physical room cluster, cinematic/compact UI, CC0 audio, 31 native screens, 89 tests and current native/CI build evidence. Shared P03 remains open.
 - [Khalid / Day 2 / denser facility](handoffs/khalid/day_02/FACILITY_DENSITY.md): 23 compact rooms, 104 physical furnishings, slower movement and paused map; 96 tests, 38 native screens, both real route wins and a clean rebuilt Mac ZIP. Shared P03 and Windows interactive QA remain open.
+
+- [Khalid / Day 2 / chapter and compact routes](handoffs/khalid/day_02/CHAPTER_AND_ROUTES.md): clear chapter/briefing/mode/Launch flow, 14-room compact research facility and faster movement; 97 tests, 38 native screens, both route wins and clean Mac build/native/hosted checks. Remaining shared phases and interactive Windows QA stay open.

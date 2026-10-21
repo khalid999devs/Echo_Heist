@@ -55,7 +55,7 @@ def test_settings_controls_change_real_values_and_return_to_menu() -> None:
     def press(value: int) -> None:
         flow.frame([pygame.event.Event(pygame.KEYDOWN, key=value)], 16)
 
-    for _ in range(4):
+    for _ in range(2):
         press(pygame.K_DOWN)
     press(pygame.K_RETURN)
     assert flow.scene == Scene.SETTINGS

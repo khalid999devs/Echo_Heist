@@ -2,6 +2,8 @@
 
 2026-10-21, Khalid; user-requested follow-up to [the first stealth slice](STEALTH_SLICE.md). Starting main: `41ce939`; branch: `work/facility-density`. This extends the playable environment without closing the remaining P03 gate.
 
+Historical checkpoint: the later [chapter/compact-route contract](CHAPTER_AND_ROUTES.md) supersedes this revision's map dimensions, room counts, coordinates and speeds. The additive Room/FloorDetail/furniture schema and simulation boundaries remain applicable.
+
 ## Map authoring and compatibility
 
 `scripts/level/author_facility.py` deterministically exports the packaged Tiled JSON at `resources/data/maps/vault-five-zone.json`. Run `uv run --locked python scripts/level/author_facility.py` after editing its room/corridor/furnishing definitions. The runtime still loads that JSON through the existing typed importer, never the authoring script. Numeric layers retain one map row per line; each object is one complete record. No runtime dependency was added.

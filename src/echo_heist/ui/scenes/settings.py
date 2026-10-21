@@ -11,11 +11,11 @@ from echo_heist.ui.render.surfaces.cinematic import draw_scene
 from echo_heist.ui.render.theme import Fonts
 
 OPTION_RECTS = (
-    pygame.Rect(44, 230, 452, 76),
-    pygame.Rect(44, 322, 452, 76),
-    pygame.Rect(44, 420, 452, 54),
-    pygame.Rect(44, 490, 452, 54),
-    pygame.Rect(44, 586, 452, 54),
+    pygame.Rect(64, 232, 480, 68),
+    pygame.Rect(64, 310, 480, 68),
+    pygame.Rect(64, 438, 480, 62),
+    pygame.Rect(64, 510, 480, 62),
+    pygame.Rect(44, 650, 130, 42),
 )
 
 
@@ -52,8 +52,14 @@ def draw_settings(
     clock_ms: int,
 ) -> None:
     draw_scene(canvas, backdrop, clock_ms, reduced_motion=settings.reduced_flashing)
-    canvas.blit(fonts.small.render("ECHO HEIST / PREFERENCES", True, theme.ACCENT), (44, 48))
-    canvas.blit(fonts.logo.render("SETTINGS", True, theme.TEXT), (39, 108))
+    canvas.blit(fonts.micro.render("ECHO HEIST / PREFERENCES", True, theme.ACCENT), (44, 35))
+    canvas.blit(fonts.title.render("SETTINGS", True, theme.TEXT), (40, 69))
+    canvas.blit(
+        fonts.small.render("Find your balance of sound and display.", True, theme.MUTED), (44, 138)
+    )
+    panel(canvas, pygame.Rect(44, 184, 520, 440), fill=(5, 18, 28, 227), border=theme.BORDER)
+    canvas.blit(fonts.micro.render("AUDIO", True, theme.ACCENT), (64, 201))
+    canvas.blit(fonts.micro.render("DISPLAY", True, theme.ACCENT), (64, 405))
     for index, (label, rect) in enumerate(
         zip(
             ("MUSIC", "SOUND EFFECTS", "REDUCED FLASHING", "FULLSCREEN", "BACK"),
@@ -78,7 +84,9 @@ def draw_settings(
             enabled = settings.reduced_flashing if index == 2 else settings.fullscreen
             text = fonts.small.render("ON" if enabled else "OFF", True, color)
             canvas.blit(text, (rect.right - text.get_width() - 20, rect.y + 13))
+            note = "Steady lights and less menu motion." if index == 2 else "Use the full display."
+            canvas.blit(fonts.micro.render(note, True, theme.MUTED), (rect.x + 20, rect.y + 38))
     canvas.blit(
         fonts.micro.render("ARROWS Adjust / Select    ENTER Toggle    ESC Back", True, theme.MUTED),
-        (44, 678),
+        (64, 598),
     )

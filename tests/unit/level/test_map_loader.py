@@ -6,6 +6,7 @@ from typing import Any
 
 import pytest
 
+from echo_heist.diagnostics.facility_routes import mission_path
 from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.level.io import MapFormatError, load_tiled_map
 from echo_heist.level.model import ZONE_IDS
@@ -113,16 +114,16 @@ CASES: list[tuple[str, Edit, str]] = [
     ("misplaced core", _core_outside_chamber, "inside zone 'core-chamber'"),
     (
         "core unreachable",
-        wall_off((61, 20), (61, 21), (61, 35), (61, 36)),
+        wall_off((48, 14), (48, 13), (48, 29), (48, 30)),
         "Core is unreachable",
     ),
-    ("upper branch cut", wall_off((35, 10)), "upper branch"),
-    ("lower branch cut", wall_off((35, 44)), "lower branch"),
-    ("cross-link cut", wall_off((45, 26), (46, 26), (47, 26)), "cross-link"),
-    ("entry sealed", wall_off((15, 25), (15, 26)), "Core is unreachable"),
+    ("upper branch cut", wall_off((30, 11)), "upper branch"),
+    ("lower branch cut", wall_off((30, 34)), "lower branch"),
+    ("cross-link cut", wall_off((38, 19)), "cross-link"),
+    ("entry sealed", wall_off((13, 19), (13, 20)), "Core is unreachable"),
     (
         "optional room sealed",
-        wall_off((12, 14), (12, 15)),
+        wall_off((10, 15), (10, 16)),
         "room 'screening' has inaccessible floor",
     ),
 ]
@@ -145,7 +146,7 @@ def test_wrong_expected_map_id_is_rejected() -> None:
 def test_furniture_has_matching_physical_opaque_acoustic_footprints() -> None:
     level = load_tiled_map(resource_bytes(f"data/maps/{MAP_ID}.json"))
     fixtures = [obj for obj in level.static_map.objects if obj.kind == "Furniture"]
-    assert len(fixtures) >= 100
+    assert len(fixtures) >= 60
     for fixture in fixtures:
         props = dict(fixture.properties)
         footprint = {
@@ -183,14 +184,24 @@ def test_invalid_furniture_cannot_silently_break_physical_room(invalid: str) -> 
     elif invalid == "rotated":
         fixture["rotation"] = 90
     else:
-        fixture["x"], fixture["y"] = 23 * 32, 19 * 32
+        fixture["x"], fixture["y"] = 17 * 32, 20 * 32
     with pytest.raises(MapFormatError):
         load_tiled_map(json.dumps(data))
 
 
-def test_dense_rooms_and_stair_gangways_keep_accessible_aisles() -> None:
+def test_compact_facility_and_stair_gangways_keep_accessible_aisles() -> None:
     level = load_tiled_map(resource_bytes(f"data/maps/{MAP_ID}.json"))
-    assert len(level.rooms) >= 20
+    assert 10 <= len(level.rooms) <= 16
+    assert level.static_map.width <= 64 and level.static_map.height <= 40
+    upper, lower = mission_path(level, "upper"), mission_path(level, "lower")
+    assert len(upper) < len(lower)
+    for path, expected, excluded in (
+        (upper, "security-control", "research-floor"),
+        (lower, "research-floor", "security-control"),
+    ):
+        visited = {zone.zone_id for tile in path if (zone := level.zone_at(tile)) is not None}
+        assert {"entry", "service-wing", "core-chamber", expected} <= visited
+        assert excluded not in visited
     assert all(room.width <= 11 and room.height <= 10 for room in level.rooms)
     assert (
         len(

@@ -32,7 +32,7 @@ Active target: complete working initial draft in **eight phases over four develo
 | P02 core gameplay/input | DONE | Continuous physics, mission/capture/initial tools, Human input and objective presenter; [owner handoff](handoffs/khalid/day_01/P02.md) |
 | P02 five-zone map/scene | DONE | Suhita's `a98548a` map/loader/flow retained; illustrated floor/bulkhead/props/actor strips and refined sci-fi UI; [integration verification](../quality/reports/phase02/integration/VERIFICATION.md) |
 | AI / Workshop / final scoring | IN_PROGRESS | One real Sentinel uses filtered sensors, BFS/FSM/fuzzy/search/report expiry; remaining advanced defenders, autonomous Companion, Workshop and final scoring are pending |
-| Local automated checks | DONE | Structure/lint/format/strict types and **111** focused cases pass on the two-floor lab revision; [current review](../quality/reports/two_floor_lab/REVIEW.md) |
+| Local automated checks | DONE | Structure/lint/format/strict types and **117** focused cases pass on the scene-presentation revision; [current review](../quality/reports/scene_presentation/REVIEW.md) |
 | Hosted CI | PASS for two-floor revision | [39610664321](https://github.com/khalid999devs/Echo_Heist/actions/runs/39610664321) at `8d551d8`: all Linux/Windows/macOS checks, native primary builds and frozen dummy-video smoke |
 | Native packaging | PASS for local macOS furnished slice | Clean `123225b` app and fresh ZIP extraction each pass all eight Cocoa frozen checks with audio ready; [exact archive/hash](../quality/reports/two_floor_lab/BUILD.json) |
 | V1 platform/hardware QA | NOT_RUN | Suhita's interactive Windows desktop/download QA, wider macOS/download behavior and full-game release matrix remain untested |
@@ -54,4 +54,4 @@ Continue P03 from the [first stealth contracts](../architecture/integration/STEA
 
 These do not prevent preparing the local foundation. They must be resolved before the corresponding release claims or external actions. See the [risk register](RISKS_AND_DECISIONS.md).
 
-Current follow-up: [38 native screen states and both route wins](../quality/reports/two_floor_lab/REVIEW.md). The [runnable handoff](handoffs/khalid/day_02/TWO_FLOOR_LAB.md) records the current archive, source commit and actual native/hosted status. Full V1 and manual Windows QA remain open.
+Current follow-up: [48 native screen states and both route wins](../quality/reports/scene_presentation/REVIEW.md). The [runnable handoff](handoffs/khalid/day_02/SCENE_PRESENTATION.md) records new navigation, timed stairs, crisp art and continuous lockdown alarm. Workshop/Companion/Guide/epilogue presentation designs are connected; AI deployment, saved policies and scoring remain pending. [Build evidence](../quality/reports/scene_presentation/BUILD.json) records actual new artifact/hosted results; older packaging rows above are historical until superseded there. Full V1 and interactive Windows QA remain open.

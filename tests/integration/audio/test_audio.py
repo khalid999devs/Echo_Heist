@@ -30,6 +30,7 @@ def test_shipped_audio_context_deduplication_pause_and_mix(monkeypatch: pytest.M
         heist = AudioFrame("HEIST", "0", 1, MissionPhase.LOCKDOWN, events=events)
         audio.update(heist, 300)
         assert audio.current_music == "urgent"
+        assert pygame.mixer.Channel(2).get_busy()
         count = audio.cues_played
         audio.update(heist, 20)
         assert audio.cues_played == count  # repeated delivery cannot replay a tactical cue
@@ -37,6 +38,7 @@ def test_shipped_audio_context_deduplication_pause_and_mix(monkeypatch: pytest.M
         audio.update(heist, 20)
         normal_music = pygame.mixer.music.get_volume()
         assert normal_music > 0 and pygame.mixer.Channel(1).get_volume() == 0
+        assert pygame.mixer.Channel(2).get_volume() == 0
         audio.update(replace(heist, paused=True), 20)
         assert 0 < pygame.mixer.music.get_volume() < normal_music
         audio.update(replace(heist, run_id=2), 20)
@@ -44,6 +46,9 @@ def test_shipped_audio_context_deduplication_pause_and_mix(monkeypatch: pytest.M
         audio.volumes(0.0, 0.7)
         audio.update(replace(heist, run_id=2), 20)
         assert pygame.mixer.music.get_volume() == 0
+        audio.update(AudioFrame("WORKSHOP", "0", 2, MissionPhase.LOCKDOWN), 300)
+        assert not pygame.mixer.Channel(2).get_busy()
+        assert audio.current_music == "title"
     finally:
         pygame.mixer.quit()
 

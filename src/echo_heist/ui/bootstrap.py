@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 from io import BytesIO
+from math import floor
 from pathlib import Path
 
 import pygame
@@ -38,8 +39,8 @@ def _logical_events(
             continue
         x, y = event.pos
         point = (
-            int((x - offset_x) * logical_width / rendered_width),
-            int((y - offset_y) * logical_height / rendered_height),
+            floor((x - offset_x) * logical_width / rendered_width),
+            floor((y - offset_y) * logical_height / rendered_height),
         )
         mapped.append(pygame.event.Event(event.type, {**event.dict, "pos": point}))
     return mapped
@@ -85,7 +86,9 @@ def run_desktop(
         elapsed_ms = 0
         while flow.running:
             logical_size = (config.logical_width, config.logical_height)
-            events = _logical_events(pygame.event.get(), screen.get_size(), logical_size)
+            events = _logical_events(
+                pygame.event.get(), pygame.display.get_window_size(), logical_size
+            )
             flow.frame(events, elapsed_ms)
             audio.volumes(flow.settings.music_volume, flow.settings.sfx_volume)
             audio.update(flow.audio_frame(), elapsed_ms)
@@ -108,7 +111,7 @@ def run_desktop(
             )
             screen.fill(config.background)
             screen.blit(
-                pygame.transform.smoothscale(canvas, size),
+                canvas if size == logical_size else pygame.transform.smoothscale(canvas, size),
                 ((width - size[0]) // 2, (height - size[1]) // 2),
             )
             pygame.display.flip()

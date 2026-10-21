@@ -21,7 +21,14 @@ def room_floors(texture: pygame.Surface) -> dict[str, pygame.Surface]:
         floor = texture.copy()
         floor.fill(tint, special_flags=pygame.BLEND_RGB_MULT)
         if style == "laboratory":
-            floor.fill((29, 35, 34), special_flags=pygame.BLEND_RGB_ADD)
+            floor.fill((43, 51, 49), special_flags=pygame.BLEND_RGB_ADD)
+            # Seamless clinical panels distinguish research from service decks.
+            # Paint once at native map resolution, without blurring the texture.
+            for y in range(0, floor.get_height(), 96):
+                for x in range(0, floor.get_width(), 96):
+                    rect = pygame.Rect(x + 2, y + 2, 92, 92)
+                    pygame.draw.rect(floor, (83, 112, 119), rect, 1, border_radius=3)
+                    pygame.draw.line(floor, (122, 149, 151), (x + 8, y + 4), (x + 88, y + 4))
         elif style in ("office", "reception"):
             floor.fill((12, 15, 16), special_flags=pygame.BLEND_RGB_ADD)
         result[style] = floor

@@ -7,12 +7,14 @@ Date: 2026-10-21. Runtime: `ui/audio/`, connected by `ui/bootstrap.py` after the
 | Title, briefing, Settings | `title.ogg`, quiet background level |
 | Infiltration | `sector.ogg`, ambient bed below tactical cues |
 | Confirmed pursuit | `pulse.ogg`; context is supplied by actual committed guard state |
-| Mandatory lockdown | `urgent.ogg` and one security alarm cue |
+| Mandatory lockdown | `urgent.ogg`, entry alarm cue and continuous siren on dedicated channel 2 |
 | Results | `transmission.ogg`; victory cue only for an actual WIN event |
 | Selection / screen navigation | Quiet hover and terminal confirmation |
 | Committed walk/sprint NoiseEvent | Concrete step sample, louder for sprint |
 | Committed Echo / EMP / melee | Hologram / electrical / metal impact cues |
 | Sighting confirmed / capture started | Security warning tone |
+
+Scene-presentation revision: Workshop/Guide/Companion designs use title music; successful extraction/epilogue use transmission. Stair start/arrival each play a footstep. The reused CC0 alarm loops independently of alerts/tools; pause/map freeze it, SFX volume mutes it, leaving live lockdown stops it. Tests cover the loop lifecycle and volume independently of music. [Current actual native evidence](../quality/reports/scene_presentation/REVIEW.md) supersedes the older timing/counts below; subjective speaker/mix and interactive Windows checks remain pending.
 
 Pursuit music now consumes the live Sentinel's actual CHASE/SEARCH state. Playback never emits a hidden simulation noise or changes guard knowledge. UI sounds and background music cannot alert robots.
 

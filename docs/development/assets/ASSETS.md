@@ -10,13 +10,13 @@ P01 foundation asset: [original SVG mark](../../../src/echo_heist/resources/asse
 | --- | --- | --- | --- |
 | A01 | Facility tiles | Five zones, floors, opaque walls, tagged glass, cover, doors, cabinets, upper/lower route cues | IN_PROGRESS; P02 illustrated floor/bulkhead/room props, glass/cover motifs; doors and interactive effects later |
 | A02 | Intruders | Operative and Companion silhouettes; idle/move/hide/tool/strike/core/captured states; shared collision dimensions | IN_PROGRESS; Human top-down idle/walk/sprint frame strip with facing and dossier portrait; remaining states later |
-| A03 | Defenders | Distinct Sentinel, Tracker, Interceptor; move/scan/alert/disabled/stun/grab cues | IN_PROGRESS; P02 guard post sprite strip; one active Sentinel patrol/move/identify/disabled state connected; distinct roster silhouettes later |
+| A03 | Defenders | Distinct Sentinel, Tracker, Interceptor; move/scan/alert/disabled/stun/grab cues | IN_PROGRESS; distinct rendered roster rows now connected by kind; one active Sentinel, remaining specialized controllers/poses later |
 | A04 | Mission anchors | Entry/exit beacon, core plinth idle/pickup/empty, carried-core indication | IN_PROGRESS; P02 reactor inset, extraction pad, animated beacons and carried-core light |
 | A05 | Interactions | Intact/shattered glass rack, rolling canister, doors and hiding feedback | TODO |
 | A06 | Effects | Echo ghost/trail, EMP ring, capture telegraph, clear suspicion/contact/lockdown states | IN_PROGRESS; P02 Echo/EMP event rings, capture telegraph and lockdown border; richer P03-P05 feedback later |
 | A07 | Audio | 6-10 gameplay cues, one loopable ambience/music layer, source event mapping and separate volumes | IN_PROGRESS; five CC0 context tracks, eleven cues, event mapping and persisted mix controls; [actual audio integration](AUDIO.md), further in-game mix review pending |
 | A08 | Interface | Legible font, status icons, mode/Workshop/results panels, non-color cues and critical subtitles | IN_PROGRESS; bundled Oxanium family, P02 title/briefing/HUD/results and keyed minimap; Workshop/accessibility later |
-| A09 | Narrative | Short opening/contact/theft/win copy and replication-seed epilogue | TODO |
+| A09 | Narrative | Short opening/contact/theft/win copy and replication-seed epilogue | IN_PROGRESS; extraction transmission now opens the source's replication-seed epilogue; remaining event subtitles later |
 | A10 | Release media | Icon, cover art, representative screenshots and gameplay video | IN_PROGRESS; P02 review screenshots only |
 
 The PDF's compressed release checklist mentions four actor silhouettes, while its detailed animation list distinguishes the operative, Companion and three guard types. Follow the detailed readability requirement: five recognizable actor identities, with shared animation bases where practical.
@@ -36,6 +36,16 @@ The PDF's compressed release checklist mentions four actor silhouettes, while it
 | A08-FONT | `resources/assets/fonts/Oxanium-{Regular,SemiBold,Bold}.ttf` and `OFL.txt` | Severin Meyer's [Oxanium upstream](https://github.com/sevmeyer/oxanium), pinned commit `a8f39e0c71186190027a093e9001459410192d1e`, downloaded 2026-10-20. SHA256 Regular `2b9c2a53ee0a8248ab901463838cc81075b410724046a09683b3cc91870fe52a`, SemiBold `e2d77ec4ee67b0152166adf5d6393360550a012c2066e0d4589053e14a733cdc`, Bold `15a44f661fd962c64cabe069a5f9f6fab85a412188f028d3e04da2ff917e37cc`, license `fe17c0f2581d71b4e1ea7e636e7f4877c29223e11bb1dd1a871e8c3f2a86336b` | Unmodified TrueType files used for all menu/HUD/result text; redistributable with included [SIL OFL 1.1](https://github.com/sevmeyer/oxanium/blob/master/OFL.txt) notice. | Credit: Oxanium by Severin Meyer / Oxanium Project Authors. Keep bundled OFL text in public builds. |
 
 The above records cover the adopted assets. The current [two-floor facility revision](../quality/reports/two_floor_lab/REVIEW.md) reuses those unmodified PNGs across 14 rooms / 63 physical furnishings and crops the chapter thumbnail at runtime from the existing cinematic. Later phases must finish the remaining rows and release credits. The generated art does not grant permission to redistribute the owner's reference images themselves; those images are not bundled.
+
+The [scene-presentation revision](../quality/reports/scene_presentation/REVIEW.md) adds these original assets (built-in imagegen, 2026-10-21; no external bitmap/reference supplied). Exact prompts/mode are in [PROMPTS](../quality/reports/scene_presentation/PROMPTS.md); full per-file hashes, dimensions and preserved originals are in [ASSET_HASHES](../quality/reports/scene_presentation/ASSET_HASHES.json). No third-party credit requirement identified; owner release review remains pending.
+
+| Runtime asset | Use |
+| --- | --- |
+| `characters/operative-directions.png` | 4 directions × 4 gait poses; proportional runtime crops replace the old rotating strip |
+| `characters/defenders.png` | Distinct Sentinel/Tracker/Interceptor rows; only existing Sentinel controller is active |
+| `characters/companion.png` | Four poses, Workshop portrait and later live controller visuals |
+| `tiles/laboratory-props.png` | Six crisp clinical instruments/planters; aspect-preserving map furnishings |
+| `scenes/stairwell.png` | Original architectural ascent/descent scene, animated from actual stair progress |
 
 For each imported or original item record: stable ID, runtime path, source/author URL, origin (original/third-party/generated), exact license text or license URL, modification notes, required attribution, download/version date, and reviewer. Store any required redistribution license notices with shipped assets and generate release credits from the register.
 

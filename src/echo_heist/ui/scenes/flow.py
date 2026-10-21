@@ -18,11 +18,13 @@ from echo_heist.ui.render.surfaces.cinematic import draw_scene
 from echo_heist.ui.render.surfaces.glass import edge_veil
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import WorldArt, build_map_surface
+from echo_heist.ui.scenes.design.screens import SceneDesigns
 from echo_heist.ui.scenes.heist import HeistRequest, HeistSession
 from echo_heist.ui.scenes.menus import (
     MODE_ITEMS,
     RESULT_MENU,
     RESULT_RETRY,
+    RESULT_STORY,
     TITLE_ITEMS,
     draw_menu,
     draw_results,
@@ -42,6 +44,10 @@ class Scene(StrEnum):
     HEIST = "HEIST"
     RESULTS = "RESULTS"
     SETTINGS = "SETTINGS"
+    WORKSHOP = "WORKSHOP"
+    LAB = "LAB"
+    GUIDE = "GUIDE"
+    EPILOGUE = "EPILOGUE"
 
 
 def load_level(map_id: str = DEFAULT_MAP_ID) -> LevelData:
@@ -80,6 +86,9 @@ class GameFlow:
         self.outcomes: Counter[str] = Counter()
         self.runs_started = 0
         self.ambient_ms = 0
+        self.settings_return = Scene.TITLE
+        self.dragging_slider: int | None = None
+        self.designs = SceneDesigns()
 
     def _start_run(self) -> None:
         self.hovered_result = None
@@ -100,19 +109,35 @@ class GameFlow:
     def _go(self, scene: Scene) -> None:
         self.scene, self.selected, self.notice = scene, 2 if scene == Scene.MODE else 0, ""
         self.hovered_result = None
+        self.dragging_slider = None
+        self.designs.selected = 0
+        self.designs.notice = ""
 
     def frame(self, events: Sequence[pygame.event.Event], elapsed_ms: int) -> None:
         self.ambient_ms += max(0, elapsed_ms)
+        if self.scene in (Scene.WORKSHOP, Scene.LAB, Scene.GUIDE, Scene.EPILOGUE):
+            if any(event.type == pygame.QUIT for event in events):
+                self.running = False
+                return
+            target = self.designs.handle(self.scene.value, list(events))
+            if target is not None:
+                self._go(Scene(target))
+            return
         if self.scene == Scene.SETTINGS:
             self._settings_events(events)
             return
         if self.scene == Scene.HEIST and self.session is not None:
+            self.session.reduced_flashing = self.settings.reduced_flashing
             request = self.session.handle(events)
             if request == HeistRequest.QUIT:
                 self.running = False
                 return
             if request == HeistRequest.RETRY:
                 self._start_run()
+                return
+            if request == HeistRequest.SETTINGS:
+                self.settings_return = Scene.HEIST
+                self._go(Scene.SETTINGS)
                 return
             self.session.update(elapsed_ms)
             end = self.session.mission_end
@@ -125,6 +150,7 @@ class GameFlow:
             self.running = False
             return
         for event in events:
+            initial_scene = self.scene
             if event.type == pygame.KEYDOWN and not getattr(event, "repeat", False):
                 self._key(event.key)
                 if not self.running or self.scene == Scene.HEIST:
@@ -135,7 +161,12 @@ class GameFlow:
                     self.selected = hovered
             elif event.type == pygame.MOUSEMOTION and self.scene == Scene.RESULTS:
                 self.hovered_result = (
-                    "RETRY"
+                    "STORY"
+                    if RESULT_STORY.collidepoint(event.pos)
+                    and self.session
+                    and self.session.mission_end
+                    and self.session.mission_end.outcome == RunOutcome.WIN
+                    else "RETRY"
                     if RESULT_RETRY.collidepoint(event.pos)
                     else "MENU"
                     if RESULT_MENU.collidepoint(event.pos)
@@ -143,7 +174,14 @@ class GameFlow:
                 )
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.scene == Scene.RESULTS:
-                    if RESULT_RETRY.collidepoint(event.pos):
+                    if (
+                        RESULT_STORY.collidepoint(event.pos)
+                        and self.session
+                        and self.session.mission_end
+                        and self.session.mission_end.outcome == RunOutcome.WIN
+                    ):
+                        self._go(Scene.EPILOGUE)
+                    elif RESULT_RETRY.collidepoint(event.pos):
                         self._start_run()
                     elif RESULT_MENU.collidepoint(event.pos):
                         self._go(Scene.TITLE)
@@ -154,6 +192,9 @@ class GameFlow:
                 if clicked is not None:
                     self.selected = clicked
                     self._key(pygame.K_RETURN)
+                    return
+            if self.scene != initial_scene:
+                return
 
     def _key(self, key: int) -> None:
         if self.scene == Scene.TITLE:
@@ -169,7 +210,10 @@ class GameFlow:
                     else:
                         self.notice = "Complete a mission to view its report."
                 elif self.selected == 2:
+                    self.settings_return = Scene.TITLE
                     self._go(Scene.SETTINGS)
+                elif self.selected == 4:
+                    self._go(Scene.GUIDE)
         elif self.scene == Scene.MODE:
             self.selected = move_selection(self.selected, MODE_ITEMS, key)
             if key == pygame.K_ESCAPE or (key in CONFIRM_KEYS and self.selected == 3):
@@ -177,6 +221,8 @@ class GameFlow:
             elif key in CONFIRM_KEYS:
                 if self.selected == 2:
                     self._start_run()
+                elif self.selected == 1:
+                    self._go(Scene.WORKSHOP)
                 elif MODE_ITEMS[self.selected].enabled:
                     self.mode_choice = self.selected
                     self.selected, self.notice = 2, ""
@@ -185,10 +231,15 @@ class GameFlow:
         elif self.scene == Scene.RESULTS:
             if key == pygame.K_r:
                 self._start_run()
-            elif key in (pygame.K_RETURN, pygame.K_KP_ENTER):
+            elif key in (pygame.K_RETURN, pygame.K_KP_ENTER) or key == pygame.K_ESCAPE:
                 self._go(Scene.TITLE)
-            elif key == pygame.K_ESCAPE:
-                self.running = False
+            elif (
+                key == pygame.K_c
+                and self.session
+                and self.session.mission_end
+                and self.session.mission_end.outcome == RunOutcome.WIN
+            ):
+                self._go(Scene.EPILOGUE)
 
     def _settings_events(self, events: Sequence[pygame.event.Event]) -> None:
         for event in events:
@@ -198,7 +249,7 @@ class GameFlow:
                 if event.key == pygame.K_ESCAPE or (
                     event.key in CONFIRM_KEYS and self.selected == 4
                 ):
-                    self._go(Scene.TITLE)
+                    self._go(self.settings_return)
                     return
                 if event.key in (pygame.K_UP, pygame.K_DOWN):
                     self.selected = (
@@ -210,7 +261,14 @@ class GameFlow:
                     )
                 elif event.key in CONFIRM_KEYS and self.selected in (2, 3):
                     self.settings = adjust(self.settings, self.selected, 1)
+            elif (
+                event.type == pygame.MOUSEBUTTONUP and event.button == 1
+            ) or event.type == pygame.WINDOWFOCUSLOST:
+                self.dragging_slider = None
             elif event.type in (pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN):
+                if event.type == pygame.MOUSEMOTION and self.dragging_slider is not None:
+                    self.settings = click(self.settings, self.dragging_slider, event.pos)
+                    continue
                 hit = next(
                     (
                         index
@@ -223,12 +281,26 @@ class GameFlow:
                     self.selected = hit
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         if hit == 4:
-                            self._go(Scene.TITLE)
+                            self._go(self.settings_return)
                             return
+                        if hit in (0, 1):
+                            self.dragging_slider = hit
                         self.settings = click(self.settings, hit, event.pos)
 
     def draw(self, canvas: pygame.Surface) -> None:
-        if self.scene == Scene.TITLE:
+        if self.scene in (Scene.WORKSHOP, Scene.LAB, Scene.GUIDE, Scene.EPILOGUE):
+            self.designs.draw(
+                canvas,
+                self.scene.value,
+                self.fonts,
+                self.backdrop,
+                self.extraction_backdrop,
+                self.ambient_ms,
+                self.settings.reduced_flashing,
+                self.level,
+                self.map_surface,
+            )
+        elif self.scene == Scene.TITLE:
             draw_menu(
                 canvas,
                 self.fonts,

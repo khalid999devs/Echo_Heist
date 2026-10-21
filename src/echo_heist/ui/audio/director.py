@@ -29,9 +29,9 @@ CUES = {
 
 
 def music_for(frame: AudioFrame) -> str:
-    if frame.scene in ("TITLE", "MODE", "SETTINGS"):
+    if frame.scene in ("TITLE", "MODE", "SETTINGS", "WORKSHOP", "LAB", "GUIDE"):
         return "title"
-    if frame.scene == "RESULTS":
+    if frame.scene in ("RESULTS", "EPILOGUE"):
         return "transmission"
     if frame.phase == MissionPhase.LOCKDOWN:
         return "urgent"
@@ -40,7 +40,9 @@ def music_for(frame: AudioFrame) -> str:
 
 def event_cue(event: GameEvent) -> tuple[str, float, bool] | None:
     details = dict(event.details)
-    if event.kind == EventKind.STAIR_USED and details.get("actor_kind") in (
+    if event.kind in (EventKind.STAIR_STARTED, EventKind.STAIR_USED) and details.get(
+        "actor_kind"
+    ) in (
         "OPERATIVE",
         "COMPANION",
     ):
@@ -100,7 +102,7 @@ class AudioDirector:
             else 1
             if critical
             else next(
-                (index for index in range(2, 10) if not pygame.mixer.Channel(index).get_busy()), -1
+                (index for index in range(3, 10) if not pygame.mixer.Channel(index).get_busy()), -1
             )
         )
         if channel_id < 0:
@@ -116,6 +118,17 @@ class AudioDirector:
             self.last_frame = frame
             return
         previous = self.last_frame
+        alarm = pygame.mixer.Channel(2)
+        lockdown = frame.scene == "HEIST" and frame.phase == MissionPhase.LOCKDOWN
+        if lockdown and not alarm.get_busy():
+            alarm.play(self.sounds["alarm"], loops=-1, fade_ms=350)
+        elif not lockdown:
+            alarm.stop()
+        alarm.set_volume(0.34 * self.sfx_volume)
+        if frame.paused:
+            alarm.pause()
+        else:
+            alarm.unpause()
         if previous is None or previous.run_id != frame.run_id:
             self.seen.clear()
             self.seen_order.clear()
@@ -167,4 +180,5 @@ class AudioDirector:
             "music_track": self.current_music,
             "audio_assets_loaded": len(self.sounds) + len(self.music_data),
             "audio_cues_played": self.cues_played,
+            "lockdown_alarm_active": self.enabled and pygame.mixer.Channel(2).get_busy(),
         }

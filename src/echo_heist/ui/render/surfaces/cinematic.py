@@ -31,18 +31,21 @@ def draw_scene(
     *,
     text_side: str = "left",
     reduced_motion: bool = False,
+    mirror_for_text: bool = True,
+    reactor_glow: bool = True,
 ) -> None:
     if reduced_motion:
         clock_ms = 0
     drift_x = round(5 * sin(clock_ms / 7500))
     drift_y = round(3 * sin(clock_ms / 9400))
-    scene = backdrop if text_side == "left" else _mirrored(backdrop)
+    scene = _mirrored(backdrop) if text_side == "right" and mirror_for_text else backdrop
     canvas.blit(scene, (-BACKDROP_PAD + drift_x, -BACKDROP_PAD + drift_y))
     width, height = canvas.get_size()
     reactor_x = round(width * (0.69 if text_side == "left" else 0.31))
     bloom = _bloom(160)
     bloom.set_alpha(150 + round(25 * sin(clock_ms / 2100)))
-    canvas.blit(bloom, (reactor_x - 160, round(height * 0.36) - 160))
+    if reactor_glow:
+        canvas.blit(bloom, (reactor_x - 160, round(height * 0.36) - 160))
     dust = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
     for index in range(22):
         x = (index * 83 + 97 + clock_ms / (190 + index * 13)) % width

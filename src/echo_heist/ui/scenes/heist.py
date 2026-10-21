@@ -100,6 +100,8 @@ class HeistSession:
         self.reduced_flashing = reduced_flashing
         self.notice = ""
         self.notice_until_ms = 0
+        self.deck_id: str | None = None
+        self.floor_changed_ms = -1000
         self._follow(0.0, snap=True)
 
     @property
@@ -111,6 +113,18 @@ class HeistSession:
         actor = next(a for a in snapshot.actors if a.actor_id == self.level.operative_id)
         if actor.position is not None:
             size = self.level.static_map.tile_size_px
+            deck = self.level.deck_at(actor.tile)
+            if deck is not None:
+                self.camera.bounds = (
+                    deck.left * size,
+                    deck.top * size,
+                    deck.width * size,
+                    deck.height * size,
+                )
+                if self.deck_id != deck.deck_id:
+                    if self.deck_id is not None:
+                        self.floor_changed_ms = self.clock_ms
+                    self.deck_id, snap = deck.deck_id, True
             self.camera.follow(to_pixels(actor.position, size), seconds, snap=snap)
 
     def pause(self) -> None:
@@ -197,6 +211,10 @@ class HeistSession:
             else:
                 dx, dy = current[0] - previous[0], current[1] - previous[1]
                 moving = dx != 0 or dy != 0
+                if abs(dx) + abs(dy) > 2 * 30_000:
+                    self.actor_motion[actor.actor_id] = ActorMotion(actor.facing)
+                    self._last_positions[actor.actor_id] = current
+                    continue
                 direction = (
                     (1 if dx > 0 else -1 if dx < 0 else 0, 1 if dy > 0 else -1 if dy < 0 else 0)
                     if moving
@@ -212,7 +230,9 @@ class HeistSession:
         self.audio_events.extend(events)
         actors = {actor.actor_id: actor for actor in self.simulation.presentation_snapshot().actors}
         for event in events:
-            if event.kind == EventKind.CORE_TAKEN:
+            if event.kind == EventKind.STAIR_USED and event.actor_id == self.level.operative_id:
+                self.notice = ""
+            elif event.kind == EventKind.CORE_TAKEN:
                 self.notice = "CORE SECURED  /  RETURN TO THE GREEN EXIT"
                 self.notice_until_ms = self.clock_ms + 4200
             elif event.kind == EventKind.CAPTURE_STARTED:
@@ -227,6 +247,7 @@ class HeistSession:
                     "echo_empty": "NO ECHO CHARGES LEFT",
                     "emp_empty": "NO EMP CHARGES LEFT",
                     "no_reachable_guard": "MELEE NEEDS A NEARBY GUARD",
+                    "stair_landing_occupied": "STAIRS BLOCKED  /  WAIT FOR THE LANDING",
                 }.get(str(reason), self.notice)
                 self.notice_until_ms = self.clock_ms + 1400
             elif event.kind == EventKind.TOOL_USED:
@@ -245,9 +266,12 @@ class HeistSession:
         observation = self.simulation.observe(self.level.operative_id)
         room = self.level.room_at(observation.own_status.tile)
         if room is not None:
-            return room.label
-        zone = self.level.zone_at(observation.own_status.tile)
-        return zone.label if zone is not None else "Corridor"
+            label = room.label
+        else:
+            zone = self.level.zone_at(observation.own_status.tile)
+            label = zone.label if zone is not None else "Corridor"
+        deck = self.level.deck_at(observation.own_status.tile)
+        return f"{'01' if deck.deck_id == 'ground' else '02'} / {label}" if deck else label
 
     def draw(self, canvas: pygame.Surface) -> None:
         snapshot = self.simulation.presentation_snapshot()
@@ -264,7 +288,13 @@ class HeistSession:
             clock_ms=self.clock_ms,
             pulses=tuple(self.pulses),
             art=self.art,
+            reduced_motion=self.reduced_flashing,
         )
+        age = self.clock_ms - self.floor_changed_ms
+        if not self.reduced_flashing and 0 <= age < 240:
+            fade = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
+            fade.fill((3, 10, 18, round(170 * (1 - age / 240))))
+            canvas.blit(fade, (0, 0))
         view = build_objective_view(
             self.simulation.observe(self.level.operative_id),
             ticks_per_second=self.simulation.ticks_per_second,
@@ -285,6 +315,9 @@ class HeistSession:
                 unavailable_guards=frozenset(
                     actor.actor_id for actor in snapshot.actors if actor.disabled or actor.stunned
                 ),
+                sprint_duration_ticks=self.rules.sprint_duration_ticks,
+                sprint_recharge_ticks=self.rules.sprint_recharge_ticks,
+                ticks_per_second=self.rules.simulation_hz,
             )
         if self.lab_note:
             self._draw_lab(canvas)
@@ -332,10 +365,8 @@ class HeistSession:
             draw_dialog(canvas, "Abort this run?", lines, self.fonts, title_color=theme.DANGER)
             return
         menu = (
-            ("Take a breath. Mission time is paused.", theme.MUTED),
             ("Esc / Enter: resume", theme.TEXT),
             ("R: restart mission", theme.TEXT),
             ("X: abort run", theme.TEXT),
-            ("Restarting keeps this facility layout.", theme.MUTED),
         )
         draw_dialog(canvas, "PAUSED", menu, self.fonts, title_color=theme.WARNING)

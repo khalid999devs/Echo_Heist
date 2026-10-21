@@ -25,7 +25,7 @@ P01 and the full P02 are DONE. [Original P02 owner handoff](../../tracking/hando
 
 Hand Suhita actual commands, import paths, map/action/scene/event interfaces and a known-good build. Do not leave her a documentation-only scaffold or require her to repair your environment setup. P02 integrates both owners on that foundation.
 
-The latest user-directed chapter/compact-route revision is recorded in the [current handoff](../../tracking/handoffs/khalid/day_02/CHAPTER_AND_ROUTES.md). Retrieve its menu focus, map coordinates and movement tuning before continuing P03. The revision does not close the remaining shared AI gate.
+The latest user-directed two-floor revision is recorded in the [current contract](../../architecture/integration/TWO_FLOOR_LAB.md). Retrieve its reciprocal stairs, deck camera bounds, own sprint timers and updated map/UI coordinates before continuing P03. The revision does not close the remaining shared AI gate.
 
 ## How to collaborate
 

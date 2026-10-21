@@ -54,9 +54,6 @@ def draw_settings(
     draw_scene(canvas, backdrop, clock_ms, reduced_motion=settings.reduced_flashing)
     canvas.blit(fonts.micro.render("ECHO HEIST / PREFERENCES", True, theme.ACCENT), (44, 35))
     canvas.blit(fonts.title.render("SETTINGS", True, theme.TEXT), (40, 69))
-    canvas.blit(
-        fonts.small.render("Find your balance of sound and display.", True, theme.MUTED), (44, 138)
-    )
     panel(canvas, pygame.Rect(44, 184, 520, 440), fill=(5, 18, 28, 227), border=theme.BORDER)
     canvas.blit(fonts.micro.render("AUDIO", True, theme.ACCENT), (64, 201))
     canvas.blit(fonts.micro.render("DISPLAY", True, theme.ACCENT), (64, 405))
@@ -84,8 +81,9 @@ def draw_settings(
             enabled = settings.reduced_flashing if index == 2 else settings.fullscreen
             text = fonts.small.render("ON" if enabled else "OFF", True, color)
             canvas.blit(text, (rect.right - text.get_width() - 20, rect.y + 13))
-            note = "Steady lights and less menu motion." if index == 2 else "Use the full display."
-            canvas.blit(fonts.micro.render(note, True, theme.MUTED), (rect.x + 20, rect.y + 38))
+            if index == 2:
+                note = "Steady lights and less menu motion."
+                canvas.blit(fonts.micro.render(note, True, theme.MUTED), (rect.x + 20, rect.y + 38))
     canvas.blit(
         fonts.micro.render("ARROWS Adjust / Select    ENTER Toggle    ESC Back", True, theme.MUTED),
         (64, 598),

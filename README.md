@@ -27,7 +27,7 @@ The older diagnostic contact room is still available for focused core-rule inspe
 uv run --locked python -m echo_heist.diagnostics.human_preview
 ```
 
-The compact 64×40 research facility has 14 purposeful rooms, 67 physical furnishings, two railed stair gangways and tuned movement (2.5 tiles/s walk, 3.7 sprint). The original upper Security/lower Research routes and cross-link remain connected. Three other posts retain P02 contact behavior while the remaining P03/P04 algorithms are developed. F3 opens real Sentinel telemetry; Tab shows the room map and controls with mission time paused. Settings groups Audio and Display controls. See the [current chapter/facility review](docs/development/quality/reports/chapter_balance/REVIEW.md) for actual checks and screenshots.
+The research facility spans two floors with 14 purposeful rooms and 63 physical furnishings. Entry and Service are downstairs; Security, Research and Core are upstairs. Press E on either stair landing to change floors. The original alternative routes and cross-link remain connected. Walk at 2.5 tiles/s; hold Shift for a louder 3.7 tiles/s sprint lasting up to three seconds, followed by four seconds of recharge. The HUD shows readiness; pause/map freeze recharge. Three other posts retain P02 contact behavior while the remaining P03/P04 algorithms are developed. F3 opens real Sentinel telemetry; Tab shows both floors with mission time paused. Settings groups Audio and Display controls. Successful extraction has its own exterior cinematic. See the [current facility review](docs/development/quality/reports/two_floor_lab/REVIEW.md) for actual checks and screenshots.
 
 For an isolated window check:
 

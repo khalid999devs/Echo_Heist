@@ -107,9 +107,10 @@ def test_real_scene_capture_reaches_result_and_retry() -> None:
 def test_mouse_menu_and_letterbox_coordinates() -> None:
     pygame.font.init()
     flow = GameFlow((1280, 720))
-    click = pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(88, 826))
+    target = TITLE_BUTTONS[0].center
+    click = pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(target[0], target[1] + 360))
     mapped = _logical_events([click], (1280, 1440), (1280, 720))
-    assert mapped[0].pos == (88, 466)
+    assert mapped[0].pos == target
     flow.frame(mapped, 0)
     assert flow.scene == Scene.MODE
     flow.frame([pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=LAUNCH_BUTTON.center)], 0)
@@ -153,14 +154,16 @@ def test_default_live_guard_allows_actual_lower_route_core_and_extraction() -> N
 def test_facility_map_freezes_time_and_clears_held_movement() -> None:
     flow = start(security_enabled=True)
     assert flow.session is not None
-    flow.frame([key(pygame.KEYDOWN, pygame.K_d)], 34)
+    flow.frame([key(pygame.KEYDOWN, pygame.K_d), key(pygame.KEYDOWN, pygame.K_LSHIFT)], 34)
     flow.frame([key(pygame.KEYDOWN, pygame.K_TAB)], 34)
     before = flow.session.simulation.presentation_snapshot()
     clock = flow.session.clock_ms
+    sprint_before = flow.session.simulation.observe(flow.level.operative_id).own_status
     flow.frame([key(pygame.KEYDOWN, pygame.K_w)], 5_000)
     assert flow.session.summary and not flow.session.paused
     assert flow.session.simulation.presentation_snapshot() == before
     assert flow.session.clock_ms == clock
+    assert flow.session.simulation.observe(flow.level.operative_id).own_status == sprint_before
     flow.frame([key(pygame.KEYDOWN, pygame.K_ESCAPE)], 0)
     assert not flow.session.summary and not flow.session.paused
     flow.frame([], 34)
@@ -191,3 +194,36 @@ def test_mode_selection_does_not_launch_and_back_does_not_start_a_run() -> None:
     click(TITLE_BUTTONS[0])
     click(LAUNCH_BUTTON)
     assert flow.scene == Scene.HEIST and flow.runs_started == 1
+
+
+def test_layered_actor_alpha_keeps_background_and_opaque_destination() -> None:
+    from echo_heist.core.contracts.world import ActorKind
+    from echo_heist.ui.render import motifs
+    from echo_heist.ui.render.surfaces.formats import opaque_surface
+    from echo_heist.ui.render.world import WorldArt
+
+    pygame.font.init()
+    canvas = opaque_surface((100, 100))
+    background = (100, 140, 155)
+    canvas.fill(background)
+    motifs.light_pool(canvas, (50, 50), (130, 170, 190), 40)
+    before = canvas.copy()
+    motifs.actor(
+        canvas,
+        (50, 50),
+        ActorKind.OPERATIVE,
+        disabled=False,
+        stunned=False,
+        carries_core=False,
+        pulse=0.5,
+        motion=motifs.ActorMotion(),
+        clock_ms=0,
+        sprites=WorldArt.load().operative,
+    )
+    # Transparent sprite corners must preserve prior light/floor layers, even
+    # when the native display offers alpha masks on otherwise opaque surfaces.
+    assert canvas.get_masks()[3] == 0
+    assert canvas.get_at((32, 27)) == before.get_at((32, 27))
+    assert canvas.get_at((35, 35)) == before.get_at((35, 35))
+    assert canvas.get_at((50, 50)) != before.get_at((50, 50))
+    assert all(canvas.get_at((x, y)).a == 255 for x in range(100) for y in range(100))

@@ -12,14 +12,18 @@ class Camera:
     world_height: int
     x: float = 0.0
     y: float = 0.0
+    bounds: tuple[int, int, int, int] | None = None
 
     def follow(self, target: tuple[float, float], seconds: float, *, snap: bool = False) -> None:
         goal_x = target[0] - self.view_width / 2
         goal_y = target[1] - self.view_height / 2
         blend = 1.0 if snap else 1.0 - exp(-8.0 * max(0.0, seconds))
-        self.x = self._clamp(self.x + (goal_x - self.x) * blend, self.world_width, self.view_width)
-        self.y = self._clamp(
-            self.y + (goal_y - self.y) * blend, self.world_height, self.view_height
+        left, top, width, height = self.bounds or (0, 0, self.world_width, self.world_height)
+        self.x = left + self._clamp(
+            self.x + (goal_x - self.x) * blend - left, width, self.view_width
+        )
+        self.y = top + self._clamp(
+            self.y + (goal_y - self.y) * blend - top, height, self.view_height
         )
 
     @staticmethod

@@ -8,12 +8,29 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested scene presentation | work/complete-visual-scenes; runtime 19b454b | None; [runnable handoff](handoffs/khalid/day_02/SCENE_PRESENTATION.md) | DONE; 117 checks, native 48-state review, app/ZIP smoke and three-platform source CI PASS; later phases remain open |
-| Suhita | None; P02-S1/S2 technical work accepted in combined review | work/suhita-p02 at a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
+| Khalid | User-requested scene presentation | main; runtime 19b454b | None; [runnable handoff](handoffs/khalid/day_02/SCENE_PRESENTATION.md) | DONE; 117 checks, native 48-state review, app/ZIP smoke and three-platform source CI PASS; later phases remain open |
+| Suhita | None; P02-S1/S2 technical work accepted in combined review | main includes original source a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
 
-P02 integration boundary: [runtime contract](../architecture/integration/P02_RUNTIME.md). The original owner slices stayed separate; under the user's later explicit request Khalid reviewed/refined Suhita's scene/render files on a new integration branch. Her branch and authorship remain intact. `ui/presenters/objective.py` and `ui/input/human.py` continue to define the core/UI boundary.
+P02 integration boundary: [runtime contract](../architecture/integration/P02_RUNTIME.md). The original owner slices stayed separate; under the user's later explicit request Khalid reviewed/refined Suhita's scene/render files on a new integration branch. Her commits and authorship remain preserved in main; obsolete branch labels were removed in the cleanup below. `ui/presenters/objective.py` and `ui/input/human.py` continue to define the core/UI boundary.
+
+## Repository branch cleanup
+
+2026-10-21, explicitly requested by Khalid. Audited fresh remote refs against `main` at `a964448e2ba081655b710b040782a251cce2265f`. Every branch tip below was an ancestor of main with **zero commits missing**; there were no open pull requests. Deleted the eight remote branches in one atomic push with expected-tip leases, then pruned tracking refs and deleted the seven corresponding merged local branches. GitHub and this checkout now retain only the main branch. Commit history, source, authorship and build artifacts are preserved; no source rewrite or gameplay change was made.
+
+| Removed historical branch | Preserved tip in main |
+| --- | --- |
+| work/chapter-and-route-balance | 8d2fffcb84cace352b09ffc21060cd630c4b7248 |
+| work/complete-visual-scenes | b1be43bdc846787fe11a045323dc6909105b7a99 |
+| work/facility-density | 3a544c9cbbd8ed7c2e8b015c010b9dcf4d39abdb |
+| work/khalid-p02 | fd93224e43d37d43122ebb8aa8182505cfd2375e |
+| work/p02-integration | 4389d6872eb6c48793583c8d87fa4bba73d0fac5 |
+| work/stealth-vertical-slice | 3af9d9bba87ec73f2126bcac10ba7f08d6430e5e |
+| work/suhita-p02 | a98548a7ba47a15bc4be81eab6e95be28edc6eee |
+| work/two-floor-atmosphere | 641929e6d13343be00da21eb055e5d8a3c37fc45 |
+
+Verification: `git merge-base --is-ancestor <tip> origin/main`, `git rev-list --count origin/main..<tip>` (all zero), `gh pr list --state open` (empty), `git ls-remote --heads origin` and `git branch --list` (main only after cleanup). Historical handoffs may still name the original feature branches; use their preserved commit IDs. Other developer checkouts can run `git fetch origin --prune`; future assigned work should start a fresh task branch from current main.
 
 ## Claim protocol
 

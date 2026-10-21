@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TARGET = ROOT / "src/echo_heist/resources/data/maps/vault-five-zone.json"
-WIDTH, HEIGHT, SIZE = 80, 56, 32
+WIDTH, HEIGHT, SIZE = 64, 40, 32
 
 
 @dataclass(frozen=True)
@@ -21,29 +21,20 @@ class RoomPlan:
 
 
 ROOMS = (
-    RoomPlan("screening", "Visitor Screening", "reception", 2, 11, 10, 7),
-    RoomPlan("reception", "Receiving / Extraction", "reception", 2, 21, 10, 7),
-    RoomPlan("freight", "Freight Locker", "storage", 2, 30, 10, 5),
-    RoomPlan("dock", "Dock Maintenance", "maintenance", 2, 38, 10, 8),
-    RoomPlan("power", "Power Intake", "maintenance", 17, 5, 5, 8),
-    RoomPlan("repair", "Repair Bay", "maintenance", 17, 16, 5, 7),
-    RoomPlan("service-office", "Engineering Office", "office", 17, 29, 5, 7),
-    RoomPlan("logistics", "Logistics", "storage", 17, 39, 5, 10),
-    RoomPlan("servers", "Service Servers", "server", 27, 5, 6, 8),
-    RoomPlan("workshop", "Tool Workshop", "maintenance", 27, 16, 6, 7),
-    RoomPlan("filtration", "Air Filtration", "maintenance", 27, 29, 6, 7),
-    RoomPlan("relay", "Data Relay", "server", 27, 39, 6, 10),
-    RoomPlan("checkpoint", "Security Checkpoint", "office", 37, 5, 7, 8),
-    RoomPlan("dispatch", "Surveillance", "server", 49, 5, 10, 8),
-    RoomPlan("archive", "Secure Archive", "storage", 37, 18, 7, 6),
-    RoomPlan("control", "Security Control", "office", 49, 18, 10, 6),
-    RoomPlan("wet-lab", "Wet Laboratory", "laboratory", 37, 29, 7, 8),
-    RoomPlan("bio-lab", "Biology / Samples", "laboratory", 49, 29, 10, 8),
-    RoomPlan("lab-stores", "Research Supplies", "storage", 37, 42, 7, 9),
-    RoomPlan("electronics", "Electronics Lab", "laboratory", 49, 42, 10, 9),
-    RoomPlan("coolant", "Coolant Control", "laboratory", 68, 17, 9, 4),
-    RoomPlan("reactor", "Core Chamber", "reactor", 68, 23, 9, 9),
-    RoomPlan("auxiliary", "Auxiliary Cells", "maintenance", 68, 34, 9, 5),
+    RoomPlan("screening", "Personnel Screening", "reception", 2, 13, 8, 5),
+    RoomPlan("reception", "Entry / Extraction", "reception", 2, 21, 8, 6),
+    RoomPlan("power", "Power & Ventilation", "maintenance", 15, 8, 5, 8),
+    RoomPlan("servers", "Service Servers", "server", 24, 8, 5, 8),
+    RoomPlan("repair", "Maintenance Bay", "maintenance", 15, 23, 5, 8),
+    RoomPlan("logistics", "Equipment Stores", "storage", 24, 23, 5, 8),
+    RoomPlan("checkpoint", "Security Checkpoint", "office", 32, 5, 6, 7),
+    RoomPlan("control", "Surveillance Control", "office", 40, 5, 6, 7),
+    RoomPlan("wet-lab", "Analytical Laboratory", "laboratory", 32, 21, 6, 7),
+    RoomPlan("bio-lab", "Biology / Test Cells", "laboratory", 40, 21, 6, 7),
+    RoomPlan("lab-stores", "Sample Archive", "storage", 32, 32, 6, 5),
+    RoomPlan("electronics", "Instrument Lab", "laboratory", 40, 32, 6, 5),
+    RoomPlan("coolant", "Containment Systems", "laboratory", 51, 11, 10, 6),
+    RoomPlan("reactor", "Core Chamber", "reactor", 51, 20, 10, 9),
 )
 
 
@@ -150,12 +141,13 @@ class Facility:
 
 
 def architecture(facility: Facility) -> None:
+    # Blueprint topology: Entry -> Service -> Security OR Research -> Core.
     zones = (
-        ("entry", "Entry / Extraction", 1, 10, 14, 38),
-        ("service-wing", "Service Wing", 16, 4, 18, 48),
-        ("security-control", "Security Control", 36, 3, 24, 22),
-        ("research-floor", "Research Floor", 36, 28, 24, 25),
-        ("core-chamber", "Core Chamber", 63, 16, 16, 24),
+        ("entry", "Entry / Extraction", 1, 12, 11, 16),
+        ("service-wing", "Service Wing", 14, 7, 15, 27),
+        ("security-control", "Security Control", 31, 4, 16, 13),
+        ("research-floor", "Research Floor", 31, 21, 16, 17),
+        ("core-chamber", "Core Chamber", 50, 10, 12, 21),
     )
     for name, label, x, y, width, height in zones:
         facility.object(
@@ -181,135 +173,76 @@ def architecture(facility: Facility) -> None:
             properties={"style": room.style, "label": room.label},
         )
     corridors = (
-        (13, 13, 2, 31),
-        (12, 14, 1, 2),
-        (12, 25, 1, 2),
-        (12, 31, 1, 2),
-        (12, 41, 1, 2),
-        (15, 25, 11, 2),
-        (23, 5, 3, 46),
-        (17, 24, 16, 3),
-        (22, 9, 1, 2),
-        (22, 19, 1, 2),
-        (22, 32, 1, 2),
-        (22, 43, 1, 2),
-        (26, 9, 1, 2),
-        (26, 19, 1, 2),
-        (26, 32, 1, 2),
-        (26, 43, 1, 2),
-        (19, 23, 2, 1),
-        (33, 9, 4, 3),
-        (33, 43, 4, 3),
-        (36, 14, 24, 3),
-        (45, 4, 3, 48),
-        (40, 13, 2, 1),
-        (40, 17, 2, 1),
-        (53, 13, 2, 1),
-        (53, 17, 2, 1),
-        (44, 9, 1, 2),
-        (48, 9, 1, 2),
-        (44, 20, 1, 2),
-        (48, 20, 1, 2),
-        (46, 25, 2, 3),
-        (36, 38, 24, 3),
-        (40, 37, 2, 1),
-        (40, 41, 2, 1),
-        (53, 37, 2, 1),
-        (53, 41, 2, 1),
-        (44, 33, 1, 2),
-        (48, 33, 1, 2),
-        (44, 44, 1, 2),
-        (48, 44, 1, 2),
-        (59, 20, 5, 2),
-        (59, 35, 5, 2),
-        (64, 21, 3, 16),
-        (64, 21, 14, 2),
-        (64, 32, 14, 2),
-        (67, 25, 1, 2),
-        (71, 32, 2, 1),
-        (71, 33, 2, 1),
-        (67, 35, 1, 2),
+        (10, 15, 1, 2),
+        (11, 15, 2, 11),
+        (10, 24, 1, 2),
+        (13, 19, 10, 2),
+        (21, 9, 2, 23),
+        (20, 11, 1, 2),
+        (23, 11, 1, 2),
+        (20, 26, 1, 2),
+        (23, 26, 1, 2),
+        # Short, exposed Security approach, through a railed access gangway.
+        (29, 10, 3, 3),
+        (35, 12, 2, 1),
+        (43, 12, 2, 1),
+        (32, 13, 20, 2),
+        # Research winds through equipment stores, then a furnished laboratory.
+        (27, 31, 2, 4),
+        (29, 33, 3, 3),
+        (32, 28, 15, 3),
+        (35, 31, 2, 1),
+        (43, 31, 2, 1),
+        (47, 29, 14, 2),
+        # Narrow branch cross-link. It remains open in both mission phases.
+        (38, 15, 2, 2),
+        (38, 17, 1, 4),
+        (38, 21, 2, 8),
+        # Both branches join the same Core room; no alternate objective anchor.
+        (55, 17, 2, 3),
+        (51, 18, 10, 1),
     )
     for rect in corridors:
         facility.open(*rect)
-    # Fixed, transparent partitions: movement/sound blockers, never invented doors.
     for x, y, width, height in (
-        (44, 18, 1, 2),
-        (48, 5, 1, 3),
-        (44, 29, 1, 3),
-        (48, 29, 1, 3),
-        (67, 23, 1, 2),
-        (12, 21, 1, 3),
+        (38, 5, 1, 3),
+        (39, 5, 1, 3),
+        (32, 20, 6, 1),
+        (40, 20, 6, 1),
+        (51, 19, 3, 1),
+        (58, 19, 3, 1),
     ):
         facility.glass.update((a, b) for a in range(x, x + width) for b in range(y, y + height))
 
 
 def furnish(facility: Facility) -> None:
-    # Explicit per-room layouts keep entrances, patrols and plausible working aisles clear.
+    # Room purpose determines its fittings; keep genuine working aisles.
     items = (
         (
             "screening",
             (
-                ("desk", 0, 0, 3, 2),
-                ("planter", 6, 0, 3, 1),
-                ("shelf", 0, 4, 3, 2),
-                ("plant", 8, 5, 1, 1),
+                ("desk", 0, 0, 3, 1),
+                ("planter", 5, 0, 3, 1),
+                ("shelf", 0, 3, 2, 2),
+                ("plant", 7, 4, 1, 1),
             ),
         ),
         (
             "reception",
             (
-                ("desk", 0, 0, 3, 2),
+                ("desk", 0, 0, 3, 1),
                 ("planter", 5, 0, 3, 1),
-                ("shelf", 8, 2, 2, 2),
-                ("plant", 8, 5, 1, 1),
-            ),
-        ),
-        (
-            "freight",
-            (
-                ("crates", 0, 0, 2, 2),
-                ("shelf", 4, 0, 3, 2),
-                ("crates", 0, 3, 2, 2),
-                ("plant", 8, 3, 1, 1),
-            ),
-        ),
-        (
-            "dock",
-            (
-                ("pump", 0, 0, 2, 3),
-                ("shelf", 5, 0, 4, 2),
-                ("workbench", 4, 5, 3, 2),
-                ("crates", 0, 6, 2, 2),
-                ("plant", 8, 6, 1, 1),
+                ("shelf", 6, 4, 2, 2),
+                ("plant", 0, 5, 1, 1),
             ),
         ),
         (
             "power",
             (
-                ("pump", 0, 0, 2, 3),
-                ("rack", 4, 0, 1, 3),
-                ("workbench", 0, 6, 2, 2),
+                ("pump", 0, 0, 2, 2),
+                ("pump", 4, 0, 1, 3),
+                ("workbench", 0, 6, 3, 2),
                 ("plant", 4, 6, 1, 1),
-            ),
-        ),
-        (
-            "repair",
-            (
-                ("shelf", 0, 0, 3, 1),
-                ("pump", 0, 2, 1, 2),
-                ("workbench", 3, 4, 2, 2),
-                ("plant", 0, 6, 1, 1),
-            ),
-        ),
-        ("service-office", (("desk", 0, 0, 3, 2), ("shelf", 0, 4, 2, 2), ("plant", 4, 5, 1, 1))),
-        (
-            "logistics",
-            (
-                ("shelf", 0, 0, 3, 2),
-                ("crates", 0, 4, 2, 2),
-                ("crates", 3, 7, 2, 2),
-                ("plant", 0, 8, 1, 1),
             ),
         ),
         (
@@ -319,114 +252,101 @@ def furnish(facility: Facility) -> None:
                 ("rack", 3, 0, 1, 3),
                 ("rack", 0, 6, 1, 2),
                 ("rack", 3, 6, 1, 2),
-                ("plant", 5, 0, 1, 1),
+                ("plant", 4, 0, 1, 1),
             ),
         ),
         (
-            "workshop",
+            "repair",
             (
-                ("workbench", 0, 0, 3, 2),
-                ("shelf", 4, 0, 2, 2),
-                ("pump", 0, 4, 2, 2),
-                ("plant", 5, 5, 1, 1),
+                ("shelf", 0, 0, 3, 1),
+                ("pump", 0, 2, 1, 2),
+                ("workbench", 2, 6, 3, 2),
+                ("plant", 0, 7, 1, 1),
             ),
         ),
-        ("filtration", (("pump", 0, 0, 2, 2), ("pump", 4, 0, 2, 2), ("planter", 1, 5, 3, 1))),
         (
-            "relay",
+            "logistics",
             (
-                ("rack", 0, 0, 1, 3),
-                ("rack", 3, 0, 1, 3),
-                ("rack", 0, 7, 1, 3),
-                ("rack", 3, 7, 1, 3),
-                ("plant", 5, 8, 1, 1),
+                ("shelf", 0, 0, 3, 1),
+                ("crates", 0, 4, 2, 2),
+                ("shelf", 0, 6, 2, 2),
+                ("plant", 4, 0, 1, 1),
             ),
         ),
         (
             "checkpoint",
             (
-                ("console", 0, 0, 3, 2),
-                ("planter", 4, 0, 3, 1),
-                ("shelf", 0, 6, 3, 2),
-                ("desk", 4, 5, 3, 2),
-            ),
-        ),
-        (
-            "dispatch",
-            (
-                ("rack", 0, 0, 1, 2),
-                ("rack", 3, 0, 1, 2),
-                ("console", 1, 6, 3, 2),
-                ("desk", 6, 6, 3, 2),
-                ("plant", 9, 0, 1, 1),
-            ),
-        ),
-        (
-            "archive",
-            (
-                ("shelf", 0, 0, 2, 2),
-                ("shelf", 0, 4, 2, 2),
-                ("crates", 5, 4, 2, 2),
-                ("plant", 6, 0, 1, 1),
+                ("console", 0, 0, 3, 1),
+                ("planter", 4, 0, 2, 1),
+                ("desk", 3, 3, 3, 2),
+                ("shelf", 0, 4, 2, 1),
             ),
         ),
         (
             "control",
             (
                 ("console", 0, 0, 3, 1),
-                ("desk", 4, 2, 3, 2),
-                ("planter", 0, 5, 3, 1),
-                ("plant", 9, 5, 1, 1),
+                ("console", 4, 0, 2, 1),
+                ("desk", 0, 3, 3, 2),
+                ("rack", 5, 3, 1, 2),
+                ("plant", 0, 6, 1, 1),
             ),
         ),
         (
             "wet-lab",
             (
-                ("tank", 0, 0, 2, 3),
-                ("labbench", 4, 0, 3, 2),
-                ("labbench", 0, 6, 3, 2),
-                ("plant", 6, 6, 1, 1),
+                ("tank", 0, 0, 1, 3),
+                ("labbench", 3, 0, 3, 1),
+                ("labbench", 3, 5, 3, 2),
+                ("plant", 0, 4, 1, 1),
             ),
         ),
         (
             "bio-lab",
             (
-                ("labbench", 0, 0, 3, 2),
-                ("tank", 4, 0, 1, 3),
-                ("tank", 7, 0, 1, 3),
+                ("labbench", 0, 0, 3, 1),
+                ("tank", 5, 0, 1, 3),
+                ("tank", 3, 3, 1, 2),
                 ("planter", 0, 6, 3, 1),
-                ("labbench", 4, 6, 3, 2),
             ),
         ),
         (
             "lab-stores",
             (
-                ("shelf", 0, 0, 3, 1),
-                ("crates", 0, 5, 2, 2),
-                ("shelf", 4, 7, 3, 2),
-                ("plant", 0, 8, 1, 1),
+                ("shelf", 0, 0, 2, 1),
+                ("shelf", 4, 0, 2, 1),
+                ("crates", 0, 3, 2, 2),
+                ("plant", 5, 4, 1, 1),
             ),
         ),
         (
             "electronics",
             (
-                ("desk", 0, 0, 3, 2),
-                ("labbench", 6, 0, 3, 2),
-                ("workbench", 3, 6, 3, 2),
-                ("plant", 9, 7, 1, 1),
+                ("labbench", 0, 0, 2, 1),
+                ("desk", 3, 1, 3, 1),
+                ("workbench", 3, 3, 3, 2),
+                ("plant", 0, 4, 1, 1),
             ),
         ),
-        ("coolant", (("tank", 0, 0, 1, 3), ("labbench", 3, 0, 3, 1), ("tank", 8, 0, 1, 3))),
+        (
+            "coolant",
+            (
+                ("tank", 0, 0, 1, 3),
+                ("labbench", 3, 0, 3, 1),
+                ("tank", 9, 0, 1, 3),
+                ("console", 0, 4, 3, 1),
+                ("plant", 9, 4, 1, 1),
+            ),
+        ),
         (
             "reactor",
             (
                 ("console", 0, 0, 3, 1),
-                ("console", 6, 0, 3, 1),
+                ("console", 7, 0, 3, 1),
                 ("pump", 0, 6, 2, 2),
-                ("planter", 6, 7, 3, 1),
+                ("planter", 7, 7, 3, 1),
             ),
         ),
-        ("auxiliary", (("pump", 0, 0, 2, 1), ("pump", 7, 0, 2, 1), ("plant", 8, 4, 1, 1))),
     )
     rooms = {room.name: room for room in ROOMS}
     for name, fixtures in items:
@@ -436,21 +356,17 @@ def furnish(facility: Facility) -> None:
                 "entry-console" if name == "reception" and index == 0 else f"{name}-{index + 1}"
             )
             facility.furniture(fixture_id, style, room.x + x, room.y + y, width, height)
-    # Corridor equipment creates visible bends and safer observation pockets.
     for name, style, x, y, width, height in (
-        ("service-baffle-upper", "pump", 23, 14, 2, 2),
-        ("service-baffle-lower", "shelf", 24, 28, 2, 2),
-        ("service-baffle-loading", "pump", 23, 37, 2, 2),
-        ("junction-planter", "planter", 27, 24, 3, 1),
-        ("east-junction-planter", "planter", 54, 15, 3, 1),
-        ("lab-junction-planter", "planter", 50, 39, 3, 1),
-        ("entry-hall-plant", "plant", 14, 36, 1, 1),
+        ("service-baffle", "pump", 21, 22, 1, 2),
+        ("research-cover", "planter", 41, 29, 3, 1),
+        ("research-screen", "labbench", 35, 29, 2, 1),
+        ("security-panel", "console", 32, 13, 2, 1),
     ):
         facility.furniture(name, style, x, y, width, height)
-    for name, y in (("security-steps", 9), ("research-steps", 43)):
-        facility.detail(name, "stairs", 33, y, 4, 3, 270)
-        facility.furniture(name + "-north-rail", "railing", 33, y, 4, 1)
-        facility.furniture(name + "-south-rail", "railing", 33, y + 2, 4, 1)
+    for name, y in (("security-steps", 10), ("research-steps", 33)):
+        facility.detail(name, "stairs", 29, y, 3, 3, 270)
+        facility.furniture(name + "-north-rail", "railing", 29, y, 3, 1)
+        facility.furniture(name + "-south-rail", "railing", 29, y + 2, 3, 1)
     for room in ROOMS:
         if room.style in ("server", "maintenance"):
             facility.detail(
@@ -468,9 +384,9 @@ def furnish(facility: Facility) -> None:
 
 def anchors_and_patrols(facility: Facility) -> None:
     for name, kind, tile in (
-        ("entry-spawn", "Spawn", (5, 25)),
-        ("entry-exit", "Exit", (3, 25)),
-        ("vault-core", "Core", (72, 27)),
+        ("entry-spawn", "Spawn", (5, 24)),
+        ("entry-exit", "Exit", (3, 24)),
+        ("vault-core", "Core", (56, 22)),
     ):
         facility.object(
             facility.anchors,
@@ -480,10 +396,14 @@ def anchors_and_patrols(facility: Facility) -> None:
             properties={"actor_id": "operative"} if kind == "Spawn" else {},
         )
     routes = (
-        ("service", "SENTINEL", ((24, 19), (24, 25), (19, 25), (19, 19), (24, 19))),
-        ("security", "SENTINEL", ((56, 7), (50, 7), (50, 10), (56, 10), (56, 7))),
-        ("research", "TRACKER", ((56, 46), (50, 46), (50, 44), (56, 44), (56, 46))),
-        ("core", "INTERCEPTOR", ((75, 37), (69, 37), (69, 35), (75, 35), (75, 37))),
+        (
+            "service",
+            "SENTINEL",
+            ((18, 12), (22, 12), (22, 20), (17, 20), (22, 20), (22, 12), (18, 12)),
+        ),
+        ("security", "SENTINEL", ((44, 8), (43, 8), (43, 10), (44, 10), (44, 8))),
+        ("research", "TRACKER", ((37, 34), (35, 34), (35, 33), (37, 33), (37, 34))),
+        ("core", "INTERCEPTOR", ((59, 26), (54, 26), (54, 25), (59, 25), (59, 26))),
     )
     for name, kind, points in routes:
         facility.object(facility.patrols, "route-" + name, "PatrolRoute", *points[0], points=points)
@@ -495,27 +415,28 @@ def anchors_and_patrols(facility: Facility) -> None:
             properties={"guard_kind": kind, "route_id": "route-" + name},
         )
     for name, tile, pair in (
-        ("entry-service", (15, 25), "entry|service-wing"),
-        ("service-security", (35, 10), "service-wing|security-control"),
-        ("service-research", (35, 44), "service-wing|research-floor"),
-        ("cross-link", (46, 26), "security-control|research-floor"),
-        ("security-core", (61, 20), "security-control|core-chamber"),
-        ("research-core", (61, 35), "research-floor|core-chamber"),
+        ("entry-service", (13, 19), "entry|service-wing"),
+        ("service-security", (30, 11), "service-wing|security-control"),
+        ("service-research", (30, 34), "service-wing|research-floor"),
+        ("cross-link", (38, 19), "security-control|research-floor"),
+        ("security-core", (48, 14), "security-control|core-chamber"),
+        ("research-core", (48, 30), "research-floor|core-chamber"),
     ):
         facility.object(
             facility.markers, "choke-" + name, "Chokepoint", *tile, properties={"zones": pair}
         )
-    # Retain stable cover/hide marker IDs for the later P05 ownership contract.
+    # Stable marker IDs for P05, beside actual cover rather than decorative walls.
     for index, (cover, hide) in enumerate(
         (
-            ((28, 26), (28, 25)),
-            ((18, 46), (18, 47)),
-            ((42, 20), (42, 21)),
-            ((57, 49), (57, 48)),
-            ((74, 29), (74, 28)),
+            ((20, 19), (20, 20)),
+            ((26, 25), (26, 26)),
+            ((36, 15), (36, 14)),
+            ((44, 28), (44, 29)),
+            ((53, 23), (53, 24)),
         ),
         1,
     ):
+        facility.floor.update((cover, hide, (cover[0] - 1, cover[1])))
         facility.cover.add(cover)
         facility.object(facility.markers, f"cover-{index}", "Cover", cover[0] - 1, cover[1])
         facility.object(facility.markers, f"hide-{index}", "HideSpot", *hide)

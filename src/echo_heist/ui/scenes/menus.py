@@ -23,23 +23,32 @@ class MenuItem:
 
 
 TITLE_ITEMS = (
-    MenuItem("HUMAN INFILTRATION"),
-    MenuItem("COMPANION INFILTRATION", enabled=False),
-    MenuItem("AI WORKSHOP", enabled=False),
+    MenuItem("PLAY CHAPTER"),
     MenuItem("MISSION REPORT"),
     MenuItem("SETTINGS"),
     MenuItem("QUIT"),
 )
 MODE_ITEMS = (
-    MenuItem("HUMAN INFILTRATION", note="Direct control  /  tools and stealth"),
-    MenuItem("COMPANION INFILTRATION", enabled=False, note="Available in a later build"),
+    MenuItem("HUMAN", note="Direct control. Tools and stealth."),
+    MenuItem("COMPANION", enabled=False, note="Watch your AI infiltrate."),
+    MenuItem("LAUNCH MISSION"),
+    MenuItem("BACK"),
 )
+CHAPTER_CARD = pygame.Rect(44, 238, 456, 274)
 TITLE_BUTTONS = (
-    pygame.Rect(44, 368, 452, 62),
-    *(pygame.Rect(44, 437 + index * 44, 452, 38) for index in range(5)),
+    pygame.Rect(60, 449, 424, 46),
+    pygame.Rect(44, 542, 160, 48),
+    pygame.Rect(216, 542, 160, 48),
+    pygame.Rect(388, 542, 112, 48),
 )
-MODE_BUTTONS = (pygame.Rect(44, 438, 452, 64), pygame.Rect(44, 514, 452, 64))
-LAUNCH_BUTTON = pygame.Rect(44, 609, 452, 65)
+LAUNCH_BUTTON = pygame.Rect(620, 548, 576, 54)
+BACK_BUTTON = pygame.Rect(44, 650, 130, 42)
+MODE_BUTTONS = (
+    pygame.Rect(620, 212, 280, 114),
+    pygame.Rect(916, 212, 280, 114),
+    LAUNCH_BUTTON,
+    BACK_BUTTON,
+)
 RESULT_RETRY = pygame.Rect(660, 590, 552, 48)
 RESULT_MENU = pygame.Rect(660, 648, 552, 48)
 
@@ -55,9 +64,9 @@ def load_backdrop(size: tuple[int, int]) -> pygame.Surface:
 
 
 def move_selection(index: int, items: tuple[MenuItem, ...], key: int) -> int:
-    if key in (pygame.K_UP, pygame.K_w):
+    if key in (pygame.K_UP, pygame.K_LEFT, pygame.K_w, pygame.K_a):
         return (index - 1) % len(items)
-    if key in (pygame.K_DOWN, pygame.K_s):
+    if key in (pygame.K_DOWN, pygame.K_RIGHT, pygame.K_s, pygame.K_d):
         return (index + 1) % len(items)
     return index
 
@@ -83,17 +92,22 @@ def _frame(
     fonts: Fonts,
     clock_ms: int,
     reduced_motion: bool,
+    *,
+    briefing: bool,
 ) -> None:
     draw_scene(canvas, backdrop, clock_ms, reduced_motion=reduced_motion)
-    pygame.draw.rect(canvas, theme.ACCENT, (44, 38, 6, 6))
-    _text(canvas, fonts.micro, "NEXUS RESEARCH  /  FACILITY A1", theme.ACCENT, (62, 33))
-    _text(canvas, fonts.logo, "ECHO", theme.TEXT, (39, 83))
-    _text(canvas, fonts.logo, "HEIST", theme.TEXT, (39, 149))
-    pygame.draw.line(canvas, theme.ACCENT, (44, 229), (150, 229), 3)
-    _text(canvas, fonts.small, "THE CORE REBELLION", theme.MUTED, (44, 247))
-    pygame.draw.line(canvas, theme.BORDER, (44, 298), (420, 298), 1)
-    _text(canvas, fonts.small, "STEAL THE CORE. SURVIVE THE LOCKDOWN.", theme.TEXT, (44, 315))
-    _text(canvas, fonts.micro, f"{__version__}  /  DEVELOPMENT BUILD", theme.MUTED, (993, 692))
+    _text(canvas, fonts.micro, "NEXUS RESEARCH  /  SITE A1", theme.ACCENT, (44, 35))
+    _text(canvas, fonts.title, "ECHO HEIST", theme.TEXT, (40, 69))
+    _text(
+        canvas,
+        fonts.small,
+        "MISSION BRIEFING" if briefing else "THE CORE REBELLION",
+        theme.MUTED,
+        (44, 138),
+    )
+    if not briefing:
+        _text(canvas, fonts.small, "Steal the Core. Survive the lockdown.", theme.TEXT, (44, 195))
+        _text(canvas, fonts.micro, f"{__version__}  /  DEVELOPMENT BUILD", theme.MUTED, (993, 692))
 
 
 def _button(
@@ -129,8 +143,9 @@ def _button(
             2,
         )
     color = theme.TEXT if enabled else theme.DISABLED
-    top = rect.y + 11 if note else rect.centery - fonts.body.get_height() // 2
-    _text(canvas, fonts.body, label, color, (rect.x + 21, top))
+    face = fonts.small if rect.width < 200 else fonts.body
+    top = rect.y + 11 if note else rect.centery - face.get_height() // 2
+    _text(canvas, face, label, color, (rect.x + 16, top))
     if note:
         _text(canvas, fonts.micro, note, theme.MUTED, (rect.x + 22, rect.y + 40))
     if enabled:
@@ -144,6 +159,129 @@ def _button(
         )
 
 
+def _chapter_card(
+    canvas: pygame.Surface, fonts: Fonts, backdrop: pygame.Surface, selected: int, clock_ms: int
+) -> None:
+    panel(canvas, CHAPTER_CARD, fill=(6, 20, 30, 224), border=theme.ACCENT_DIM)
+    source = pygame.Rect(round(backdrop.get_width() * 0.59), 65, 450, 350)
+    thumb = pygame.transform.smoothscale(backdrop.subsurface(source), (128, 100))
+    canvas.blit(thumb, (60, 254))
+    _text(canvas, fonts.micro, "CHAPTER 01", theme.ACCENT, (206, 258))
+    _text(canvas, fonts.body, "The Core", theme.TEXT, (204, 282))
+    _text(canvas, fonts.body, "Rebellion", theme.TEXT, (204, 309))
+    _text(canvas, fonts.micro, "NEXUS RESEARCH FACILITY", theme.MUTED, (60, 370))
+    _text(canvas, fonts.small, "Infiltrate. Recover. Get out.", theme.TEXT, (60, 395))
+    _button(
+        canvas,
+        TITLE_BUTTONS[0],
+        "PLAY CHAPTER",
+        fonts,
+        selected=selected == 0,
+        enabled=True,
+        clock_ms=clock_ms,
+    )
+
+
+def _route_diagram(canvas: pygame.Surface, fonts: Fonts) -> None:
+    _text(canvas, fonts.micro, "TWO WAYS IN. TWO WAYS OUT.", theme.MUTED, (620, 354))
+    boxes = (
+        ("ENTRY", pygame.Rect(620, 416, 92, 40)),
+        ("SERVICE", pygame.Rect(732, 416, 100, 40)),
+        ("SECURITY", pygame.Rect(858, 388, 132, 40)),
+        ("RESEARCH", pygame.Rect(858, 452, 132, 40)),
+        ("CORE", pygame.Rect(1028, 416, 168, 40)),
+    )
+    color = theme.ACCENT_DIM
+    for points in (
+        ((712, 436), (732, 436)),
+        ((832, 436), (844, 436), (844, 408), (858, 408)),
+        ((832, 436), (844, 436), (844, 472), (858, 472)),
+        ((990, 408), (1008, 408), (1008, 436), (1028, 436)),
+        ((990, 472), (1008, 472), (1008, 436)),
+        ((924, 428), (924, 452)),
+    ):
+        pygame.draw.lines(canvas, color, False, points, 2)
+    for label, rect in boxes:
+        panel(canvas, rect, fill=(5, 23, 31, 225), border=color)
+        text = fonts.micro.render(label, True, theme.TEXT)
+        canvas.blit(text, text.get_rect(center=rect.center))
+    _text(
+        canvas,
+        fonts.micro,
+        "Security: direct / exposed     Research: longer / cover",
+        theme.MUTED,
+        (620, 510),
+    )
+
+
+def _briefing(
+    canvas: pygame.Surface, fonts: Fonts, selected: int, mode_choice: int, clock_ms: int
+) -> None:
+    panel(canvas, pygame.Rect(44, 184, 520, 440), fill=(5, 18, 28, 227), border=theme.BORDER)
+    _text(canvas, fonts.micro, "CHAPTER 01", theme.ACCENT, (64, 204))
+    _text(canvas, fonts.heading, "The Core Rebellion", theme.TEXT, (62, 229))
+    _text(canvas, fonts.small, "A single heist at Nexus Research Site A1.", theme.MUTED, (64, 275))
+    steps = (
+        ("01  INFILTRATE", "Enter through the Service Wing."),
+        ("02  RECOVER", "Hold E beside the experimental Core."),
+        ("03  EXTRACT", "Theft starts lockdown. Return to Entry."),
+    )
+    for index, (label, description) in enumerate(steps):
+        y = 323 + index * 67
+        _text(canvas, fonts.micro, label, theme.ACCENT, (64, y))
+        _text(canvas, fonts.small, description, theme.TEXT, (64, y + 23))
+    pygame.draw.line(canvas, theme.BORDER, (64, 527), (544, 527))
+    _text(
+        canvas,
+        fonts.micro,
+        "WASD / ARROWS  Move     SHIFT  Sprint     TAB  Map",
+        theme.MUTED,
+        (64, 546),
+    )
+    _text(
+        canvas,
+        fonts.micro,
+        "Q  Echo     F  EMP     SPACE  Stun     ESC  Pause",
+        theme.MUTED,
+        (64, 578),
+    )
+    panel(canvas, pygame.Rect(600, 184, 616, 440), fill=(5, 18, 28, 219), border=theme.BORDER)
+    _text(canvas, fonts.micro, "PLAY MODE", theme.MUTED, (620, 187))
+    for index, item in enumerate(MODE_ITEMS[:2]):
+        rect = MODE_BUTTONS[index]
+        chosen = index == mode_choice
+        border = theme.ACCENT if chosen else theme.BORDER
+        panel(canvas, rect, fill=(7, 34, 44, 220 if chosen else 150), border=border)
+        pygame.draw.circle(canvas, border, (rect.x + 21, rect.y + 25), 6, 2)
+        if chosen:
+            pygame.draw.circle(canvas, theme.ACCENT, (rect.x + 21, rect.y + 25), 3)
+        color = theme.TEXT if item.enabled else theme.DISABLED
+        _text(canvas, fonts.small, item.label, color, (rect.x + 39, rect.y + 12))
+        _text(
+            canvas,
+            fonts.micro,
+            "SELECTED" if chosen else "COMING LATER",
+            border,
+            (rect.x + 16, rect.y + 49),
+        )
+        _text(canvas, fonts.micro, item.note, theme.MUTED, (rect.x + 16, rect.y + 78))
+        if selected == index:
+            pygame.draw.rect(canvas, theme.TEXT, rect.inflate(-6, -6), 1, border_radius=4)
+    _route_diagram(canvas, fonts)
+    _button(
+        canvas,
+        LAUNCH_BUTTON,
+        "LAUNCH MISSION",
+        fonts,
+        selected=selected == 2,
+        enabled=MODE_ITEMS[mode_choice].enabled,
+        clock_ms=clock_ms,
+    )
+    _button(
+        canvas, BACK_BUTTON, "BACK", fonts, selected=selected == 3, enabled=True, clock_ms=clock_ms
+    )
+
+
 def draw_menu(
     canvas: pygame.Surface,
     fonts: Fonts,
@@ -154,60 +292,50 @@ def draw_menu(
     notice: str,
     clock_ms: int,
     reduced_motion: bool = False,
+    mode_choice: int = 0,
+    report_available: bool = False,
 ) -> None:
-    _frame(canvas, backdrop, fonts, clock_ms, reduced_motion)
-    if scene == "TITLE":
-        _text(canvas, fonts.micro, "01  /  CHOOSE YOUR OPERATION", theme.ACCENT, (44, 343))
-        for index, item in enumerate(TITLE_ITEMS):
+    briefing = scene == "MODE"
+    _frame(canvas, backdrop, fonts, clock_ms, reduced_motion, briefing=briefing)
+    if not briefing:
+        _chapter_card(canvas, fonts, backdrop, selected, clock_ms)
+        for index, label in enumerate(("REPORT", "SETTINGS", "QUIT"), 1):
             _button(
                 canvas,
                 TITLE_BUTTONS[index],
-                item.label,
+                label,
                 fonts,
-                selected=index == selected,
-                enabled=item.enabled,
+                selected=selected == index,
+                enabled=index != 1 or report_available,
                 clock_ms=clock_ms,
             )
+        message = notice or (
+            "Finish a mission to unlock its report."
+            if selected == 1 and not report_available
+            else ""
+        )
+        if message:
+            _text(canvas, fonts.micro, message, theme.WARNING if notice else theme.MUTED, (44, 612))
         _text(
             canvas,
             fonts.micro,
-            notice or "ARROWS  Select    ENTER  Confirm    MOUSE  Navigate",
-            theme.WARNING if notice else theme.MUTED,
-            (44, 664),
+            "ARROWS  Select    ENTER  Confirm    ESC  Quit",
+            theme.MUTED,
+            (44, 674),
         )
     else:
-        _text(canvas, fonts.micro, "02  /  MISSION BRIEFING", theme.ACCENT, (44, 375))
-        _text(canvas, fonts.small, "RESEARCH SITE A1  /  FIVE ZONES", theme.TEXT, (44, 399))
-        for index, item in enumerate(MODE_ITEMS):
-            _button(
-                canvas,
-                MODE_BUTTONS[index],
-                item.label,
-                fonts,
-                selected=index == selected,
-                enabled=item.enabled,
-                note=item.note,
-                clock_ms=clock_ms,
-            )
-        launch_enabled = MODE_ITEMS[selected].enabled
-        _button(
-            canvas,
-            LAUNCH_BUTTON,
-            "LAUNCH MISSION",
-            fonts,
-            selected=launch_enabled,
-            enabled=launch_enabled,
-            clock_ms=clock_ms,
-        )
+        _briefing(canvas, fonts, selected, mode_choice, clock_ms)
         if notice:
-            _text(canvas, fonts.micro, notice, theme.WARNING, (44, 587))
-    _text(
-        canvas,
-        fonts.micro,
-        "ESC  " + ("Quit" if scene == "TITLE" else "Back"),
-        theme.MUTED,
-        (46, 690),
-    )
+            panel(canvas, pygame.Rect(600, 640, 616, 32), fill=(5, 18, 28, 240))
+            _text(canvas, fonts.micro, notice, theme.WARNING, (612, 647))
+        panel(canvas, pygame.Rect(600, 676, 610, 23), fill=(5, 18, 28, 220))
+        _text(
+            canvas,
+            fonts.micro,
+            "ENTER  Confirm    ARROWS  Select    ESC  Back",
+            theme.MUTED,
+            (600, 680),
+        )
 
 
 def draw_results(

@@ -20,6 +20,10 @@ def room_floors(texture: pygame.Surface) -> dict[str, pygame.Surface]:
     }.items():
         floor = texture.copy()
         floor.fill(tint, special_flags=pygame.BLEND_RGB_MULT)
+        if style == "laboratory":
+            floor.fill((29, 35, 34), special_flags=pygame.BLEND_RGB_ADD)
+        elif style in ("office", "reception"):
+            floor.fill((12, 15, 16), special_flags=pygame.BLEND_RGB_ADD)
         result[style] = floor
     return result
 
@@ -69,6 +73,14 @@ def draw_room_trim(surface: pygame.Surface, level: LevelData, fonts: Fonts) -> N
         # A restrained seam defines each room without drawing a second tile grid.
         edge = (49, 104, 116) if room.style in ("laboratory", "reactor", "server") else (89, 90, 76)
         pygame.draw.rect(surface, edge, rect.inflate(-4, -4), 1)
+        if room.style == "laboratory":
+            pygame.draw.line(
+                surface,
+                (166, 196, 193),
+                (rect.left + 6, rect.top + 6),
+                (rect.right - 6, rect.top + 6),
+                2,
+            )
         title = fonts.micro.render(room.label.upper(), True, (143, 168, 176))
         if title.get_width() > rect.width - 8:
             title = pygame.transform.smoothscale(title, (rect.width - 8, title.get_height()))

@@ -17,7 +17,7 @@ uv run --locked echo-heist --headless --seed 1042
 uv run --locked python scripts/checks/run.py
 ```
 
-The desktop entry opens the cinematic title, then a Human mission briefing and the actual five-zone heist. Select with mouse or arrows/Enter. In the mission, move with WASD/arrows, sprint with Shift, hold E near the Core, and return to the original Exit after lockdown. Q deploys Echo, F uses EMP, Space melees, Tab opens the paused facility map, and Escape pauses. Pause offers resume, same-seed retry and confirmed abort. Companion remains visibly unavailable until Phase 4.
+The desktop entry opens a Chapter 01 card. Play Chapter opens the briefing, where you choose a mode and use Launch Mission. Select with mouse or arrows/Enter; Back returns without starting a run. In the mission, move with WASD/arrows, sprint with Shift, hold E near the Core, and return to the original Exit after lockdown. Q deploys Echo, F uses EMP, Space melees, Tab opens the paused facility map, and Escape pauses. Pause offers resume, same-seed retry and confirmed abort. Companion remains visibly unavailable until Phase 4.
 
 The window preserves aspect ratio on resize and maps mouse input through its letterbox. `--mute` skips audio initialization; unavailable audio devices fall back silently. `--headless` repeats the small seeded foundation diagnostic without importing pygame.
 
@@ -27,7 +27,7 @@ The older diagnostic contact room is still available for focused core-rule inspe
 uv run --locked python -m echo_heist.diagnostics.human_preview
 ```
 
-The facility now has 23 smaller rooms, 104 physical furnishings, narrow corridors, two railed stair gangways and slower movement. Three other posts retain P02 contact behavior while the remaining P03/P04 algorithms are developed. F3 opens real Sentinel telemetry; Tab shows the room map and controls with mission time paused. Music and sound volumes are adjustable in Settings. See the [current facility review](docs/development/quality/reports/facility_density/REVIEW.md) for actual checks and screenshots.
+The compact 64×40 research facility has 14 purposeful rooms, 67 physical furnishings, two railed stair gangways and tuned movement (2.5 tiles/s walk, 3.7 sprint). The original upper Security/lower Research routes and cross-link remain connected. Three other posts retain P02 contact behavior while the remaining P03/P04 algorithms are developed. F3 opens real Sentinel telemetry; Tab shows the room map and controls with mission time paused. Settings groups Audio and Display controls. See the [current chapter/facility review](docs/development/quality/reports/chapter_balance/REVIEW.md) for actual checks and screenshots.
 
 For an isolated window check:
 

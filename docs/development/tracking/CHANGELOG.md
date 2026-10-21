@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-10-21 - Clear chapter flow and compact research routes
+
+- Replaced the crowded opening with a Chapter 01 card, one Play action and separate Report/Settings/Quit. Briefing now explains objectives and routes; mode choice is separate from Launch. Added real Back behavior and Audio/Display settings groups.
+- Compacted the map to 64×40, 14 purpose-built rooms and 67 physical furnishings. Preserved Entry → Service → upper Security or lower Research → Core, the cross-link and both return paths. Security is shorter; Research has storage/lab cover. The conditional second floor was unnecessary to fit this connected layout.
+- Raised Human walk/sprint to 2.5/3.7 tiles/s and restored defender speed defaults; body size, sensing, tools, capture and approved scoring are unchanged. Brighter lab material/trim distinguishes research rooms. The QA keyboard driver now aligns around visible body overhang/corners using real movement feedback.
+- All 97 tests, structure/Ruff/strict types pass. Inspected 38 native screens; actual upper/lower extractions, capture, abort and report unlock work. Audio-enabled source WIN exercises all five music contexts and 16 assets. [Review](../quality/reports/chapter_balance/REVIEW.md) records the current evidence; full P03 and P05 mechanics remain open.
+
 ## 2026-10-21 - Denser facility and slower movement
 
 - Rebuilt the actual five-zone layout as 23 compact rooms with 104 physical furnishings, narrower bent corridors and two railed stair gangways. Added original generated desk/planter/lab/pump/shelf/stair art, room floor treatments, signs, grates and cables.

@@ -14,6 +14,7 @@ from echo_heist.infrastructure.resources import load_game_rules, resource_bytes
 from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.ui.audio.model import AudioFrame
+from echo_heist.ui.render.environment.furnishings.catalogue import prepare_furniture
 from echo_heist.ui.render.surfaces.cinematic import draw_scene
 from echo_heist.ui.render.surfaces.glass import edge_veil
 from echo_heist.ui.render.theme import Fonts
@@ -76,6 +77,7 @@ class GameFlow:
         self.backdrop = load_backdrop(view_size)
         self.extraction_backdrop = load_backdrop(view_size, "assets/scenes/extraction-dawn.png")
         self.map_surface = build_map_surface(self.level, self.fonts, self.art)
+        self.furnishings = prepare_furniture(self.level, self.art.props)
         self.scene = Scene.TITLE
         self.selected = 0
         self.mode_choice = 0
@@ -100,6 +102,7 @@ class GameFlow:
             view_size=self.view_size,
             map_surface=self.map_surface,
             art=self.art,
+            furnishings=self.furnishings,
             reduced_flashing=self.settings.reduced_flashing,
             security_enabled=self.security_enabled,
         )
@@ -299,6 +302,7 @@ class GameFlow:
                 self.settings.reduced_flashing,
                 self.level,
                 self.map_surface,
+                self.furnishings,
             )
         elif self.scene == Scene.TITLE:
             draw_menu(

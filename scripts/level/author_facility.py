@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TARGET = ROOT / "src/echo_heist/resources/data/maps/vault-five-zone.json"
-WIDTH, HEIGHT, SIZE = 64, 40, 48
+WIDTH, HEIGHT, SIZE = 64, 40, 96
 
 
 @dataclass(frozen=True)
@@ -105,6 +105,9 @@ class Facility:
         height: int = 1,
         rotation: int = 0,
     ) -> None:
+        if style == "tank":
+            # The collision base is floor area; visual vessel height is separate.
+            height = 1
         assert all(
             (a, b) in self.floor for a in range(x, x + width) for b in range(y, y + height)
         ), name
@@ -367,6 +370,36 @@ def furnish(facility: Facility) -> None:
                 "entry-console" if name == "reception" and index == 0 else f"{name}-{index + 1}"
             )
             facility.furniture(fixture_id, style, room.x + x, room.y + y, width, height)
+    # Perimeter instruments and compact islands, with the original doorways,
+    # stair landings, core approach and patrol lanes kept open.
+    extras = {
+        "screening": (("rack", 0, 1, 1, 2), ("console", 3, 4, 2, 1)),
+        "reception": (("shelf", 0, 1, 1, 2), ("plant", 7, 1, 1, 1), ("workbench", 4, 5, 1, 1)),
+        "power": (("rack", 0, 3, 1, 2), ("console", 3, 2, 1, 1)),
+        "servers": (("console", 1, 7, 2, 1), ("workbench", 1, 0, 1, 1)),
+        "repair": (("console", 3, 0, 2, 1), ("pump", 0, 4, 1, 1), ("workbench", 4, 2, 1, 1)),
+        "logistics": (("rack", 4, 1, 1, 2), ("workbench", 2, 6, 1, 1), ("rack", 3, 0, 1, 1)),
+        "checkpoint": (("rack", 5, 1, 1, 2), ("console", 0, 2, 2, 1), ("plant", 5, 5, 1, 1)),
+        "control": (("rack", 0, 1, 1, 2), ("plant", 5, 6, 1, 1), ("console", 1, 1, 2, 1)),
+        "wet-lab": (("labbench", 1, 2, 2, 1), ("workbench", 2, 4, 1, 1), ("shelf", 0, 6, 2, 1)),
+        "bio-lab": (("labbench", 0, 2, 2, 1), ("shelf", 0, 4, 2, 1)),
+        "lab-stores": (("rack", 0, 1, 1, 1), ("workbench", 2, 4, 1, 1)),
+        "electronics": (("shelf", 0, 1, 1, 2), ("workbench", 1, 2, 1, 1)),
+        "coolant": (("console", 7, 4, 2, 1), ("pump", 4, 2, 2, 2), ("plant", 8, 0, 1, 1)),
+        "reactor": (
+            ("tank", 0, 2, 1, 2),
+            ("tank", 9, 2, 1, 2),
+            ("rack", 0, 8, 2, 1),
+            ("workbench", 3, 7, 1, 1),
+            ("plant", 9, 5, 1, 1),
+        ),
+    }
+    for name, fixtures in extras.items():
+        room = rooms[name]
+        for index, (style, x, y, width, height) in enumerate(fixtures, 1):
+            facility.furniture(
+                f"{name}-equipment-{index}", style, room.x + x, room.y + y, width, height
+            )
     for name, style, x, y, width, height in (
         ("service-baffle", "pump", 21, 22, 1, 2),
         ("research-cover", "planter", 41, 29, 3, 1),

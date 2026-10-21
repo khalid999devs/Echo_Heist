@@ -4,6 +4,7 @@ import pygame
 
 from echo_heist.level.model import LevelData
 from echo_heist.ui.render import theme
+from echo_heist.ui.render.environment.furnishings.catalogue import FurnitureVisual, draw_preview
 from echo_heist.ui.render.hud import panel
 from echo_heist.ui.render.surfaces.cinematic import draw_scene
 from echo_heist.ui.render.theme import Fonts
@@ -179,6 +180,7 @@ class SceneDesigns:
         reduced_motion: bool,
         level: LevelData,
         map_surface: pygame.Surface,
+        furnishings: tuple[FurnitureVisual, ...],
     ) -> None:
         draw_scene(
             canvas,
@@ -236,10 +238,15 @@ class SceneDesigns:
                     )
             button(canvas, GUIDE_CONTROLS[4], "BACK", fonts, self.selected == 4)
         else:
-            self._lab(canvas, fonts, level, map_surface)
+            self._lab(canvas, fonts, level, map_surface, furnishings)
 
     def _lab(
-        self, canvas: pygame.Surface, fonts: Fonts, level: LevelData, map_surface: pygame.Surface
+        self,
+        canvas: pygame.Surface,
+        fonts: Fonts,
+        level: LevelData,
+        map_surface: pygame.Surface,
+        furnishings: tuple[FurnitureVisual, ...],
     ) -> None:
         deck = level.decks[self.lab_floor]
         tile_px = level.static_map.tile_size_px
@@ -252,6 +259,7 @@ class SceneDesigns:
         source.clamp_ip(bounds)
         self.lab_pan = [source.centerx - bounds.centerx, source.centery - bounds.centery]
         canvas.blit(map_surface, dest, source)
+        draw_preview(canvas, furnishings, source, dest.topleft)
         pygame.draw.rect(canvas, theme.BORDER, dest, 1, border_radius=4)
         panel(canvas, pygame.Rect(60, 188, 206, 30), fill=(4, 17, 27, 240))
         canvas.blit(fonts.micro.render("DRAG TO EXPLORE", True, theme.ACCENT), (74, 196))

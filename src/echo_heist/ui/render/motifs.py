@@ -1,6 +1,5 @@
 """Small deterministic facility and actor motifs; art never defines collision."""
 
-from dataclasses import dataclass
 from functools import lru_cache
 from math import atan2, cos, degrees, pi, sin
 
@@ -8,15 +7,8 @@ import pygame
 
 from echo_heist.core.contracts.world import ActorKind
 from echo_heist.ui.render import theme
-
-
-@dataclass(frozen=True, slots=True)
-class ActorMotion:
-    """Presentation-only gait derived from the last committed position change."""
-
-    direction: tuple[int, int] = (0, -1)
-    moving: bool = False
-    sprinting: bool = False
+from echo_heist.ui.render.actors.draw import draw_actor
+from echo_heist.ui.render.actors.model import ActorMotion as ActorMotion
 
 
 def shade(color: theme.Color, amount: int) -> theme.Color:
@@ -117,24 +109,18 @@ def wall_tile(
 
 
 def glass_tile(surface: pygame.Surface, rect: pygame.Rect) -> None:
-    pygame.draw.rect(surface, (20, 40, 50), rect)
-    pygame.draw.rect(surface, (58, 76, 82), rect.inflate(-2, -2), 2)
-    pygame.draw.rect(surface, (19, 82, 97), rect.inflate(-8, -4))
-    pygame.draw.line(
-        surface,
-        (112, 226, 239),
-        (rect.left + 9, rect.top + 4),
-        (rect.left + 9, rect.bottom - 5),
-        2,
-    )
-    pygame.draw.line(
-        surface,
-        (56, 148, 164),
-        (rect.right - 6, rect.top + 4),
-        (rect.right - 6, rect.bottom - 5),
-        1,
-    )
-    pygame.draw.circle(surface, (7, 24, 34), rect.center, 2)
+    pane = pygame.Surface(rect.size, pygame.SRCALPHA)
+    bounds = pane.get_rect().inflate(-6, -8)
+    pygame.draw.rect(pane, (118, 203, 216, 28), bounds)
+    pygame.draw.line(pane, (169, 218, 223, 150), bounds.topleft, bounds.topright, 2)
+    pygame.draw.line(pane, (66, 105, 116, 220), bounds.bottomleft, bounds.bottomright, 3)
+    for x in (bounds.left, bounds.right):
+        pygame.draw.line(pane, (122, 155, 160, 220), (x, bounds.top), (x, bounds.bottom), 2)
+    for offset in (rect.w // 3, rect.w // 3 + 7):
+        pygame.draw.line(
+            pane, (206, 241, 242, 65), (offset, bounds.top + 6), (offset - 12, bounds.bottom - 8), 2
+        )
+    surface.blit(pane, rect.topleft)
 
 
 def cover_tile(surface: pygame.Surface, rect: pygame.Rect, variant: int) -> None:
@@ -241,8 +227,27 @@ def actor(
     motion: ActorMotion,
     clock_ms: int,
     sprites: tuple[pygame.Surface, ...] | None = None,
+    walk: tuple[pygame.Surface, ...] = (),
+    run: tuple[pygame.Surface, ...] = (),
+    fraction: float = 1.0,
 ) -> None:
     """Animate a facing armored silhouette without changing actor location or hitbox."""
+    if sprites is not None:
+        draw_actor(
+            canvas,
+            point,
+            sprites,
+            motion,
+            clock_ms,
+            disabled=disabled,
+            stunned=stunned,
+            carries_core=carries_core,
+            pulse=pulse,
+            walk=walk,
+            run=run,
+            fraction=fraction,
+        )
+        return
     x, y = point
     guard = kind != ActorKind.OPERATIVE
     accent = (
@@ -273,32 +278,6 @@ def actor(
 
     dx, dy = motion.direction
     angle = degrees(atan2(-dx, -dy))
-    if sprites is not None:
-        if active and motion.sprinting:
-            frame_index = (1, 3, 2, 3)[(clock_ms // 95) % 4]
-        elif active:
-            frame_index = 1 + (clock_ms // 180) % 2
-        else:
-            frame_index = 0
-        if len(sprites) == 16:
-            row = (1 if dx > 0 else 3) if abs(dx) > abs(dy) else (0 if dy < 0 else 2)
-            frame_index += row * 4
-        # Directional humans use authored viewpoints. Robots keep their upright
-        # three-quarter silhouette rather than rotating their feet overhead.
-        frame = sprites[frame_index]
-        frame_rect = frame.get_rect(center=(x, y - bob))
-        contour = pygame.mask.from_surface(frame, 96).outline(every=2)
-        if len(contour) > 2:
-            halo = pygame.Surface(frame.get_size(), pygame.SRCALPHA)
-            pygame.draw.lines(halo, (*accent, 85), True, contour, 1)
-            canvas.blit(halo, frame_rect)
-        canvas.blit(frame, frame_rect)
-        if carries_core:
-            pygame.draw.circle(canvas, theme.WARNING, (x + 12, y - 12), 4 + int(pulse), 2)
-        if disabled or stunned:
-            pygame.draw.arc(canvas, accent, (x - 20, y - 21, 40, 40), 0, 5.4, 3)
-        return
-
     sprite = pygame.Surface((44, 44), pygame.SRCALPHA)
     cx, cy = 22, 22
     metal = (74, 92, 103) if guard else (89, 122, 133)

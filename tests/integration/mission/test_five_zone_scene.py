@@ -121,7 +121,7 @@ def test_art_and_gait_follow_committed_movement_without_changing_simulation() ->
     flow = start()
     assert flow.session is not None
     art = flow.session.art
-    assert art.operative[0].get_width() <= flow.level.static_map.tile_size_px + 4
+    assert art.operative[0].get_bounding_rect().width <= flow.level.static_map.tile_size_px + 4
     assert pygame.image.tobytes(art.operative[0], "RGBA") != pygame.image.tobytes(
         art.operative[3], "RGBA"
     )
@@ -129,10 +129,30 @@ def test_art_and_gait_follow_committed_movement_without_changing_simulation() ->
     flow.frame([key(pygame.KEYDOWN, pygame.K_d), key(pygame.KEYDOWN, pygame.K_LSHIFT)], 34)
     assert flow.session.simulation.tick == first_tick + 1
     assert flow.session.actor_motion[flow.level.operative_id].sprinting
-    tick_after_move = flow.session.simulation.tick
+    fingerprint = flow.session.simulation.fingerprint()
     canvas = pygame.Surface((1280, 720))
-    flow.draw(canvas)
-    assert flow.session.simulation.tick == tick_after_move
+    for _ in range(3):
+        flow.draw(canvas)
+        assert flow.session.simulation.fingerprint() == fingerprint
+    motion = flow.session.actor_motion[flow.level.operative_id]
+    assert motion.phase_step > 0 and motion.previous_position is not None
+    from echo_heist.ui.render.actors.model import position_at
+
+    current = flow.session.simulation.observe(flow.level.operative_id).own_status.position
+    assert current is not None
+    assert position_at(current, motion, 0) == motion.previous_position
+    assert position_at(current, motion, 1) == current
+    middle = position_at(current, motion, 0.5)
+    assert all(
+        min(a, b) <= value <= max(a, b)
+        for a, b, value in zip(motion.previous_position, current, middle, strict=True)
+    )
+    flow.frame([key(pygame.KEYUP, pygame.K_d), key(pygame.KEYUP, pygame.K_LSHIFT)], 34)
+    stopped = flow.session.actor_motion[flow.level.operative_id]
+    assert not stopped.moving and stopped.phase_step == 0
+    phase = stopped.phase
+    flow.frame([], 100)
+    assert flow.session.actor_motion[flow.level.operative_id].phase == phase
 
 
 def test_default_live_guard_allows_actual_lower_route_core_and_extraction() -> None:
@@ -204,14 +224,15 @@ def test_layered_actor_alpha_keeps_background_and_opaque_destination() -> None:
     from echo_heist.ui.render.world import WorldArt
 
     pygame.font.init()
-    canvas = opaque_surface((100, 100))
+    canvas = opaque_surface((200, 200))
     background = (100, 140, 155)
     canvas.fill(background)
-    motifs.light_pool(canvas, (50, 50), (130, 170, 190), 40)
+    motifs.light_pool(canvas, (100, 100), (130, 170, 190), 80)
     before = canvas.copy()
+    sprites = WorldArt.load().operative
     motifs.actor(
         canvas,
-        (50, 50),
+        (100, 150),
         ActorKind.OPERATIVE,
         disabled=False,
         stunned=False,
@@ -219,12 +240,16 @@ def test_layered_actor_alpha_keeps_background_and_opaque_destination() -> None:
         pulse=0.5,
         motion=motifs.ActorMotion(),
         clock_ms=0,
-        sprites=WorldArt.load().operative,
+        sprites=sprites,
     )
     # Transparent sprite corners must preserve prior light/floor layers, even
     # when the native display offers alpha masks on otherwise opaque surfaces.
     assert canvas.get_masks()[3] == 0
-    assert canvas.get_at((32, 27)) == before.get_at((32, 27))
-    assert canvas.get_at((35, 35)) == before.get_at((35, 35))
-    assert canvas.get_at((50, 50)) != before.get_at((50, 50))
-    assert all(canvas.get_at((x, y)).a == 255 for x in range(100) for y in range(100))
+    sprite_rect = sprites[0].get_rect(midbottom=(100, 153))
+    for pixel in (
+        (sprite_rect.left + 1, sprite_rect.top + 1),
+        (sprite_rect.right - 2, sprite_rect.bottom - 20),
+    ):
+        assert canvas.get_at(pixel) == before.get_at(pixel)
+    assert canvas.get_at((100, 100)) != before.get_at((100, 100))
+    assert all(canvas.get_at((x, y)).a == 255 for x in range(200) for y in range(200))

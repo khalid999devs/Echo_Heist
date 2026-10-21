@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested scene presentation | main; runtime 19b454b | None; [runnable handoff](handoffs/khalid/day_02/SCENE_PRESENTATION.md) | DONE; 117 checks, native 48-state review, app/ZIP smoke and three-platform source CI PASS; later phases remain open |
+| Khalid | User-requested closer camera, grounded animation and denser lab | work/close-camera-detail; baseline main 9b308e4 | Presentation camera/actors/furnishings/lighting, authored map fixtures and focused verification | IN_PROGRESS; scoring and remaining shared phases unchanged |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | main includes original source a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.

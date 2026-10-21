@@ -3,6 +3,7 @@
 from collections import deque
 from collections.abc import Sequence
 from enum import StrEnum
+from math import hypot
 
 import pygame
 
@@ -10,14 +11,19 @@ from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.results import MissionEnd
 from echo_heist.core.contracts.security.model import GuardPatrol, SecuritySpec
-from echo_heist.core.contracts.world import ActorKind
+from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, ActorKind
 from echo_heist.core.simulation.engine import Simulation
 from echo_heist.infrastructure.resources import load_sensor_rules
 from echo_heist.level.model import LevelData
 from echo_heist.ui.input.human import HumanInput, UiCommand
 from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
+from echo_heist.ui.render.actors.model import position_at
 from echo_heist.ui.render.camera import Camera
+from echo_heist.ui.render.environment.furnishings.catalogue import (
+    FurnitureVisual,
+    prepare_furniture,
+)
 from echo_heist.ui.render.environment.overview import draw_overview
 from echo_heist.ui.render.environment.stairwell import Stairwell
 from echo_heist.ui.render.hud import draw_hud, panel
@@ -28,7 +34,6 @@ from echo_heist.ui.render.world import (
     WorldArt,
     build_map_surface,
     draw_world,
-    to_pixels,
 )
 from echo_heist.ui.scenes.navigation.controls import (
     ABORT_BUTTONS,
@@ -60,6 +65,7 @@ class HeistSession:
         art: WorldArt | None = None,
         reduced_flashing: bool = False,
         security_enabled: bool = True,
+        furnishings: tuple[FurnitureVisual, ...] | None = None,
     ) -> None:
         self.level, self.seed, self.fonts, self.rules = level, seed, fonts, rules
         candidates = tuple(post for post in level.guards if post.kind == ActorKind.SENTINEL)
@@ -94,6 +100,9 @@ class HeistSession:
         self.input = HumanInput(level.operative_id)
         self.art = art or WorldArt.load()
         self.map_surface = map_surface or build_map_surface(level, fonts, self.art)
+        self.furnishings = (
+            furnishings if furnishings is not None else prepare_furniture(level, self.art.props)
+        )
         self.camera = Camera(*view_size, *self.map_surface.get_size())
         self.paused = self.summary = self.lab_note = self.confirm_abort = False
         self.accumulator = 0
@@ -136,7 +145,20 @@ class HeistSession:
                     if self.deck_id is not None:
                         self.floor_changed_ms = self.clock_ms
                     self.deck_id, snap = deck.deck_id, True
-            self.camera.follow(to_pixels(actor.position, size), seconds, snap=snap)
+            motion = self.actor_motion.get(actor.actor_id, ActorMotion())
+            position = position_at(actor.position, motion, self.render_fraction)
+            self.camera.follow(
+                (
+                    position[0] * size / POSITION_UNITS_PER_TILE,
+                    position[1] * size / POSITION_UNITS_PER_TILE,
+                ),
+                seconds,
+                snap=snap,
+            )
+
+    @property
+    def render_fraction(self) -> float:
+        return 1.0 if self.paused or self.summary or self.mission_end else self.accumulator / 1000
 
     def pause(self) -> None:
         self.paused, self.confirm_abort, self.accumulator = True, False, 0
@@ -267,7 +289,7 @@ class HeistSession:
             else:
                 dx, dy = current[0] - previous[0], current[1] - previous[1]
                 moving = dx != 0 or dy != 0
-                if abs(dx) + abs(dy) > 2 * 30_000:
+                if abs(dx) + abs(dy) > 2 * POSITION_UNITS_PER_TILE:
                     self.actor_motion[actor.actor_id] = ActorMotion(actor.facing)
                     self._last_positions[actor.actor_id] = current
                     continue
@@ -279,7 +301,17 @@ class HeistSession:
                 sprinting = actor.actor_id == self.level.operative_id and (
                     dx * dx + dy * dy > sprint_delta * sprint_delta
                 )
-                self.actor_motion[actor.actor_id] = ActorMotion(direction, moving, sprinting)
+                phase_step = hypot(dx, dy) / (
+                    POSITION_UNITS_PER_TILE * (1.55 if sprinting else 1.0)
+                )
+                self.actor_motion[actor.actor_id] = ActorMotion(
+                    direction,
+                    moving,
+                    sprinting,
+                    (old_motion.phase + phase_step) % 1,
+                    phase_step,
+                    previous,
+                )
             self._last_positions[actor.actor_id] = current
 
     def _record_events(self, events: tuple[GameEvent, ...]) -> None:
@@ -345,6 +377,8 @@ class HeistSession:
             pulses=tuple(self.pulses),
             art=self.art,
             reduced_motion=self.reduced_flashing,
+            furnishings=self.furnishings,
+            fraction=self.render_fraction,
         )
         age = self.clock_ms - self.floor_changed_ms
         if not self.reduced_flashing and 0 <= age < 240:

@@ -11,6 +11,7 @@ from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
 from echo_heist.core.contracts.world import Position, StaticMap, Tile
 from echo_heist.core.perception.sensors import sight_ray
 from echo_heist.ui.render import theme
+from echo_heist.ui.render.actors.model import DEFENDER_SIZE
 from echo_heist.ui.render.camera import Camera
 
 
@@ -55,9 +56,10 @@ def draw_vision(
             pygame.draw.line(layer, (*color, 100), points[0], edge, 1)
         if view.identification_ticks:
             x, y = points[0]
-            pygame.draw.rect(layer, (5, 13, 20, 230), (x - 21, y - 44, 42, 6), border_radius=2)
+            top = y - DEFENDER_SIZE[1] - 8
+            pygame.draw.rect(layer, (5, 13, 20, 230), (x - 21, top, 42, 6), border_radius=2)
             width = round(
                 40 * min(1, view.identification_ticks / view.identification_required_ticks)
             )
-            pygame.draw.rect(layer, (*color, 255), (x - 20, y - 43, width, 4), border_radius=2)
+            pygame.draw.rect(layer, (*color, 255), (x - 20, top + 1, width, 4), border_radius=2)
     canvas.blit(layer, (0, 0))

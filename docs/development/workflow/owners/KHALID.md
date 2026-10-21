@@ -36,3 +36,5 @@ You own core strategy but do not own every backend module: Suhita owns map impor
 For your frontend slices, create the agreed adapter/presenter and give Suhita the connection point. Do not rewrite her scene architecture. For a shared contract change, update the contract and explain the consumer effect in the handoff before integration.
 
 When acting as integrator, inspect both slices, run relevant combined checks/playthroughs and reconcile shared task status. Completion evidence must be factual. Leave public platform claims/publishing pending until their actual gates pass. Any change to approved scoring rules must be proposed in chat and approved first.
+
+The [closer-camera handoff](../../tracking/handoffs/khalid/day_02/CLOSE_CAMERA.md) supersedes 48px map presentation and furniture baked into map surfaces. Retrieve it before changing map/scene consumers: 96px tiles, larger interpolated actors, 101 physical fixtures and separately cached depth-sorted furnishings. Remaining phase ownership is unchanged.

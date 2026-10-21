@@ -12,26 +12,82 @@ def image(path: str) -> pygame.Surface:
 
 
 def sprite_grid(
-    path: str, columns: int, rows: int, size: tuple[int, int]
+    path: str,
+    columns: int,
+    rows: int,
+    size: tuple[int, int],
+    *,
+    row_edges: tuple[int, ...] | None = None,
 ) -> tuple[pygame.Surface, ...]:
     sheet = image(path)
     frames = []
+    cells = []
     for row in range(rows):
         for col in range(columns):
             left, right = (
                 col * sheet.get_width() // columns,
                 (col + 1) * sheet.get_width() // columns,
             )
-            top, bottom = row * sheet.get_height() // rows, (row + 1) * sheet.get_height() // rows
-            cell = sheet.subsurface((left, top, right - left, bottom - top))
-            crop = cell.subsurface(cell.get_bounding_rect(min_alpha=24))
-            frame = pygame.Surface(size, pygame.SRCALPHA)
-            fitted = pygame.transform.smoothscale(
-                crop, crop.get_rect().fit(pygame.Rect((0, 0), size)).size
+            top, bottom = (
+                row_edges[row : row + 2]
+                if row_edges
+                else (row * sheet.get_height() // rows, (row + 1) * sheet.get_height() // rows)
             )
-            frame.blit(fitted, fitted.get_rect(midbottom=(size[0] // 2, size[1])))
-            frames.append(frame)
+            cell = sheet.subsurface((left, top, right - left, bottom - top))
+            # Atlas poses can cross a nominal cell edge by a few pixels. Keep
+            # the connected figure, excluding a neighbouring boot/head fragment.
+            silhouette = pygame.mask.from_surface(cell, 32).connected_component()
+            clean = cell.copy()
+            clean.blit(
+                silhouette.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0, 0, 0, 0)),
+                (0, 0),
+                special_flags=pygame.BLEND_RGBA_MULT,
+            )
+            cells.append(clean)
+    # One scale for the complete cycle prevents body/head size changing with
+    # every lifted knee or swinging arm. Keep the authored cell pivot stable.
+    bounds = [cell.get_bounding_rect(min_alpha=48) for cell in cells]
+    scale = min(size[0] / max(rect.w for rect in bounds), size[1] / max(rect.h for rect in bounds))
+    for cell, safe in zip(cells, bounds, strict=True):
+        fitted = pygame.transform.smoothscale(
+            cell.subsurface(safe), (max(1, round(safe.w * scale)), max(1, round(safe.h * scale)))
+        )
+        frame = pygame.Surface(size, pygame.SRCALPHA)
+        frame.blit(fitted, fitted.get_rect(midbottom=(size[0] // 2, size[1])))
+        frames.append(frame)
     return tuple(frames)
+
+
+def clinical_props() -> tuple[pygame.Surface, ...]:
+    sheet = image("assets/tiles/clinical-topdown-props.png")
+    # The generated sheet uses irregular padding; explicit regions avoid
+    # borrowing the edge of a neighbouring instrument.
+    regions = (
+        (0, 0, 535, 480),
+        (540, 0, 220, 480),
+        (775, 0, 479, 480),
+        (35, 480, 380, 330),
+        (440, 480, 330, 330),
+        (780, 480, 474, 330),
+        (40, 810, 280, 444),
+        (350, 810, 490, 444),
+        (860, 810, 394, 444),
+    )
+    cells = (sheet.subsurface(rect) for rect in regions)
+    result = []
+    for cell in cells:
+        # Tighten the exported matte at decode time; source PNGs are preserved.
+        mask = pygame.mask.from_surface(cell, 100).connected_component()
+        for offset in ((2, 0), (-2, 0), (0, 2), (0, -2)):
+            mask = mask.overlap_mask(mask, offset)
+        clean = cell.copy()
+        clean.blit(
+            mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0, 0, 0, 0)),
+            (0, 0),
+            special_flags=pygame.BLEND_RGBA_MULT,
+        )
+        result.append(clean.subsurface(clean.get_bounding_rect(min_alpha=32)))
+    return tuple(result)
 
 
 def laboratory_props() -> tuple[pygame.Surface, ...]:

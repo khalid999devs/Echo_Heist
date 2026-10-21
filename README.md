@@ -27,7 +27,7 @@ The older diagnostic contact room is still available for focused core-rule inspe
 uv run --locked python -m echo_heist.diagnostics.human_preview
 ```
 
-The research facility spans two floors with 14 purposeful rooms and 63 physical furnishings. Entry and Service are downstairs; Security, Research and Core are upstairs. Press E on either stair landing to change floors. The original alternative routes and cross-link remain connected. Walk at 2.5 tiles/s; hold Shift for a louder 3.7 tiles/s sprint lasting up to three seconds, followed by four seconds of recharge. The HUD shows readiness; pause/map freeze recharge. Three other posts retain P02 contact behavior while the remaining P03/P04 algorithms are developed. F3 opens real Sentinel telemetry; Tab shows both floors with mission time paused. Settings groups Audio and Display controls. Successful extraction has its own exterior cinematic. See the [current facility review](docs/development/quality/reports/two_floor_lab/REVIEW.md) for actual checks and screenshots.
+The research facility spans two floors with 14 purposeful rooms and 101 physical furnishings. Entry and Service are downstairs; Security, Research and Core are upstairs. Press E on either stair landing to change floors. The original alternative routes and cross-link remain connected. Walk at 2.5 tiles/s; hold Shift for a louder 3.7 tiles/s sprint lasting up to three seconds, followed by four seconds of recharge. The HUD shows readiness; pause/map freeze recharge. Three other posts retain P02 contact behavior while the remaining P03/P04 algorithms are developed. F3 opens real Sentinel telemetry; Tab shows both floors with mission time paused. Settings groups Audio and Display controls. Successful extraction has its own exterior cinematic. See the [current facility review](docs/development/quality/reports/close_camera/REVIEW.md) for actual checks and screenshots.
 
 For an isolated window check:
 
@@ -55,7 +55,9 @@ Use `dist/EchoHeist/EchoHeist.exe` on Windows. The smoke helper runs the frozen 
 
 See the [P01 handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md) and [Phase 2 evidence](docs/development/quality/reports/phase02/integration/VERIFICATION.md). P03 is in progress; P04-P08 remain in the development plan.
 
-Latest visual pass: [scene review and screenshots](docs/development/quality/reports/scene_presentation/REVIEW.md). Mouse navigation, draggable audio sliders, timed climbing, continuous lockdown siren and directional character art are connected. Companion opens a clearly marked Workshop/scene design preview; its AI deployment is later work. The Field Guide opens from the title. A real extraction unlocks the encrypted epilogue. [Runnable developer handoff](docs/development/tracking/handoffs/khalid/day_02/SCENE_PRESENTATION.md).
+Current camera/detail pass: a closer 13⅓×7½-tile view, larger foot-anchored operative, distance-driven walk/run cycles, depth-sorted furniture, translucent glass and room-local lighting. [Screenshots and actual checks](docs/development/quality/reports/close_camera/REVIEW.md); [developer handoff](docs/development/tracking/handoffs/khalid/day_02/CLOSE_CAMERA.md). Movement rules and approved scoring are unchanged.
+
+Previous visual pass: [scene review and screenshots](docs/development/quality/reports/scene_presentation/REVIEW.md). Mouse navigation, draggable audio sliders, timed climbing, continuous lockdown siren and directional character art are connected. Companion opens a clearly marked Workshop/scene design preview; its AI deployment is later work. The Field Guide opens from the title. A real extraction unlocks the encrypted epilogue. [Runnable developer handoff](docs/development/tracking/handoffs/khalid/day_02/SCENE_PRESENTATION.md).
 
 ## Development plan
 

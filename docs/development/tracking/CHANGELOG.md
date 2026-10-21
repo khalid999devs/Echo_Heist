@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-10-22 - Closer camera and grounded lab detail
+
+- Tightened native gameplay to 13⅓×7½ tiles, enlarged the operative, added distance-driven directional walk/run cycles, render interpolation and foot-pivot shadows. Simulation speeds/ranges/scoring remain unchanged.
+- Added 38 physical instruments/fixtures across the same 14 rooms; corrected tank floor bases, overhead prop projection, depth ordering, glass transparency and local/lockdown lighting. Both routes and full-room reachability remain valid.
+- 117 cases, strict types over 94 source files, lint/format/structure pass. Native 48-state/default-security sweep completes both extractions/capture; 378 motion frames and 14 architectural previews inspected. [Review and current delivery evidence](../quality/reports/close_camera/REVIEW.md); [runnable handoff](handoffs/khalid/day_02/CLOSE_CAMERA.md). No later phase gate was closed.
+
 ## 2026-10-21 - Two-floor lab and timed sprint
 
 - Preserved the original two-route/cross-link topology across real downstairs/upper decks, connected through two reciprocal Simulation-owned stair pairs. E transfers at a landing; guards, BFS, acoustics and validation share those edges. Destination occupancy and held-E protection prevent overlap/bouncing.

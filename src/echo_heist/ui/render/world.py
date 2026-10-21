@@ -6,13 +6,21 @@ from math import cos, pi, sin
 
 import pygame
 
+from echo_heist.core.contracts.observations import EntityView
 from echo_heist.core.contracts.results import PresentationSnapshot
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, ActorKind, MissionPhase
 from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.level.model import LevelData
 from echo_heist.ui.render import motifs, theme
+from echo_heist.ui.render.actors.model import (
+    COMPANION_SIZE,
+    DEFENDER_SIZE,
+    OPERATIVE_SIZE,
+    position_at,
+)
 from echo_heist.ui.render.camera import Camera
-from echo_heist.ui.render.environment.art import laboratory_props, sprite_grid
+from echo_heist.ui.render.environment.art import clinical_props, laboratory_props, sprite_grid
+from echo_heist.ui.render.environment.furnishings.catalogue import FurnitureVisual, draw_instrument
 from echo_heist.ui.render.environment.interiors import draw_details, draw_room_trim, room_floors
 from echo_heist.ui.render.environment.lighting import bake_lighting, draw_equipment
 from echo_heist.ui.render.surfaces.formats import opaque_surface
@@ -40,6 +48,8 @@ class WorldArt:
     operative: tuple[pygame.Surface, ...]
     guard: tuple[pygame.Surface, ...]
     companion: tuple[pygame.Surface, ...]
+    operative_walk: tuple[pygame.Surface, ...]
+    operative_run: tuple[pygame.Surface, ...]
 
     @classmethod
     def load(cls) -> "WorldArt":
@@ -74,10 +84,30 @@ class WorldArt:
         return cls(
             floor,
             bulkhead,
-            props + laboratory_props(),
-            sprite_grid("assets/characters/operative-directions.png", 4, 4, (44, 58)),
-            sprite_grid("assets/characters/defenders.png", 4, 3, (44, 54)),
-            sprite_grid("assets/characters/companion.png", 2, 2, (40, 48)),
+            props + laboratory_props() + clinical_props(),
+            sprite_grid(
+                "assets/characters/operative-directions.png",
+                4,
+                4,
+                OPERATIVE_SIZE,
+                row_edges=(0, 312, 615, 926, 1254),
+            ),
+            sprite_grid("assets/characters/defenders.png", 4, 3, DEFENDER_SIZE),
+            sprite_grid("assets/characters/companion.png", 2, 2, COMPANION_SIZE),
+            sprite_grid(
+                "assets/characters/operative/walk.png",
+                8,
+                4,
+                OPERATIVE_SIZE,
+                row_edges=(0, 241, 446, 674, 887),
+            ),
+            sprite_grid(
+                "assets/characters/operative/run.png",
+                8,
+                4,
+                OPERATIVE_SIZE,
+                row_edges=(0, 239, 449, 670, 887),
+            ),
         )
 
 
@@ -136,16 +166,12 @@ def _roof_tile(
 def _decorate_cover(surface: pygame.Surface, level: LevelData, art: WorldArt) -> None:
     """Illustrate physical cover cells without placing furnishings on closed roofs."""
     size = level.static_map.tile_size_px
-    remaining = set(level.cover_tiles)
-    while remaining:
-        x, y = min(remaining)
-        width = 1
-        while (x + width, y) in remaining:
-            width += 1
-        remaining.difference_update((x + offset, y) for offset in range(width))
-        rect = pygame.Rect(x * size, y * size, width * size, size)
-        prop = pygame.transform.smoothscale(art.props[3], rect.inflate(-3, -3).size)
-        surface.blit(prop, rect.move(1, 0))
+    for x, y in sorted(level.cover_tiles):
+        rect = pygame.Rect(x * size, y * size, size, size).inflate(-4, -4)
+        fitted = art.props[3].get_rect().fit(rect)
+        fitted.midbottom = rect.midbottom
+        prop = pygame.transform.smoothscale(art.props[3], fitted.size)
+        surface.blit(prop, fitted)
 
 
 def _floor_shadows(surface: pygame.Surface, level: LevelData) -> None:
@@ -196,38 +222,6 @@ def _furniture_rects(level: LevelData) -> tuple[tuple[pygame.Rect, str, int], ..
     return tuple(result)
 
 
-def _draw_furniture(surface: pygame.Surface, level: LevelData, art: WorldArt) -> None:
-    styles = {
-        "rack": 15,
-        "console": 14,
-        "tank": 13,
-        "crates": 3,
-        "plant": 4,
-        "workbench": 5,
-        "desk": 14,
-        "planter": 17,
-        "labbench": 12,
-        "pump": 16,
-        "shelf": 10,
-    }
-    for footprint, style, rotation in _furniture_rects(level):
-        # The sprite and its contact shadow stay within the physical footprint.
-        # No invisible rectangle extends into a neighboring walking lane.
-        if style == "railing":
-            pygame.draw.rect(surface, (12, 23, 28), footprint.inflate(-2, -6), border_radius=3)
-            pygame.draw.rect(
-                surface, (113, 122, 115), footprint.inflate(-4, -10), 2, border_radius=2
-            )
-            pygame.draw.line(surface, theme.WARNING, footprint.midleft, footprint.midright, 2)
-            continue
-        source = pygame.transform.rotate(art.props[styles[style]], rotation)
-        fitted = source.get_rect().fit(footprint.inflate(-4, -4))
-        prop = pygame.transform.smoothscale(source, fitted.size)
-        shadow = motifs.contact_shadow(footprint.width, max(12, footprint.height // 2), 115)
-        surface.blit(shadow, (footprint.left, footprint.centery))
-        surface.blit(prop, fitted)
-
-
 def build_map_surface(
     level: LevelData, fonts: Fonts, art: WorldArt | None = None
 ) -> pygame.Surface:
@@ -263,6 +257,7 @@ def build_map_surface(
             if tile in furniture_tiles:
                 motifs.floor_tile(surface, rect, zone_id, variant, texture=floor_texture)
             elif tile in level.glass_tiles:
+                motifs.floor_tile(surface, rect, zone_id, variant, texture=floor_texture)
                 motifs.glass_tile(surface, rect)
             elif tile in level.cover_tiles:
                 motifs.cover_tile(surface, rect, variant)
@@ -289,7 +284,6 @@ def build_map_surface(
     draw_details(surface, level, art.props[11] if art else None)
     if art is not None:
         _decorate_cover(surface, level, art)
-        _draw_furniture(surface, level, art)
     draw_room_trim(surface, level, fonts)
     anchors = {obj.object_id: obj.tile for obj in world_map.objects}
     for object_id, painter in (
@@ -424,6 +418,8 @@ def draw_world(
     pulses: tuple[VisualPulse, ...] = (),
     art: WorldArt | None = None,
     reduced_motion: bool = False,
+    furnishings: tuple[FurnitureVisual, ...] = (),
+    fraction: float = 1.0,
 ) -> None:
     size = level.static_map.tile_size_px
     canvas.fill(theme.BACKGROUND)
@@ -440,22 +436,19 @@ def draw_world(
     else:
         canvas.blit(map_surface, camera.to_screen((0, 0)))
     draw_equipment(canvas, level, camera, 0 if reduced_motion else clock_ms, deck)
-    if snapshot.phase == MissionPhase.LOCKDOWN:
-        cycle = 0.55 if reduced_motion else (1 + sin(clock_ms / 440)) / 2
-        canvas.fill(
-            (255, round(244 - 64 * cycle), round(246 - 64 * cycle)),
-            special_flags=pygame.BLEND_RGB_MULT,
+    layers: list[tuple[float, str, FurnitureVisual | EntityView]] = []
+    for item in furnishings:
+        screen_rect = pygame.Rect(camera.to_screen(item.render_rect.topleft), item.render_rect.size)
+        if (deck is not None and not deck.contains(item.tile)) or not screen_rect.colliderect(
+            canvas.get_rect()
+        ):
+            continue
+        feet = camera.to_screen(item.footprint.midbottom)
+        canvas.blit(
+            item.shadow.surface,
+            (feet[0] - item.shadow.pivot[0], feet[1] - item.shadow.pivot[1]),
         )
-        for choke in level.chokepoints:
-            screen_point = camera.to_screen(
-                ((choke.tile[0] + 0.5) * size, (choke.tile[1] + 0.5) * size)
-            )
-            motifs.light_pool(canvas, screen_point, (round(130 + 125 * cycle), 30, 28), 110)
-        for room in level.rooms:
-            lamp = camera.to_screen(((room.left + room.width / 2) * size, (room.top + 0.2) * size))
-            color = (round(140 + 115 * cycle), round(30 + 18 * cycle), 32)
-            motifs.light_pool(canvas, lamp, color, 155)
-            pygame.draw.line(canvas, color, (lamp[0] - 22, lamp[1]), (lamp[0] + 22, lamp[1]), 3)
+        layers.append((item.depth, item.object_id, item))
     draw_vision(canvas, level.static_map, snapshot, camera)
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
     _anchor(
@@ -505,9 +498,25 @@ def draw_world(
     for entity in snapshot.actors:
         if entity.position is None or (deck is not None and not deck.contains(entity.tile)):
             continue
-        point = camera.to_screen(to_pixels(entity.position, size))
-        if entity.kind == ActorKind.OPERATIVE:
-            motifs.light_pool(canvas, point, theme.ACCENT, 65)
+        motion = (actor_motion or {}).get(entity.actor_id, motifs.ActorMotion())
+        render_position = position_at(entity.position, motion, fraction)
+        layers.append(
+            (render_position[1] * size / POSITION_UNITS_PER_TILE, entity.actor_id, entity)
+        )
+    for _, _, layer_item in sorted(layers, key=lambda entry: (entry[0], entry[1])):
+        if isinstance(layer_item, FurnitureVisual):
+            draw_instrument(canvas, layer_item, camera, 0 if reduced_motion else clock_ms)
+            continue
+        entity = layer_item
+        assert entity.position is not None
+        motion = (actor_motion or {}).get(entity.actor_id, motifs.ActorMotion())
+        render_position = position_at(entity.position, motion, fraction)
+        point = camera.to_screen(
+            (
+                render_position[0] * size / POSITION_UNITS_PER_TILE,
+                render_position[1] * size / POSITION_UNITS_PER_TILE,
+            )
+        )
         motifs.actor(
             canvas,
             point,
@@ -531,6 +540,11 @@ def draw_world(
             )
             if art is not None
             else None,
+            walk=art.operative_walk
+            if art is not None and entity.kind == ActorKind.OPERATIVE
+            else (),
+            run=art.operative_run if art is not None and entity.kind == ActorKind.OPERATIVE else (),
+            fraction=fraction,
         )
         capture = captures.get(entity.actor_id)
         if capture is not None:
@@ -538,6 +552,22 @@ def draw_world(
             ring = pygame.Rect(0, 0, 38, 38)
             ring.center = point
             pygame.draw.arc(canvas, theme.WARNING, ring, pi / 2, pi / 2 + 2 * pi * progress, 4)
+    if snapshot.phase == MissionPhase.LOCKDOWN:
+        cycle = 0.55 if reduced_motion else (1 + sin(clock_ms / 440)) / 2
+        canvas.fill(
+            (255, round(244 - 64 * cycle), round(246 - 64 * cycle)),
+            special_flags=pygame.BLEND_RGB_MULT,
+        )
+        for room in level.rooms:
+            bounds = pygame.Rect(
+                camera.to_screen((room.left * size, room.top * size)),
+                (room.width * size, room.height * size),
+            )
+            canvas.set_clip(bounds.clip(original_clip))
+            lamp = (bounds.centerx, bounds.top + round(0.2 * size))
+            color = (round(140 + 115 * cycle), round(30 + 18 * cycle), 32)
+            motifs.light_pool(canvas, lamp, color, 155)
+            pygame.draw.line(canvas, color, (lamp[0] - 22, lamp[1]), (lamp[0] + 22, lamp[1]), 3)
     canvas.set_clip(original_clip)
     if snapshot.phase == MissionPhase.LOCKDOWN:
         canvas.blit(alert_frame(canvas.get_size()), (0, 0))

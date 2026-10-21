@@ -1,0 +1,56 @@
+{
+  "video_driver": "cocoa",
+  "frames": 378,
+  "animation_frames_seen": {
+    "walk": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "run": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
+  },
+  "directions": [
+    [
+      -1,
+      0
+    ],
+    [
+      0,
+      -1
+    ],
+    [
+      0,
+      1
+    ],
+    [
+      1,
+      0
+    ]
+  ],
+  "simulation_fingerprint_preserved_on_every_draw": true,
+  "tile_size_px": 96,
+  "viewport_tiles": [
+    13.333333333333334,
+    7.5
+  ],
+  "architectural_preview_rooms": 14,
+  "draw_ms": {
+    "median": 4.35,
+    "max": 19.31
+  },
+  "scope": "Native visual fixture with security disabled; mission wins use capture_scenes."
+}

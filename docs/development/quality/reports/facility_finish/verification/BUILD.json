@@ -85,5 +85,57 @@
     "path": "output/responsive-facility/walk-run.mp4",
     "frames": 378,
     "scope": "60Hz visual input fixture; security disabled; separately verified default-security mission routes"
+  },
+  "windows_build_manifest": {
+    "architecture": "AMD64",
+    "archive": "echo-heist-0.1.0a1-windows-x64.zip",
+    "archive_bytes": 107693962,
+    "archive_sha256": "1fe180b6adbaf9cd2c8ad77bc620dcdd82fc5550ea398290aa14d8ea635cb68c",
+    "host_os": "Windows-2022Server-10.0.20348-SP0",
+    "lock_sha256": "f7e94248badd117c651bc96c4d74b8886477ab7d7e1b1b4e214b44c7e8c5aefe",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "unsigned",
+    "source_commit": "28aff885cd1324c18f9e489d02f24832478696e6",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "windows-x64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "windows_hosted_smoke": {
+    "artifact": "D:\\a\\Echo_Heist\\Echo_Heist\\dist\\EchoHeist\\EchoHeist.exe",
+    "checks": {
+      "frames_rendered": true,
+      "frozen_desktop": true,
+      "frozen_headless": true,
+      "resources_loaded": true,
+      "same_event_hash": true,
+      "same_state_hash": true,
+      "settings_saved": true,
+      "surface_saved": true
+    },
+    "passed": true,
+    "scope": "CI dummy video",
+    "video_driver": "dummy"
+  },
+  "local_windows_download": {
+    "manifest_and_archive_hash_match": true,
+    "downloaded_from_run": 39679169548,
+    "archive": "dist/echo-heist-0.1.0a1-windows-x64.zip",
+    "zip_contains_executable_and_29_asset_audio_manifest": true,
+    "execution_on_local_mac": "NOT_RUN; Windows EXE is not executed on macOS"
+  },
+  "integrated_main_verification": {
+    "commit": "a1797bfdebc552bb56f3fe83097cfdd355a33339",
+    "run_id": 39679846964,
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39679846964",
+    "jobs": {
+      "headless-checks": "success",
+      "macos-arm64": "success",
+      "windows-x64": "success"
+    },
+    "runtime_matches_packaged_28aff88": true,
+    "branch_cleanup": "Only main remains after expected-tip/ancestry-checked retirement; all incremental commits preserved"
   }
 }

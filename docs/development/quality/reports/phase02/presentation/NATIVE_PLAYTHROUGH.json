@@ -1,0 +1,21 @@
+{
+  "driver": "cocoa",
+  "audio_device_ready": true,
+  "frames": 1287,
+  "update_audio_draw_ms_mean": 7.77,
+  "update_audio_draw_ms_p95": 8.43,
+  "includes_display_or_encoding": false,
+  "tracks_from_actual_states": [
+    "pulse",
+    "sector",
+    "title",
+    "transmission",
+    "urgent"
+  ],
+  "outcome": "WIN",
+  "audio": {
+    "music_track": "transmission",
+    "audio_assets_loaded": 16,
+    "audio_cues_played": 108
+  }
+}

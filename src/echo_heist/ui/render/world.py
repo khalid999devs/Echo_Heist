@@ -370,7 +370,8 @@ def _anchor(
     label = fonts.micro.render(
         "EMPTY SOCKET" if kind == "CORE" and not active else kind, True, color
     )
-    canvas.blit(label, (point[0] - label.get_width() // 2, point[1] - 55))
+    label_y = point[1] + 65 if kind == "CORE" else point[1] - 55
+    canvas.blit(label, (point[0] - label.get_width() // 2, label_y))
 
 
 def draw_world(

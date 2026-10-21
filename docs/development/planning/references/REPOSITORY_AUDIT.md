@@ -2,6 +2,8 @@
 
 Date: 2026-10-21. Developer: Khalid. Source: [owner's complete brief](IMPLEMENTATION_BRIEF.md), [original blueprint](../../../idea/ECHO_HEIST_Complete_V1_Game_Development_Blueprint.pdf), and [visual inspirations](../../../screenshots/README.md).
 
+This is the repository snapshot **before** the milestone implementation. The [current runtime contract](../../architecture/integration/STEALTH_SLICE.md) and [review](../../quality/reports/phase02/presentation/REVIEW.md) record what was subsequently implemented. Missing-system statements below describe the audit baseline.
+
 ## Existing behavior
 
 - P01 packaging, locked Python environment, resource/settings storage and deterministic headless checks work.

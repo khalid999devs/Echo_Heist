@@ -121,11 +121,12 @@ def draw_hud(
     clock_ms: int = 0,
     notice: str = "",
     guards: tuple[GuardView, ...] = (),
+    unavailable_guards: frozenset[str] = frozenset(),
 ) -> None:
     _objective(canvas, view, zone_label, level, operative_tile, phase, fonts)
     status = pygame.Rect(canvas.get_width() - 236, 20, 216, 72)
     panel(canvas, status, fill=(5, 15, 25, 180))
-    states = {guard.state for guard in guards}
+    states = {guard.state for guard in guards if guard.actor_id not in unavailable_guards}
     alert = (
         "DETECTED"
         if GuardState.CHASE in states
@@ -133,6 +134,8 @@ def draw_hud(
         if GuardState.SPOTTED in states
         else "SEARCHING"
         if GuardState.SEARCH in states or GuardState.INVESTIGATE in states
+        else "DISRUPTED"
+        if guards and not states
         else "PATROL"
     )
     color = (

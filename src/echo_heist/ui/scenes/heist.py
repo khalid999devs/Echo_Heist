@@ -280,6 +280,9 @@ class HeistSession:
                 clock_ms=self.clock_ms,
                 notice=self.notice if self.clock_ms < self.notice_until_ms else "",
                 guards=snapshot.guards,
+                unavailable_guards=frozenset(
+                    actor.actor_id for actor in snapshot.actors if actor.disabled or actor.stunned
+                ),
             )
         if self.lab_note:
             self._draw_lab(canvas)

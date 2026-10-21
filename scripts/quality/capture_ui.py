@@ -133,7 +133,8 @@ def main() -> int:
     shot(flow, "menus/05-settings")
     flow.frame([key(pygame.K_RIGHT), key(pygame.K_DOWN), key(pygame.K_LEFT)], 16)
     shot(flow, "menus/06-settings-adjusted")
-    flow.frame([key(pygame.K_ESCAPE)] + [key(pygame.K_DOWN)] * 2 + [key(pygame.K_RETURN)], 16)
+    flow.frame([key(pygame.K_ESCAPE)], 16)
+    flow.frame([key(pygame.K_DOWN)] * 2 + [key(pygame.K_RETURN)], 16)
     assert flow.scene == Scene.TITLE and flow.notice
     shot(flow, "unavailable/workshop")
     flow.frame([key(pygame.K_DOWN), key(pygame.K_RETURN)], 16)

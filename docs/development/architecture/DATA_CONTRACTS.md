@@ -72,3 +72,7 @@ Reject duplicate/missing objective anchors, invalid patrol coordinates, unknown 
 | Presentation reference | 1280 x 720, preserve aspect at 1366 x 768 and 1920 x 1080 |
 
 Keep these in a versioned configuration resource with units and bounds. Log tuning changes with before/after values and evidence. Avoid storing the same numerical constant separately in AI, UI and simulation code.
+
+## Implemented first Sentinel subset (2026-10-21)
+
+The [stealth runtime contract](integration/STEALTH_SLICE.md) extends these targets with SecuritySpec, filtered visible/heard/anonymous-motion values, Simulation-owned GuardMemory, real BFS/fuzzy decisions, expiring original-tick reports and privileged GuardView telemetry. Fingerprint schema is 3. These are implemented for one Sentinel; full P03 and later AI/scoring targets above remain open.

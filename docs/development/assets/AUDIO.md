@@ -14,8 +14,10 @@ Date: 2026-10-21. Runtime: `ui/audio/`, connected by `ui/bootstrap.py` after the
 | Committed Echo / EMP / melee | Hologram / electrical / metal impact cues |
 | Sighting confirmed / capture started | Security warning tone |
 
-Pursuit music is ready to consume a true guard alert; before the live guard system is connected it must not trigger from invented values. Playback never emits a hidden simulation noise or changes guard knowledge. UI sounds and background music cannot alert robots.
+Pursuit music now consumes the live Sentinel's actual CHASE/SEARCH state. Playback never emits a hidden simulation noise or changes guard knowledge. UI sounds and background music cannot alert robots.
 
 Tracks stream from packaged in-memory resource bytes, independent of cwd. Music switches with a 250 ms fade-out and 700 ms fade-in. Ordinary SFX use bounded channels; UI and security cues have reserved channels. Event IDs deduplicate repeated delivery and reset on a genuinely new run. Music ducks while paused. Separate music/SFX sliders apply immediately and persist through SettingsStore; unavailable devices and `--mute` preserve silent gameplay.
 
-Actual checks: all 72 tests plus structure/Ruff/strict types PASS. The audio integration case decodes all 16 shipped assets and checks context selection, event deduplication, pause ducking and independent volumes using SDL dummy audio. A 90-frame native Cocoa startup on the Mac reported `audio=ready`, 16 assets loaded, `music_track=title`, settings saved and no runtime error. This proves playback initialization, not subjective mix approval or Windows speaker quality.
+Actual checks: all 89 tests plus structure/Ruff/strict types PASS. The audio integration case decodes all 16 shipped assets and checks context selection, event deduplication, pause ducking and independent volumes using SDL dummy audio. A 90-frame native Cocoa startup on the Mac reported `audio=ready`, 16 assets loaded, `music_track=title`, settings saved and no runtime error. This proves playback initialization, not subjective mix approval or Windows speaker quality.
+
+The native audio-enabled Human playthrough exercised title, infiltration, pursuit, lockdown and result music, loaded all 16 assets and emitted 108 event/UI cues during a genuine WIN. Exact performance/evidence scope: [current review](../quality/reports/phase02/presentation/REVIEW.md).

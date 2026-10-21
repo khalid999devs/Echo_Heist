@@ -1,60 +1,51 @@
-# Phase 2 screen composition review
+# Cinematic interface and first stealth slice review
 
-Date: 2026-10-21, Asia/Dhaka. Owner: Khalid, under the user's requested visual follow-up. Branch: `work/p02-ui-polish`; starting main: `9ea201f`. This review supersedes the earlier integration screenshots for current presentation. P02 gameplay scope and approved scoring are unchanged; P03 is not started.
+2026-10-21, Khalid. Branch: `work/stealth-vertical-slice`; starting main: `9ea201f`. This supersedes the previous P02 presentation captures. P02 remains complete; this starts a **partial P03 Sentinel/perception slice**, not full V1 completion. The [runtime contract](../../../../architecture/integration/STEALTH_SLICE.md) and [runnable handoff](../../../../tracking/handoffs/khalid/day_02/STEALTH_SLICE.md) describe the boundary.
 
-## Result and visual decisions
+## Implemented and visibly exercised
 
-The owner selected a **cinematic 3D-rendered facility scene with animation**, rather than a live real-time 3D diorama. The new perspective artwork shows the operative and Companion overlooking the reactor. Runtime camera drift, dust and a restrained light pulse animate that artwork. The gameplay environment remains the authoritative 2D Tiled mission.
+- Owner-approved cinematic 3D-rendered chamber with subtle pan/dust/light animation; continuous gradient behind futuristic type and shared translucent controls. Gameplay remains a genuine 2D top-down mission.
+- Six-item main menu, honest unavailable Companion/Workshop states, real last-session report navigation, independent persisted music/SFX sliders, reduced flashing and fullscreen.
+- Compact objective/waypoint, elapsed time, actual guard alert state, tool stocks and small minimap. Base HUD panels occupy about 10.5% of the logical canvas; transient notices/progress keep total below 20%. Explicit Tab/F3 dialogs are optional overlays.
+- Nine Entry/Service furnishings with matching map-owned physical/opaque/acoustic footprints, room-appropriate sprites, clear route lanes, contact shadows, darker closed roofs and cover art fitted to actual cover cells. This is the first furnished cluster; the entire facility is not yet a finished interior.
+- One live Sentinel: real BFS patrol, sight cone, progressive identification, heard-only investigation, chase, last-seen search/expiry and return. Actual movement drives gait/facing. F3 shows real BFS, memory, identification and fuzzy values. Other three posts retain P02 contact behavior.
+- Real Core hold/theft, changed lockdown objective/music/emergency lights, empty socket, extraction, capture and interruptible EMP/melee. A disabled robot remains a solid body. HUD labels disruption rather than suggesting immediate active pursuit.
+- Five CC0 context tracks and eleven event cues, licensed and hashed in the [audio record](../../../../assets/AUDIO.md). Playback follows committed events and cannot alter guard knowledge.
 
-- Replaced the title's top-down image and hard vertical divider with a perspective chamber and continuous dark-to-scene fade. Kept the reactor and characters visible while leaving quiet space for controls.
-- Unified menus, HUD, notices and dialogs with rounded translucent glass, consistent light edges and soft fills. Removed the abrupt portrait card and the result screen's solid wall of color.
-- Blurred the underlying mission for pause, route and abort dialogs; kept the heading, body and input hints clear. Disabled Companion selection has visible focus and a plain explanation.
-- Removed phase numbers, simulation ticks, internal guard IDs and seed jargon from player-facing copy. Actual outcome/time/Core extraction status remain factual; no score is fabricated.
-- Cropped props from explicit atlas regions to remove neighboring fragments, toned them to the environment, added contact shadows, reduced extra floor grid lines and softened actor/lockdown outlines.
+## Native screens inspected
 
-## Screens inspected
+The screenshot driver uses Cocoa, actual GameFlow/HumanInput actions and asserted scene/outcome transitions. It exports explicit RGB because unused Cocoa display alpha produced blank previews in some viewers. All **31** current images are opaque. The source sweep asserts a genuine upper-route win using EMP, a live Sentinel capture and voluntary abort; it never forces an outcome. This is scripted inspection, not a human playtest.
 
-All captures use the actual `GameFlow`, bundled assets and native macOS Cocoa display. Routes use real HumanInput actions; win, capture and abort are asserted against committed outcomes. These are scripted visual inspections, not a substitute for human playtesting or Windows desktop QA.
-
-| Screen/state | Evidence | Visual inspection |
+| Group | Screens | Review |
 | --- | --- | --- |
-| Title / begin selected | [Screenshot](screens/menus/01-title.png) | Clear title/action hierarchy, perspective scene and continuous blend |
-| Title / quit selected | [Screenshot](screens/menus/02-title-quit-selected.png) | Selection moves without shifting controls |
-| Human briefing | [Screenshot](screens/menus/03-human-briefing.png) | Launch and mode choices remain clear over scene |
-| Companion unavailable | [Screenshot](screens/menus/04-companion-unavailable.png) | Focus/disabled state and explanation visible; launch unavailable |
-| Mission entry | [Screenshot](screens/gameplay/01-entry.png) | Objective, inventory, route and quick controls readable |
-| Route guide | [Screenshot](screens/gameplay/02-route-guide.png) | Dialog fits, underlying world is blurred, close key visible |
-| Pause | [Screenshot](screens/gameplay/03-paused.png) | Resume/restart/abort instructions and layout explanation fit |
-| Confirm abort | [Screenshot](screens/gameplay/04-confirm-abort.png) | Consequence and confirm/cancel keys clear |
-| Core hold | [Screenshot](screens/gameplay/05-core-link.png) | Progress bar, objective and actor visible |
-| Lockdown | [Screenshot](screens/gameplay/06-lockdown.png) | Return objective and non-color alert text clear; soft perimeter |
-| Echo feedback | [Screenshot](screens/feedback/echo.png) | Tool notice fits and inventory updates |
-| EMP feedback | [Screenshot](screens/feedback/emp.png) | Notice fits and stock reaches zero |
-| Melee out of range | [Screenshot](screens/feedback/melee.png) | Failure guidance fits without hiding controls |
-| Tactical telemetry unavailable | [Screenshot](screens/feedback/lab-unavailable.png) | Plain notice and close key fit |
-| Win | [Screenshot](screens/outcomes/01-win.png) | Factual outcome, time and Core status; scene blends behind text |
-| Capture | [Screenshot](screens/outcomes/02-captured.png) | Red accent has no hard cutoff; outcome/time readable |
-| Abort | [Screenshot](screens/outcomes/03-aborted.png) | Amber outcome has same layout and controls |
-| Result retry hover | [Screenshot](screens/outcomes/04-retry-hover.png) | Hover feedback stays inside the action |
-| Result menu hover | [Screenshot](screens/outcomes/05-menu-hover.png) | Secondary action has visible focus |
-| 960×540 window | [Screenshot](screens/display/01-small-window.png) | Full composition and controls retained at smaller scale |
-| 1024×800 window | [Screenshot](screens/display/02-tall-window-letterbox.png) | Correct letterboxing; no stretched artwork or clipped controls |
+| Main menu | [Human focus](screens/menus/01-title.png), [Quit focus](screens/menus/02-title-quit-selected.png) | Stable focus and continuous cinematic blend |
+| Briefing | [Human](screens/menus/03-human-briefing.png), [Companion unavailable](screens/menus/04-companion-unavailable.png) | Clear launch/disabled choices and explanation |
+| Settings | [Default](screens/menus/05-settings.png), [Adjusted](screens/menus/06-settings-adjusted.png) | Visible slider values, selection and back controls |
+| Honest missing screens | [Workshop](screens/unavailable/workshop.png), [No report yet](screens/unavailable/empty-report.png) | Plain explanation; no fake configuration or report |
+| Normal mission | [Entry](screens/gameplay/01-entry.png), [Core hold](screens/gameplay/05-core-link.png), [Lockdown](screens/gameplay/06-lockdown.png) | Open view, real progress/return objective and removed Core marker |
+| Dialogs | [Route](screens/gameplay/02-route-guide.png), [Pause](screens/gameplay/03-paused.png), [Abort confirmation](screens/gameplay/04-confirm-abort.png) | Background blur and clear input/consequence text |
+| Sentinel | [Patrol](screens/stealth/patrol.png), [Suspicious](screens/stealth/spotted.png), [Chase](screens/stealth/chase.png), [Disabled](screens/stealth/disabled.png), [Search](screens/stealth/search.png), [Return](screens/stealth/return.png) | Sensor-clipped cones and labels follow committed behavior |
+| Feedback | [Echo](screens/feedback/echo.png), [EMP](screens/feedback/emp.png), [Melee out of range](screens/feedback/melee.png), [Live Lab](screens/feedback/live-ai-lab.png) | Actual inventory/response; diagnostics clearly optional |
+| Outcomes | [Win](screens/outcomes/01-win.png), [Capture](screens/outcomes/02-captured.png), [Abort](screens/outcomes/03-aborted.png), [Retry hover](screens/outcomes/04-retry-hover.png), [Menu hover](screens/outcomes/05-menu-hover.png) | Factual unscored results and stable action focus |
+| Window sizes | [960×540](screens/display/01-small-window.png), [1024×800](screens/display/02-tall-window-letterbox.png) | Preserved aspect and visible controls |
 
-The [seven-second clip](cinematic-preview.mp4) captures title drift/dust, menu selection and real walk/sprint input. It contains 210 frames at 30 fps. Source update/draw averaged 3.96 ms, p95 6.34 ms on this local run, excluding display/encoding. This is a presentation sample, not a full-game AI performance claim.
+The earlier [seven-second cinematic clip](cinematic-preview.mp4) remains a title/gait sample from before the active Sentinel and compact HUD. It is not current gameplay/AI evidence.
 
-## Commands and actual checks
+## Actual verification
 
 ```sh
 UV_CACHE_DIR="$PWD/.cache/uv" uv run --locked python scripts/checks/run.py
-UV_CACHE_DIR="$PWD/.cache/uv" uv run --locked python scripts/quality/capture_ui.py --output docs/development/quality/reports/phase02/presentation/screens
+UV_CACHE_DIR="$PWD/.cache/uv" uv run --locked python scripts/quality/capture_ui.py --output output/vertical-slice/final-evidence
+UV_CACHE_DIR="$PWD/.cache/uv" uv run --locked --all-extras python scripts/packaging/build.py
+UV_CACHE_DIR="$PWD/.cache/uv" uv run --locked --all-extras python scripts/packaging/smoke.py "dist/Echo Heist.app" --output-dir output/vertical-slice/frozen-app
 ```
 
-PASS: 70 existing tests; Ruff lint/format; strict mypy across 56 source files; 1,000-line/6-file structure checks. No cosmetic unit tests were added. The native capture sweep asserts real win/capture/abort outcomes and saved 21 screenshots. A first requested 1024×900 window was constrained by macOS to 1024×820; the final capture explicitly requests 1024×800 and completes without that warning.
+PASS: **89 cases**, Ruff lint/format, strict mypy over **72 source files**, 1,000-line/6-file structure rules. Meaningful new cases cover sight/glass/corners/acoustics, shortest BFS, bounded fuzzy output, anonymous cues, hidden-position invariance, report expiry, capture interruption, active-guard replay, furniture errors/layer order and an actual lower-route extraction with the live Sentinel.
 
-Final clean native build and hosted CI evidence: PENDING until the candidate is committed and rebuilt. The earlier integration archive predates this visual follow-up and must not be used as evidence for the new background.
+An accelerated native audio-enabled playthrough at `8fd87db` completed WIN in 1,287 rendered frames, exercised all five music contexts from actual states, loaded all 16 audio assets and emitted 108 cues. Update/audio/draw averaged **7.77 ms**, p95 **8.43 ms**, excluding display/encoding. [Machine-readable result](NATIVE_PLAYTHROUGH.json). This is one local source measurement, not a complete FPS, minimum-hardware, subjective mix or final AI benchmark.
 
-## Reproduce and continue
+A clean `8fd87db` macOS arm64 app and freshly extracted ZIP each passed all eight Cocoa frozen-smoke checks with audio ready and 16 assets loaded. Final small label refinements are being rebuilt; the exact latest archive/commit and hosted CI result are recorded in the handoff when complete. No Windows interactive or Linux native release claim is made.
 
-Run `uv run --locked echo-heist`. Use arrows/mouse and Enter in menus, WASD/arrows to move, Shift to sprint, E at the Core, Tab for the guide, Escape to pause. The source and frozen app must use the same visual resource paths and logical 1280×720 canvas.
+## Remaining work
 
-Windows interactive visual inspection and subjective human play-feel remain NOT_RUN. P03 guard AI and the owner's deferred P05 glass/door/hiding/canister mechanics remain assigned future work. Asset provenance and the exact adopted prompt are in [PROMPTS](PROMPTS.md) and the [asset register](../../../../assets/ASSETS.md).
+The owner's full brief is still open: extend purposeful interiors and route pacing, finish Tracker A*, Interceptor minimax/alpha-beta, NEXUS, autonomous Companion/MCTS, Workshop/profile behavior, approved scoring and remaining production animation/cues. Glass breaking, doors, hiding and canisters remain P05 by explicit owner choice. Wider human play-feel, Windows speakers/input and clean-machine release QA remain NOT_RUN. Do not replace these with fake UI metrics or declare the full game polished.

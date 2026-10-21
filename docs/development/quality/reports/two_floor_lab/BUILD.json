@@ -84,23 +84,15 @@
     }
   },
   "hosted_ci": {
-    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39608091170",
-    "source_commit": "123225bfda7698f505705436521cc09023118d02",
-    "conclusion": "PENDING; Linux and Windows passed, hosted macOS runner in startup with no steps reported at integration",
-    "scope": "Native primary builds and dummy-video frozen smoke, not interactive hardware QA",
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39610664321",
+    "source_commit": "8d551d8142dc5cbcef7049d3b4f4e0b32b6111d6",
+    "implementation_commit": "123225bfda7698f505705436521cc09023118d02",
+    "conclusion": "success",
     "jobs": [
-      {
-        "name": "headless-checks",
-        "conclusion": "success"
-      },
-      {
-        "name": "windows-x64",
-        "conclusion": "success"
-      },
-      {
-        "name": "macos-arm64",
-        "conclusion": "PENDING"
-      }
-    ]
+      "headless-checks",
+      "windows-x64",
+      "macos-arm64"
+    ],
+    "scope": "All three platform checks, native Windows/macOS builds and frozen SDL dummy-video smoke. Runtime/test/build files match clean local implementation 123225b; interactive hardware/download QA remains separate."
   }
 }

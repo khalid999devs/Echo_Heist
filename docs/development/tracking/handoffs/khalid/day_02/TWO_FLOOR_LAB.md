@@ -35,7 +35,7 @@ Clean `123225b` Mac arm64 app and freshly extracted ZIP each PASS all eight nati
 
 Actual native commands: `scripts/packaging/build.py`; `scripts/packaging/smoke.py "dist/Echo Heist.app" --output-dir output/two-floor-lab/frozen-app`; fresh `ditto -x -k` to `output/two-floor-lab/extracted-123225b`, followed by smoke on its app under `frozen-extracted`. These use locked uv with `--all-extras`. The build manifest is clean; runtime/test/build paths match `123225b` after documentation-only record edits.
 
-Hosted source CI: [39608091170](https://github.com/khalid999devs/Echo_Heist/actions/runs/39608091170). At integration, Linux and Windows checks/builds passed; hosted macOS remained in runner startup with no steps reported. Local native Mac checks/build/smoke passed. BUILD.json keeps those facts separate; do not claim the queued hosted job passed. Windows interactive hardware/audio/download and Linux native packaging remain NOT_RUN. No development hours or external-player usability result is invented.
+Post-merge [CI 39610664321](https://github.com/khalid999devs/Echo_Heist/actions/runs/39610664321) **PASS** at `8d551d8`: Linux/Windows/macOS checks, native primary builds and frozen dummy-video smoke. Runtime/test/build paths match clean `123225b`; later records change documentation only. The earlier source Mac runner delay is superseded by this successful main run. Interactive Windows hardware/audio/download and Linux native packaging remain NOT_RUN. No development hours or external-player usability result is invented.
 
 ## Next owner work
 

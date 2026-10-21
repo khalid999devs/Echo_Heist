@@ -41,6 +41,10 @@ Rendering principles used: [depth sorting](https://docs.godotengine.org/en/stabl
 
 ## Build boundary
 
-Source checks and native scene review pass. A fresh clean-source Mac build and hosted CI are pending the implementation commit; the earlier scene-presentation downloads do not contain this change. Actual manifests, archive hashes and smoke results will be recorded here after execution.
+Clean runtime **`ac2edfe62a007aa72f98c3f67356d0717a7fca2e`**, following asset commit `5eee828`, built successfully with Python 3.13.16 / PyInstaller 6.22.3 / macOS 26.4.1 arm64. The Mac app and fresh ZIP extraction each PASS all eight frozen Cocoa checks from an unrelated working directory, with native audio ready. The app is ad-hoc signed, not notarized. [Exact manifest, smoke and CI evidence](BUILD.json).
+
+Current `dist/echo-heist-0.1.0a1-macos-arm64.zip`: **59,444,312 bytes**, SHA256 **`bad5acbb228d78062b732ca545cdb3460aa1bc38b16dcfdbb40567cb00d31e41`**. This replaces the older file at the same path; the preceding scene-presentation ZIP did not contain this refinement.
+
+[Source CI 39650365624](https://github.com/khalid999devs/Echo_Heist/actions/runs/39650365624) PASS at that runtime: all Linux/Windows/macOS check jobs, native Windows/macOS packages and eight-check frozen dummy-video smoke. Windows interactive desktop/audio testing is still NOT_RUN. Source runs use the commands above; Windows can retrieve its artifact from the linked CI or build natively with the documented packaging command.
 
 This completes the requested camera/character/room-detail source refinement. It does not close P03-P08, implement advanced defenders/Companion/NEXUS, persist Workshop policies, add scoring or bring forward deferred environment interactions. Interactive Windows hardware/audio/download, subjective audio/animation playtest and public-release QA remain separate gates.

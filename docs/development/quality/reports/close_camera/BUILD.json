@@ -1,0 +1,220 @@
+{
+  "revision": "Closer camera and grounded lab detail",
+  "baseline_main": "9b308e47aed209dd7278c51ab09cd5513fb9fa12",
+  "runtime_source_commit": "ac2edfe62a007aa72f98c3f67356d0717a7fca2e",
+  "local_checks": {
+    "tests": 117,
+    "mypy_source_files": 94,
+    "ruff": "PASS",
+    "structure": "PASS",
+    "diff_check": "PASS"
+  },
+  "native_scene_sweep": {
+    "video_driver": "cocoa",
+    "screens": 48,
+    "outcomes": {
+      "upper": {
+        "outcome": "WIN",
+        "ticks": 1505
+      },
+      "lower": {
+        "outcome": "WIN",
+        "ticks": 1620
+      }
+    },
+    "capture_ticks": 759,
+    "guard_states": [
+      "CHASE",
+      "INVESTIGATE",
+      "PATROL",
+      "RETURN",
+      "SEARCH",
+      "SPOTTED"
+    ],
+    "rooms_seen": [
+      "Containment Systems",
+      "Core Chamber",
+      "Entry / Extraction",
+      "Equipment Stores",
+      "Power & Ventilation",
+      "Sample Archive",
+      "Security Checkpoint",
+      "Service Servers"
+    ],
+    "stair_views": [
+      [
+        "down",
+        0
+      ],
+      [
+        "down",
+        1
+      ],
+      [
+        "down",
+        2
+      ],
+      [
+        "up",
+        0
+      ],
+      [
+        "up",
+        1
+      ],
+      [
+        "up",
+        2
+      ]
+    ],
+    "alarm_frames": 1560,
+    "tracks": [
+      "pulse",
+      "sector",
+      "title",
+      "transmission",
+      "urgent"
+    ],
+    "frames": 3862,
+    "render_audio_display_ms": {
+      "median": 2.75,
+      "p95": 3.89,
+      "max": 319.12
+    },
+    "scope": "Accelerated native source input sweep; frame timings exclude simulation. AI scenes are designs; actual Human outcomes only."
+  },
+  "motion_and_room_review": {
+    "video_driver": "cocoa",
+    "frames": 378,
+    "animation_frames_seen": {
+      "walk": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "run": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    "directions": [
+      [
+        -1,
+        0
+      ],
+      [
+        0,
+        -1
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "simulation_fingerprint_preserved_on_every_draw": true,
+    "tile_size_px": 96,
+    "viewport_tiles": [
+      13.333333333333334,
+      7.5
+    ],
+    "architectural_preview_rooms": 14,
+    "draw_ms": {
+      "median": 4.35,
+      "max": 19.31
+    },
+    "scope": "Native visual fixture with security disabled; mission wins use capture_scenes."
+  },
+  "macos_manifest": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 59444312,
+    "archive_sha256": "bad5acbb228d78062b732ca545cdb3460aa1bc38b16dcfdbb40567cb00d31e41",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "ac2edfe62a007aa72f98c3f67356d0717a7fca2e",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "native_app_smoke": {
+    "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/dist/Echo Heist.app/Contents/MacOS/EchoHeist",
+    "checks": {
+      "frames_rendered": true,
+      "frozen_desktop": true,
+      "frozen_headless": true,
+      "resources_loaded": true,
+      "same_event_hash": true,
+      "same_state_hash": true,
+      "settings_saved": true,
+      "surface_saved": true
+    },
+    "passed": true,
+    "scope": "native display smoke",
+    "video_driver": "cocoa"
+  },
+  "fresh_zip_extraction_smoke": {
+    "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/close-camera/fresh-download/Echo Heist.app/Contents/MacOS/EchoHeist",
+    "checks": {
+      "frames_rendered": true,
+      "frozen_desktop": true,
+      "frozen_headless": true,
+      "resources_loaded": true,
+      "same_event_hash": true,
+      "same_state_hash": true,
+      "settings_saved": true,
+      "surface_saved": true
+    },
+    "passed": true,
+    "scope": "native display smoke",
+    "video_driver": "cocoa"
+  },
+  "macos_audio": "ready in both native Cocoa frozen desktop reports",
+  "hosted_ci": {
+    "conclusion": "success",
+    "databaseId": 39650365624,
+    "headSha": "ac2edfe62a007aa72f98c3f67356d0717a7fca2e",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "macos-arm64",
+        "status": "completed",
+        "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39650365624/job/119396789797"
+      },
+      {
+        "conclusion": "success",
+        "name": "headless-checks",
+        "status": "completed",
+        "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39650365624/job/119396790008"
+      },
+      {
+        "conclusion": "success",
+        "name": "windows-x64",
+        "status": "completed",
+        "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39650365624/job/119396790205"
+      }
+    ],
+    "status": "completed",
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39650365624"
+  },
+  "scope": "Current Human draft; full V1, interactive Windows hardware/audio, quarantine acceptance and minimum-hardware testing remain open."
+}

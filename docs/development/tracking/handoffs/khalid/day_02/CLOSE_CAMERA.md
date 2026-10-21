@@ -27,6 +27,10 @@ Click Play Chapter → Launch Mission. Move with WASD/arrows, hold Shift for the
 
 117 tests, strict types over 94 source files, lint/format/structure pass. Native 48-state sweep passes both real extractions (1505/1620 ticks), contact capture (759), stairs, all five context tracks and siren lifecycle. 378 native walk/run frames cover all directions/eight phase slots; every draw preserves the simulation fingerprint. All 14 room previews were inspected separately. Exact commands/timings and source asset provenance are linked in the review.
 
-Fresh native packaging and hosted verification are pending the clean implementation commit. Previous ZIPs are stale for this revision; do not present them as current. This section will be replaced with actual source/archive/CI evidence after execution.
+Implementation commits: `5eee828` (original assets/provenance), **`ac2edfe62a007aa72f98c3f67356d0717a7fca2e`** (verified runtime/map/rendering). Subsequent delivery changes are records only. [Exact build manifest and smoke evidence](../../../../quality/reports/close_camera/BUILD.json).
+
+Clean Mac archive `dist/echo-heist-0.1.0a1-macos-arm64.zip`: **59,444,312 bytes**, SHA256 `bad5acbb228d78062b732ca545cdb3460aa1bc38b16dcfdbb40567cb00d31e41`. The app and fresh extraction each pass all eight native Cocoa checks with audio ready; ad-hoc signed, not notarized. This replaces the previous download at that filename.
+
+[CI 39650365624](https://github.com/khalid999devs/Echo_Heist/actions/runs/39650365624) passes all three hosted platform jobs, including native Windows/macOS builds and frozen dummy-video smoke at the runtime commit. Suhita can download `foundation-windows-x64`, extract the included game ZIP and run `EchoHeist/EchoHeist.exe`, keeping its support folder. This is a hosted Windows execution check; her interactive hardware/audio playtest remains open. Main integration preserves both implementation commits and the delivery record; the temporary branch is removed after verified integration.
 
 No deferred glass breaking, door/hiding/canister mechanics, advanced AI, policy persistence or scoring is represented as finished. Continue the existing owner queues and consume these visuals in later slices. An interactive Windows playtest remains required before claiming Windows desktop quality.

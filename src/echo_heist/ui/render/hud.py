@@ -8,26 +8,10 @@ from echo_heist.core.contracts.world import MissionPhase, Tile
 from echo_heist.level.model import LevelData
 from echo_heist.ui.presenters.objective import ObjectiveView
 from echo_heist.ui.render import theme
+from echo_heist.ui.render.surfaces.glass import panel as panel
 from echo_heist.ui.render.theme import Color, Fonts
 
 CONTROLS = "WASD MOVE    SHIFT SPRINT    E CORE    Q ECHO    F EMP    SPACE MELEE    TAB GUIDE"
-
-
-def panel(
-    canvas: pygame.Surface,
-    rect: pygame.Rect,
-    *,
-    fill: tuple[int, int, int, int] = theme.PANEL,
-    border: Color = theme.BORDER,
-) -> None:
-    layer = pygame.Surface(rect.size, pygame.SRCALPHA)
-    layer.fill(fill)
-    canvas.blit(layer, rect.topleft)
-    pygame.draw.rect(canvas, border, rect, 1, border_radius=7)
-    pygame.draw.line(canvas, border, (rect.x + 10, rect.y), (rect.x + 29, rect.y), 2)
-    pygame.draw.line(
-        canvas, border, (rect.right - 29, rect.bottom - 1), (rect.right - 10, rect.bottom - 1), 2
-    )
 
 
 def _label(
@@ -105,8 +89,8 @@ def _waypoint(
     target = anchors[level.core_id if core else level.exit_id]
     dx, dy = target[0] - operative_tile[0], target[1] - operative_tile[1]
     color = theme.WARNING if core else theme.ACCENT
-    rect = pygame.Rect(446, 20, 532, 75)
-    panel(canvas, rect, fill=(6, 20, 31, 232), border=color)
+    rect = pygame.Rect(446, 20, 348, 75)
+    panel(canvas, rect, fill=(6, 20, 31, 188), border=color)
     center = rect.x + 34, rect.y + 37
     pygame.draw.circle(canvas, color, center, 21, 2)
     if dx or dy:
@@ -142,8 +126,8 @@ def _waypoint(
 
 
 def _first_run_help(canvas: pygame.Surface, fonts: Fonts) -> None:
-    rect = pygame.Rect(canvas.get_width() - 282, 169, 262, 141)
-    panel(canvas, rect, fill=(4, 17, 28, 236), border=theme.ACCENT_DIM)
+    rect = pygame.Rect(canvas.get_width() - 282, 152, 262, 141)
+    panel(canvas, rect, fill=(4, 17, 28, 188), border=theme.ACCENT_DIM)
     _label(canvas, fonts.micro, "QUICK START", theme.ACCENT, (rect.x + 14, rect.y + 11))
     _label(canvas, fonts.small, "WASD  Move", theme.TEXT, (rect.x + 14, rect.y + 35))
     _label(canvas, fonts.small, "SHIFT  Sprint", theme.TEXT, (rect.x + 14, rect.y + 63))
@@ -169,8 +153,8 @@ def draw_hud(
     clock_ms: int = 0,
     notice: str = "",
 ) -> None:
-    panel(canvas, pygame.Rect(20, 20, 407, 137))
-    pygame.draw.rect(canvas, theme.ACCENT, (20, 20, 5, 137))
+    panel(canvas, pygame.Rect(20, 20, 407, 118))
+    pygame.draw.line(canvas, theme.ACCENT, (20, 33), (20, 125), 3)
     _label(canvas, fonts.micro, f"MISSION / {zone_label.upper()}", theme.ACCENT, (37, 34))
     _label(canvas, fonts.body, view.objective, theme.TEXT, (37, 60))
     pygame.draw.line(canvas, theme.BORDER, (37, 95), (409, 95), 1)
@@ -184,7 +168,7 @@ def draw_hud(
     _label(canvas, fonts.small, prompt, color, (37, 107))
     if view.interaction_progress is not None:
         done, total = view.interaction_progress
-        interaction = pygame.Rect(20, 168, 407, 47)
+        interaction = pygame.Rect(20, 152, 407, 47)
         panel(canvas, interaction, fill=(26, 21, 8, 236), border=theme.WARNING)
         _label(
             canvas,
@@ -201,7 +185,7 @@ def draw_hud(
             (track.x, track.y, round(track.w * min(done, total) / max(1, total)), track.h),
             border_radius=4,
         )
-    status = pygame.Rect(canvas.get_width() - 282, 20, 262, 137)
+    status = pygame.Rect(canvas.get_width() - 282, 20, 262, 118)
     panel(canvas, status)
     _label(canvas, fonts.micro, "MISSION TIME", theme.ACCENT, (status.x + 15, 32))
     _label(canvas, fonts.heading, view.elapsed, theme.TEXT, (status.x + 15, 52))
@@ -209,7 +193,7 @@ def draw_hud(
     _label(canvas, fonts.small, view.inventory, theme.MUTED, (status.x + 15, 109))
     _waypoint(canvas, level, operative_tile, phase, fonts)
     if phase == MissionPhase.LOCKDOWN:
-        _label(canvas, fonts.micro, "LOCKDOWN ACTIVE", theme.DANGER, (610, 104))
+        _label(canvas, fonts.micro, "LOCKDOWN ACTIVE", theme.DANGER, (515, 104))
     elif clock_ms < 10_000:
         _first_run_help(canvas, fonts)
     draw_minimap(canvas, level, operative_tile, phase, fonts)
@@ -241,11 +225,15 @@ def draw_dialog(
     height = 108 + 36 * len(lines)
     rect = pygame.Rect(0, 0, 660, height)
     rect.center = canvas.get_rect().center
+    small = pygame.transform.smoothscale(canvas, (160, 90))
+    canvas.blit(pygame.transform.smoothscale(small, canvas.get_size()), (0, 0))
     shade = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
-    shade.fill((0, 0, 0, 165))
+    shade.fill((1, 7, 13, 125))
     canvas.blit(shade, (0, 0))
-    panel(canvas, rect, fill=(5, 17, 27, 246), border=title_color)
-    pygame.draw.rect(canvas, title_color, (rect.left, rect.top, 5, rect.height))
+    panel(canvas, rect, fill=(5, 17, 27, 220), border=title_color)
+    pygame.draw.line(
+        canvas, title_color, (rect.left, rect.top + 16), (rect.left, rect.bottom - 16), 3
+    )
     heading = fonts.heading.render(title, True, title_color)
     canvas.blit(heading, (rect.centerx - heading.get_width() // 2, rect.top + 22))
     for index, (value, color) in enumerate(lines):

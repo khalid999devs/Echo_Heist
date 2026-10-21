@@ -12,6 +12,7 @@ from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.level.model import LevelData
 from echo_heist.ui.render import motifs, theme
 from echo_heist.ui.render.camera import Camera
+from echo_heist.ui.render.surfaces.glass import alert_frame
 from echo_heist.ui.render.theme import Fonts
 
 
@@ -44,13 +45,18 @@ class WorldArt:
         floor.fill((183, 193, 201), special_flags=pygame.BLEND_RGB_MULT)
         bulkhead.fill((160, 175, 185), special_flags=pygame.BLEND_RGB_MULT)
         atlas = image("assets/tiles/facility-props.png")
-        cell_w, cell_h = atlas.get_width() // 3, atlas.get_height() // 2
-        props = tuple(
-            atlas.subsurface(
-                pygame.Rect((index % 3) * cell_w, (index // 3) * cell_h, cell_w, cell_h)
-            )
-            for index in range(6)
+        # This illustrated atlas has irregular padding; explicit regions prevent
+        # a neighboring prop's edge from leaking into another furnishing.
+        regions = (
+            (100, 8, 280, 500),
+            (498, 90, 545, 420),
+            (1150, 0, 285, 540),
+            (50, 555, 420, 420),
+            (565, 544, 400, 435),
+            (1046, 570, 465, 410),
         )
+        cells = tuple(atlas.subsurface(pygame.Rect(region)) for region in regions)
+        props = tuple(cell.subsurface(cell.get_bounding_rect(min_alpha=16)) for cell in cells)
 
         def frames(path: str, size: tuple[int, int]) -> tuple[pygame.Surface, ...]:
             sheet = image(path)
@@ -65,7 +71,7 @@ class WorldArt:
             result = []
             for cell in cells:
                 frame = pygame.transform.smoothscale(cell.subsurface(bounds), size)
-                frame.fill((46, 48, 50), special_flags=pygame.BLEND_RGB_ADD)
+                frame.fill((28, 34, 39), special_flags=pygame.BLEND_RGB_ADD)
                 result.append(frame)
             return tuple(result)
 
@@ -149,8 +155,37 @@ def _decorate_rooms(surface: pygame.Surface, level: LevelData, art: WorldArt) ->
         if level.static_map.can_walk(tile):
             continue
         prop = pygame.transform.smoothscale(art.props[index], dimensions)
+        prop.fill((210, 222, 231), special_flags=pygame.BLEND_RGB_MULT)
         point = ((tile[0] + 0.5) * size, (tile[1] + 0.5) * size)
+        shadow = pygame.Surface((dimensions[0] + 14, dimensions[1] + 10), pygame.SRCALPHA)
+        pygame.draw.ellipse(shadow, (0, 5, 8, 95), shadow.get_rect().inflate(-4, -5))
+        surface.blit(shadow, shadow.get_rect(center=(point[0] + 3, point[1] + 8)))
         surface.blit(prop, prop.get_rect(center=point))
+
+
+def _floor_shadows(surface: pygame.Surface, level: LevelData) -> None:
+    """Bake soft wall contact shadows into the static map's walkable floor."""
+    world_map = level.static_map
+    size = world_map.tile_size_px
+    layer = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+    for y in range(world_map.height):
+        for x in range(world_map.width):
+            if not world_map.can_walk((x, y)):
+                continue
+            left, top = x * size, y * size
+            for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                if world_map.can_walk((x + dx, y + dy)):
+                    continue
+                for offset in range(9):
+                    color = (0, 5, 9, round(83 * (1 - offset / 9) ** 2))
+                    if dx:
+                        px = left + offset if dx < 0 else left + size - 1 - offset
+                        start, end = (px, top), (px, top + size - 1)
+                    else:
+                        py = top + offset if dy < 0 else top + size - 1 - offset
+                        start, end = (left, py), (left + size - 1, py)
+                    pygame.draw.line(layer, color, start, end)
+    surface.blit(layer, (0, 0))
 
 
 def build_map_surface(
@@ -191,6 +226,7 @@ def build_map_surface(
                     )
                 else:
                     _roof_tile(surface, rect, variant, art.bulkhead if art else None)
+    _floor_shadows(surface, level)
     if art is not None:
         _decorate_rooms(surface, level, art)
     anchors = {obj.object_id: obj.tile for obj in world_map.objects}
@@ -386,9 +422,8 @@ def draw_world(
             ring = pygame.Rect(0, 0, 38, 38)
             ring.center = point
             pygame.draw.arc(canvas, theme.WARNING, ring, pi / 2, pi / 2 + 2 * pi * progress, 4)
-        if entity.kind != ActorKind.OPERATIVE:
-            label = fonts.micro.render(entity.actor_id.upper(), True, theme.MUTED)
+        if entity.kind != ActorKind.OPERATIVE and 150 < point[1] < canvas.get_height() - 65:
+            label = fonts.micro.render(entity.kind.value.upper(), True, theme.MUTED)
             canvas.blit(label, (point[0] - label.get_width() // 2, point[1] + 14))
     if snapshot.phase == MissionPhase.LOCKDOWN:
-        border = canvas.get_rect().inflate(-5, -5)
-        pygame.draw.rect(canvas, theme.DANGER, border, 2 + int(2 * pulse))
+        canvas.blit(alert_frame(canvas.get_size()), (0, 0))

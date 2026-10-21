@@ -1,5 +1,7 @@
 # Phase 2 combined verification
 
+Current presentation is superseded by the [2026-10-21 screen composition review](../presentation/REVIEW.md), including the perspective cinematic title and all-screen captures. The evidence below preserves the earlier integration candidate and its build hash.
+
 Dates: 2026-10-20 through 2026-10-21, Asia/Dhaka. Candidate: `work/p02-integration`, based on Suhita's `a98548a` (which already includes Khalid's `fd93224`). The user's direction on 2026-10-20 transferred final P02 integration review to Khalid. The source PDF SHA256 remains `64fc08b2725796211931d28550a95557e09ddf3c43f3d66c774e6354e36dedda`.
 
 ## Review decision

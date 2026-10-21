@@ -14,7 +14,7 @@ from echo_heist.ui.input.human import HumanInput, UiCommand
 from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.camera import Camera
-from echo_heist.ui.render.hud import draw_dialog, draw_hud
+from echo_heist.ui.render.hud import draw_dialog, draw_hud, panel
 from echo_heist.ui.render.motifs import ActorMotion
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import (
@@ -246,8 +246,9 @@ class HeistSession:
                 notice=self.notice if self.clock_ms < self.notice_until_ms else "",
             )
         if self.lab_note:
-            note = "Algorithm Lab telemetry arrives in Phase 03  /  F3 to close"
-            canvas.blit(self.fonts.small.render(note, True, theme.WARNING), (24, 225))
+            note = "Tactical telemetry is unavailable in this build.  F3 to close."
+            panel(canvas, pygame.Rect(20, 222, 630, 44), border=theme.ACCENT_DIM)
+            canvas.blit(self.fonts.small.render(note, True, theme.MUTED), (34, 232))
         if self.paused:
             self._draw_pause(canvas)
         elif self.summary:
@@ -256,16 +257,16 @@ class HeistSession:
     def _draw_pause(self, canvas: pygame.Surface) -> None:
         if self.confirm_abort:
             lines = (
-                ("Abort records an unsuccessful run.", theme.TEXT),
+                ("Ending now marks this attempt unsuccessful.", theme.TEXT),
                 ("X: confirm abort    Esc: keep playing", theme.WARNING),
             )
             draw_dialog(canvas, "Abort this run?", lines, self.fonts, title_color=theme.DANGER)
             return
         menu = (
-            ("Simulation time is frozen", theme.MUTED),
+            ("Take a breath. Mission time is paused.", theme.MUTED),
             ("Esc / Enter: resume", theme.TEXT),
-            ("R: restart with the same seed", theme.TEXT),
+            ("R: restart mission", theme.TEXT),
             ("X: abort run", theme.TEXT),
-            ("Map " + self.level.static_map.map_id + f"  |  seed {self.seed}", theme.MUTED),
+            ("Restarting keeps this facility layout.", theme.MUTED),
         )
         draw_dialog(canvas, "PAUSED", menu, self.fonts, title_color=theme.WARNING)

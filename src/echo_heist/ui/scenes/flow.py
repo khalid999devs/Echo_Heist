@@ -10,11 +10,11 @@ from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.infrastructure.resources import load_game_rules, resource_bytes
 from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
+from echo_heist.ui.render.surfaces.cinematic import draw_scene
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import WorldArt, build_map_surface
 from echo_heist.ui.scenes.heist import HeistRequest, HeistSession
 from echo_heist.ui.scenes.menus import (
-    BACKDROP_PAD,
     LAUNCH_BUTTON,
     MODE_ITEMS,
     RESULT_MENU,
@@ -23,7 +23,6 @@ from echo_heist.ui.scenes.menus import (
     draw_menu,
     draw_results,
     load_backdrop,
-    load_operative_portrait,
     menu_hit,
     move_selection,
 )
@@ -59,7 +58,6 @@ class GameFlow:
         self.fonts = Fonts()
         self.art = WorldArt.load()
         self.backdrop = load_backdrop(view_size)
-        self.portrait = load_operative_portrait()
         self.map_surface = build_map_surface(self.level, self.fonts, self.art)
         self.scene = Scene.TITLE
         self.selected = 0
@@ -156,7 +154,7 @@ class GameFlow:
             elif key in CONFIRM_KEYS and MODE_ITEMS[self.selected].enabled:
                 self._start_run()
             elif key in CONFIRM_KEYS:
-                self.notice = "Companion mode is not playable until Phase 04."
+                self.notice = "Companion deployment is unavailable in this build."
         elif self.scene == Scene.RESULTS:
             if key == pygame.K_r:
                 self._start_run()
@@ -171,7 +169,6 @@ class GameFlow:
                 canvas,
                 self.fonts,
                 self.backdrop,
-                self.portrait,
                 scene="TITLE",
                 selected=self.selected,
                 notice=self.notice,
@@ -182,7 +179,6 @@ class GameFlow:
                 canvas,
                 self.fonts,
                 self.backdrop,
-                self.portrait,
                 scene="MODE",
                 selected=self.selected,
                 notice=self.notice,
@@ -192,9 +188,7 @@ class GameFlow:
             self.session.draw(canvas)
             end = self.session.mission_end
             if self.scene == Scene.RESULTS and end is not None:
-                canvas.fill((3, 12, 20))
-                crop = pygame.Rect(650 + BACKDROP_PAD, BACKDROP_PAD, 620, self.view_size[1])
-                canvas.blit(self.backdrop, (0, 0), crop)
+                draw_scene(canvas, self.backdrop, self.ambient_ms, text_side="right")
                 draw_results(
                     canvas,
                     end,

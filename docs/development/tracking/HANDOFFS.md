@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | None; P02-K1/K2 and user-directed integration review complete | work/khalid-p02 and work/p02-integration | None | P02 DONE; P03 not started |
+| Khalid | User-requested P02 visual follow-up | work/p02-ui-polish | ui/scenes, ui/render, cinematic scene asset, scripts/quality, visual review records | IN_PROGRESS; P03 not started |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | work/suhita-p02 at a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.

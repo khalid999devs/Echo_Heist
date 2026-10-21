@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested fullscreen/layout, sound and complete facility scene refinement | work/close-camera-detail; verified runtime ac2edfe | Responsive presentation, audio mix, room equipment/cover presentation, authored fixtures and verification | IN_PROGRESS; prior closer-camera pass verified, expanded owner feedback being implemented; scoring unchanged |
+| Khalid | User-requested fullscreen/layout, sound and complete facility scene refinement | Runtime 28aff88; integration to main | None; [runnable handoff](handoffs/khalid/presentation/SCENE_FINISH.md) | DONE; 127 checks, actual native/hosted builds pass; P03-P08 and scoring gates unchanged |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | main includes original source a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
@@ -70,6 +70,8 @@ What the other owner/integrator must connect next:
 Keep secrets and machine-local profile data out of the record. Include a seed/profile and controls for gameplay checks. Generated large logs/build/video artifacts are linked with version/hash rather than committed into the handoff tree.
 
 ## Shared task completion
+
+Latest consumer handoff: [responsive facility and audio](handoffs/khalid/presentation/SCENE_FINISH.md), with [actual evidence](../quality/reports/facility_finish/REVIEW.md). Full-window/safe-area mapping, equipment appearance/condition, revised HideSpot coordinates and listener-filtered tactical audio supersede prior presentation details. Clean runtime `28aff88` passes all three hosted jobs and both native Mac smoke checks. The follow-up is integrated with its original incremental history; only the temporary branch label is retired after ancestry verification. Windows interactive QA and later phase mechanics remain open.
 
 An owner can mark their named slice DONE when its behavior/checks pass. A shared EH task remains TODO/IN_PROGRESS until every required slice in its Backlog mapping is complete and its feature acceptance passes. The integrator marks P01-P08 DONE only on the combined build and records exact evidence in Status. Missing primary archives or gameplay functionality keep P08 incomplete; public release is tracked separately.
 

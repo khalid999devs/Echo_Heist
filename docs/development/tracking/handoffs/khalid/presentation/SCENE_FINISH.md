@@ -31,4 +31,6 @@ Inspect the laboratories and service rooms for distinct fitted equipment, correc
 
 127 behavior checks, strict types over 97 source files, lint/format/structure pass. Both default-security Human routes, capture, 48 scene states, 30 responsive native states, all four movement facings and 19 architectural previews pass. The real bootstrap fullscreen check reports audio ready and settings saved. Exact native app/fresh-ZIP and hosted results are recorded separately in BUILD.json, without treating CI configuration as execution.
 
+Clean runtime `28aff88` produces the current 106,402,812-byte Mac ZIP; its native app and fresh extraction each pass all eight Cocoa frozen checks with audio ready. Hosted run [39679169548](https://github.com/khalid999devs/Echo_Heist/actions/runs/39679169548) passes Linux checks and native Windows/Mac builds with frozen dummy-video smoke. Exact SHA256 and environment are in BUILD.json. CI artifacts are downloadable from that run; a dummy-video runner is not Suhita's interactive Windows test.
+
 Interactive Windows display/audio/download checks still need Suhita's hardware. Full P03, P04-P08, final scoring/policies and P05 environment interactions remain pending. Source license/public-release gates are unchanged. Continue the assigned phase queue from the updated contract; do not mark the whole game complete from this presentation pass.

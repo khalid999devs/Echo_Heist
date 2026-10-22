@@ -2,6 +2,8 @@
 
 ## Natural locomotion follow-up
 
+Decode correction: alpha-component bounds showed the generated spacing is slightly irregular. Explicit row/column edges follow the transparent gutters so no helmet/boot is cut by a nominal cell boundary. The PNGs remain unmodified; all sixteen substantial silhouettes per atlas fit wholly inside their runtime source regions. This supersedes the initial equal-grid decode in intermediate 089c6a4.
+
 Built-in imagegen, 2026-10-22. Selected walk is a new transparent PNG; selected run edits that walk as an identity reference, preserving its helmet/suit. Both are unmodified 4x4 atlases at `resources/assets/characters/operative/{walk,run}.png`; originals and hashes are in ASSETS.json. Earlier 8x4 edits retained the faulty stride and an unreferenced run variant changed the identity; those variants were rejected and are not shipped. Runtime uses four authored contact/passing key poses per direction, distance-based timing and a two-pixel run flight lift. No claim of skeletal motion capture.
 
 Walk prompt:

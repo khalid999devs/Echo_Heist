@@ -111,12 +111,16 @@ class WorldArt:
                 4,
                 4,
                 OPERATIVE_SIZE,
+                row_edges=(0, 290, 579, 874, 1190),
+                column_edges=(0, 384, 647, 990, 1322),
             ),
             sprite_grid(
                 "assets/characters/operative/run.png",
                 4,
                 4,
                 OPERATIVE_SIZE,
+                row_edges=(0, 321, 614, 909, 1189),
+                column_edges=(0, 406, 681, 1026, 1323),
             ),
             sprite_grid("assets/characters/operative/crouch.png", 4, 4, (110, 86)),
         )

@@ -18,6 +18,7 @@ def sprite_grid(
     size: tuple[int, int],
     *,
     row_edges: tuple[int, ...] | None = None,
+    column_edges: tuple[int, ...] | None = None,
 ) -> tuple[pygame.Surface, ...]:
     sheet = image(path)
     frames = []
@@ -25,8 +26,9 @@ def sprite_grid(
     for row in range(rows):
         for col in range(columns):
             left, right = (
-                col * sheet.get_width() // columns,
-                (col + 1) * sheet.get_width() // columns,
+                column_edges[col : col + 2]
+                if column_edges
+                else (col * sheet.get_width() // columns, (col + 1) * sheet.get_width() // columns)
             )
             top, bottom = (
                 row_edges[row : row + 2]

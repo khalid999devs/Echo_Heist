@@ -40,6 +40,7 @@ executable = EXE(
     strip=False,
     upx=False,
     console=False,
+    icon=None if mac else str(project / "packaging/icons/echo-heist.ico"),
     target_arch="arm64" if mac else None,
     codesign_identity=None,
     entitlements_file=None,
@@ -51,6 +52,7 @@ if mac:
     app = BUNDLE(
         collection,
         name="Echo Heist.app",
+        icon=str(project / "packaging/icons/echo-heist.icns"),
         bundle_identifier="io.echoheist.game",
         info_plist={
             "CFBundleShortVersionString": "0.1.0",

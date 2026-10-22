@@ -5,6 +5,7 @@ from io import BytesIO
 from math import floor
 from os import environ
 from pathlib import Path
+from time import perf_counter
 
 import pygame
 
@@ -15,10 +16,10 @@ from echo_heist.infrastructure.persistence.settings import (
     SettingsStore,
 )
 from echo_heist.infrastructure.resources import load_bootstrap_config, resource_bytes
-from echo_heist.ui.audio.director import AudioDirector
 from echo_heist.ui.render.layout.viewport import logical_size_for
 from echo_heist.ui.render.surfaces.formats import opaque_surface
-from echo_heist.ui.scenes.flow import GameFlow
+from echo_heist.ui.startup.screen import paint_first_frame
+from echo_heist.ui.startup.sequence import open_game
 
 
 def _logical_events(
@@ -50,6 +51,7 @@ def run_desktop(
     mute: bool = False,
     screenshot: Path | None = None,
 ) -> dict[str, object]:
+    began = perf_counter()
     config = load_bootstrap_config()
     store = SettingsStore(data_dir / "settings.json")
     loaded = store.load()
@@ -60,31 +62,45 @@ def run_desktop(
         # Respect an explicit environment override; this only affects this process.
         environ.setdefault("SDL_MOUSE_FOCUS_CLICKTHROUGH", "1")
         pygame.display.init()
-        pygame.font.init()
         flags = pygame.FULLSCREEN if settings.fullscreen else pygame.RESIZABLE
         screen = pygame.display.set_mode(
             (0, 0) if settings.fullscreen else (settings.window_width, settings.window_height),
             flags,
         )
         pygame.display.set_caption(config.title)
-        mark = pygame.image.load(BytesIO(resource_bytes("assets/branding/mark.svg")), "mark.svg")
+        paint_first_frame(screen)
+        first_paint_ms = (perf_counter() - began) * 1000
+        pygame.font.init()
+        mark = pygame.image.load(
+            BytesIO(resource_bytes("assets/branding/concepts/core.png")), "core.png"
+        )
         pygame.display.set_icon(mark)
-        audio_state = "muted"
-        if not mute:
-            try:
-                pygame.mixer.init()
-                pygame.mixer.music.set_volume(settings.music_volume)
-                audio_state = "ready"
-            except pygame.error:
-                audio_state = "unavailable; continuing silently"
+        opened = open_game(
+            screen, settings, mute=mute, minimum_ms=0 if smoke_frames is not None else 2200
+        )
+        startup_report = {**opened.report, "first_logo_paint_ms": round(first_paint_ms, 2)}
+        audio_state = opened.audio_state
+        if opened.game is None:
+            saved = store.save(settings)
+            return {
+                "diagnostic": "phase-2-game-scenes",
+                "version": __version__,
+                "frames": 0,
+                "scene": "STARTUP",
+                "video_driver": pygame.display.get_driver(),
+                "window_size": list(screen.get_size()),
+                "audio": opened.audio_state,
+                "startup": startup_report,
+                "resources_loaded": False,
+                "settings_saved": saved.saved,
+                "settings_notice": loaded.notice or saved.notice,
+                "settings_path": str(store.path.resolve()),
+            }
         logical_size = logical_size_for(screen.get_size())
         canvas = opaque_surface(logical_size)
-        flow = GameFlow(logical_size, settings=settings)
-        audio = AudioDirector(
-            enabled=audio_state == "ready",
-            music_volume=settings.music_volume,
-            sfx_volume=settings.sfx_volume,
-        )
+        flow, audio = opened.game.flow, opened.game.audio
+        del opened  # Drop the warm first-frame buffer after ownership transfer.
+        # Consume no opening input in the menu; reset the frame clock at handoff.
         display_fullscreen = settings.fullscreen
         clock = pygame.time.Clock()
         elapsed_ms = 0
@@ -153,6 +169,7 @@ def run_desktop(
             "logical_viewport": list(logical_size),
             "fullscreen": pygame.display.is_fullscreen(),
             "audio": audio_state,
+            "startup": startup_report,
             **audio.report(),
             "resources_loaded": True,
             **flow.report(),

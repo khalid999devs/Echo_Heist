@@ -10,7 +10,7 @@ from echo_heist.core.contracts.world import MissionPhase
 from echo_heist.ui.audio.director import AudioDirector, event_cue
 from echo_heist.ui.audio.model import AudioFrame
 from echo_heist.ui.scenes.flow import GameFlow, Scene
-from echo_heist.ui.scenes.menus import MODE_BUTTONS, TITLE_BUTTONS
+from echo_heist.ui.scenes.menus import CHAPTER_CARD, MODE_BUTTONS, TITLE_BUTTONS
 
 
 def test_hover_and_click_on_already_selected_buttons_are_audible(
@@ -24,6 +24,9 @@ def test_hover_and_click_on_already_selected_buttons_are_audible(
         audio = AudioDirector(enabled=True)
         audio.update(flow.audio_frame(), 0)
         count = audio.cues_played
+        flow.frame([pygame.event.Event(pygame.MOUSEMOTION, pos=CHAPTER_CARD.center)], 0)
+        audio.update(flow.audio_frame(), 20)
+        assert audio.cues_played == count + 1
         point = TITLE_BUTTONS[0].center
         flow.frame([pygame.event.Event(pygame.MOUSEMOTION, pos=point)], 0)
         audio.update(flow.audio_frame(), 20)
@@ -41,6 +44,9 @@ def test_hover_and_click_on_already_selected_buttons_are_audible(
         )
         audio.update(flow.audio_frame(), 20)
         assert flow.scene == Scene.MODE and audio.cues_played == count + 3
+        # Selection reconciliation without a new user intent must not replay hover.
+        audio.update(replace(flow.audio_frame(), selection="changed"), 20)
+        assert audio.cues_played == count + 3
     finally:
         pygame.mixer.quit()
 
@@ -143,3 +149,37 @@ def test_settings_controls_change_real_values_and_return_to_menu() -> None:
     assert flow.settings.reduced_flashing
     press(pygame.K_ESCAPE)
     assert flow.scene == Scene.TITLE
+
+
+def test_music_transition_ramps_across_frames_without_blocking_fadeout(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SDL_AUDIODRIVER", "dummy")
+    pygame.mixer.init()
+
+    def blocking_api_forbidden(*args: object) -> None:
+        pytest.fail("Music transitions must not block the main loop with fadeout")
+
+    monkeypatch.setattr(pygame.mixer.music, "fadeout", blocking_api_forbidden)
+    try:
+        audio = AudioDirector(enabled=True, music_volume=1.0)
+        title = AudioFrame("TITLE", "0", 0)
+        audio.update(title, 0)
+        old_volume = pygame.mixer.music.get_volume()
+        heist = AudioFrame("HEIST", "0", 1, MissionPhase.INFILTRATE)
+        audio.update(heist, 100)
+        middle_volume = pygame.mixer.music.get_volume()
+        assert audio.current_music == "title" and 0 < middle_volume < old_volume
+        audio.update(heist, 100)
+        assert 0 < pygame.mixer.music.get_volume() < middle_volume
+        audio.update(heist, 50)
+        assert audio.current_music == "sector" and pygame.mixer.music.get_busy()
+        audio.update(replace(heist, alerted=True), 50)
+        assert audio.current_music == "sector"
+        audio.update(heist, 17)  # transient alert clears; keep the current stream
+        assert audio.current_music == audio.target_music == "sector"
+        audio.volumes(0.0, 0.7)
+        audio.update(heist, 17)
+        assert pygame.mixer.music.get_volume() == 0
+    finally:
+        pygame.mixer.quit()

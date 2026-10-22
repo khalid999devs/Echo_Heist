@@ -25,3 +25,6 @@ class AudioFrame:
     suspicious: bool = False
     ui_feedback_serial: int = 0
     ui_feedback_cue: str = "hover"
+    explicit_ui_feedback: bool = False
+    transition_serial: int = 0
+    transition_cue: str = "stair-start"

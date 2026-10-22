@@ -33,6 +33,8 @@ def test_desktop_resources_audio_fallback_and_saved_settings_outside_repo(tmp_pa
     result = json.loads(report.read_text())
     assert result["frames"] == 2
     assert result["resources_loaded"]
+    assert result["startup"]["completed"] and result["startup"]["frames"] > 0
+    assert result["startup"]["sound_cues"] == 0
     assert result["settings_saved"]
     assert result["audio"].startswith("unavailable")
     assert result["video_driver"] == "dummy"

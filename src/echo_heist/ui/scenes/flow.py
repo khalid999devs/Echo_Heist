@@ -1,7 +1,7 @@
 """Scene navigation (separate from mission phase); owns no gameplay rules."""
 
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from enum import StrEnum
 
 import pygame
@@ -40,6 +40,7 @@ from echo_heist.ui.scenes.menus import (
 )
 from echo_heist.ui.scenes.navigation.controls import ABORT_BUTTONS, MAP_CLOSE, PAUSE_BUTTONS
 from echo_heist.ui.scenes.settings import OPTION_RECTS, adjust, click, draw_settings
+from echo_heist.ui.scenes.transitions.airlock import AirlockTransition
 
 DEFAULT_MAP_ID = "vault-five-zone"
 CONFIRM_KEYS = (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE)
@@ -72,18 +73,28 @@ class GameFlow:
         rules: GameRules | None = None,
         settings: Settings | None = None,
         security_enabled: bool = True,
+        loading: Callable[[float, str], None] | None = None,
     ) -> None:
+        def prepared(fraction: float, label: str) -> None:
+            if loading is not None:
+                loading(fraction, label)
+
         self.view_size, self.seed = view_size, seed
         self.level = level or load_level()
         self.rules = rules or load_game_rules()
         self.settings = settings or Settings()
         self.security_enabled = security_enabled
+        prepared(0.06, "Preparing the facility")
         self.fonts = Fonts()
-        self.art = WorldArt.load()
         self.backdrop = load_backdrop(view_size)
         self.extraction_backdrop = load_backdrop(view_size, "assets/scenes/extraction-dawn.png")
+        prepared(0.18, "Preparing the facility")
+        self.art = WorldArt.load()
+        prepared(0.52, "Preparing the facility")
         self.map_surface = build_map_surface(self.level, self.fonts, self.art)
+        prepared(0.80, "Preparing the facility")
         self.furnishings = prepare_furniture(self.level, self.art.props)
+        prepared(0.96, "Preparing the facility")
         self.scene = Scene.TITLE
         self.selected = 0
         self.mode_choice = 0
@@ -98,10 +109,12 @@ class GameFlow:
         self.dragging_slider: int | None = None
         self.designs = SceneDesigns()
         self.ui_feedback = UiFeedback()
+        self.airlock = AirlockTransition()
+        prepared(1.0, "Facility ready")
 
     def _feedback_rects(self) -> tuple[pygame.Rect, ...]:
         if self.scene == Scene.TITLE:
-            return (*TITLE_BUTTONS, CHAPTER_CARD)
+            return (CHAPTER_CARD, *TITLE_BUTTONS[1:])
         if self.scene == Scene.MODE:
             return MODE_BUTTONS
         if self.scene == Scene.SETTINGS:
@@ -133,6 +146,7 @@ class GameFlow:
         )
         self.runs_started += 1
         self.scene = Scene.HEIST
+        self.airlock.start("ENTRY")
 
     def resize(self, view_size: tuple[int, int]) -> None:
         self.view_size = view_size
@@ -143,6 +157,7 @@ class GameFlow:
             self.session.resize(view_size)
 
     def _go(self, scene: Scene) -> None:
+        self.airlock.skip()
         self.scene, self.selected, self.notice = scene, 2 if scene == Scene.MODE else 0, ""
         self.hovered_result = None
         self.dragging_slider = None
@@ -153,6 +168,23 @@ class GameFlow:
         events = interface_events(events, self.view_size)
         self.ui_feedback.feed(events, self.scene.value, self._feedback_rects())
         self.ambient_ms += max(0, elapsed_ms)
+        if self.airlock.active:
+            intent = any(
+                event.type in (pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN, pygame.WINDOWFOCUSLOST)
+                for event in events
+            )
+            if any(event.type == pygame.QUIT for event in events):
+                self.running = False
+                return
+            if intent:
+                self.airlock.skip()
+            elif self.airlock.kind == "ENTRY":
+                # No hidden guard/capture/timer advances while the entrance is
+                # obscured. A deliberate input skips straight into normal play.
+                self.airlock.advance(elapsed_ms)
+                return
+            else:
+                self.airlock.advance(elapsed_ms)
         if self.scene in (Scene.WORKSHOP, Scene.LAB, Scene.GUIDE, Scene.EPILOGUE):
             if any(event.type == pygame.QUIT for event in events):
                 self.running = False
@@ -183,6 +215,8 @@ class GameFlow:
                 self.outcomes[end.outcome.value] += 1
                 self.scene = Scene.RESULTS
                 self.hovered_result = None
+                if end.outcome == RunOutcome.WIN:
+                    self.airlock.start("EXIT")
             return
         if any(event.type == pygame.QUIT for event in events):
             self.running = False
@@ -328,6 +362,11 @@ class GameFlow:
     def draw(self, canvas: pygame.Surface) -> None:
         if self.scene == Scene.HEIST and self.session is not None:
             self.session.draw(canvas)
+            self.airlock.draw(canvas, reduced_motion=self.settings.reduced_flashing)
+            return
+        if self.airlock.showing_mission and self.session is not None:
+            self.session.draw(canvas)
+            self.airlock.draw(canvas, reduced_motion=self.settings.reduced_flashing)
             return
         end = self.session.mission_end if self.session is not None else None
         ending = self.scene == Scene.EPILOGUE or (
@@ -400,6 +439,7 @@ class GameFlow:
                 hovered=self.hovered_result,
                 clock_ms=self.ambient_ms,
             )
+        self.airlock.draw(canvas, reduced_motion=self.settings.reduced_flashing)
 
     def audio_frame(self) -> AudioFrame:
         events = tuple(self.session.audio_events) if self.session is not None else ()
@@ -427,6 +467,9 @@ class GameFlow:
             listener_id=self.level.operative_id,
             ui_feedback_serial=self.ui_feedback.serial,
             ui_feedback_cue=self.ui_feedback.cue,
+            explicit_ui_feedback=True,
+            transition_serial=self.airlock.serial,
+            transition_cue=self.airlock.cue,
             audible_event_ids=frozenset(cue.event_id for cue in observation.heard_events)
             if observation
             else frozenset(),

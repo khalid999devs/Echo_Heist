@@ -66,6 +66,7 @@ def main() -> int:
         "same_state_hash": trace["state_hash"] == expected["state_hash"],
         "same_event_hash": trace["event_hash"] == expected["event_hash"],
         "resources_loaded": window["resources_loaded"] is True,
+        "startup_completed": window["startup"]["completed"] is True,
         "settings_saved": window["settings_saved"] is True,
         "frames_rendered": window["frames"] == 12,
         "surface_saved": screenshot.is_file(),

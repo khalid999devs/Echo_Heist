@@ -1,6 +1,7 @@
 """Context music, bounded event cues, pause ducking and independent mix controls."""
 
 from collections import deque
+from collections.abc import Callable
 from io import BytesIO
 
 import pygame
@@ -12,7 +13,7 @@ from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.ui.audio.model import AudioFrame
 
 MUSIC = ("title", "sector", "pulse", "urgent", "transmission")
-MUSIC_GAINS = {"title": 0.32, "sector": 0.24, "pulse": 0.32, "urgent": 0.36, "transmission": 0.30}
+MUSIC_GAINS = {"title": 0.40, "sector": 0.34, "pulse": 0.38, "urgent": 0.40, "transmission": 0.34}
 CUES = {
     "hover": "ui/hover.ogg",
     "confirm": "ui/confirm.ogg",
@@ -94,21 +95,31 @@ def event_cue(event: GameEvent) -> tuple[str, float, bool] | None:
 
 class AudioDirector:
     def __init__(
-        self, *, enabled: bool, music_volume: float = 0.5, sfx_volume: float = 0.7
+        self,
+        *,
+        enabled: bool,
+        music_volume: float = 0.5,
+        sfx_volume: float = 0.7,
+        loading: Callable[[float], None] | None = None,
     ) -> None:
         self.enabled = enabled and pygame.mixer.get_init() is not None
         self.music_volume, self.sfx_volume = music_volume, sfx_volume
         self.sounds: dict[str, pygame.mixer.Sound] = {}
         self.music_data: dict[str, bytes] = {}
         if self.enabled:
-            pygame.mixer.set_num_channels(12)
-            self.sounds = {
-                name: pygame.mixer.Sound(file=BytesIO(resource_bytes(f"assets/audio/{path}")))
-                for name, path in CUES.items()
-            }
-            self.music_data = {
-                name: resource_bytes(f"assets/audio/music/{name}.ogg") for name in MUSIC
-            }
+            if pygame.mixer.get_num_channels() < 12:
+                pygame.mixer.set_num_channels(12)
+            count = len(CUES) + len(MUSIC)
+            for name, path in CUES.items():
+                self.sounds[name] = pygame.mixer.Sound(
+                    file=BytesIO(resource_bytes(f"assets/audio/{path}"))
+                )
+                if loading is not None:
+                    loading(len(self.sounds) / count)
+            for name in MUSIC:
+                self.music_data[name] = resource_bytes(f"assets/audio/music/{name}.ogg")
+                if loading is not None:
+                    loading((len(self.sounds) + len(self.music_data)) / count)
         self.current_music: str | None = None
         self.target_music: str | None = None
         self.change_in_ms = 0
@@ -182,6 +193,10 @@ class AudioDirector:
             self.seen.clear()
             self.seen_order.clear()
             self.footstep_index = 0
+        if frame.transition_serial and (
+            previous is None or frame.transition_serial != previous.transition_serial
+        ):
+            self.play(frame.transition_cue, 0.32)
         if previous is None and frame.ui_feedback_serial:
             self.play(
                 frame.ui_feedback_cue, 0.26 if frame.ui_feedback_cue == "hover" else 0.48, ui=True
@@ -201,7 +216,7 @@ class AudioDirector:
                 elif self.clock_ms - self.last_adjust_ms >= 85:
                     self.play("adjust", 0.09, ui=True)
                     self.last_adjust_ms = self.clock_ms
-            elif frame.selection != previous.selection:
+            elif not frame.explicit_ui_feedback and frame.selection != previous.selection:
                 self.play("hover", 0.26, ui=True)
             if frame.scene == "HEIST" and frame.suspicious and not previous.suspicious:
                 self.play("discovery", 0.12)
@@ -245,17 +260,23 @@ class AudioDirector:
         desired = music_for(frame)
         if desired != self.target_music:
             self.target_music = desired
-            self.change_in_ms = 250 if self.current_music is not None else 0
-            if self.current_music is not None:
-                pygame.mixer.music.fadeout(250)
+            # music.fadeout blocks the calling thread until the fade completes.
+            # Ramp its gain across frames instead; never sleep the gameplay loop.
+            self.change_in_ms = (
+                250 if self.current_music is not None and self.current_music != desired else 0
+            )
         self.change_in_ms = max(0, self.change_in_ms - max(0, elapsed_ms))
+        duck = 0.3 if frame.paused else 1.0
         if self.current_music != self.target_music and self.change_in_ms == 0:
             self.stream = BytesIO(self.music_data[desired])
             pygame.mixer.music.load(self.stream, f"{desired}.ogg")
+            # load resets volume; set it before play to avoid a full-volume burst.
+            pygame.mixer.music.set_volume(self.music_volume * MUSIC_GAINS[desired] * duck)
             pygame.mixer.music.play(loops=-1, fade_ms=700)
             self.current_music = desired
-        duck = 0.3 if frame.paused else 1.0
-        pygame.mixer.music.set_volume(self.music_volume * MUSIC_GAINS[desired] * duck)
+        gain = MUSIC_GAINS[self.current_music or desired]
+        fade = self.change_in_ms / 250 if self.current_music != desired else 1.0
+        pygame.mixer.music.set_volume(self.music_volume * gain * duck * fade)
         for index, gain in self.channel_gains.items():
             channel = pygame.mixer.Channel(index)
             channel.set_volume(gain * self.sfx_volume)

@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested material/perspective coherence, crouch/under-desk movement and ambience/UI audio | work/materials-and-crouch; baseline 687dbf3 | Render/environment/assets, map validation/authoring, Simulation posture/movement and input/audio consumers | IN_PROGRESS; owner explicitly requests this crouch/under-desk subset now; remaining P05 systems and scoring unchanged |
+| Khalid | User-requested materials/crouch/audio plus natural human gait and confirmed-pursuit speed | work/materials-and-crouch; verified intermediate 8a0dffd | Movement rules/security tests, actor art/presentation and delivery records | IN_PROGRESS; finish gait/pursuit verification and refreshed native/hosted builds; other phase gates unchanged |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | main includes original source a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
@@ -70,6 +70,8 @@ What the other owner/integrator must connect next:
 Keep secrets and machine-local profile data out of the record. Include a seed/profile and controls for gameplay checks. Generated large logs/build/video artifacts are linked with version/hash rather than committed into the handoff tree.
 
 ## Shared task completion
+
+Latest consumer baseline: [grounded material/crouch handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md), [actual evidence](../quality/reports/material_cohesion/REVIEW.md). Posture/clearance, fingerprint-6, material and explicit UI-feedback contracts supersede the previous subset deferral. Clean runtime `8a0dffd` passes all three hosted jobs and both native Mac app/ZIP checks. Only this user-requested early P05 subset is complete; the shared environment/AI/release gates remain open.
 
 Latest consumer handoff: [responsive facility and audio](handoffs/khalid/presentation/SCENE_FINISH.md), with [actual evidence](../quality/reports/facility_finish/REVIEW.md). Full-window/safe-area mapping, equipment appearance/condition, revised HideSpot coordinates and listener-filtered tactical audio supersede prior presentation details. Clean runtime `28aff88` passes all three hosted jobs and both native Mac smoke checks. The follow-up is integrated with its original incremental history; only the temporary branch label is retired after ancestry verification. Windows interactive QA and later phase mechanics remain open.
 

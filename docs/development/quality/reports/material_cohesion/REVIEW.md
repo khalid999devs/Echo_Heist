@@ -1,5 +1,15 @@
 # Material, perspective and crouch review
 
+## Locomotion and pursuit follow-up
+
+Final source review: native Cocoa captures **48 states / 3,793 rendered frames**, upper WIN at 1,488 ticks, lower WIN at 1,566, capture at 759; all six Sentinel states, five music contexts and six stair stages observed. Render/audio/display median 7.89ms, p95 8.77ms, maximum 316.41ms (cold load; excludes Simulation cost). Native movement capture has **780 frames**, all four facings and all four walk/run/creep key poses, real desk entry/refused stand/exit and unchanged simulation fingerprints on every instrumented draw; median draw 4.59ms, maximum 29.85ms. Scene contact sheets and full-size views were inspected under [screens/locomotion](screens/locomotion/); JSON is in [verification/locomotion](verification/locomotion/). Video: local `output/gait-and-pursuit/walk-run-crouch.mp4`. Remaining Windows physical QA is unrun. Latest package results are recorded after a clean source commit, independently of the intermediate build below.
+
+The user's final steering replaces the old gait. Walk/run now use four direction-specific contact/passing poses per cycle, with distinct alternate-leg poses instead of inserted idle frames. Walking is 2.4 tiles/s and sprint 4 tiles/s; 1.6/1.85-tile cycles give about 1.5/2.16 cycles/s. Run flight lifts the art at most two pixels while contact shadows remain on the floor. Movement interpolation remains tied to committed displacement; blocked movement and pause cannot advance the gait. The existing three-second burst and four-second recharge remain.
+
+Walk footsteps now occur every ten ticks, sprint every seven, crouch every 24; their quiet/loud gain and radius distinction remains. Confirmed CHASE raises defender speed by 15%, for real Human or Companion sightings. Unidentified motion/noise does not grant that boost. CHASE can pursue only the legitimate last-seen position; SEARCH/RETURN revert to ordinary phase speed. Lockdown uses its 120% multiplier instead of stacking boosts. Four new integration cases cover both intruder kinds, partial-versus-confirmed sight and lockdown precedence; all **139** tests and the full checks pass.
+
+The first native upper-route sweep was captured on return after the old QA keyboard driver spent EMP too far from contact. Delaying that diagnostic input until imminent contact restores both route wins without changing guard logic, collision, inventory or mission rules. The keyboard driver remains an explicitly diagnostic Human fixture, never a Companion implementation. Source review outputs are in `output/gait-and-pursuit/`; intermediate 8a0dffd evidence below stays historical.
+
 Khalid, 2026-10-22. User-requested follow-up to the [responsive facility revision](../facility_finish/REVIEW.md), baseline main `687dbf3`. The owner explicitly requested crouching/crouch-walking and under-desk hiding now, bringing this subset forward from the previous Phase 5 deferral. The remaining shared P03/P05 and later phase gates stay open; approved scoring is unchanged.
 
 ## Visible changes
@@ -19,7 +29,7 @@ UnderDesk objects validate ownership of a three-tile-wide single-depth hiding de
 
 The three opening tiles are (3,21), (44,33), (52,15). Existing standing collision, opaque geometry, room/stair access and both mission branches are preserved. A candidate north-wall desk move blocked the Instrument Lab entrance; validation caught it and the rear service aisle was retained. Presentation contact, mounts and material treatment provide the new integration without sacrificing circulation.
 
-## Actual checks
+## Intermediate 8a0dffd checks
 
 - `uv run --locked python scripts/checks/run.py`: **135 tests**, strict mypy over **101 source files**, Ruff lint/format and the 1,000-line/six-direct-file structure guards pass.
 - Focused regressions cover crouch speed/cadence/sprint stock, under-desk entry/exit and low headroom, open-floor visibility, retained guard memory, audible hidden movement/reachable investigation, guard action restrictions, deterministic replay, corrupt desk ownership/clearance and repeated selection-independent UI feedback.
@@ -29,6 +39,10 @@ The three opening tiles are (3,21), (44,33), (52,15). Existing standing collisio
 - Audio source hashes/decoding/lifecycle and UI cue gain are checked. ffmpeg measured source hover mean −17.3dBFS / peak −1.1, confirmation −24.0 / −5.3 and title −21.9 / −0.9 before playback gains; this quantifies cue headroom, not subjective speaker approval. All 29 packaged audio manifest hashes match.
 
 Raw captures/video/logs remain under ignored `output/materials-and-crouch/`. Kept contact sheets and full-size crouch/material views are under `screens/`. [Build evidence](verification/BUILD.json) distinguishes clean source, native package smoke and hosted checks; Windows physical display/audio QA remains unrun.
+
+Clean runtime `8a0dffd6a1c84a7dfd2a1ccaa72160979d77e854` produces the 101,197,251-byte Mac ZIP, SHA256 `d526a7aa198f4817dd95e6bb7e46b3131d9e11f760fe655f0babc540c2eedec3`. Native app and fresh ZIP extraction each pass all eight frozen checks with Cocoa/audio ready. [Hosted run 39687683742](https://github.com/khalid999devs/Echo_Heist/actions/runs/39687683742) passes Linux checks and native Windows/Mac builds/frozen dummy-video smoke. The native bootstrap pointer sequence also plays all ten expected menu cues, including already-selected controls. Exact manifests/environment and scope are retained in BUILD.json/AUDIO.json.
+
+Actual packaging commands: `uv run --locked --all-extras python scripts/packaging/build.py`, then `uv run --locked python scripts/packaging/smoke.py 'dist/Echo Heist.app' --output-dir output/materials-and-crouch/native-smoke`. Extracted with `ditto -x -k dist/echo-heist-0.1.0a1-macos-arm64.zip output/materials-and-crouch/fresh-download` and ran the same smoke script against that extracted app with output directory `output/materials-and-crouch/download-smoke`. Local 60Hz movement footage is `output/materials-and-crouch/walk-run-crouch.mp4`; it is the visual fixture, not the default-security mission evidence.
 
 ## References and provenance
 

@@ -1,5 +1,7 @@
 # Current development status
 
+Locomotion follow-up on `work/materials-and-crouch`: 139 cases and full checks pass. Fresh native review passes both routes (upper WIN 1,488 ticks; lower WIN 1,566), capture at 759, 48 screen states and 780 movement frames with actual crouch/clearance checks. Confirmed-pursuit speed is 115%, with lockdown precedence. Replacement packages are being recorded before main integration; earlier 8a0dffd results below remain intermediate evidence.
+
 Current material/crouch refinement: [actual scene review](../quality/reports/material_cohesion/REVIEW.md), [runnable handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). 135 behavior cases, strict types over 101 source files, both real route wins/capture, 48 native scene states, 782 walk/run/creep review frames, real under-desk entry/refusal/exit and 30 native layout captures pass. Its packaging/hosted results are tracked separately in [BUILD.json](../quality/reports/material_cohesion/verification/BUILD.json); older build rows below name their exact previous revisions. Approved scoring and remaining shared gates are unchanged.
 
 Latest 2026-10-22 scene refinement: [responsive display, facility and audio](../quality/reports/facility_finish/REVIEW.md), [runnable handoff](handoffs/khalid/presentation/SCENE_FINISH.md). 127 behavior cases, strict types over 97 source files, native route/capture sweep, 30 responsive states and 19 room/recess previews pass. Clean runtime `28aff88` Mac app/fresh ZIP each pass eight native checks with audio ready; all three hosted platform jobs pass. [Exact archive/hash and actual build results](../quality/reports/facility_finish/verification/BUILD.json). P03-P08 and Windows interactive QA remain open.
@@ -36,9 +38,9 @@ Active target: complete working initial draft in **eight phases over four develo
 | P02 core gameplay/input | DONE | Continuous physics, mission/capture/initial tools, Human input and objective presenter; [owner handoff](handoffs/khalid/day_01/P02.md) |
 | P02 five-zone map/scene | DONE | Suhita's `a98548a` map/loader/flow retained; illustrated floor/bulkhead/props/actor strips and refined sci-fi UI; [integration verification](../quality/reports/phase02/integration/VERIFICATION.md) |
 | AI / Workshop / final scoring | IN_PROGRESS | One real Sentinel uses filtered sensors, BFS/FSM/fuzzy/search/report expiry; remaining advanced defenders, autonomous Companion, Workshop and final scoring are pending |
-| Local automated checks | DONE | Structure/lint/format/strict types and **127** focused cases pass; [current review](../quality/reports/facility_finish/REVIEW.md) |
-| Hosted CI | PASS for current scene runtime | [39679169548](https://github.com/khalid999devs/Echo_Heist/actions/runs/39679169548) at `28aff88`: Linux/Windows/macOS checks, native primary builds and frozen dummy-video smoke |
-| Native packaging | PASS for local macOS scene revision | Clean `28aff88` app and fresh ZIP extraction each pass eight Cocoa frozen checks with audio ready; [exact current archive/hash](../quality/reports/facility_finish/verification/BUILD.json) |
+| Local automated checks | DONE | Structure/lint/format/strict types and **135** cases pass; [current review](../quality/reports/material_cohesion/REVIEW.md) |
+| Hosted CI | PASS for material/crouch runtime | [39687683742](https://github.com/khalid999devs/Echo_Heist/actions/runs/39687683742) at `8a0dffd`: all three platform jobs, native primary builds and frozen dummy-video smoke |
+| Native packaging | PASS for local macOS material/crouch revision | Clean `8a0dffd` app and fresh ZIP extraction each pass eight Cocoa checks with audio ready; [exact archive/hash](../quality/reports/material_cohesion/verification/BUILD.json) |
 | V1 platform/hardware QA | NOT_RUN | Suhita's interactive Windows desktop/download QA, wider macOS/download behavior and full-game release matrix remain untested |
 | Assets and licensing | IN_PROGRESS | Original generated scene/tile/prop/actor art plus Oxanium/OFL recorded in [asset register](../assets/ASSETS.md); remaining production set and source license pending |
 | itch.io/video/submission | TODO | GitHub source is published; game distribution, gameplay video and academic submission are still pending |
@@ -47,7 +49,7 @@ P02 is a playable Human draft, not the full V1 game. The standard app launches t
 
 ## Next action
 
-Continue P03 from the [first stealth contracts](../architecture/integration/STEALTH_SLICE.md) and [latest facility handoff](handoffs/khalid/presentation/SCENE_FINISH.md). Retrieve the [timed stair/lockdown/responsive-scene contract](../architecture/integration/SCENE_PRESENTATION.md) plus original deck/sprint geometry before editing consumers. Shared registry, Tracker A* and remaining cues/fixtures are still required before the P03 gate can close. Suhita's interactive Windows x64 check remains useful platform evidence and must not be represented as complete until run on her machine.
+Continue P03 from the [first stealth contracts](../architecture/integration/STEALTH_SLICE.md) and [latest material/crouch handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). Retrieve the [timed stair/lockdown/responsive-scene contract](../architecture/integration/SCENE_PRESENTATION.md) plus original deck/sprint geometry before editing consumers. Shared registry, Tracker A* and remaining cues/fixtures are still required before the P03 gate can close. Suhita's interactive Windows x64 check remains useful platform evidence and must not be represented as complete until run on her machine.
 
 ## Open inputs to resolve during development
 

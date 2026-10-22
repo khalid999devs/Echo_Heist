@@ -108,17 +108,15 @@ class WorldArt:
             sprite_grid("assets/characters/companion.png", 2, 2, COMPANION_SIZE),
             sprite_grid(
                 "assets/characters/operative/walk.png",
-                8,
+                4,
                 4,
                 OPERATIVE_SIZE,
-                row_edges=(0, 241, 446, 674, 887),
             ),
             sprite_grid(
                 "assets/characters/operative/run.png",
-                8,
+                4,
                 4,
                 OPERATIVE_SIZE,
-                row_edges=(0, 239, 449, 670, 887),
             ),
             sprite_grid("assets/characters/operative/crouch.png", 4, 4, (110, 86)),
         )

@@ -32,12 +32,8 @@ def draw_actor(
         pivot = (frame.get_width() // 2, frame.get_height())
     elif active and walk:
         poses = run if motion.sprinting and run else walk
-        index = int(phase * 8) % 8
-        frame = poses[row * 8 + index]
-        if not motion.sprinting and index in (2, 6):
-            # Close the stride at passing points instead of holding every frame
-            # in an extended contact pose. Use the matching authored viewpoint.
-            frame = sprites[row * 4]
+        count = len(poses) // 4
+        frame = poses[row * count + int(phase * count) % count]
         pivot = (frame.get_width() // 2, frame.get_height())
     else:
         pose = 1 + int(phase * 2) if active else 0
@@ -45,7 +41,10 @@ def draw_actor(
         pivot = (frame.get_width() // 2, frame.get_height())
     feet = (point[0], point[1] + 3)
     draw_shadow(canvas, frame, feet)
-    canvas.blit(frame, (feet[0] - pivot[0], feet[1] - pivot[1]))
+    # Run passing poses have a short flight phase. Keep the contact shadow on
+    # the floor; the low lift never affects collision or the camera anchor.
+    lift = round(2 * (1 - abs(2 * ((phase * 2) % 1) - 1))) if active and motion.sprinting else 0
+    canvas.blit(frame, (feet[0] - pivot[0], feet[1] - pivot[1] - lift))
     if carries_core:
         pygame.draw.circle(canvas, theme.WARNING, (point[0] + 19, point[1] - 45), 5, 2)
     if disabled or stunned:

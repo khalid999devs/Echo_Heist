@@ -2,6 +2,8 @@
 
 ## 2026-10-22 - Grounded materials and crouch
 
+- Follow-up: replaced faulty human gait with matched contact/passing poses; tuned walk/run travel/cadence and footsteps while retaining timed sprint/recharge. Confirmed pursuit is 115% guard speed; lockdown 120% takes precedence. Both Human and Companion identification paths covered. 139 checks, 48 refreshed native states, both default-security wins/capture and 780 motion frames pass; exact evidence in the material review. The diagnostic keyboard driver's EMP timing now waits for imminent contact; no mission/AI/inventory shortcut was added.
+
 - Replaced the blue technical floor grid with restrained neutral mineral/epoxy materials; matched cutaway wall caps/fronts, structural lights, room grade, bolted equipment bases and short services. Attached high-ceiling contact/cast shadows replace the detached projection. Standing geometry, 914 floor tiles and routes remain unchanged.
 - Implemented the owner's early crouch/creep/three under-desk subset in Simulation, with real clearance, low-headroom refusal, quiet cadence, sprint conservation, filtered visibility and retained guard memory. Heard cover cues lead to reachable approaches. Fingerprint schema 6; scoring unchanged.
 - Connected sixteen crouch poses and C input/HUD/guide feedback. Default title/exploration is ambient; explicit hover/click events now sound even on selected controls. Asset originals, CC0 notices and hashes preserved.

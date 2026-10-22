@@ -1,8 +1,14 @@
+from dataclasses import replace
+from math import hypot
+
+import pytest
+
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind
+from echo_heist.core.contracts.results import MissionSpec
 from echo_heist.core.contracts.security.model import GuardPatrol, GuardState, SecuritySpec
-from echo_heist.core.contracts.world import ActorKind, ActorSpawn, StaticMap, Tile
+from echo_heist.core.contracts.world import ActorKind, ActorSpawn, MapObject, StaticMap, Tile
 from echo_heist.core.simulation.engine import Simulation
 from echo_heist.infrastructure.resources import load_sensor_rules
 
@@ -126,3 +132,66 @@ def test_active_security_replay_repeats(rules: GameRules) -> None:
         )
         assert first.step(actions) == second.step(actions)
     assert first.fingerprint() == second.fingerprint()
+
+
+@pytest.mark.parametrize("intruder_kind", [ActorKind.OPERATIVE, ActorKind.COMPANION])
+@pytest.mark.parametrize("lockdown", [False, True])
+def test_only_confirmed_pursuit_accelerates_guard(
+    rules: GameRules, intruder_kind: ActorKind, lockdown: bool
+) -> None:
+    rules = replace(rules, core_interaction_ticks=1)
+    world = StaticMap(
+        "pursuit-speed",
+        24,
+        12,
+        objects=(MapObject("core", "Core", (10, 4)), MapObject("exit", "Exit", (20, 4))),
+    )
+    spec = SecuritySpec((GuardPatrol("sentinel", ((3, 4), (18, 4))),), load_sensor_rules())
+    spawns = (
+        ActorSpawn("intruder", (10, 4), intruder_kind),
+        ActorSpawn("sentinel", (3, 4), ActorKind.SENTINEL),
+    )
+    mission = MissionSpec("intruder", "core", "exit") if lockdown else None
+    boosted = Simulation(world, spawns, rules=rules, security=spec, mission=mission)
+    ordinary = Simulation(
+        world,
+        spawns,
+        rules=replace(rules, chase_guard_speed_percent=100),
+        security=spec,
+        mission=mission,
+    )
+    if lockdown:
+        for sim in (boosted, ordinary):
+            sim.step((Action("intruder", ActionKind.INTERACT, sim.tick, target_id="core"),))
+    saw_partial = saw_confirmed = False
+    for _ in range(40):
+        before = [sim.observe("sentinel").own_status.position for sim in (boosted, ordinary)]
+        results = [sim.step() for sim in (boosted, ordinary)]
+        after = [sim.observe("sentinel").own_status.position for sim in (boosted, ordinary)]
+        distances = []
+        for old, new in zip(before, after, strict=True):
+            assert old is not None and new is not None
+            distances.append(hypot(new[0] - old[0], new[1] - old[1]))
+        state = boosted.presentation_snapshot().guards[0].state
+        if state == GuardState.SPOTTED:
+            saw_partial = True
+            assert distances[0] == distances[1]
+            assert boosted.observe("sentinel") == ordinary.observe("sentinel")
+        elif state == GuardState.CHASE:
+            saw_confirmed = True
+            assert any(event.kind == EventKind.SIGHTING_CONFIRMED for event in results[0].events)
+            assert distances[0] == (
+                rules.sentinel_speed_units_per_second
+                * max(
+                    rules.chase_guard_speed_percent,
+                    rules.lockdown_guard_speed_percent if lockdown else 100,
+                )
+                // 100
+                // rules.simulation_hz
+            )
+            if lockdown:
+                assert distances[0] == distances[1]  # no runaway stacked multiplier
+            else:
+                assert distances[0] > distances[1]
+            break
+    assert saw_partial and saw_confirmed

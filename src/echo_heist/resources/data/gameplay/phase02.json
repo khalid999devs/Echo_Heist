@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "simulation_hz": 30,
-  "walk_speed_units_per_second": 75000,
-  "sprint_speed_units_per_second": 111000,
+  "walk_speed_units_per_second": 72000,
+  "sprint_speed_units_per_second": 120000,
   "sprint_duration_ticks": 90,
   "sprint_recharge_ticks": 120,
   "stair_travel_ticks": 24,
@@ -21,11 +21,13 @@
   "melee_stun_ticks": 45,
   "melee_immunity_ticks": 60,
   "echo_history_ticks": 75,
-  "footstep_interval_ticks": 12,
+  "footstep_interval_ticks": 10,
   "walk_noise_radius_tiles": 1,
   "sprint_noise_radius_tiles": 3,
   "emp_noise_radius_tiles": 5,
   "melee_noise_radius_tiles": 6,
   "crouch_speed_percent": 55,
-  "crouch_footstep_interval_ticks": 24
+  "crouch_footstep_interval_ticks": 24,
+  "sprint_footstep_interval_ticks": 7,
+  "chase_guard_speed_percent": 115
 }

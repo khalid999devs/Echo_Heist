@@ -309,7 +309,7 @@ class HeistSession:
                     dx * dx + dy * dy > sprint_delta * sprint_delta
                 )
                 phase_step = hypot(dx, dy) / (
-                    POSITION_UNITS_PER_TILE * (1.55 if sprinting else 1.0)
+                    POSITION_UNITS_PER_TILE * (1.85 if sprinting else 1.6)
                 )
                 self.actor_motion[actor.actor_id] = ActorMotion(
                     direction,

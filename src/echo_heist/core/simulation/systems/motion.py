@@ -5,6 +5,7 @@ from math import isqrt
 from echo_heist.core.contracts.actions import Action
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind
+from echo_heist.core.contracts.security.model import GuardState
 from echo_heist.core.contracts.world import (
     POSITION_UNITS_PER_TILE as UNIT,
 )
@@ -76,11 +77,16 @@ def move_actor(
         actor.kind,
         rules.sprint_speed_units_per_second if sprint else rules.walk_speed_units_per_second,
     )
-    if (
-        actor.kind not in (ActorKind.OPERATIVE, ActorKind.COMPANION)
-        and world.phase == MissionPhase.LOCKDOWN
-    ):
-        speed = speed * rules.lockdown_guard_speed_percent // 100
+    if actor.kind not in (ActorKind.OPERATIVE, ActorKind.COMPANION):
+        memory = world.guard_memories.get(actor.actor_id)
+        # CHASE follows confirmed observation, including pursuit to the last
+        # seen location. Hearing/partial suspicion never unlock this boost.
+        chase = memory is not None and memory.state == GuardState.CHASE
+        multiplier = max(
+            rules.chase_guard_speed_percent if chase else 100,
+            rules.lockdown_guard_speed_percent if world.phase == MissionPhase.LOCKDOWN else 100,
+        )
+        speed = speed * multiplier // 100
     step = speed // rules.simulation_hz
     if actor.crouched:
         step = step * rules.crouch_speed_percent // 100
@@ -147,6 +153,8 @@ def move_actor(
         actor.next_footstep_tick = world.tick + (
             rules.crouch_footstep_interval_ticks
             if actor.crouched
+            else rules.sprint_footstep_interval_ticks
+            if sprint
             else rules.footstep_interval_ticks
         )
 

@@ -44,6 +44,32 @@
       "sha256": "254799c7f2565dbdc56dff9161d7476805e1ec0a4f966fd8b0a052e7d004e888",
       "original_preserved": true,
       "selected_png_unchanged": true
+    },
+    {
+      "path": "src/echo_heist/resources/assets/characters/operative/walk.png",
+      "original": "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a/exec-6da5be08-07d4-4318-8f2d-9e079db0b409.png",
+      "mode": "new transparent",
+      "bytes": 917109,
+      "dimensions": [
+        1322,
+        1190
+      ],
+      "sha256": "cbd52cbf97a1a93243bc0be86e062955665f106a5405830ee5b5b0dc404a39fd",
+      "original_preserved": true,
+      "selected_png_unchanged": true
+    },
+    {
+      "path": "src/echo_heist/resources/assets/characters/operative/run.png",
+      "original": "/Users/khalid999devs/.codex/generated_images/01a14ef6-d91a-7fb3-bc50-12047aa1b20a/exec-1c6a48f6-738e-4a4a-b3da-d580ff99f085.png",
+      "mode": "edit with selected walk identity reference",
+      "bytes": 1088831,
+      "dimensions": [
+        1323,
+        1189
+      ],
+      "sha256": "bae08fec8859728e303c337666b5cae3a48646725c90d035acbd0c7ab9e51076",
+      "original_preserved": true,
+      "selected_png_unchanged": true
     }
   ]
 }

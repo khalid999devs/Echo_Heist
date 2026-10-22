@@ -61,7 +61,16 @@ def main() -> int:
                 pygame.display.flip()
                 motion = flow.session.actor_motion.get(flow.level.operative_id)
                 if motion is not None and motion.moving:
-                    count = 4 if label == "crouch" else 8
+                    count = (
+                        len(
+                            flow.session.art.operative_crouch
+                            if label == "crouch"
+                            else flow.session.art.operative_run
+                            if label == "run"
+                            else flow.session.art.operative_walk
+                        )
+                        // 4
+                    )
                     phases[label].add(int(motion.phase * count) % count)
                     directions.add(motion.direction)
                 pygame.image.save(canvas, str(frames / f"{frame_number:05d}.png"))

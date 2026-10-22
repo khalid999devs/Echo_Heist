@@ -1,5 +1,7 @@
 # Grounded facility and crouch handoff
 
+Latest user steering adds natural locomotion and a 15% confirmed-pursuit speed increase. Walk/run are now matched four-facing/four-key-pose atlases with contact/passing poses, distance cycles 1.6/1.85 tiles and no idle pose inserted mid-walk. Walk is 2.4 tiles/s, sprint 4 tiles/s; three-second burst/four-second recharge unchanged. Walk/sprint/crouch footstep intervals are ten/seven/24 ticks, with the quiet/loud mix and hearing radius preserved. Simulation applies pursuit speed only to actual CHASE memory, including observed Companion targets; lockdown's 120% takes precedence, never stacks. New regressions cover partial identification and both intruder kinds in ordinary/lockdown phases. The 8a0dffd package evidence below is historical; final delivery evidence follows in verification/locomotion/. Scoring and remaining phase gates are unchanged.
+
 Owner: Khalid, user-directed refinement, 2026-10-22, baseline main `687dbf3`. [Review/screenshots/build evidence](../../../../quality/reports/material_cohesion/REVIEW.md). This supersedes the prior scene handoff's floor/wall materials, shadow projection and complete deferral of under-desk interaction. The owner explicitly brought crouch/creep/under-desk clearance forward now; remaining Phase 5 environment ownership and phase gates are unchanged.
 
 ## Run
@@ -29,5 +31,7 @@ Inspect the warm neutral slab floor, cutaway wall faces and structural lights, a
 ## Evidence and remaining work
 
 135 focused cases and structure/lint/format/types pass. Both real extraction routes, capture, 48 native scene states, walk/run/creep cycles, under-desk refusal/exit and architectural previews pass. Exact layout, motion and native/hosted package results are retained in the review; no simulated Windows hardware result is substituted for Suhita's machine.
+
+Runtime `8a0dffd` is cleanly packaged. The native Mac app and fresh ZIP extraction each pass all eight frozen checks with audio ready; ZIP size 101,197,251 bytes. All three jobs pass in [run 39687683742](https://github.com/khalid999devs/Echo_Heist/actions/runs/39687683742), including native Windows/Mac builds and dummy-video smoke. Exact hashes/manifests are in BUILD.json. Native bootstrap menu navigation plays ten hover/click cues; movement footage is in local `output/materials-and-crouch/walk-run-crouch.mp4` (visual security-disabled fixture).
 
 This completes the requested refinement and early crouch subset, not shared P03 or P05. Suhita retains the remaining locker HideSpot lifecycle, glass, doors and canisters. Future Companion navigation must plan posture/clearance explicitly; default standing BFS correctly avoids desk openings. Remaining AI/NEXUS, policies/scoring, release licensing/video/itch.io and physical Windows QA stay in their existing queues.

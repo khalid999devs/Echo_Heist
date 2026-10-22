@@ -73,7 +73,9 @@ def test_step_order_is_stable_and_noise_is_not_per_render_frame(rules: GameRules
     for _ in range(30):
         result = sim.step((Action("a", ActionKind.MOVE, sim.tick, (1, 0), sprint=True),))
         noise.extend(event for event in result.events if event.kind == EventKind.NOISE_CREATED)
-    assert len(noise) == 3
+    assert len(noise) == (30 + rules.sprint_footstep_interval_ticks - 1) // (
+        rules.sprint_footstep_interval_ticks
+    )
     assert all(
         dict(event.details)["radius_tiles"] == rules.sprint_noise_radius_tiles for event in noise
     )
@@ -84,6 +86,8 @@ def test_invalid_rules_and_spawn_fail_at_boundary(rules: GameRules) -> None:
         replace(rules, capture_windup_ticks=0)
     with pytest.raises(ValueError):
         replace(rules, actor_radius_units=UNIT)
+    with pytest.raises(ValueError, match="Pursuit speed"):
+        replace(rules, chase_guard_speed_percent=150)
     with pytest.raises(ValueError):
         GameRules.from_payload({"schema_version": 1})
     with pytest.raises(ValueError, match="walkable"):

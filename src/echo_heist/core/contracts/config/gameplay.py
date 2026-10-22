@@ -37,6 +37,8 @@ class GameRules:
     melee_noise_radius_tiles: int
     crouch_speed_percent: int = 55
     crouch_footstep_interval_ticks: int = 24
+    sprint_footstep_interval_ticks: int = 7
+    chase_guard_speed_percent: int = 115
 
     def __post_init__(self) -> None:
         for field in fields(self):
@@ -53,6 +55,8 @@ class GameRules:
             raise ValueError("Sprint must not be slower than walking")
         if not 10 <= self.crouch_speed_percent <= 90:
             raise ValueError("Crouch speed must stay below walking speed")
+        if not 100 <= self.chase_guard_speed_percent <= 130:
+            raise ValueError("Pursuit speed must stay within 100-130 percent")
 
     @classmethod
     def from_payload(cls, payload: object) -> Self:

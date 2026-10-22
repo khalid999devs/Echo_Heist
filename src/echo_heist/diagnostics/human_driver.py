@@ -118,7 +118,9 @@ class HumanDriver:
             and observation.own_status.inventory.emp_charges
             and pygame.K_f not in self.held
         ):
-            radius = self.rules.emp_radius_units * 4 // 5
+            # Conserve charges until contact is imminent; firing at every
+            # distant patrol wastes the escape tools before the return route.
+            radius = self.rules.capture_range_units + UNIT // 8
             if any(
                 actor.position is not None
                 and not actor.disabled

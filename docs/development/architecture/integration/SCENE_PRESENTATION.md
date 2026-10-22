@@ -1,5 +1,7 @@
 # Complete scene presentation pass
 
+Latest user-directed locomotion tuning (2026-10-22): walking is 72,000 units/s (2.4 tiles/s), sprint 120,000 (4 tiles/s), retaining 90-tick burst/120-tick recharge. Footsteps use ten ticks walking, seven sprinting and 24 crouched; their original radius/gain distinction remains. `GameRules.chase_guard_speed_percent=115` applies only to Simulation-owned CHASE memory reached through real identification, including Companion sightings. During lockdown use the maximum of pursuit and lockdown multipliers, never their product. Losing sight retains only legitimate last-seen pursuit; SEARCH/RETURN use normal phase speed. No new identity is inferred from sound. Posture/clearance replay remains schema 6 with the new rules included in its fingerprint. Operative walk/run are now 16-pose (four directions/four key poses) atlases, replacing idle-frame insertion; phase follows traveled distance with 1.6-tile walk and 1.85-tile run cycles. Renderer flight lift is presentation-only.
+
 Khalid, 2026-10-21, user-directed visual/navigation refinement on `work/complete-visual-scenes`, baseline main `1d34f3b`. Existing [two-floor contract](TWO_FLOOR_LAB.md) remains the foundation. The user explicitly requests all scene designs now, with remaining AI/profile/scoring logic later. This does not close P03-P08 or change approved scoring. Deferred glass/doors/hiding/canister mechanics remain deferred.
 
 ## Scope

@@ -7,6 +7,25 @@
 - Added a geometry-revision adapter for later doors/glass, deterministic replay headers/logs with tick-by-tick verification, a headless evidence script and 40 focused tests. Fingerprint schema is now 8.
 - Windows 11 / i5-1235U: full checks pass except the pre-existing 30 s desktop smoke timeout (35–46 s resource loading on this laptop, failing identically on main). All three default-security routes win with tools, careless routes are captured, every replay matches, and Windows/Linux hashes are identical. [Handoff](handoffs/suhita/day_02/P03.md), [evidence](../quality/reports/phase03/windows/VERIFICATION.md). Shared P03 remains open for Khalid's KR1/KR2 and the combined gate; scoring unchanged.
 
+## 2026-10-22 - Blue story opening and polished academic deck
+
+- Revised the proposal to 17 slides: original blue cinematic opening and a story-to-coursework explanation first, followed by the formal model, fair architecture and three core algorithm/behavior slides. Kept the main academic backgrounds white with blue/cyan typography, character panels and editable diagrams/tables.
+- Added a supporting white lab illustration with saved prompt/provenance; corrected pose crops, contrast, arrow routing and crowded captions. Four real captures serve context, diagnostics, Workshop preview and a distinct ending.
+- Recovered editable layout export after disk exhaustion and removal of the primary runtime during wider cache cleanup. The final PPTX passes package/layout checks and all 17 pages were inspected through native LibreOffice/PDF rendering. First-party re-import and Windows PowerPoint were not claimed. Updated guides and a verified pack include the PDF preview, screenshots, artwork and fonts; [actual record](HANDOFFS.md). Gameplay and scoring remain unchanged.
+
+## 2026-10-22 - Focus the proposal on AI theory and implementation
+
+- Replaced the scene-heavy 22-slide proposal with 16 slides total and no appendix. Three core slides connect algorithm inputs/computation to Sentinel/Tracker, Interceptor/NEXUS and Companion behavior, including actual fuzzy-function values and a labeled alpha-beta example.
+- Condensed gameplay context; retained three useful captures. Added formal agent/PEAS framing, architecture boundaries, method assumptions, correctness evidence and a reproducible evaluation design. Planned AI remains explicitly distinguished from the working Sentinel subset.
+- Updated the proposal structure and Suhita refinement/rehearsal guide. Verified exported slide rendering, native editable content, notes, transfer-pack integrity and project document checks; [actual record](HANDOFFS.md). No gameplay or scoring change.
+
+## 2026-10-22 - AI lab proposal draft and refinement handoff
+
+- Reviewed all nine original PowerPoint slides, embedded visuals and speaker notes. Prepared an editable 16-slide main proposal with six technical appendix slides, real gameplay screenshots, clear Human/AI controller comparison, role-specific algorithms and an honest implementation snapshot.
+- Applied the owner's later white classroom theme with dark text, restrained teal/amber accents, futuristic headings, character mode panels, lab props, facility illustrations, 12 gameplay captures and Echo emblems. Corrected the obsolete four-week schedule and separated proposed MCTS/minimax/NEXUS behavior from the working Human/Sentinel subset.
+- Added [proposal structure](../academic/proposal/STRUCTURE.md) and [Suhita handoff](../academic/proposal/SUHITA_HANDOFF.md), including the source-slide audit, screenshot checklist, academic references, course/team metadata to fill and a short presentation route. Packaged editable slides, guides, PNGs and licensed fonts for transfer. Gameplay code, phase gates and approved scoring are unchanged.
+
+
 ## 2026-10-22 - Rebalance remaining visuals and gameplay logic
 
 - Khalid explicitly requested complex graphics/scenes for himself and most remaining logic for Suhita. Replaced future assignments in Workload, P03-P08, both owner guides, startup/Windows instructions, feature mappings and integration/quality/release responsibilities. P01/P02 authorship and existing completion evidence are preserved.

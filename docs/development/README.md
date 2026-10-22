@@ -26,6 +26,7 @@ Preserve approved gameplay requirements. The blueprint explicitly identifies con
 
 | Group | Document | Purpose |
 | --- | --- | --- |
+| Academic | [Proposal structure](academic/proposal/STRUCTURE.md) and [Suhita refinement handoff](academic/proposal/SUHITA_HANDOFF.md) | White classroom deck, AI narrative, actual screenshots and proposal evidence |
 | Planning | [Master plan](planning/MASTER_PLAN.md) | Dependency order, milestones, owners, gates, delivery strategy |
 | Planning | [Eight phases](planning/phases/README.md) | Detailed owner slices, context, dependencies and gates for P01-P08 |
 | Planning | [Workload and speed](planning/WORKLOAD.md) | Revised graphics/logic responsibilities, remaining estimates and shared-file handoffs |

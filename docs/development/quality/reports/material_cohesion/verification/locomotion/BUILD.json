@@ -1,0 +1,96 @@
+{
+  "stage": "Final runtime and clean Mac app/ZIP verified; matching Windows CI archive downloading",
+  "runtime_source_commit": "bac35029a3a81d3a1b0f5e98e8c937acf6ca4e8b",
+  "local_checks": {
+    "tests": 139,
+    "mypy_source_files": 101,
+    "ruff_and_format": "PASS",
+    "structure": "PASS"
+  },
+  "native_source_scene_report": "PLAYTHROUGH.json",
+  "native_source_motion_report": "MOTION.json",
+  "atlas_containment_report": "ATLAS.json",
+  "macos_manifest": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 100474527,
+    "archive_sha256": "0d5ab0070c858d9a5ff74db7fbfc03ad950f45db781ee0a9b84a6b78135e5499",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "bac35029a3a81d3a1b0f5e98e8c937acf6ca4e8b",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "macos_checks": {
+    "native_app": {
+      "summary": {
+        "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/dist/Echo Heist.app/Contents/MacOS/EchoHeist",
+        "checks": {
+          "frames_rendered": true,
+          "frozen_desktop": true,
+          "frozen_headless": true,
+          "resources_loaded": true,
+          "same_event_hash": true,
+          "same_state_hash": true,
+          "settings_saved": true,
+          "surface_saved": true
+        },
+        "passed": true,
+        "scope": "native display smoke",
+        "video_driver": "cocoa"
+      },
+      "audio": "ready",
+      "audio_assets_loaded": 29
+    },
+    "fresh_zip": {
+      "summary": {
+        "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/gait-and-pursuit/fresh-download/Echo Heist.app/Contents/MacOS/EchoHeist",
+        "checks": {
+          "frames_rendered": true,
+          "frozen_desktop": true,
+          "frozen_headless": true,
+          "resources_loaded": true,
+          "same_event_hash": true,
+          "same_state_hash": true,
+          "settings_saved": true,
+          "surface_saved": true
+        },
+        "passed": true,
+        "scope": "native display smoke",
+        "video_driver": "cocoa"
+      },
+      "audio": "ready",
+      "audio_assets_loaded": 29
+    }
+  },
+  "hosted_runtime": {
+    "run_id": 39733213862,
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39733213862",
+    "source_commit": "bac35029a3a81d3a1b0f5e98e8c937acf6ca4e8b",
+    "conclusion": "success",
+    "jobs": {
+      "headless-checks": "success",
+      "windows-x64": "success",
+      "macos-arm64": "success"
+    },
+    "scope": "Linux headless tests; native Windows/Mac builds and muted dummy-video frozen smoke"
+  },
+  "windows_download": "IN_PROGRESS; CI package/smoke passed, archive integrity/source matching will be recorded after transfer",
+  "video": {
+    "path": "output/gait-and-pursuit/walk-run-crouch.mp4",
+    "frames": 780,
+    "fps": 60,
+    "scope": "Native keyboard visual fixture, security disabled; real default-security wins/capture separately recorded"
+  },
+  "limits": [
+    "Physical Windows interactive display/audio QA NOT_RUN",
+    "Mac is ad-hoc signed, not notarized",
+    "Companion deployment, shared P03/full P05 and later V1 phase gates remain open"
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "stage": "Runtime verified; clean Mac app/ZIP and hosted Windows/Mac builds pass",
+  "stage": "Historical intermediate 8a0dffd evidence; final locomotion runtime is recorded in locomotion/BUILD.json",
   "local_checks": {
     "tests": 135,
     "mypy_source_files": 101,

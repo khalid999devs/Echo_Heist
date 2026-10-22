@@ -45,4 +45,6 @@ uv run --locked --all-extras python scripts/packaging/build.py
 uv run --locked python scripts/packaging/smoke.py 'dist/Echo Heist.app'
 ```
 
+The clean package source is `c2213c2` (runtime code `600698a`). Mac app/fresh ZIP each pass nine native checks with audio ready; all three hosted jobs pass in [run 39744256054](https://github.com/khalid999devs/Echo_Heist/actions/runs/39744256054). Native icon and all 72 packaged resources match source. Matching downloads are `dist/echo-heist-0.1.0a1-macos-arm64.zip` and `dist/echo-heist-0.1.0a1-windows-x64.zip`; [BUILD.json](../../../../quality/reports/cinematic_startup/verification/BUILD.json) records exact hashes, source manifests and the Windows verification scope. The local opening preview is `output/cinematic-startup/opening-preview.mp4` (silent captured footage; game audio is verified separately).
+
 The full codebase remains a playable development revision. Physical Windows gameplay/audio QA, remaining AI/NEXUS, policy/scoring integration, later environment lifecycles and public itch.io release gates are still pending. Suhita should fetch main, read this consumer handoff, then create her next assigned branch. Do not restore the old invisible tile-sized fixture barriers.

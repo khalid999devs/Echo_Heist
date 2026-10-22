@@ -1,0 +1,237 @@
+{
+  "runtime_code_commit": "600698a",
+  "clean_package_source": "c2213c2ee56c1623206e122aa184c7a252b62cb1",
+  "macos_manifest": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 112147378,
+    "archive_sha256": "efb67c45e644e5f9fa179f2b897f3458a3577ad14ce399552469b6c641be8323",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "c2213c2ee56c1623206e122aa184c7a252b62cb1",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "macos_native_checks": {
+    "native-app": {
+      "smoke": {
+        "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/dist/Echo Heist.app/Contents/MacOS/EchoHeist",
+        "checks": {
+          "frames_rendered": true,
+          "frozen_desktop": true,
+          "frozen_headless": true,
+          "resources_loaded": true,
+          "same_event_hash": true,
+          "same_state_hash": true,
+          "settings_saved": true,
+          "startup_completed": true,
+          "surface_saved": true
+        },
+        "passed": true,
+        "scope": "native display smoke",
+        "video_driver": "cocoa"
+      },
+      "desktop": {
+        "audio": "ready",
+        "audio_assets_loaded": 29,
+        "audio_cues_played": 0,
+        "diagnostic": "phase-2-game-scenes",
+        "frames": 12,
+        "fullscreen": false,
+        "lockdown_alarm_active": false,
+        "logical_viewport": [
+          1280,
+          720
+        ],
+        "map_id": "vault-five-zone",
+        "music_track": "title",
+        "outcomes": {},
+        "resources_loaded": true,
+        "room_ambience_active": false,
+        "runs_started": 0,
+        "runtime": {
+          "architecture": "arm64",
+          "frozen": true,
+          "python": "3.13.16"
+        },
+        "scene": "TITLE",
+        "seed": 1042,
+        "settings_notice": null,
+        "settings_path": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/cinematic-startup/native-app/profile/settings.json",
+        "settings_saved": true,
+        "simulation_steps": 0,
+        "startup": {
+          "cancelled": false,
+          "completed": true,
+          "elapsed_ms": 2245.6,
+          "first_logo_paint_ms": 194.67,
+          "frame_gap_ms": {
+            "max": 26.41,
+            "median": 17.15,
+            "p95": 22.97
+          },
+          "frames": 116,
+          "resource_load_ms": 1654.83,
+          "skip_requested": false,
+          "sound_cues": 3
+        },
+        "version": "0.1.0a1",
+        "video_driver": "cocoa",
+        "window_size": [
+          1280,
+          720
+        ]
+      }
+    },
+    "native-zip": {
+      "smoke": {
+        "artifact": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/cinematic-startup/fresh-download/Echo Heist.app/Contents/MacOS/EchoHeist",
+        "checks": {
+          "frames_rendered": true,
+          "frozen_desktop": true,
+          "frozen_headless": true,
+          "resources_loaded": true,
+          "same_event_hash": true,
+          "same_state_hash": true,
+          "settings_saved": true,
+          "startup_completed": true,
+          "surface_saved": true
+        },
+        "passed": true,
+        "scope": "native display smoke",
+        "video_driver": "cocoa"
+      },
+      "desktop": {
+        "audio": "ready",
+        "audio_assets_loaded": 29,
+        "audio_cues_played": 0,
+        "diagnostic": "phase-2-game-scenes",
+        "frames": 12,
+        "fullscreen": false,
+        "lockdown_alarm_active": false,
+        "logical_viewport": [
+          1280,
+          720
+        ],
+        "map_id": "vault-five-zone",
+        "music_track": "title",
+        "outcomes": {},
+        "resources_loaded": true,
+        "room_ambience_active": false,
+        "runs_started": 0,
+        "runtime": {
+          "architecture": "arm64",
+          "frozen": true,
+          "python": "3.13.16"
+        },
+        "scene": "TITLE",
+        "seed": 1042,
+        "settings_notice": null,
+        "settings_path": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/cinematic-startup/native-zip/profile/settings.json",
+        "settings_saved": true,
+        "simulation_steps": 0,
+        "startup": {
+          "cancelled": false,
+          "completed": true,
+          "elapsed_ms": 2205.14,
+          "first_logo_paint_ms": 132.21,
+          "frame_gap_ms": {
+            "max": 23.15,
+            "median": 17.12,
+            "p95": 22.74
+          },
+          "frames": 115,
+          "resource_load_ms": 1613.03,
+          "skip_requested": false,
+          "sound_cues": 3
+        },
+        "version": "0.1.0a1",
+        "video_driver": "cocoa",
+        "window_size": [
+          1280,
+          720
+        ]
+      }
+    }
+  },
+  "package_contents": {
+    "bundle_icon": "echo-heist.icns",
+    "native_icon_bytes_match": true,
+    "packaged_resource_files_match": 72,
+    "physical_profiles": 106,
+    "scope": "Native Mac package byte comparison against verified source; native smoke recorded separately"
+  },
+  "hosted_runtime_ci": {
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39744256054",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "windows-x64",
+        "conclusion": "success",
+        "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39744256054/job/119708703741"
+      },
+      {
+        "name": "macos-arm64",
+        "conclusion": "success",
+        "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39744256054/job/119708703907"
+      },
+      {
+        "name": "headless-checks",
+        "conclusion": "success",
+        "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39744256054/job/119708704105"
+      }
+    ]
+  },
+  "windows_physical_interactive_gameplay_audio": "NOT_RUN",
+  "linux_desktop_package": "NOT_BUILT; source checks pass on Linux CI",
+  "public_release": "NOT_PUBLISHED; full V1 gates remain open",
+  "windows_download": {
+    "manifest": {
+      "architecture": "AMD64",
+      "archive": "echo-heist-0.1.0a1-windows-x64.zip",
+      "archive_bytes": 110634833,
+      "archive_sha256": "5b04cbebfb2bf6084621b58767d9e27a2d1bc9a27a3c811b9ec6af76dc173cc9",
+      "host_os": "Windows-2022Server-10.0.20348-SP0",
+      "lock_sha256": "f7e94248badd117c651bc96c4d74b8886477ab7d7e1b1b4e214b44c7e8c5aefe",
+      "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+      "pyinstaller": "6.22.3",
+      "python": "3.13.16",
+      "signing": "unsigned",
+      "source_commit": "c2213c2ee56c1623206e122aa184c7a252b62cb1",
+      "stage": "Human stealth vertical slice; full V1 remains in development",
+      "target": "windows-x64",
+      "version": "0.1.0a1",
+      "working_tree_dirty": false
+    },
+    "zip_crc": "PASS",
+    "windows_executable": "PRESENT; MZ header",
+    "all_packaged_resources_match": 72,
+    "binary_files_exact_bytes": 61,
+    "text_files_semantic_or_normalized_lf_match": 11,
+    "line_endings": "Windows checkout uses CRLF for text; parsed JSON and normalized text match. Native manifest lock hash reflects its platform checkout bytes.",
+    "frozen_smoke": {
+      "artifact": "D:\\a\\Echo_Heist\\Echo_Heist\\dist\\EchoHeist\\EchoHeist.exe",
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "startup_completed": true,
+        "surface_saved": true
+      },
+      "passed": true,
+      "scope": "CI dummy video",
+      "video_driver": "dummy"
+    },
+    "scope": "Native Windows CI build; nine frozen checks with SDL dummy video/muted audio. Download SHA256/CRC/executable/resources checked on Mac. Physical Windows interaction/gameplay/audio NOT_RUN."
+  }
+}

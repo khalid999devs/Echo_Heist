@@ -1,0 +1,10 @@
+{
+  "video_driver": "cocoa",
+  "closed_reduced_and_normal_identical": true,
+  "surface_masks": [
+    16711680,
+    65280,
+    255,
+    4278190080
+  ]
+}

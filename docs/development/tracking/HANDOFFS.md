@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested cinematic opening, boundary/audio fixes, facility variety, desktop icon and performance audit | work/cinematic-startup | Startup/bootstrap/audio, physical furniture alignment, bounded render caches, room materials/lights, branding/packaging, focused checks and delivery records | IN_PROGRESS; finish the opening plus latest collision/feedback/performance steering; shared phase gates unchanged |
+| Khalid | User-requested cinematic opening/airlocks, boundary/audio fixes, facility variety, desktop icon and performance audit | Runtime 600698a; clean packages c2213c2; integration target main | None; [runnable handoff](handoffs/khalid/presentation/CINEMATIC_STARTUP.md) | DONE; 149 tests/full checks, both native wins/capture, 56 scene states, motion/performance/RSS review, nine-check native Mac app/ZIP and all three hosted jobs pass; matching Windows archive verified; shared phase gates and physical Windows QA unchanged |
 | Khalid | User-requested materials/crouch/audio plus natural human gait and confirmed-pursuit speed | Verified runtime bac3502; main integration ab6d734 | None; [runnable handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md) | DONE; 139 checks, both native route wins/capture, native Mac app/ZIP, matching Windows archive and all runtime/main hosted jobs pass; physical Windows QA and shared phase gates unchanged |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | main includes original source a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
@@ -73,6 +73,8 @@ What the other owner/integrator must connect next:
 Keep secrets and machine-local profile data out of the record. Include a seed/profile and controls for gameplay checks. Generated large logs/build/video artifacts are linked with version/hash rather than committed into the handoff tree.
 
 ## Shared task completion
+
+Current consumer baseline: [cinematic/physical-fixture handoff](handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [actual evidence](../quality/reports/cinematic_startup/REVIEW.md). Fingerprint-7, explicit physical bounds, 0.2-tile actor radius, startup ownership, pressure-door presentation and nonblocking music fades supersede the earlier descriptions. Runtime/source package references are exact in BUILD.json. Integration preserves the four separate implementation/review commits and adds the final delivery record; remove the temporary work branch only after ancestry/zero-unique/expected-tip checks. Shared P03-P08 are not marked complete by this refinement.
 
 Latest consumer baseline: [grounded material/crouch handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md), [actual evidence](../quality/reports/material_cohesion/REVIEW.md). Posture/clearance, fingerprint-6, material and explicit UI-feedback contracts supersede the previous subset deferral. Final natural-gait/pursuit runtime `bac3502` passes 139 cases, all three hosted jobs and native Mac app/ZIP checks. It supersedes intermediate 8a0dffd; [latest package evidence](../quality/reports/material_cohesion/verification/locomotion/BUILD.json). Only this user-requested subset is complete; the shared environment/AI/release gates remain open.
 

@@ -1,6 +1,8 @@
 # ECHO HEIST
 
-A Python + pygame-ce desktop stealth game with Human and autonomous Companion modes.
+A Python + pygame-ce desktop stealth game. Human infiltration is playable; autonomous Companion mode is in development.
+
+Latest refinement adds an animated logo/loading opening, pressure-door entrance and extraction, collision bounds matched to visible fixtures, a desktop app icon and varied laboratory floors/lights. Music transitions now fade across frames without blocking gameplay. **C toggles crouch/creep**; Shift provides the timed sprint. [Verified screenshots, performance and builds](docs/development/quality/reports/cinematic_startup/REVIEW.md), [current runnable handoff](docs/development/tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md).
 
 Current refinement adds coherent neutral floor/wall materials, attached contact shadows, equipment bases/service feeds, **C to crouch/crouch-walk beneath three open desks**, ambient exploration music and explicit hover/click feedback. [Review and current builds](docs/development/quality/reports/material_cohesion/REVIEW.md), [runnable handoff](docs/development/tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md).
 
@@ -23,7 +25,7 @@ uv run --locked python scripts/checks/run.py
 
 The desktop entry opens a Chapter 01 card. Play Chapter opens the briefing, where you choose a mode and use Launch Mission. Select with mouse or arrows/Enter; Back returns without starting a run. In the mission, move with WASD/arrows, sprint with Shift, hold E near the Core, and return to the original Exit after lockdown. Q deploys Echo, F uses EMP, Space melees, Tab opens the paused facility map, and Escape pauses. Pause offers resume, same-seed retry and confirmed abort. Companion remains visibly unavailable until Phase 4.
 
-The window preserves aspect ratio on resize and maps mouse input through its letterbox. `--mute` skips audio initialization; unavailable audio devices fall back silently. `--headless` repeats the small seeded foundation diagnostic without importing pygame.
+The game fills the resized/fullscreen window, expands the visible world proportionally and keeps menu controls inside a centered safe area. Pointer input uses that same mapping. `--mute` skips audio initialization; unavailable audio devices fall back silently. `--headless` repeats the small seeded foundation diagnostic without importing pygame.
 
 The older diagnostic contact room is still available for focused core-rule inspection:
 

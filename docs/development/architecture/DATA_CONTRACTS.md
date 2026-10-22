@@ -78,3 +78,7 @@ Keep these in a versioned configuration resource with units and bounds. Log tuni
 ## Implemented first Sentinel subset (2026-10-21)
 
 The [stealth runtime contract](integration/STEALTH_SLICE.md) extends these targets with SecuritySpec, filtered visible/heard/anonymous-motion values, Simulation-owned GuardMemory, real BFS/fuzzy decisions, expiring original-tick reports and privileged GuardView telemetry. The [two-floor contract](integration/TWO_FLOOR_LAB.md) now adds immutable reciprocal stair edges, own-only sprint/recharge values and fingerprint schema 4. The active atlas is 64×40 at 48 px/tile; physics retains fixed-point units. Walking/sprinting is 2.5/3.7 tiles/s with the owner's approved 90-tick burst/120-tick recharge. Full P03 and later AI/scoring targets above remain open.
+
+## P03 defender logic (2026-10-22, Suhita)
+
+The [guard registry/evidence/geometry contract](integration/defenders/GUARD_CONTRACT.md) adds `GuardRole` assignments from the validated level registry, evidence provenance on every guard goal, Tracker A* and last-seen search, witnessed versus unseen under-desk hiding, sight-gated capture, `Observation.geometry_revision` with `GEOMETRY_REVISED`, `HIDE_WITNESSED`, and replay headers/logs. Fingerprint schema is **8**. Interceptor minimax, NEXUS and P05 object lifecycles remain open.

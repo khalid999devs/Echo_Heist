@@ -1,12 +1,12 @@
 # P03 guard registry, evidence and geometry-revision contract
 
-Owner: **Suhita**, P03-SR1/SR2/SR3 on `work/suhita-p03` (from main `a700359`). Consumers: Khalid's P03-KR1/KR2 cue and diagnostic presentation, later P04 Interceptor/NEXUS and Companion work. Status: **published at claim time; the "Actual" notes are filled in only after verification** in the [P03 handoff](../../../tracking/handoffs/suhita/day_02/P03.md).
+Owner: **Suhita**, P03-SR1/SR2/SR3 on `work/suhita-p03` (from main `a700359`). Consumers: Khalid's P03-KR1/KR2 cue and diagnostic presentation, later P04 Interceptor/NEXUS and Companion work. Status: **implemented and verified** on Windows; see the [P03 handoff](../../../tracking/handoffs/suhita/day_02/P03.md) and [Windows evidence](../../../quality/reports/phase03/windows/VERIFICATION.md).
 
 The fingerprint-7 baseline in the [cinematic/fixture handoff](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md) still governs physical bounds, posture, stairs and sprint. This contract adds only defender logic values. Simulation remains the only mutation authority; controllers receive one filtered `Observation` and return a `GuardDecision`.
 
 ## Registry: `level/security.py`
 
-- `build_security_registry(level: LevelData) -> SecurityRegistry` validates the existing map posts, routes and chokepoints and raises `SecurityRegistryError` listing every problem. It never edits the map or infers values from art.
+- `build_security_registry(level: LevelData, rules: GameRules) -> SecurityRegistry` validates the existing map posts, routes and chokepoints and raises `SecurityRegistryError` listing every problem. It never edits the map or infers values from art.
 - `GuardAssignment(guard_id, kind, role, route_id, patrol, zone_id, chokepoint_ids)`; `patrol` is the closed route without its repeated first point. Role is derived from the authored `guard_kind`:
   - `SENTINEL` → `GuardRole.SENTINEL` (BFS/FSM/fuzzy, existing controller);
   - `TRACKER` → `GuardRole.TRACKER` (A* + last-seen memory, new controller);
@@ -38,3 +38,10 @@ The fingerprint-7 baseline in the [cinematic/fixture handoff](../../../tracking/
 ## Replay
 
 `core/simulation/replay.py` records a header (game/fingerprint schema, map/rules/sensor hashes, registry revision, seed, rate) plus per-tick intruder actions, and verifies a re-run tick by tick against event and fingerprint hashes. Fingerprint schema becomes **8** because guard memory/evidence/witness state and geometry revision enter the canonical state; schema-7 hashes are not comparable.
+
+## Actual values (packaged map, 2026-10-22)
+
+- Registry revision `29b5e21f…`: `guard-service` and `guard-security` SENTINEL; `guard-research` TRACKER; `guard-core` POST with chokepoints `choke-research-core`, `choke-security-core`. Map hash `967e2c05…`.
+- Sensor config unchanged (`security.json`): sight 8 tiles, half-angle 50°, identification 18 / near 6 ticks, memory 150, search 90, report TTL 90. Radio reports repeat at most every 15 ticks per chasing guard.
+- Tracker search: up to 4 tiles within 2 legal steps of the last sighting, ordered by observed heading, then distance, then tile. A POST controller algorithm is reported as `NONE`.
+- `RouteDriver` / `run_route` in `diagnostics/guard_evidence.py` are QA drivers reading only the operative's Observation; they are not controllers.

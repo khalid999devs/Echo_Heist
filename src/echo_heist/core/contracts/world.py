@@ -1,8 +1,11 @@
 """Static map boundary for the future Tiled loader; never a live world reference."""
 
+from collections.abc import Mapping
 from dataclasses import dataclass
+from dataclasses import field as data_field
 from enum import StrEnum
 from math import isfinite
+from types import MappingProxyType
 
 type Tile = tuple[int, int]
 type Position = tuple[int, int]
@@ -85,6 +88,39 @@ class StairLink:
 
 
 @dataclass(frozen=True, slots=True)
+class ObstacleBounds:
+    object_id: str
+    left: int
+    top: int
+    right: int
+    bottom: int
+    reserved_tiles: frozenset[Tile]
+    opaque: bool = True
+
+    def __post_init__(self) -> None:
+        tiles = frozenset(immutable_tile(tile) for tile in self.reserved_tiles)
+        object.__setattr__(self, "reserved_tiles", tiles)
+        if any(type(value) is not int for value in (self.left, self.top, self.right, self.bottom)):
+            raise ValueError("Obstacle bounds must be integer simulation units")
+        if (
+            not self.object_id
+            or not tiles
+            or not (0 <= self.left < self.right and 0 <= self.top < self.bottom)
+        ):
+            raise ValueError("Obstacle needs positive bounds and reserved tiles")
+        unit = POSITION_UNITS_PER_TILE
+        if any(
+            (x, y) not in tiles
+            for x in range(self.left // unit, (self.right - 1) // unit + 1)
+            for y in range(self.top // unit, (self.bottom - 1) // unit + 1)
+        ):
+            raise ValueError("Obstacle bounds extend beyond their reserved tiles")
+
+    def contains(self, point: Position) -> bool:
+        return self.left <= point[0] < self.right and self.top <= point[1] < self.bottom
+
+
+@dataclass(frozen=True, slots=True)
 class StaticMap:
     map_id: str
     width: int
@@ -95,6 +131,12 @@ class StaticMap:
     tile_size_px: int = 32
     stairs: tuple[StairLink, ...] = ()
     crouch_tiles: frozenset[Tile] = frozenset()
+    obstacles: tuple[ObstacleBounds, ...] = ()
+    obstacle_index: Mapping[Tile, tuple[ObstacleBounds, ...]] = data_field(
+        init=False, repr=False, compare=False
+    )
+    hard_blocked: frozenset[Tile] = data_field(init=False, repr=False)
+    hard_opaque: frozenset[Tile] = data_field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         if self.width <= 0 or self.height <= 0 or self.tile_size_px <= 0:
@@ -109,6 +151,22 @@ class StaticMap:
         if not crouch_tiles <= self.blocked_tiles & self.opaque_tiles:
             raise ValueError("Under-desk space must be inside solid, opaque furniture")
         object.__setattr__(self, "crouch_tiles", crouch_tiles)
+        object.__setattr__(self, "obstacles", tuple(self.obstacles))
+        index: dict[Tile, list[ObstacleBounds]] = {}
+        if len({obstacle.object_id for obstacle in self.obstacles}) != len(self.obstacles):
+            raise ValueError("Duplicate obstacle ID")
+        for obstacle in self.obstacles:
+            if not obstacle.reserved_tiles <= self.blocked_tiles:
+                raise ValueError("Obstacle must reserve blocked map tiles")
+            for tile in obstacle.reserved_tiles:
+                index.setdefault(tile, []).append(obstacle)
+        object.__setattr__(
+            self,
+            "obstacle_index",
+            MappingProxyType({tile: tuple(values) for tile, values in index.items()}),
+        )
+        object.__setattr__(self, "hard_blocked", frozenset(self.blocked_tiles - index.keys()))
+        object.__setattr__(self, "hard_opaque", frozenset(self.opaque_tiles - index.keys()))
         if any(not self.contains(obj.tile) for obj in self.objects):
             raise ValueError("Map object is outside the map")
         object.__setattr__(self, "stairs", tuple(self.stairs))
@@ -139,6 +197,17 @@ class StaticMap:
     def can_walk(self, tile: Tile, *, crouched: bool = False) -> bool:
         return self.contains(tile) and (
             tile not in self.blocked_tiles or (crouched and tile in self.crouch_tiles)
+        )
+
+    def point_blocked(self, point: Position, *, vision: bool = False) -> bool:
+        tile = position_tile(point)
+        return (
+            not self.contains(tile)
+            or tile in (self.hard_opaque if vision else self.hard_blocked)
+            or any(
+                obstacle.contains(point) and (not vision or obstacle.opaque)
+                for obstacle in self.obstacle_index.get(tile, ())
+            )
         )
 
 

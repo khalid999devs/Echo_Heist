@@ -339,7 +339,7 @@ class Simulation:
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 6,
+            "schema_version": 7,
             "seed": self._seed,
             "rules": asdict(self._rules),
             "mission": asdict(self._mission) if self._mission else None,
@@ -359,6 +359,18 @@ class Simulation:
                 "blocked": sorted(self._map.blocked_tiles),
                 "opaque": sorted(self._map.opaque_tiles),
                 "crouch_tiles": sorted(self._map.crouch_tiles),
+                "obstacles": [
+                    (
+                        obj.object_id,
+                        obj.left,
+                        obj.top,
+                        obj.right,
+                        obj.bottom,
+                        sorted(obj.reserved_tiles),
+                        obj.opaque,
+                    )
+                    for obj in self._map.obstacles
+                ],
                 "objects": [asdict(obj) for obj in self._map.objects],
                 "stairs": [asdict(link) for link in self._map.stairs],
             },

@@ -54,7 +54,9 @@ def test_diagonal_corner_and_other_actor_block_physical_body(rules: GameRules) -
     )
     for _ in range(50):
         pair.step((Action("a", ActionKind.MOVE, pair.tick, (1, 0)),))
-    assert pair.observe("a").own_status.tile == (1, 1)
+    own, other = pair.observe("a").own_status.position, pair.observe("b").own_status.position
+    assert own is not None and other is not None
+    assert own[0] < other[0] and other[0] - own[0] >= 2 * rules.actor_radius_units
 
 
 def test_step_order_is_stable_and_noise_is_not_per_render_frame(rules: GameRules) -> None:

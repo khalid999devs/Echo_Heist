@@ -677,6 +677,25 @@ def export(facility: Facility) -> dict:
 
 
 def write_map(data: dict) -> None:
+    # Preserve calibrated bounds only for fixtures whose placement/size remains
+    # identical. Changed/new art must be reviewed with calibrate_colliders.py.
+    previous = json.loads(TARGET.read_text()) if TARGET.exists() else {"layers": []}
+    old_objects = {
+        obj["name"]: obj for layer in previous["layers"] for obj in layer.get("objects", [])
+    }
+    for layer in data["layers"]:
+        for obj in layer.get("objects", []):
+            old = old_objects.get(obj["name"])
+            if old is None or any(
+                old.get(key) != obj.get(key) for key in ("x", "y", "width", "height")
+            ):
+                continue
+            existing = {p["name"] for p in obj.get("properties", [])}
+            obj.setdefault("properties", []).extend(
+                p
+                for p in old.get("properties", [])
+                if p["name"].startswith("collision_") and p["name"] not in existing
+            )
     # Numeric tile data keeps one complete map row per physical line. Tiled
     # objects are one record per line, rather than thousands of boilerplate lines.
     entries = []

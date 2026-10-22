@@ -10,7 +10,7 @@
   "sentinel_speed_units_per_second": 54000,
   "tracker_speed_units_per_second": 72000,
   "interceptor_speed_units_per_second": 84000,
-  "actor_radius_units": 9000,
+  "actor_radius_units": 6000,
   "interaction_range_units": 33000,
   "capture_range_units": 33000,
   "melee_range_units": 33000,

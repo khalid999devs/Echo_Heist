@@ -30,17 +30,20 @@ def clear_reach(
     steps = max(1, (max(abs(dx), abs(dy)) + UNIT // 8 - 1) // (UNIT // 8))
     previous, target = position_tile(start), position_tile(end)
 
-    def clear(tile: tuple[int, int]) -> bool:
+    def clear(point: Position) -> bool:
+        tile = position_tile(point)
         return (allow_solid_end and tile == target and world_map.contains(tile)) or (
-            world_map.can_walk(tile) and tile not in world_map.opaque_tiles
+            not world_map.point_blocked(point) and not world_map.point_blocked(point, vision=True)
         )
 
     for index in range(steps + 1):
-        tile = position_tile((start[0] + dx * index // steps, start[1] + dy * index // steps))
-        if not clear(tile):
+        point = start[0] + dx * index // steps, start[1] + dy * index // steps
+        tile = position_tile(point)
+        if not clear(point):
             return False
-        if (tile[0] != previous[0] and tile[1] != previous[1]) and (
-            not clear((tile[0], previous[1])) or not clear((previous[0], tile[1]))
+        if (tile[0] != previous[0] and tile[1] != previous[1]) and any(
+            corner in world_map.hard_blocked or corner in world_map.hard_opaque
+            for corner in ((tile[0], previous[1]), (previous[0], tile[1]))
         ):
             return False
         previous = tile
@@ -52,11 +55,37 @@ def body_fits(
 ) -> bool:
     left, top = (position[0] - radius) // UNIT, (position[1] - radius) // UNIT
     right, bottom = (position[0] + radius - 1) // UNIT, (position[1] + radius - 1) // UNIT
-    return all(
-        world_map.can_walk((x, y), crouched=crouched)
-        for x in range(left, right + 1)
-        for y in range(top, bottom + 1)
-    )
+    tiles = tuple((x, y) for x in range(left, right + 1) for y in range(top, bottom + 1))
+    if any(
+        not world_map.contains(tile)
+        or (tile in world_map.hard_blocked and not (crouched and tile in world_map.crouch_tiles))
+        for tile in tiles
+    ):
+        return False
+    checked: set[str] = set()
+    for tile in tiles:
+        for obstacle in world_map.obstacle_index.get(tile, ()):
+            if obstacle.object_id in checked:
+                continue
+            checked.add(obstacle.object_id)
+            x0, y0 = (
+                max(position[0] - radius, obstacle.left),
+                max(position[1] - radius, obstacle.top),
+            )
+            x1, y1 = (
+                min(position[0] + radius, obstacle.right),
+                min(position[1] + radius, obstacle.bottom),
+            )
+            if x0 >= x1 or y0 >= y1:
+                continue
+            if crouched and all(
+                (x, y) in world_map.crouch_tiles
+                for x in range(x0 // UNIT, (x1 - 1) // UNIT + 1)
+                for y in range(y0 // UNIT, (y1 - 1) // UNIT + 1)
+            ):
+                continue
+            return False
+    return True
 
 
 def move_actor(

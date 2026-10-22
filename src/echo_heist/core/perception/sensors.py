@@ -16,14 +16,14 @@ def sight_ray(world_map: StaticMap, start: Position, end: Position) -> tuple[boo
     for index in range(steps + 1):
         point = start[0] + dx * index // steps, start[1] + dy * index // steps
         tile = position_tile(point)
-        if not world_map.contains(tile) or tile in world_map.opaque_tiles:
+        if world_map.point_blocked(point, vision=True):
             return False, last_clear
         if (
             tile[0] != previous[0]
             and tile[1] != previous[1]
             and (
-                (tile[0], previous[1]) in world_map.opaque_tiles
-                or (previous[0], tile[1]) in world_map.opaque_tiles
+                (tile[0], previous[1]) in world_map.hard_opaque
+                or (previous[0], tile[1]) in world_map.hard_opaque
             )
         ):
             return False, last_clear

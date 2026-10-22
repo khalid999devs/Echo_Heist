@@ -4,8 +4,18 @@ import json
 import re
 from dataclasses import dataclass, field
 from math import isfinite
+from typing import cast
 
-from echo_heist.core.contracts.world import ActorKind, MapObject, Scalar, StairLink, StaticMap, Tile
+from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
+from echo_heist.core.contracts.world import (
+    ActorKind,
+    MapObject,
+    ObstacleBounds,
+    Scalar,
+    StairLink,
+    StaticMap,
+    Tile,
+)
 from echo_heist.level.io.validate import check_level
 from echo_heist.level.model import (
     DETAIL_STYLES,
@@ -287,6 +297,49 @@ def _apply_furniture(raw: RawMap) -> None:
         obj.properties.update(width_tiles=width, height_tiles=height)
 
 
+def _obstacles(raw: RawMap) -> tuple[ObstacleBounds, ...]:
+    result = []
+    keys = ("collision_left", "collision_top", "collision_right", "collision_bottom")
+    for obj in raw.objects:
+        if obj.kind not in ("Furniture", "Cover") or not any(key in obj.properties for key in keys):
+            continue
+        values = tuple(obj.properties.get(key) for key in keys)
+        if any(type(value) is not int or not 0 <= value <= 1000 for value in values):
+            raise MapFormatError(
+                f"{obj.object_id!r}: collision bounds require four integers 0-1000"
+            )
+        a, b, c, d = cast(tuple[int, int, int, int], values)
+        if a >= c or b >= d:
+            raise MapFormatError(f"{obj.object_id!r}: collision bounds must have positive area")
+        left, top, width, height = obj.rect or (*obj.tile, 1, 1)
+        if obj.kind == "Cover":
+            x, y = obj.properties.get("collision_tile_x"), obj.properties.get("collision_tile_y")
+            if (
+                type(x) is not int
+                or type(y) is not int
+                or (x, y) not in raw.layers.get("cover", frozenset())
+            ):
+                raise MapFormatError(
+                    f"{obj.object_id!r}: collision must reference its physical cover tile"
+                )
+            left, top, width, height = x, y, 1, 1
+        reserved = frozenset(
+            (x, y) for x in range(left, left + width) for y in range(top, top + height)
+        )
+        result.append(
+            ObstacleBounds(
+                obj.object_id,
+                left * UNIT + a * width * UNIT // 1000,
+                top * UNIT + b * height * UNIT // 1000,
+                left * UNIT + c * width * UNIT // 1000,
+                top * UNIT + d * height * UNIT // 1000,
+                reserved,
+                bool(obj.properties.get("blocks_vision", obj.kind == "Cover")),
+            )
+        )
+    return tuple(result)
+
+
 def build_level(raw: RawMap) -> LevelData:
     """Construct typed values; validate.check_level decides whether they are playable."""
 
@@ -399,6 +452,7 @@ def build_level(raw: RawMap) -> LevelData:
         raw.tile_size,
         tuple(links),
         frozenset(obj.tile for obj in of("UnderDesk")),
+        _obstacles(raw),
     )
     return LevelData(
         static_map,

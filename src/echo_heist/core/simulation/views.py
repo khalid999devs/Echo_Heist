@@ -9,7 +9,7 @@ from echo_heist.core.contracts.results import (
     PresentationSnapshot,
     StairView,
 )
-from echo_heist.core.contracts.security.model import GuardView, SecuritySpec
+from echo_heist.core.contracts.security.model import ROLE_ALGORITHMS, GuardView, SecuritySpec
 from echo_heist.core.contracts.world import StaticMap
 from echo_heist.core.simulation.systems.mission import interaction_hints
 from echo_heist.core.simulation.world import WorldState
@@ -56,6 +56,7 @@ def observe(
         shared_reports=world.security_reports if actor_id in world.guard_memories else (),
         visual_cues=world.visual_cues.get(actor_id, ()),
         interactions=interaction_hints(world, world_map, rules, mission, actor_id),
+        geometry_revision=world.geometry_revision,
     )
 
 
@@ -110,8 +111,15 @@ def presentation(
                 memory.path,
                 memory.expanded_nodes,
                 memory.urgency,
+                patrol.role,
+                ROLE_ALGORITHMS[patrol.role],
+                memory.evidence_kind,
+                memory.evidence_tick,
+                memory.path_cost,
+                memory.search_tiles,
             )
-            for actor_id, memory in world.guard_memories.items()
+            for patrol in security.patrols
+            for actor_id, memory in ((patrol.actor_id, world.guard_memories[patrol.actor_id]),)
         )
         if security is not None
         else (),

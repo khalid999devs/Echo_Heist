@@ -81,3 +81,6 @@ class WorldState:
     heard_cues: dict[str, tuple[HeardCue, ...]] = field(default_factory=dict)
     visual_cues: dict[str, tuple[VisualCue, ...]] = field(default_factory=dict)
     security_reports: tuple[SecurityReport, ...] = ()
+    # Cover each guard actually saw an intruder enter, keyed by guard ID.
+    hide_witnesses: dict[str, tuple[VisualCue, ...]] = field(default_factory=dict)
+    geometry_revision: int = 0

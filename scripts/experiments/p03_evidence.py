@@ -60,6 +60,7 @@ def main() -> int:
                 "tools": result.tools,
                 "events": result.events,
                 "decisions_by_algorithm": result.algorithms,
+                "decisions_by_evidence": result.evidence,
                 "max_expanded_nodes": result.max_expanded,
                 "state_trails": result.states,
                 "event_chain_hash": canonical_hash(list(result.log.tick_hashes)),

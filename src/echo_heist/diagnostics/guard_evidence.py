@@ -132,6 +132,7 @@ class ScenarioResult:
     capture_by: str | None
     events: dict[str, int]
     algorithms: dict[str, int]
+    evidence: dict[str, int]
     max_expanded: dict[str, int]
     states: dict[str, list[str]]
     tools: dict[str, int]
@@ -173,6 +174,7 @@ def run_route(
     pending = list(steps)
     counts: Counter[str] = Counter()
     algorithms: Counter[str] = Counter()
+    evidence: Counter[str] = Counter()
     expanded: dict[str, int] = {}
     states: dict[str, list[str]] = {}
     end = None
@@ -199,6 +201,8 @@ def run_route(
                 details = dict(event.details)
                 algorithm = str(details["algorithm"])
                 algorithms[algorithm] += 1
+                # NOISE/MOTION goals carry the Sentinel's Sugeno urgency.
+                evidence[str(details.get("evidence_kind") or "ROUTINE")] += 1
                 nodes = details.get("expanded_nodes")
                 if isinstance(nodes, int):
                     expanded[algorithm] = max(expanded.get(algorithm, 0), nodes)
@@ -217,6 +221,7 @@ def run_route(
         end.capture_by if end else None,
         dict(sorted(counts.items())),
         dict(sorted(algorithms.items())),
+        dict(sorted(evidence.items())),
         dict(sorted(expanded.items())),
         {key: value[:24] for key, value in sorted(states.items())},
         dict(driver.tools_used),

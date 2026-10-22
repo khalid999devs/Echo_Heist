@@ -1,44 +1,41 @@
 # Khalid's agent guide
 
-Latest requested refinement: [cinematic/fixture consumer handoff](../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [review/evidence](../../quality/reports/cinematic_startup/REVIEW.md). Retrieve fingerprint-7, explicit physical bounds, startup/airlock lifecycle and audio contracts. This supersedes the preceding fingerprint-6 consumer baseline; shared phase ownership is unchanged.
+Identity: **Khalid**. The owner explicitly changed the remaining split on **2026-10-22**: lead complex visual graphics, scene design, animation, camera, UI/audio presentation, rendering performance and desktop delivery. Suhita now leads most gameplay logic, including core systems previously authored by you. The [remaining workload](../../planning/WORKLOAD.md) estimates 48 points for you and 60 for Suhita to offset completed foundation/refinement work; equal lifetime effort is a target, not a measured fact.
 
-Latest user-directed handoff: [grounded materials and crouch](../../tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md), with [actual evidence](../../quality/reports/material_cohesion/REVIEW.md). Retrieve posture/under-desk clearance, fingerprint-6 and UI-feedback contracts. This explicitly requested early P05 subset does not close the shared phase gates; resume remaining P03 from this baseline.
+Read [START_HERE](../START_HERE.md), [Status](../../tracking/STATUS.md), [claims](../../tracking/HANDOFFS.md), [code rules](../CODE_RULES.md), the assigned phase and its source/contracts. P01/P02 are DONE; **P03 is the earliest open phase**. P05 has only an early crouch subset. Preview scenes do not complete their future behavior gates.
 
-Identity: Khalid, the project owner in this conversation. Focus: software architecture, system design, core/AI strategy and logic, with real input/diagnostics/result presentation work. Estimated workload: 80 of 160 points. P01 is entirely yours.
+## Actual baseline
 
-Follow [startup/context retrieval](../START_HERE.md) and [code rules](../CODE_RULES.md). Check [Status](../../tracking/STATUS.md), [claims/handoffs](../../tracking/HANDOFFS.md) and actual prerequisite evidence. P01 is complete; source and its [runnable handoff](../../tracking/handoffs/khalid/day_01/P01.md) now exist.
+Start from current main containing `ec8ca48` and this ownership revision. Retrieve [cinematic/physical-fixture handoff](../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [scene contract](../../architecture/integration/SCENE_PRESENTATION.md) and [actual evidence](../../quality/reports/cinematic_startup/REVIEW.md). Latest contracts are fingerprint **7**, explicit physical obstacle bounds versus conservative route tiles, 0.2-tile body, two decks/stairs, posture/under-desk clearance, full-display input mapping, explicit UI audio serials and loading/airlock lifecycles. Older fingerprint-3/6 handoffs are historical subsets.
 
-## Assigned queue
+The existing game already has cinematic title/loading/airlocks, room art and material variety, character walk/run/crouch, quiet steps/louder sprint, lockdown presentation, real Human wins/capture and first Sentinel behavior. Preserve these and adapt to real new logic; do not restart the visual foundation.
 
-| Phase | Your slices / points | Your result | Integrator |
+## Active queue — revised IDs
+
+`KR` means Khalid's revised remaining slice. Original P03-P08 K/S IDs are historical; completed contributions keep their credit.
+
+| Phase | Your slices / points | Remaining result | Integration lead |
 | --- | --- | --- | --- |
-| [P01](../../planning/phases/foundation/PHASE_01.md) | P01-K1 5; K2 4; K3 3 | Environment/structure/contracts/headless shell + visible bootstrap/native smoke | You |
-| [P02](../../planning/phases/foundation/PHASE_02.md) | P02-K1 6; K2 2 | Movement/mission/capture/basic tools + human input/objective presenter | Suhita |
-| [P03](../../planning/phases/intelligence/PHASE_03.md) | P03-K1 7; K2 6; K3 2 | Fair sensors/navigation/defenders/fuzzy/replay + live diagnostics | You |
-| [P04](../../planning/phases/intelligence/PHASE_04.md) | P04-K1 9; K2 3; K3 2 | Autonomous strategy/MCTS/minimax + decision presenter | You |
-| [P05](../../planning/phases/experience/PHASE_05.md) | P05-K1 5; K2 2 | Complete tools/capture ordering + tool input/HUD | Suhita |
-| [P06](../../planning/phases/experience/PHASE_06.md) | P06-K1 4; K2 2 | Approved scoring/encounters + score-breakdown presenter | Suhita |
-| [P07](../../planning/phases/delivery/PHASE_07.md) | P07-K1 5; K2 2; K3 2 | Fairness/replay/performance harness, accurate guide + diagnostics usability | You |
-| [P08](../../planning/phases/delivery/PHASE_08.md) | P08-K1 6; K2 3 | Native archives/manifests and complete functional/source handoff | You |
+| P01/P02 | Complete; no new claim | Foundation/core/integrated Human scene retained | Complete |
+| [P03](../../planning/phases/intelligence/PHASE_03.md) | P03-KR1 3; KR2 2 | Guard states/cues and genuine diagnostics; geometry/scene integration review | Suhita |
+| [P04](../../planning/phases/intelligence/PHASE_04.md) | P04-KR1 4; KR2 3 | Companion/Lab decision presentation, follow camera, NEXUS/deploy/protocol UI | Suhita |
+| [P05](../../planning/phases/experience/PHASE_05.md) | P05-KR1 3; KR2 6 | Tool HUD/input, physical interaction animation, props/VFX/SFX and provenance | Suhita |
+| [P06](../../planning/phases/experience/PHASE_06.md) | P06-KR1 3; KR2 4; KR3 2 | Actual score/results, Workshop/full scene flow, settings/accessibility presentation | You |
+| [P07](../../planning/phases/delivery/PHASE_07.md) | P07-KR1 5; KR2 4 | Whole-game usability/accessibility and diagnostic clarity; render/audio/memory profiling | You |
+| [P08](../../planning/phases/delivery/PHASE_08.md) | P08-KR1 5; KR2 4 | Primary builds/Mac QA, technical handoff, final traceability, demonstration/media/credits | You |
 
-The full slice prefix applies to abbreviated IDs in this table, for example P03-K2. Read the phase for exact file boundaries, source pages, dependencies and gate. Points include testing/handoff effort; avoid silently absorbing Suhita's assigned systems to save communication time.
+## Start next
 
-## Start now
+Claim **P03-KR1/KR2** on `work/khalid-p03` from synchronized main. Read Suhita's P03 claims/contract first. Use the current real Sentinel to review cue readability now; connect Tracker telemetry after her handoff. Your queue does not include implementing her remaining AI to avoid waiting. Complete independent visual work and record exact consumer dependencies.
 
-P01 and the full P02 are DONE. [Original P02 owner handoff](../../tracking/handoffs/khalid/day_01/P02.md) records core/tools/input/objective interfaces; the [integration handoff](../../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) records Suhita's map/scene and the user-directed final review. The owner's 2026-10-21 implementation brief started a first P03 Sentinel/perception subset; retrieve the [stealth runtime contracts](../../architecture/integration/STEALTH_SLICE.md) and current Status before continuing. The shared P03 gate stays open. The verified baseline uses Python 3.13.16, a locked environment and actual desktop/headless builds. Keep root files within six, authored files below 1,001 lines and tests under grouped `tests/`.
+You own complex drawing/layout under `ui/render/`, visual scene files, startup/audio presentation and assets. Suhita may make narrow functional controller/deployment/result wiring in `ui/scenes/heist.py` / `flow.py`; designate one writer before either edits those shared files. Preserve her core/AI/persistence changes. You retain real nonvisual work in geometry/art calibration, display/input/resource integration, performance and build engineering.
 
-Hand Suhita actual commands, import paths, map/action/scene/event interfaces and a known-good build. Do not leave her a documentation-only scaffold or require her to repair your environment setup. P02 integrates both owners on that foundation.
+Provide actual typed display/event requirements before asset/UI implementation. Rendering must not mutate Simulation, infer detections or fabricate search metrics. The full-display pointer mapping, startup worker ownership, actual-WIN extraction animation and independent audio volumes remain regression constraints.
 
-The latest user-directed two-floor revision is recorded in the [current contract](../../architecture/integration/TWO_FLOOR_LAB.md). Retrieve its reciprocal stairs, deck camera bounds, own sprint timers and updated map/UI coordinates before continuing P03. The [runnable handoff](../../tracking/handoffs/khalid/day_02/TWO_FLOOR_LAB.md) records 111 checks, native screenshots and the clean Mac archive. The revision does not close the remaining shared AI gate.
+## Verification and handoff
 
-## How to collaborate
+Run the checks relevant to changed behavior and inspect actual scenes at supported laptop sizes. Use screenshot/motion/performance tools only where needed; do not rerun every historical audit for a copy change. Save exact commands/results and asset provenance under `docs/development`.
 
-The latest [scene presentation handoff](../../tracking/handoffs/khalid/day_02/SCENE_PRESENTATION.md) supersedes immediate stair travel and the previous menu layout. Workshop/Companion/Guide/epilogue designs are navigable; AI deployment, persistence and scoring remain later work. Retrieve that contract before implementing the next controller or profile consumer.
+Give Suhita a runnable branch/commit, actual interfaces and the exact next connection. Integrate both owner slices before closing a shared phase. P03/P04/P05 are led by Suhita with your visual acceptance; P06-P08 by you with her behavior/platform evidence. Neither build success nor a polished preview proves missing AI or mechanics.
 
-You own core strategy but do not own every backend module: Suhita owns map importing/validation, registry adapters, NEXUS/director protocols, environment object systems and profile/policy logic. Your simulation must invoke those systems through agreed data/actions rather than duplicating them.
-
-For your frontend slices, create the agreed adapter/presenter and give Suhita the connection point. Do not rewrite her scene architecture. For a shared contract change, update the contract and explain the consumer effect in the handoff before integration.
-
-When acting as integrator, inspect both slices, run relevant combined checks/playthroughs and reconcile shared task status. Completion evidence must be factual. Leave public platform claims/publishing pending until their actual gates pass. Any change to approved scoring rules must be proposed in chat and approved first.
-
-The [closer-camera handoff](../../tracking/handoffs/khalid/day_02/CLOSE_CAMERA.md) supersedes 48px map presentation and furniture baked into map surfaces. Retrieve it before changing map/scene consumers: 96px tiles, larger interpolated actors, 101 physical fixtures and separately cached depth-sorted furnishings. Remaining phase ownership is unchanged.
+Keep natural short commits without assistant attribution. Preserve user changes and teammate authorship. No external teammate messages or spawned agents without explicit authorization. Stop at the requested slice boundary. Further scoring-rule changes still require chat approval.

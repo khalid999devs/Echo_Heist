@@ -1,69 +1,50 @@
 # Current development status
 
-Latest verified runtime `600698a`, clean packaged source `c2213c2`: cinematic loading, skippable pressure-door Entry/WIN extraction, fixed physical fixture boundaries, single hover cues, nonblocking music fades, native app icon and room material/light variety. **149 tests/full checks pass**. Native normal/skip-resize/fullscreen/close, 56 scene states, both route wins/capture, 780 motion frames and a 12-restart performance/memory audit pass. Mac app/fresh ZIP each pass nine native Cocoa checks with audio ready. All three [runtime CI jobs](https://github.com/khalid999devs/Echo_Heist/actions/runs/39744256054) pass. Matching Windows ZIP is downloaded and verified: SHA256/CRC/executable, 61 exact binary assets and 11 semantically matching/line-ending-normalized text resources. Windows physical gameplay/audio QA remains NOT_RUN. [Consumer handoff](handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [actual review](../quality/reports/cinematic_startup/REVIEW.md), [exact final delivery evidence](../quality/reports/cinematic_startup/verification/BUILD.json). The older records below are historical; shared phase gates remain unchanged.
+Updated **2026-10-22, Asia/Dhaka**. **P01 and P02 are DONE. P03 is IN_PROGRESS and is the next implementation priority.** P05 has an explicitly requested early crouch subset; P04/P06/P07/P08 are not complete. Advanced-looking screens and successful desktop builds do not close these missing behavior gates.
 
-Latest runtime `bac3502`: 139 cases and full checks pass. Fresh native review passes both routes (upper WIN 1,488 ticks; lower WIN 1,566), capture at 759, 48 screen states and 780 movement frames with actual crouch/clearance checks. Confirmed-pursuit speed is 115%, with lockdown precedence. Clean Mac app/fresh ZIP each pass eight native Cocoa checks with audio ready; all three hosted jobs pass. [Exact latest delivery record](../quality/reports/material_cohesion/verification/locomotion/BUILD.json) distinguishes downloaded packages from physical Windows QA, which remains NOT_RUN.
+The latest integrated baseline is `ec8ca48` on main; runtime code is `600698a`, clean packaged source `c2213c2`. The current ownership revision is documentation only. Main's [three CI jobs passed](https://github.com/khalid999devs/Echo_Heist/actions/runs/39746051343). Retrieve the [consumer handoff](handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [review](../quality/reports/cinematic_startup/REVIEW.md) and [exact build evidence](../quality/reports/cinematic_startup/verification/BUILD.json).
 
-Integrated into main at `ab6d734`, whose [three CI jobs pass](https://github.com/khalid999devs/Echo_Heist/actions/runs/39734108371). Only main remains locally/remotely after ancestor/zero-unique/expected-tip checks. Matching Windows archive is now downloaded to dist: SHA256/CRC, executable, gameplay config, five updated binary assets and all 29 audio hashes pass. It is a native CI build with dummy-video smoke, not a physical Windows gameplay/audio result. Mac and Windows archive manifests both identify clean runtime bac3502.
+## Completed and verified
 
-Current material/crouch refinement: [actual scene review](../quality/reports/material_cohesion/REVIEW.md), [runnable handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). Strict types cover 101 source files. The preceding 8a0dffd run recorded 135 cases, 782 movement frames and 30 native layout captures; [its historical build record](../quality/reports/material_cohesion/verification/BUILD.json) is retained separately. The final locomotion review supersedes its actor art, cadence and pursuit speed. Approved scoring and remaining shared gates are unchanged.
-
-Latest 2026-10-22 scene refinement: [responsive display, facility and audio](../quality/reports/facility_finish/REVIEW.md), [runnable handoff](handoffs/khalid/presentation/SCENE_FINISH.md). 127 behavior cases, strict types over 97 source files, native route/capture sweep, 30 responsive states and 19 room/recess previews pass. Clean runtime `28aff88` Mac app/fresh ZIP each pass eight native checks with audio ready; all three hosted platform jobs pass. [Exact archive/hash and actual build results](../quality/reports/facility_finish/verification/BUILD.json). P03-P08 and Windows interactive QA remain open.
-
-Updated: 2026-10-22, Asia/Dhaka.
-
-Active target: complete working initial draft in **eight phases over four development days**. Day 1 implementation started on 2026-10-18. Owners: Khalid and Suhita; estimated allocation 80 points each. P01 and the complete Human P02 gate are DONE after user-directed integration review of Suhita's branch. A first P03 Sentinel/perception subset is now implemented; shared P03 and P04-P08 remain open.
-
-## Eight-phase checkpoints
-
-| Day / phase | Target | Integrator | Actual status |
-| --- | --- | --- | --- |
-| 1 / P01 | Environment/filesystem/contracts/runnable shell; Khalid-only | Khalid | DONE |
-| 1 / P02 | Five-zone scene, complete Human loop and basic tools | Suhita planned; Khalid completed integration review | DONE; both owner slices accepted on actual map with Human win/capture/pause/retry evidence |
-| 2 / P03 | Fair sensors, active defenders, BFS/A*/fuzzy and replay | Khalid | IN_PROGRESS; one Sentinel/perception subset, Tracker/shared registry gate open |
-| 2 / P04 | Autonomous Companion/MCTS, Interceptor/minimax and NEXUS | Khalid | TODO |
-| 3 / P05 | Complete tools/props and scene/audio feedback | Suhita | IN_PROGRESS; owner-requested early crouch/under-desk subset implemented; full environment/tools gate pending |
-| 3 / P06 | Workshop/profiles, scoring, settings/full UI and ending | Suhita | TODO |
-| 4 / P07 | Full integration/fairness/evidence and usability | Khalid | TODO |
-| 4 / P08 | Complete functional audit, primary archives and runnable draft handoff | Khalid | TODO |
-
-## Actual state
-
-| Area | Status | Evidence |
+| Area | Working now | Evidence / boundary |
 | --- | --- | --- |
-| Source review | DONE | All 19 PDF pages extracted/read; p. 19 visually checked; PDF hash in development hub |
-| Development plan and document groups | DONE | Indexed documents in [development hub](../README.md) |
-| Architecture and setup specification | DONE | [Codebase](../architecture/CODEBASE.md), [contracts](../architecture/DATA_CONTRACTS.md), [setup](../workflow/INITIAL_SETUP.md) |
-| Revised schedule and scoring design | DONE | Four-day plan and [50/40/10 scoring](../planning/SCORING.md), explicitly approved in chat |
-| Eight-phase ownership, agent startup and code rules | DONE | Named queues and executable structure checker enforce the authored-file/directory/test-layout baseline |
-| Local Git/source package/dependencies | DONE | main with incremental commits; installed 0.1.0a1 package, Python 3.13.16 and real uv.lock |
-| GitHub source and teammate bootstrap | DONE | [Public repository](https://github.com/khalid999devs/Echo_Heist), main pushed with original history; fresh clone verified through 99a8658; [Windows handoff](../workflow/setup/WINDOWS_SUHITA.md) prepared |
-| P01 contracts/runtime/resources/settings | DONE | [Runnable handoff](handoffs/khalid/day_01/P01.md); pure headless diagnostic and actual desktop shell |
-| P02 core gameplay/input | DONE | Continuous physics, mission/capture/initial tools, Human input and objective presenter; [owner handoff](handoffs/khalid/day_01/P02.md) |
-| P02 five-zone map/scene | DONE | Suhita's `a98548a` map/loader/flow retained; illustrated floor/bulkhead/props/actor strips and refined sci-fi UI; [integration verification](../quality/reports/phase02/integration/VERIFICATION.md) |
-| AI / Workshop / final scoring | IN_PROGRESS | One real Sentinel uses filtered sensors, BFS/FSM/fuzzy/search/report expiry; remaining advanced defenders, autonomous Companion, Workshop and final scoring are pending |
-| Local automated checks | DONE | Structure/lint/format/strict types and **139** cases pass; [current review](../quality/reports/material_cohesion/REVIEW.md) |
-| Hosted CI | PASS for final locomotion runtime | [39733213862](https://github.com/khalid999devs/Echo_Heist/actions/runs/39733213862) at `bac3502`: all three platform jobs, native primary builds and frozen dummy-video smoke |
-| Native packaging | PASS for local macOS final runtime | Clean `bac3502` app and fresh ZIP extraction each pass eight Cocoa checks with audio ready; [exact archive/hash](../quality/reports/material_cohesion/verification/locomotion/BUILD.json) |
-| V1 platform/hardware QA | NOT_RUN | Suhita's interactive Windows desktop/download QA, wider macOS/download behavior and full-game release matrix remain untested |
-| Assets and licensing | IN_PROGRESS | Original generated scene/tile/prop/actor art plus Oxanium/OFL recorded in [asset register](../assets/ASSETS.md); remaining production set and source license pending |
-| itch.io/video/submission | TODO | GitHub source is published; game distribution, gameplay video and academic submission are still pending |
+| Foundation / P01 | Grouped repository, locked Python/pygame-ce, pure fixed-tick Simulation, immutable contracts, resources/settings, CI and PyInstaller pipeline | [P01 handoff](handoffs/khalid/day_01/P01.md); original Khalid-only work |
+| Human heist / P02 | Movement/collision, core theft, mandatory lockdown, original extraction, fair interruptible capture, pause/retry and basic Echo/EMP/melee | [Combined P02](handoffs/khalid/day_01/P02_INTEGRATION.md); Suhita's map/loader contribution and Khalid's core/refinement preserved |
+| Facility | Five zones, two decks, 14 rooms, two branch routes/cross-link/stairs, 101 furnishings, accurate fixture bodies and three under-desk clearances | Current fingerprint 7; conservative route tiles differ from physical obstacle bounds |
+| Character / movement | Close camera, walk/run/crouch animation, grounded shadow, C crouch/creep, timed 3-second sprint / 4-second recharge, quiet walking / louder sprint | Existing implementation reused; no separate sitting action |
+| First P03 subset | One live Sentinel with filtered sight/hearing, BFS/FSM/fuzzy, legitimate reports, chase/search/return and capture integration | Other three guard posts retain P02 contact behavior; no complete Tracker/Interceptor/NEXUS yet |
+| Presentation | Cinematic loading/title, desktop icon, entry/extraction pressure doors, responsive menus/HUD/settings, map, timed stairs, distinct win/capture/abort endings | Airlock animation does not implement P05 physical doors |
+| Scene detail / audio | Material/lighting variety, contextual laboratory props/aftermath, reduced flashing, event SFX, ambient/context music, nonblocking fades and single hover cues | 29 recordings with provenance; actual simulation events drive gameplay feedback |
+| Later scene designs | Workshop, Companion, Guide/Lab and epilogue designs/navigation | Existing previews must be connected to real logic before their phase gates pass |
+| Verification | 149 tests/full checks; 56 scene states, both default-security route wins/capture, 780 motion frames, startup variants | [Actual review](../quality/reports/cinematic_startup/REVIEW.md); no new runtime tests implied by this doc revision |
+| Performance | Native measured p95 16.889 ms, 3,000 measured frames, no sustained growth in 12-restart audit | Scoped to this baseline/hardware, not proof for future full AI or every machine |
+| Builds | Matching Mac arm64 / Windows x64 archives; Mac app and fresh ZIP each pass nine native Cocoa checks with audio | Windows native CI build + frozen dummy-video smoke pass; **physical Windows gameplay/audio NOT_RUN** |
 
-P02 is a playable Human draft, not the full V1 game. The standard app launches the actual five-zone scene; P03-P08 and public-release gates remain separate. Outcomes are unscored until P06. One Sentinel now patrols/senses/chases/searches; three other posts retain P02 contact behavior. The current compact atlas has two floors, 14 purposeful rooms and 101 physical furnishings. Entry/Service are downstairs, Security/Research/Core upstairs; two reciprocal stair pairs and the original branch/cross-link routes remain open. Shift uses the owner-approved three-second louder sprint/four-second recharge; walking stays at 2.5 tiles/s and sprint at 3.7. Tab pauses on both floor plans. A Chapter 01 card, clear briefing/mode/Launch separation and Audio/Display groups replace the crowded opening. Compact HUD, CC0 context audio and persisted mix settings remain connected. Clinical lighting, soft contact shadows, native alpha-correct compositing and a distinct original extraction ending are connected. The 3D-style title art is an illustration; gameplay collision comes only from the validated Tiled map.
+## Phase checkpoints and remaining work
 
-## Next action
+| Phase | Status | Remaining gate | Revised integration lead |
+| --- | --- | --- | --- |
+| P01 — Foundation | DONE | None | Khalid, complete |
+| P02 — Human heist | DONE | None; maintain regressions as later systems integrate | Complete combined review |
+| P03 — Perception/defenders | IN_PROGRESS | Tracker A*, full registry/geometry revisions, remaining fair sensing/hiding/capture integration, real guard diagnostics and replay evidence | Suhita; Khalid visual acceptance |
+| P04 — Autonomous strategy | TODO | Companion FSM/utility/A*/real MCTS, Interceptor/minimax/alpha-beta, NEXUS dispatch/protocol persistence/reset and first-launch AI mode | Suhita; Khalid visual acceptance |
+| P05 — Tools/environment | IN_PROGRESS, early subset only | Finish shared Echo/EMP/melee edge cases; functional doors/glass/canisters/locker hiding and their scene/audio integration | Suhita; Khalid visual acceptance |
+| P06 — Workshop/full flow | TODO | Editable saved policies/profiles, seed/reset/retry semantics, approved scoring/encounters, history, full settings/accessibility and all screens connected | Khalid; Suhita behavior acceptance |
+| P07 — Integrated evidence | TODO | Complete both-mode QA, fairness/replay/performance/accessibility, experiment harness and blocker fixes | Khalid + Suhita |
+| P08 — Functional draft delivery | TODO | Full comparison, final feature audit, candidate primary packages, physical platform QA, source/credits/demo handoff | Khalid + Suhita |
 
-Continue P03 from the [first stealth contracts](../architecture/integration/STEALTH_SLICE.md) and [latest material/crouch handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). Retrieve the [timed stair/lockdown/responsive-scene contract](../architecture/integration/SCENE_PRESENTATION.md) plus original deck/sprint geometry before editing consumers. Shared registry, Tracker A* and remaining cues/fixtures are still required before the P03 gate can close. Suhita's interactive Windows x64 check remains useful platform evidence and must not be represented as complete until run on her machine.
+Required functionality remains R01-R27 in [scope](../planning/V1_SCOPE.md); no missing mechanic is relabeled as future polish. Approved 50/40/10 scoring is **specified but not implemented**. Current results are unscored. Public itch.io downloads, gameplay video/academic submission, license decisions and wider platform validation remain separate release work. Linux has source CI only; no tested Linux desktop release. Browser/Steam are outside V1.
 
-## Open inputs to resolve during development
+## Current ownership and next action
 
-- Available hours and academic submission deadline; implementation began on 2026-10-18 and the working-draft target stays four days.
-- Suhita's Windows x64 desktop/manual QA and minimum supported OS/hardware. The hosted Windows x64 runner now builds and executes the frozen foundation successfully with dummy video.
-- Wider macOS test versions and signing/notarization approach; only macOS 26.4.1 arm64 native smoke is verified, with ad-hoc signing.
-- Source license and asset provenance. GitHub origin is now khalid999devs/Echo_Heist; Suhita uses her own account and needs collaborator access to push her owner branch.
+The owner changed the split on 2026-10-22. **Khalid owns complex graphics/scenes/presentation and desktop delivery; Suhita owns most gameplay/AI/persistence logic.** See [Workload](../planning/WORKLOAD.md), including revised KR/SR IDs, file seams, historical-credit preservation and 48/60 remaining estimates. The old whole-project 80/80 estimate is not a measured effort record.
 
-These do not prevent preparing the local foundation. They must be resolved before the corresponding release claims or external actions. See the [risk register](RISKS_AND_DECISIONS.md).
+- **Suhita next:** P03-SR1/SR2/SR3 on `work/suhita-p03`; finish the P03 logic from current main, verify on Windows and hand off real APIs/events. [Owner guide](../workflow/owners/SUHITA.md), [Windows commands and pasteable prompt](../workflow/setup/WINDOWS_SUHITA.md).
+- **Khalid next:** P03-KR1/KR2; guard cues, genuine diagnostics and scene/geometry integration. [Owner guide](../workflow/owners/KHALID.md).
+- No new runtime slice is claimed by this planning update. Check [claims/handoffs](HANDOFFS.md) before editing. P03 closes only after both queues and the combined gate pass; P04 then becomes ready.
 
-Current follow-up: [48 native screen states and both route wins](../quality/reports/scene_presentation/REVIEW.md). The [runnable handoff](handoffs/khalid/day_02/SCENE_PRESENTATION.md) records navigation, timed stairs, crisp art and continuous lockdown alarm. Workshop/Companion/Guide/epilogue designs are connected; AI deployment, saved policies and scoring remain pending. [Build evidence](../quality/reports/scene_presentation/BUILD.json) records actual current artifacts and hosted results. Full V1 and interactive Windows QA remain open.
+The original four-development-day / eight-phase target remains, with actual progress reported honestly: implementation began 2026-10-18 and P03 is still open on 2026-10-22 after requested visual refinements. Day labels are the original sequence, not proof the target was met or a fresh four-day promise. Available hours/deadline, physical Windows QA, broader Mac/download testing and source licensing remain open inputs in [Risks](RISKS_AND_DECISIONS.md).
 
-Latest owner-requested refinement: [closer camera, larger operative and 101 furnishings](../quality/reports/close_camera/REVIEW.md), with [runnable handoff](handoffs/khalid/day_02/CLOSE_CAMERA.md). Native 48-state sweep, both route wins, capture, 14 architectural room previews and four-facing walk/run check pass. Clean runtime `ac2edfe` native app/ZIP smoke and all three hosted platform jobs pass; [exact current build evidence](../quality/reports/close_camera/BUILD.json). Full V1/Windows interactive QA remain open.
+## Historical evidence
+
+Earlier verified refinements remain in [Changelog](CHANGELOG.md), [handoff index](HANDOFFS.md), [scene presentation](handoffs/khalid/day_02/SCENE_PRESENTATION.md), [closer camera](handoffs/khalid/day_02/CLOSE_CAMERA.md), [responsive facility](handoffs/khalid/presentation/SCENE_FINISH.md), and [materials/crouch](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). They document their own older test counts, coordinates, hashes and scopes. The latest cinematic/fixture handoff supersedes their fingerprint/geometry consumer baseline; it does not erase their contributions.

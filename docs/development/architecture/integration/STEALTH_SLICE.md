@@ -1,5 +1,7 @@
 # First stealth slice: implemented runtime contracts
 
+Ownership note, 2026-10-22: author/file assignments below describe that historical handoff. The [revised workload](../../planning/WORKLOAD.md) governs future work: Suhita may implement remaining core/AI logic, Khalid leads complex visuals/scenes. Use narrow shared-file claims and the latest fingerprint-7 consumer handoff from START_HERE.
+
 2026-10-21, Khalid. User-directed extension of the accepted P02 baseline. This is a verified subset of P03-K1/K2/K3, not completion of shared P03. The [implementation brief](../../planning/references/IMPLEMENTATION_BRIEF.md) remains the full target.
 
 Subsequent environment revision: [furnished facility/movement contracts](FACILITY_DENSITY.md) supersede this checkpoint's nine-object layout, coordinates, speeds and text-only Tab guide. The remaining AI ownership and filtered-observation boundaries below still apply. The counts/evidence below describe the earlier checkpoint.

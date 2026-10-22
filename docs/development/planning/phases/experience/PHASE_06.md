@@ -1,6 +1,8 @@
 # P06 - Workshop, approved scoring and complete game flow
 
-Day 3, second block. Integrator: **Suhita**. Effort: Khalid 6, Suhita 14. Status: TODO. Prerequisite: P05. Feature anchors: EH-023, EH-024, EH-033 and remaining scene/settings/narrative EH-025. Source: PDF pp. 2, 5, 14-18 plus user-approved scoring.
+Day 3, second block. Integrator: **Khalid**. Remaining effort: Khalid 9, Suhita 9. Status: TODO. Prerequisite: P05. Feature anchors: EH-023, EH-024, EH-033 and remaining scene/settings/narrative EH-025. Source: PDF pp. 2, 5, 14-18 plus user-approved scoring.
+
+Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.
 
 ## Inputs
 
@@ -8,17 +10,20 @@ Read the [approved scoring specification](../../SCORING.md), policy/persistence 
 
 ## Owner slices
 
-| Slice | Owner / points | Deliverable |
+| Slice | Owner / remaining points | Deliverable |
 | --- | --- | --- |
-| P06-K1 | Khalid / 4 | Approved 50/40/10 scoring, shared detection encounters, integer pace, rank/achievement semantics and immutable result breakdown |
-| P06-K2 | Khalid / 2 | Score-breakdown widget/presenter, clear per-encounter explanation and real result statistics |
-| P06-S1 | Suhita / 5 | Backend validated policy fields/weight translation, Ghost/Balanced/Rush presets, named profile save/load and seed/reset deployment settings |
-| P06-S2 | Suhita / 7 | Complete main/menu/mode/Workshop/heist/results/epilogue flow, retry/edit/new-seed actions, readable HUD/Lab View and narrative presentation |
-| P06-S3 | Suhita / 2 | Settings persistence connection, remapping/volumes/window/reduced-flash/subtitle controls and invalid-profile recovery UI |
+| P06-KR1 | Khalid / 3 | Actual result/score breakdown, encounter explanation, statistics and achievement presentation |
+| P06-KR2 | Khalid / 4 | Connect/refine existing Workshop, modes, HUD/Lab/guide/results/epilogue screens and complete retry/edit/new-seed navigation |
+| P06-KR3 | Khalid / 2 | Settings/remapping/accessibility UI, volume/window/reduced-flash/subtitle controls and invalid-profile recovery presentation |
+| P06-SR1 | Suhita / 3 | Approved 50/40/10 score, team detection encounter lifetime, integer pace, ranks/achievements and immutable result data |
+| P06-SR2 | Suhita / 4 | Validated four-block policy/weight translation, Ghost/Balanced/Rush presets and versioned named-profile save/load/recovery |
+| P06-SR3 | Suhita / 2 | Apply seed/policy/reset atomically at deployment, retry semantics, history/telemetry and settings/remapping persistence; functional scene wiring |
 
 ## File boundaries and interfaces
 
-Khalid writes `core/scoring/` and a score presenter under the result scene's agreed subdirectory. Suhita writes `workshop/`, profile persistence adapters, settings UI and scene navigation. Agree the immutable result/policy schema first; neither developer should edit the other's scoring/profile implementation to simplify a widget.
+Suhita owns `core/scoring/`, `workshop/`, policy/profile/history persistence, encounter state and behavior/data integration. Khalid owns result/Workshop/settings screens, scene layout/navigation presentation, input binding UI and genuine diagnostics display. Publish immutable result/policy/deployment contracts before connecting screens. Existing `ui/scenes/design/` previews are presentation assets, not validated policy or saved profile implementations.
+
+Shared `flow.py`, `heist.py`, settings and resources glue use narrow single-writer claims. Suhita can connect real commands/data without taking over layout; Khalid can build complete interaction affordances without duplicating backend rules. Preserve actual result/airlock semantics and never display a calculated grade before its authoritative result exists.
 
 Use only enum/bounded data profiles, never arbitrary executable code. Policies affect legal tactical preferences and weights, not map/physics/defenders. Apply profile/seed/memory settings together at deployment. Results retain the actual seed/policy/score metadata; retries must not silently choose a new challenge or retain memory after reset.
 

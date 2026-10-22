@@ -1,5 +1,7 @@
 # Codebase architecture and foundation baseline
 
+Current ownership (2026-10-22): [Workload](../planning/WORKLOAD.md) supersedes historical author boundaries below. Suhita leads remaining core/AI/persistence logic; Khalid leads complex rendering/scenes/audio and build engineering. Shared composition roots/map data use narrow single-writer claims. Current contracts come from the [fingerprint-7 consumer handoff](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md).
+
 Blueprint basis: PDF pp. 16-17. P01 implements package/bootstrap, immutable contracts, resources/settings, checks and native packaging. Khalid's [P02 owner work](../tracking/handoffs/khalid/day_01/P02.md) adds continuous core/mission/capture/tool rules and input/presenters; Suhita's map/loader/scene source was accepted in the [P02 integration review](../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md). AI and Workshop remain planned. Read actual handoffs before extending these boundaries.
 
 Required: follow [code rules](../workflow/CODE_RULES.md), with no authored file over 1,000 lines and no maintained directory over six direct files. The [phase/workload plan](../planning/WORKLOAD.md) assigns both developers actual frontend/backend work; package ownership does not mean one developer owns every file in a layer.

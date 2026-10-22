@@ -1,41 +1,65 @@
-# Khalid and Suhita: workload and delivery speed
+# Khalid and Suhita: remaining workload and delivery
 
-Target: eight phases over four development days, producing a complete functional V1 initial draft. Phase 1 is entirely Khalid's responsibility. The [phase index](phases/README.md) contains the exact assignments and completion gates.
+Revised **2026-10-22**, explicitly requested by Khalid. This replaces the original future-work allocation: **Khalid leads complex visual graphics and scenes; Suhita leads most gameplay logic.** P01/P02 credit, completed commits and verified refinements remain historical facts. The eight phases, required V1 scope and approved scoring are unchanged.
 
-## Balanced ownership
+## Responsibility and balance
 
-Khalid leads software architecture, system design, simulation/core logic, strategy algorithms, deterministic experiments and build engineering. He also owns visible input, live algorithm diagnostics and score-presentation work. Suhita leads level/scene architecture, environment composition, game presentation, UI flow and visual/audio feedback. She also owns substantive map importing/validation, NEXUS coordination/protocol persistence and Workshop policy/profile logic.
+- **Khalid:** environment/art direction, assets, lighting/materials, character animation, camera, UI layouts, scene transitions, sound presentation, visual usability, rendering performance and desktop packaging. His substantive nonvisual work is display/input integration, resource/build engineering, profiling and shared architecture review.
+- **Suhita:** perception, guard navigation/behavior, Companion planning/MCTS, Interceptor/minimax, NEXUS, abilities, environment lifecycles, scoring, Workshop/profile/history persistence and deterministic evidence. Her presentation work is narrow functional wiring of real data/actions into existing screens and Windows gameplay QA; complex graphics stay with Khalid.
+- Both own tests and documentation for their changes. Simulation is the only authority for gameplay mutation; renderers/audio consume events and immutable views. Suhita's logic ownership includes fixing existing core modules previously written by Khalid.
 
-For this pygame desktop game, frontend means input, scenes, rendering/audio and UI; backend means local simulation, algorithms, data models and persistence. No web server is implied. Both developers own real work on both sides.
+The original **80/80 whole-project estimate is retired**, not an actual time record. Khalid has already delivered all P01, substantial P02/core integration and extensive visual/build refinements; Suhita's original P02 contribution remains credited. Actual historical hours were not logged, so exact lifetime equality cannot be claimed.
 
-## Effort allocation
+The **remaining estimate is 48 Khalid / 60 Suhita points**, including verification, integration and handoffs. The modest extra remaining logic allocation compensates for Khalid's completed foundation/refinement work. This is a provisional route toward equal total effort, not a measured equality or an instruction to add unnecessary art. Reuse finished scenes; charge only missing connections, needed adaptations and evidenced defects.
 
-Points are relative planning estimates, not hours, guaranteed completion times, lines of code or equal difficulty per file. They include implementation, verification, documentation and integration for that slice. Totals deliberately compensate Suhita's later workload for Khalid owning all initial setup.
+| Phase | Original work block | Khalid remaining | Suhita remaining | Integration lead |
+| --- | --- | --- | --- | --- |
+| P01 | Day 1 / foundation | 0 — DONE, original 12 | 0 — no P01 assignment | Khalid, complete |
+| P02 | Day 1 / Human heist | 0 — DONE, original 8 | 0 — DONE, original 12 | Complete combined review |
+| P03 | Day 2 / defenders | 5 — cues, diagnostics, geometry review | 12 — fair sensing, Tracker, registry, replay | Suhita; Khalid verifies visuals |
+| P04 | Day 2 / autonomous AI | 7 — Companion/Lab/NEXUS presentation | 18 — Companion, MCTS, Interceptor, NEXUS | Suhita; Khalid verifies visuals |
+| P05 | Day 3 / interactions | 9 — tools/props animation, sound and scene fit | 10 — tool rules and environment lifecycles | Suhita; Khalid verifies visuals |
+| P06 | Day 3 / complete flow | 9 — Workshop, settings, results and full UI | 9 — profiles, scoring, persistence and deployment | Khalid; Suhita verifies behavior |
+| P07 | Day 4 / integration | 9 — UX/accessibility, render performance | 6 — fairness/replay/AI evidence and recovery | Khalid; both verify candidate |
+| P08 | Day 4 / delivery | 9 — builds, Mac QA, demo/media and handoff | 5 — Windows gameplay QA and experiment report | Khalid; both verify delivery |
+| Remaining | Six open phase gates | **48** | **60** | Shared functional result |
 
-| Phase | Day | Focus | Khalid points | Suhita points | Integrator |
-| --- | --- | --- | --- | --- | --- |
-| P01 | 1, opening | Environment, repository, contracts, runtime shell | 12 | 0 | Khalid |
-| P02 | 1, remainder | Human heist and five-zone scene | 8 | 12 | Suhita |
-| P03 | 2, first block | Fair perception and defender behaviors | 15 | 9 | Khalid |
-| P04 | 2, second block | Companion strategy and NEXUS | 14 | 10 | Khalid |
-| P05 | 3, first block | Tools, interactive environment and feedback | 7 | 13 | Suhita |
-| P06 | 3, second block | Workshop, scoring and complete scene flow | 6 | 14 | Suhita |
-| P07 | 4, first block | Full integration, evidence and usability | 9 | 11 | Khalid |
-| P08 | 4, second block | Desktop draft delivery and complete-function gate | 9 | 11 | Khalid |
-| Total | Four days | Initial functional V1 draft | 80 | 80 | Shared result |
+Days are the original four-development-day sequence, not a claim that the target was met or a new four-day countdown. Work began 2026-10-18; on 2026-10-22 P03 is still open after requested refinements. Resume by dependencies and report actual progress. Do not cut required mechanics to make a date appear achieved.
 
-The uneven daily totals are intentional: Khalid's early architecture/AI work is balanced by Suhita's later scene/Workshop/integration work. Equal totals are a planning target; record actual active effort and blockers at each phase gate. If a slice proves much larger, transfer an unstarted, well-bounded task with its points/context rather than silently adding untracked work to one person. Keep the revised cumulative totals visible here.
+## Revised slice IDs and preserved history
 
-## Working quickly together
+New remaining-work IDs use **KR / SR**, for example `P03-KR1` and `P03-SR1`. K/S is the current owner; R identifies this rebalance. Existing `P03-K1` through `P08-S3` references in dated handoffs describe the original assignment and completed subsets; **do not claim them for new work**. P01/P02 IDs stay unchanged. The active phase specs and Backlog use the revised IDs.
 
-1. Khalid finishes P01 and records one runnable foundation handoff. Suhita can read the source, plan scene composition and collect provenance during that time, but has no required P01 implementation or dependency-repair assignment.
-2. Within P02-P08, each person implements the separate files listed in that phase. Start with stable contracts and small working behavior; integrate both slices at the gate. Do not hold independent work while the other developer finishes an unrelated file.
-3. The earliest missing required behavior wins priority over optional effects or architecture refinements. Keep P07/P08 for integration and delivery; do not defer the first working MCTS, Workshop or EMP until the last phase.
-4. Use one owner per slice, a branch/commit or recorded diff, clear input/output records and a short handoff. Multiple phases may have independent preparation underway, but never claim a phase complete before all prerequisites and its own gate pass.
-5. Keep verification proportional. Reuse a small high-value suite and manual playthroughs. The 1,000-line/six-file rules guide responsibility boundaries without creating empty packages or an oversized test framework.
+| Phase | How unfinished original responsibilities transfer |
+| --- | --- |
+| P03 | Original K1/K2 logic → SR1/SR2; S1 registry and behavioral S3 fixtures → SR3; K3/S2 visuals → KR1; map/visible integration review → KR2 |
+| P04 | Original K1 Companion → SR1; K2 Interceptor and S1 dispatch → SR2; S2 protocols → SR3; K3/S3 presentation → KR1/KR2; functional deployment wiring → SR3 |
+| P05 | Original K1 tools → SR1; S1 lifecycle and behavioral S3 checks → SR2; K2 HUD/input → KR1; S2 art/effects and S3 provenance/audio presentation → KR2 |
+| P06 | Original K1 scoring → SR1; S1 policy/profile logic → SR2; functional settings/history/deployment from S2/S3 → SR3; K2/S2/S3 screens → KR1/KR2/KR3 |
+| P07 | Original K1 fairness/replay/search → SR1; S1 scenario registry, backend recovery and algorithm explanation accuracy → SR2; original K2/K3/S2 presentation → KR1; rendering/resource/audio performance → KR2 |
+| P08 | Original K1 builds → KR1; K2 source handoff and S3 media → KR2; native Mac UX → KR1; Windows UX → SR1; S2 comparison/evidence → SR2 |
 
-## Phase 8 means functional completion
+Completed early crouch, Sentinel, materials, startup and airlock work is reused, never reimplemented to satisfy an old task description. A new slice covers only its remaining acceptance gap.
 
-All R01-R27 gameplay/data/interface functionality must be represented, implemented and verified to the initial-draft standard, including both modes, all required algorithms, tools, Workshop, NEXUS protocols/reset, scores, results/retry, settings, accessibility baseline and ending. Produce Windows/macOS draft archives and evidence; a missing primary build remains incomplete delivery. Publication actions and optional Linux are separately tracked and do not redefine functional completion.
+## File ownership and handoff seams
 
-After the complete draft, improve measured balance, AI accuracy, art/animation, sound and other polish. Required mechanics are never moved into that later work. Public release still requires its full license, clean-machine and distribution gates; it may happen on Day 4 if ready.
+| Area | Primary writer | Other owner's integration seam |
+| --- | --- | --- |
+| `core/`, `ai/`, future `workshop/`, persistence, behavioral tests | Suhita | Khalid reviews contracts and consumes typed snapshots/events; targeted resource/display persistence remains his claimed slice |
+| `ui/render/`, scene design/layout/animation, `ui/startup/`, `ui/audio/`, visual/audio assets | Khalid | Suhita supplies actual values/events and verifies observable feedback; no scene redesign required for logic |
+| `level/model.py`, `level/io/`, patrol/chokepoint registry | Suhita | Khalid supplies placement/geometry requirements; agree schemas before changing the map |
+| Packaged map JSON, level authoring/calibration scripts | Khalid for composition; explicitly shared for behavior metadata | Claim exact files before edits; Suhita can add required patrol/object metadata with a narrow claim while preserving coordinates/art/route IDs |
+| `ui/scenes/heist.py`, `flow.py`, app/resources/settings glue | One named writer at a time | Suhita may wire controllers/deployment/results into current screens; Khalid owns drawing/layout; claim exact methods/files and hand off before overlapping work |
+| Packaging, display/render profiling and presentation QA drivers | Khalid | Suhita provides Windows results and logic/search regressions; native platform claims require actual runs |
+
+No blanket prohibition on the other owner's directory may prevent necessary integration. Record a narrow claim, update the changed contract and avoid simultaneous writes. Do not duplicate a scene, importer or controller to bypass a shared file.
+
+## Execution order and effort review
+
+1. **Now:** Suhita starts P03-SR1 → SR2 → SR3 from current main on `work/suhita-p03`. Khalid can prepare P03-KR1/KR2 on `work/khalid-p03` using existing real Sentinel data while the Tracker contract is finalized.
+2. Publish the typed guard/registry/event contract first. Both branches use it; Suhita wires the runtime and Khalid connects/refines the visible cues. No placeholder search metrics or hidden-state shortcuts.
+3. Integrate P03 and verify its shared gate before starting P04 logic. Apply the same pattern through P08. Agents stop at the explicitly requested owner/phase boundary.
+4. At each phase gate record actual active effort if known, remaining estimates, blockers and files touched. If forecasts differ by more than about 20%, transfer a bounded **unstarted** slice (for example a fixture/persistence task to Khalid or integration QA to Suhita), update its owner/context, and keep the primary specialisms above. Never invent historical hours.
+5. Both developers test their own work. Neither becomes the other person's cleanup queue. Reuse finished art and working rules; prioritize missing required functionality over optional visual expansion.
+
+P08 closes only with all R01-R27 functionality, both modes, real algorithms, environment/tools, policies, scores, persistence, verified primary archives and evidence. Public itch.io release/license/platform gates remain separately recorded. See the [phase specs](phases/README.md) and [current status](../tracking/STATUS.md).

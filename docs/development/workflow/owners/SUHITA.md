@@ -1,42 +1,47 @@
 # Suhita's agent guide
 
-Current consumer baseline: [grounded materials and crouch handoff](../../tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md), [actual evidence](../../quality/reports/material_cohesion/REVIEW.md). Fetch main before a fresh owner branch; retrieve its UnderDesk/posture/fingerprint-6 contract and existing full-window pointer/HideSpot contracts. The user brought this crouch subset forward; remaining locker/glass/door/canister lifecycle stays in your P05 queue. Native build results are recorded separately; interactive Windows display/audio QA still needs your machine.
+Identity: **Suhita**, Windows x64. Khalid explicitly reassigned the remaining work on **2026-10-22**: you lead most gameplay logic; he leads complex visual graphics, scenes and presentation. This supersedes your original scene-heavy queue and his original exclusive core ownership. Read the [remaining workload and transfer map](../../planning/WORKLOAD.md). Remaining estimates are 60 points for you / 48 for Khalid, accounting provisionally for his completed foundation and large refinement pass; actual effort is reviewed at every gate.
 
-Identity: Suhita. Focus: game scene/level architecture, visual composition, presentation and interface flow, with substantive map/NEXUS/environment/policy backend work. Estimated workload: 80 of 160 points. **P01 setup belongs entirely to Khalid.**
+P01 belonged entirely to Khalid and is complete. Your original P02 map/loader/scene contribution is accepted and preserved. **Do not redo P02 or resume its deleted branch. P03-SR1/SR2/SR3 are next.** Use the [current Windows setup](../setup/WINDOWS_SUHITA.md) and start a fresh `work/suhita-p03` from current main, or safely resume that branch after inspecting its changes.
 
-Your workstation uses **Windows x64**. The [Windows setup guide](../setup/WINDOWS_SUHITA.md) still supplies PowerShell environment/check/build commands; its original P02 startup instructions are historical. P02's [integrated baseline](../../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) is complete; P03-S1/S2/S3 are your next assigned slices. The Mac app/ZIP is not your runnable Windows artifact. Windows outcomes must be recorded from actual runs.
+## Retrieve the baseline before editing
 
-Before P03 map/registry work, retrieve the [two-floor/stair/sprint contract](../../architecture/integration/TWO_FLOOR_LAB.md). The current revision has 14 rooms across two decks, 63 physical furnishings, two reciprocal stair pairs and a paused two-floor map. Shift uses the owner's approved three-second sprint/four-second recharge; walking stays responsive. Preserve stable IDs and new Deck/Stair records. Glass breaking, doors, hiding and canisters remain P05.
+Follow [START_HERE](../START_HERE.md): [Status](../../tracking/STATUS.md), [claims](../../tracking/HANDOFFS.md), [P03](../../planning/phases/intelligence/PHASE_03.md), source PDF pp. 6-11 and 16-18, code rules, architecture/data contracts and approved scoring. Read the accepted [P02 integration](../../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) and [first Sentinel contract](../../architecture/integration/STEALTH_SLICE.md) as history, then the **latest** [cinematic/physical-fixture handoff](../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md) and [scene integration contract](../../architecture/integration/SCENE_PRESENTATION.md).
 
-On "start" in Suhita's context, retrieve [startup context](../START_HERE.md), [Status](../../tracking/STATUS.md), [claims/handoffs](../../tracking/HANDOFFS.md), [code rules](../CODE_RULES.md) and the earliest ready assigned phase below. Read that phase's source pages/contracts and Khalid's actual foundation handoff before implementation. Do not ask her to explain the whole idea again.
+Current main contains `ec8ca48` plus the ownership update. Current runtime has one active Sentinel, real Human wins/capture, 14 rooms/five zones across two decks, 101 furnishings, four existing guard posts and validated patrol/chokepoint data. Three posts still have only P02 contact behavior; Tracker, Interceptor and NEXUS are not implemented controllers. Companion/Workshop designs are previews, not running AI or saved policy functionality.
 
-## Assigned queue
+Critical current contracts:
 
-| Phase | Your slices / points | Your result | Integrator |
+- Fingerprint **7**; immutable explicit obstacle bounds share physics/LOS/reach. `StaticMap.can_walk` is a conservative tile grid, not every sub-tile passage. Do not restore invisible tile-sized fixture barriers.
+- Reciprocal stair traversal is an actual Simulation action. Keep deck topology, legal body clearance, crouch/under-desk rules and stable map IDs when adding navigation.
+- Approved sprint is three seconds plus four-second recharge; walking is quieter. Hearing yields cue locations, never hidden actor positions. Chase speed and lockdown precedence already exist; reuse them.
+- Simulation owns all mutation; controllers use filtered immutable observations/reports. Renderer snapshots are privileged display data and forbidden as AI inputs.
+- Full-display coordinates/pointer translation, explicit UI-audio serials, loading worker lifecycle and actual-WIN-only extraction are working consumer contracts.
+
+## Active queue — revised IDs
+
+`SR` means Suhita's revised remaining slice. Original P03-P08 K/S IDs are historical. A new slice covers unfinished acceptance only, not a rewrite of already verified logic.
+
+| Phase | Your slices / points | Remaining result | Integration lead |
 | --- | --- | --- | --- |
-| P01 | None / 0 | Read/prepare scene ideas if useful; no required setup implementation | Khalid |
-| [P02](../../planning/phases/foundation/PHASE_02.md) | P02-S1 8; S2 4 | Five-zone map, scene/camera/basic flow + typed loader/validation | You |
-| [P03](../../planning/phases/intelligence/PHASE_03.md) | P03-S1 4; S2 3; S3 2 | Backend patrol registry/geometry adapter + guard feedback/fixtures | Khalid |
-| [P04](../../planning/phases/intelligence/PHASE_04.md) | P04-S1 5; S2 2; S3 3 | Backend NEXUS dispatch/protocol persistence + Companion camera/alerts | Khalid |
-| [P05](../../planning/phases/experience/PHASE_05.md) | P05-S1 5; S2 5; S3 3 | Backend environment objects + scene/tool effects/audio/provenance/tests | You |
-| [P06](../../planning/phases/experience/PHASE_06.md) | P06-S1 5; S2 7; S3 2 | Backend policies/profiles + Workshop/full scenes/settings/ending | You |
-| [P07](../../planning/phases/delivery/PHASE_07.md) | P07-S1 4; S2 5; S3 2 | Backend scenario/persistence integration + full usability/accessibility pass | Khalid |
-| [P08](../../planning/phases/delivery/PHASE_08.md) | P08-S1 5; S2 3; S3 3 | Native gameplay QA, experiment analysis, demonstration and release media | Khalid |
+| P01/P02 | Complete; no new claim | Retain original foundation/map contribution | Complete |
+| [P03](../../planning/phases/intelligence/PHASE_03.md) | P03-SR1 4; SR2 5; SR3 3 | Fair sensing/report/capture gaps; Tracker A* and defender rules; registry/geometry revision/replay integration | You |
+| [P04](../../planning/phases/intelligence/PHASE_04.md) | P04-SR1 9; SR2 6; SR3 3 | Companion FSM/utility/A*/MCTS; Interceptor/minimax + NEXUS dispatch; protocol persistence/reset and functional deployment | You |
+| [P05](../../planning/phases/experience/PHASE_05.md) | P05-SR1 4; SR2 6 | Complete shared tools/capture rules; doors/glass/canister/hiding lifecycles and their integration tests | You |
+| [P06](../../planning/phases/experience/PHASE_06.md) | P06-SR1 3; SR2 4; SR3 2 | Approved scores/encounters; policies/profiles; history/settings/deployment/retry behavior | Khalid |
+| [P07](../../planning/phases/delivery/PHASE_07.md) | P07-SR1 4; SR2 2 | Fairness/replay/search performance; scenario/persistence evidence and accurate algorithm explanations | Khalid |
+| [P08](../../planning/phases/delivery/PHASE_08.md) | P08-SR1 3; SR2 2 | Physical Windows full-game QA; complete comparison and honest experiment report | Khalid |
 
-The full slice prefix applies to abbreviated IDs, for example P06-S2. Read the phase specification for detailed inputs, files, expected behavior and verification; this table is the queue, not a substitute for the phase.
+## Start now and stop boundary
 
-## If setup is not ready
+1. Reproduce the locked Windows environment; read current claims and inspect local changes. The latest recorded suite has **149 tests**; use the actual count on your fetched commit. Launch Human mode and report actual display/audio behavior, including failures.
+2. Claim **P03-SR1/SR2/SR3 only** and exact files. Audit existing sensing, Sentinel and crouch implementation before changing it. Write the typed guard/registry/revision/event contract with consumer notes early.
+3. Finish perception/report provenance and capture fairness gaps, implement real Tracker A* with legitimate last-seen search/expiry, complete registry and deterministic replay evidence. Reuse the existing Sentinel BFS/FSM/fuzzy implementation. Integrate through current Simulation; do not build a second engine or importer.
+4. Replace the temporary nearest-Sentinel selection in `ui/scenes/heist.py` with your validated registry through a **narrow functional wiring claim**. Enable Sentinel/Tracker behavior required by P03; Interceptor minimax remains P04. Let Khalid own complex rendering/art/camera/layout changes. Expose typed guard/event metrics for his P03-KR1/KR2 work.
+5. Run relevant checks and real default-security win/capture routes, including both decks and stair links. Record behavior changes and deterministic seed/action/config metadata. Do not use `security_enabled=False` to pass gameplay acceptance or feed privileged view state into controllers.
+6. Write `tracking/handoffs/suhita/day_02/P03.md` under `docs/development`, plus grouped Windows evidence as needed. Record actual commands, tests, files, contracts, remaining visual dependencies and what Khalid should inspect. Guide Suhita through the visible result using exact controls/routes.
+7. Commit naturally with Suhita's own Git identity; push `work/suhita-p03` when access permits. Keep main for integration. **Stop after your P03 slices. Do not start P04 or mark full P03 DONE until Khalid's required visual slices and the combined gate pass.**
 
-Inspect for the P01 runnable handoff. If absent, report exactly which package/commands/contracts are missing and leave P02 implementation unclaimed. You may prepare the five-zone layout, scene flow and asset provenance without modifying Khalid's foundation files. Do not silently take over environment setup, invent APIs or mark a prerequisite complete.
+Your logic authority includes `core/`, `ai/`, typed level registry/import validation, persistence and behavioral tests. Shared map JSON and scene/composition roots require a precise claim; current screen structure/art and routes must be preserved. A new schema must have its consumer migration in the handoff. Do not create broad abstractions or regenerate art to solve a logic task.
 
-If P01 is ready but one external native runner is unavailable, follow the documented local interfaces and continue ready work; keep the missing platform evidence explicit. A setup defect that prevents your local launch needs a precise reproduction/handoff, while independent map/UI preparation can continue.
-
-## Guide Suhita through each working result
-
-Explain the next owned slice briefly and implement it. For map work, validate object IDs/connectivity/tags and give the exact launch command/spawn/route to inspect. For UI work, list the screen path, keys and expected visible state. For backend work, show a small real scenario and the event/policy/profile result, alongside proportionate automated checks.
-
-Inspect/run what available tools can verify. If a native/manual check requires Suhita's machine, give concise exact steps and record it NOT_RUN until evidence arrives. Do not substitute screenshots alone for functional behavior or ask for confirmation after every routine edit.
-
-Keep simulation mutations out of scene callbacks. Your backend modules produce validated values/tasks or run as Simulation-owned systems. Never grant hidden world access to NEXUS, duplicate Khalid's algorithms or change approved scoring to fit a screen. Coordinate the score presenter and input/diagnostic widgets through their agreed interfaces.
-
-Record the final paths/commands, fixtures, map IDs, event/profile contracts, actual checks and next consumer action. Complete your slices only; shared EH items and the full phase need both owners' accepted behavior. After P08, all defined features must work; later polish improves the complete draft.
+Tests stay under grouped root `tests/`, only for meaningful risks. All authored files <=1,000 lines and directories <=six maintained direct files. Do not change approved scoring rules without a chat proposal and approval. No external teammate messages or spawned agents without explicit authorization. Native hosted Windows dummy-video success is not physical Windows gameplay/audio QA; record them separately.

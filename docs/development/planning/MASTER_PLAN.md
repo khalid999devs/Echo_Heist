@@ -1,31 +1,32 @@
 # Eight-phase, four-day functional V1 draft plan
 
-Status: implementation pending. Owners: Khalid and Suhita. The user requires the complete working initial draft after Phase 8, with all defined functionality; later work improves accuracy, balance and polish.
+Status: P01/P02 DONE; P03 IN_PROGRESS; P05 early crouch subset only; remaining gates open. Ownership revised 2026-10-22. Owners: Khalid and Suhita. The user requires the complete working initial draft after Phase 8, with all defined functionality; later work improves accuracy, balance and polish.
 
 ## Authority and boundaries
 
 The source PDF defines the game. User overrides define four development days, eight phases, named workload ownership, repository limits and approved scoring. The [scope matrix](V1_SCOPE.md) remains the feature checklist and [approved scoring](SCORING.md) remains unchanged. The old M0-M5 implementation labels are retired; use P01-P08 and preserve EH feature IDs for traceability.
 
-Khalid owns Phase 1 completely. For P02-P08, both developers have real frontend and backend responsibilities, weighted toward their strengths. [Workload allocation](WORKLOAD.md) totals 80 estimated points each; points include implementation, verification and handoff, not just code. Start/end dates are recorded when implementation begins.
+Khalid owns Phase 1 completely. Completed P02 and refinement contributions stay credited. For remaining P03-P08, Khalid leads complex visuals/scenes and Suhita leads most logic, with both retaining real frontend/backend work. [Workload allocation](WORKLOAD.md) replaces the original 80/80 estimate with **48/60 remaining points**, provisionally offsetting Khalid's completed foundation/visual work. Points include verification/handoff, are not hours, and are reviewed against actual effort at every gate. New KR/SR slice IDs prevent old assignments from being mistaken for current ownership.
 
 ## Phase and day map
 
-| Day | Phase | Focus | Khalid / Suhita points | Integrator |
+| Original block | Phase | Focus | Remaining Khalid / Suhita | Integration lead |
 | --- | --- | --- | --- | --- |
-| 1, opening | [P01](phases/foundation/PHASE_01.md) | Environment, filesystem, contracts, runnable shell and smoke package | 12 / 0 | Khalid |
-| 1, remainder | [P02](phases/foundation/PHASE_02.md) | Five-zone scene, Human core/lockdown/extract/capture/retry loop | 8 / 12 | Suhita |
-| 2, first block | [P03](phases/intelligence/PHASE_03.md) | Fair sensing, BFS/A*/fuzzy, active defenders and replay | 15 / 9 | Khalid |
-| 2, second block | [P04](phases/intelligence/PHASE_04.md) | Autonomous Companion/MCTS, Interceptor/minimax, NEXUS | 14 / 10 | Khalid |
-| 3, first block | [P05](phases/experience/PHASE_05.md) | Complete tools/props, scene/audio feedback and rule edge cases | 7 / 13 | Suhita |
-| 3, second block | [P06](phases/experience/PHASE_06.md) | Workshop/profiles, scoring, settings, complete UI and ending | 6 / 14 | Suhita |
-| 4, first block | [P07](phases/delivery/PHASE_07.md) | Full integration, fairness/evidence, performance and usability | 9 / 11 | Khalid |
-| 4, second block | [P08](phases/delivery/PHASE_08.md) | Native draft archives, full comparison, functional audit and handoff | 9 / 11 | Khalid |
+| Day 1 | P01/P02 | Foundation and Human heist | 0 / 0 — DONE | Complete combined work |
+| Day 2, first | [P03](phases/intelligence/PHASE_03.md) | Fair sensing, BFS/A*/fuzzy, defenders and replay | 5 / 12 | Suhita |
+| Day 2, second | [P04](phases/intelligence/PHASE_04.md) | Companion/MCTS, Interceptor/minimax, NEXUS | 7 / 18 | Suhita |
+| Day 3, first | [P05](phases/experience/PHASE_05.md) | Tools/environment rules and visible/audio feedback | 9 / 10 | Suhita |
+| Day 3, second | [P06](phases/experience/PHASE_06.md) | Workshop/profiles/scoring, full UI/settings/ending | 9 / 9 | Khalid |
+| Day 4, first | [P07](phases/delivery/PHASE_07.md) | Integrated correctness, evidence, performance and UX | 9 / 6 | Khalid |
+| Day 4, second | [P08](phases/delivery/PHASE_08.md) | Candidate builds, complete comparison/audit/demo | 9 / 5 | Khalid |
 
-The [phase index](phases/README.md) links detailed source pages, owner slices, planned file boundaries, interfaces, necessary checks and completion gates. Daily totals differ intentionally; overall estimated workload is equal. Record actual effort and transfer bounded unstarted tasks when evidence calls for rebalancing.
+The [phase index](phases/README.md) links detailed source pages, owner slices, planned file boundaries, interfaces, necessary checks and completion gates. Completed hours were not logged, so exact lifetime equality cannot be claimed. Review actual active effort and transfer bounded unstarted work when evidence calls for rebalancing. Work began 2026-10-18 and P03 is still open on 2026-10-22 after user-requested refinements; the four-day target is retained, not reported as achieved or restarted.
 
 ## Developer responsibilities
 
-Khalid leads software architecture, system design, simulation/AI strategy, determinism and build engineering. His frontend work includes input adapters, objective/tool presenters, live diagnostics and result scoring presentation. Suhita leads scene/level architecture, world composition, screens, feedback and game usability. Her backend work includes map importing/validation, patrol registries, NEXUS task/protocol logic, environment object lifecycles and Workshop policy/profile persistence.
+Khalid leads environment/art, character animation, lighting/materials, camera, scene/UI/audio presentation, rendering performance, resource/display integration and desktop packaging. Suhita leads core/AI/perception/navigation, tools and environment lifecycle, NEXUS, Workshop policy/profile/history persistence, approved scoring and deterministic evidence. She also wires real backend data/actions into existing scenes and performs Windows gameplay QA. Khalid continues architecture/contract review and build engineering; both test their own changes.
+
+Shared scene roots and map JSON require narrow single-writer claims. Publish typed display/event/deployment contracts before connecting graphics. Suhita is authorized to implement unfinished logic in modules previously authored by Khalid; Khalid preserves her runtime changes while completing the visual consumers.
 
 One primary writer owns each slice/file. Shared systems are connected through explicit contracts, with consumer-impact notes in the handoff. No general engine framework, speculative abstractions, unnecessary tests or empty module forest is needed for this draft.
 
@@ -37,7 +38,7 @@ One primary writer owns each slice/file. Shared systems are connected through ex
 4. Run proportionate checks and give the developer exact instructions for observing the working result. Record actual results and remaining platform/manual gaps.
 5. Integrate both slices, check the phase gate and update tracking before calling the phase DONE.
 
-Suhita can prepare scene plans/provenance while Khalid sets up P01, but she has no required setup implementation. Once the foundation handoff is runnable, owners work independently within the same phase. Respect prerequisites without idling on unrelated blocked external checks.
+P01/P02 are complete. Start Suhita at P03-SR1/SR2/SR3 and Khalid at P03-KR1/KR2. Owners can progress independently on agreed interfaces within the phase. Respect shared gates and the requested stop boundary; a preview scene does not satisfy a future logic prerequisite.
 
 ## Completion after Phase 8
 

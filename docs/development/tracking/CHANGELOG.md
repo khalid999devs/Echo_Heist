@@ -1,5 +1,13 @@
 # Development changelog
 
+## 2026-10-22 - Rebalance remaining visuals and gameplay logic
+
+- Khalid explicitly requested complex graphics/scenes for himself and most remaining logic for Suhita. Replaced future assignments in Workload, P03-P08, both owner guides, startup/Windows instructions, feature mappings and integration/quality/release responsibilities. P01/P02 authorship and existing completion evidence are preserved.
+- Introduced KR/SR remaining-work IDs to prevent stale owner queues from being resumed. Current next slices are Suhita P03-SR1/SR2/SR3 and Khalid P03-KR1/KR2; shared scene/map files require narrow single-writer claims. No Suhita task is claimed by this planning change.
+- Replaced stale P02 Windows commands/prompts with current-main P03 bootstrap, actual fingerprint-7 baseline, functional-wiring allowance and explicit stop/handoff boundary. Rewrote Status as a clean completed/remaining list, distinguishing preview screens from missing behavior and Windows CI from physical QA.
+- Remaining estimates are 48 Khalid / 60 Suhita points, provisionally offsetting Khalid's completed foundation/refinement work. Historical hours are unknown; review actual effort at every gate rather than claiming measured lifetime equality. The original four-day target is retained, with its unmet progress reported honestly.
+- Documentation-only change; scoring, scope, runtime, lock and packaged artifacts are unchanged. Validation and runnable context are recorded in the latest entry of [claims/handoffs](HANDOFFS.md).
+
 ## 2026-10-22 - Grounded materials and crouch
 
 - Follow-up: replaced faulty human gait with matched contact/passing poses; tuned walk/run travel/cadence and footsteps while retaining timed sprint/recharge. Confirmed pursuit is 115% guard speed; lockdown 120% takes precedence. Both Human and Companion identification paths covered. 139 checks, 48 refreshed native states, both default-security wins/capture and 780 motion frames pass; exact evidence in the material review. The diagnostic keyboard driver's EMP timing now waits for imminent contact; no mission/AI/inventory shortcut was added.

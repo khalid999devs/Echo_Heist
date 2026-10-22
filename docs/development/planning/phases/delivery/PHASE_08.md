@@ -1,6 +1,8 @@
 # P08 - Complete functional V1 draft and desktop delivery
 
-Day 4, second block. Integrator: **Khalid**. Effort: Khalid 9, Suhita 11. Status: TODO. Prerequisite: P07. Feature anchors: completion of EH-027, EH-028 and EH-030. Source: PDF pp. 18-19 plus the user's complete-draft requirement.
+Day 4, second block. Integrator: **Khalid**. Remaining effort: Khalid 9, Suhita 5. Status: TODO. Prerequisite: P07. Feature anchors: completion of EH-027, EH-028 and EH-030. Source: PDF pp. 18-19 plus the user's complete-draft requirement.
+
+Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.
 
 ## Inputs
 
@@ -8,17 +10,18 @@ Read P07's candidate handoff, [full scope](../../V1_SCOPE.md), [experiment proto
 
 ## Owner slices
 
-| Slice | Owner / points | Deliverable |
+| Slice | Owner / remaining points | Deliverable |
 | --- | --- | --- |
-| P08-K1 | Khalid / 6 | Locked native Windows x64/macOS arm64 draft builds, resource/save checks, archive hashes/manifests and reproducible packaging instructions |
-| P08-K2 | Khalid / 3 | Source/run/test/build instructions, final functional traceability audit and technical handoff of the complete draft |
-| P08-S1 | Suhita / 5 | Full Human/Companion native UX playthroughs, install/launch-to-results/retry checks, final scene/UI defect fixes |
-| P08-S2 | Suhita / 3 | Execute/analyze the full 24-scenario/four-policy comparison, honest outcome/failure summary and policy-change evidence |
-| P08-S3 | Suhita / 3 | Short gameplay demonstration, representative screenshots, credits/provenance check and draft distribution-page materials |
+| P08-KR1 | Khalid / 5 | Locked Windows/macOS candidate builds, resource/save checks, exact archive manifests/hashes, Mac native gameplay/download QA and packaging instructions |
+| P08-KR2 | Khalid / 4 | Complete source/run/test/build handoff and shared traceability audit; gameplay demonstration, representative screenshots, credits and draft distribution media |
+| P08-SR1 | Suhita / 3 | Physical Windows Human/Companion launch-to-results/retry/controls/audio/save/download QA and owned logic fixes |
+| P08-SR2 | Suhita / 2 | Execute/analyze complete 24-scenario/four-policy comparison, failure/policy-change evidence and reproducibility notes for the final handoff |
 
 ## File boundaries and interfaces
 
-Khalid owns native build scripts/specs, manifests and technical source instructions. Suhita owns gameplay evidence/UI corrections and experiment/report generation outputs; coordinate a bug fix with the owning subsystem. Store compact reports under grouped quality/release folders, large logs/build/video artifacts outside source control, and durable artifact/hash references in the handoff.
+Khalid owns packaging/specs/manifests, Mac platform and visual QA, technical delivery instructions and demonstration/media/credits. Suhita owns native Windows gameplay evidence, complete experiment/report outputs and related logic fixes. Both reconcile R01-R27 against the exact candidate; a teammate's build is not a substitute for that platform's physical playthrough.
+
+Store compact reports under grouped quality/release folders and large logs/builds/video outside source control, with durable artifact/hash references. Existing development archives are useful baselines, not the final complete-V1 artifacts; rebuild after remaining gameplay ships. Publishing remains subject to the separate actual release gates/account context.
 
 ## Complete-function acceptance checklist
 

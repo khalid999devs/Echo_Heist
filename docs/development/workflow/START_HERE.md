@@ -1,16 +1,16 @@
 # Start or resume developer work
 
-Latest user-directed consumer revision: [cinematic opening, airlocks and physical fixtures](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [actual review](../quality/reports/cinematic_startup/REVIEW.md). Retrieve **fingerprint-7**, fine obstacle bounds versus conservative route tiles, 0.2-tile actor body, startup thread ownership and explicit audio serials before editing consumers. Existing crouch/full-display pointer contracts remain in force.
+Ownership updated **2026-10-22**: Khalid leads complex graphics/scenes; Suhita leads most gameplay logic. Read the [revised workload](../planning/WORKLOAD.md). **KR/SR** are the active remaining-work slice IDs; original P03-P08 assignments in dated handoffs are historical. P01/P02 are complete, P03 is next, and P05 has only an early crouch subset. P04/P06/P07/P08 remain open. Do not repeat completed work or count preview screens as finished behavior.
 
-Latest presentation/gameplay subset: [grounded materials and crouch handoff](../tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md), [actual review/build evidence](../quality/reports/material_cohesion/REVIEW.md). Retrieve its posture/under-desk clearance, fingerprint-6, material and explicit UI-feedback contracts plus the existing full-window pointer contract before editing consumers. The owner brought this crouch subset forward; remaining phase gates are unchanged.
+Latest actual consumer baseline: [cinematic opening, airlocks and physical fixtures](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [actual review](../quality/reports/cinematic_startup/REVIEW.md). Retrieve **fingerprint-7**, precise obstacle bounds versus conservative route tiles, 0.2-tile actor body, two-deck stairs, posture/clearance, full-display pointer mapping, startup thread ownership and explicit audio serials before changing consumers. Earlier fingerprint-3/6 contracts and counts are superseded where noted.
 
-This is the operational entry point for either developer's coding agent. The goal is a complete working initial V1 draft in eight phases over four development days. P01 and P02 are implemented; retrieve the [actual P02 integrated handoff](../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md). P03 has a first verified Sentinel subset; P04-P08 are pending; inspect current tracking/code before assuming later modules exist.
+This is the operational entry point for either developer's separately invoked agent. The eight-phase/four-development-day functional target remains; [Status](../tracking/STATUS.md) records actual progress rather than a calendar guarantee. The [accepted P02 handoff](../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) preserves the original contributions.
 
 ## Resolve the developer once
 
 - If the user/context identifies Khalid, or explicitly points to his guide, use [Khalid's queue](owners/KHALID.md).
 - If the user/context identifies Suhita, or explicitly points to her guide, use [Suhita's queue](owners/SUHITA.md).
-- Suhita's Windows x64 machine uses the [Windows setup/handoff](setup/WINDOWS_SUHITA.md); it includes clone/bootstrap commands and the P02 owner boundary.
+- Suhita's Windows x64 machine uses the [Windows setup/handoff](setup/WINDOWS_SUHITA.md); it includes current clone/bootstrap commands, the P03-SR1/SR2/SR3 boundary and a complete starting prompt.
 - Keep that identity for later messages such as "start", "continue" or "finish my part" in the same conversation. Do not ask repeatedly.
 - If no identity is available, read the plan/state without mutations and ask one concise identity question. Do not guess or claim the other developer's slice.
 
@@ -21,13 +21,13 @@ This is the operational entry point for either developer's coding agent. The goa
 3. Read [code rules](CODE_RULES.md), [codebase](../architecture/CODEBASE.md), [contracts](../architecture/DATA_CONTRACTS.md), [approved scoring](../planning/SCORING.md) and relevant source PDF pages. The user overrides the blueprint's schedule/score defaults; preserve all other required functionality.
    The owner's [full gameplay/environment/UI brief](../planning/references/IMPLEMENTATION_BRIEF.md) and [repository audit/first milestone](../planning/references/REPOSITORY_AUDIT.md) guide the 2026-10-21 incremental revision. Also retrieve the [two-floor/stair/sprint geometry](../architecture/integration/TWO_FLOOR_LAB.md) and [latest scene/timed-stair/lockdown contract](../architecture/integration/SCENE_PRESENTATION.md) and the [closer-camera consumer handoff](../tracking/handoffs/khalid/day_02/CLOSE_CAMERA.md) before changing coordinates, map rendering, routes or menu focus; concept screenshots are inspiration, never runtime gameplay or evidence of missing systems.
 4. Inspect existing code, available launch/check commands, working changes, dependency lock and relevant tests. Planned paths are a starting design; follow the P01 actual contract map and update docs if a justified implementation layout differs.
-5. Check your task slices/feature anchors, readiness, active claims and file boundaries. Choose the earliest ready slice for your identity. Do not use a generic A/B role assignment or the retired M0-M5 milestones.
+5. Check your task slices/feature anchors, readiness, active claims and file boundaries. Choose the earliest ready slice for your identity. Use revised KR/SR IDs for P03-P08. Do not resume old P02 branches, original future K/S assignments or the retired M0-M5 milestones.
 
 ## Execute and guide the developer
 
 Explain the current phase, your assigned slice and expected visible behavior briefly, then implement it through verification. Provide exact working launch commands, controls, seed/profile and what to inspect whenever a scene or gameplay check matters. Use available local inspection tools to verify what you can; request developer assistance only for genuinely unavailable hardware/manual actions or missing required information.
 
-Do not stop at a plan or ask permission to perform already assigned reversible work. Keep frontend/backend boundaries, structural limits and the proportional test policy. If a dependency is missing, finish useful independent preparation within your assignment and record the exact blocker rather than implementing someone else's system or faking its result.
+Do not stop at a plan or ask permission to perform already assigned reversible work. Keep the revised visual/logic file seams, structural limits and proportional test policy. Suhita may change previously Khalid-authored core/AI logic; shared scene roots/map files require narrow single-writer claims. If a dependency is missing, finish useful independent preparation within your assignment and record the exact blocker rather than implementing someone else's system or faking its result.
 
 When your slice passes, record commands/evidence, changed APIs/map/events, branch/commit/diff and next integration action in the handoff. Update your slice status; complete shared EH feature anchors only when every listed owner slice and feature acceptance pass. The phase integrator checks the combined build before recording phase completion. Continue the next ready slice only within the user's requested scope.
 

@@ -1,12 +1,12 @@
 # ECHO HEIST development hub
 
-Latest refinement: [grounded materials, crouch and ambient UI audio](quality/reports/material_cohesion/REVIEW.md), [runnable consumer handoff](tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). The owner explicitly requested the early crouch/under-desk subset; full P03/P05 and later gates remain open. See its separate build record for actual native/hosted results.
+Current state, **2026-10-22**: **P01/P02 complete; P03 in progress**; P05 has an early crouch subset and the other later gates remain open. See the clean [completed/remaining list](tracking/STATUS.md).
 
-Current scene baseline: [responsive facility and sound review](quality/reports/facility_finish/REVIEW.md), [runnable owner handoff](tracking/handoffs/khalid/presentation/SCENE_FINISH.md). Covers full-display layout/pointer fixes, interrupted research, prepared hiding recesses and the 29-asset audio mix. Exact builds/platform results are in that review; full V1 phase gates remain open.
+Latest verified refinement: [cinematic opening/airlocks, physical fixtures, audio/performance and app icon](quality/reports/cinematic_startup/REVIEW.md), [runnable consumer handoff](tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Current baseline is fingerprint 7 with 149 passing tests and separately recorded native/hosted build results; physical Windows gameplay/audio remains pending.
 
-Created: 2026-10-18. Stage: P01 and complete Human P02 integrated; first P03 stealth slice in progress; P04-P08 pending. Day 1 implementation started on 2026-10-18; P02 was accepted on 2026-10-20.
+The owner revised responsibilities: **Khalid handles complex visual graphics/scenes; Suhita handles most gameplay logic.** The [remaining workload](planning/WORKLOAD.md) and revised KR/SR slices replace the original future 80/80 allocation, while preserving completed work. Remaining estimates are 48 Khalid / 60 Suhita to provisionally offset Khalid's foundation/refinement effort; review actual effort at each gate. Both still touch frontend/backend through explicit contracts.
 
-Current target: a complete working initial draft in **eight phases over four development days**. Khalid owns Phase 1; later work is split by strengths with 80 estimated points each. All defined functionality must work after Phase 8; later work improves accuracy and polish. Public distribution retains its platform/release checks.
+The target remains a complete functional initial V1 draft in eight phases over four development days. Work began 2026-10-18; the target has not been demonstrated complete. Day labels describe the original sequence, not a restarted clock. Required mechanics must work by P08; public release retains its independent checks.
 
 Agents start at the root [AGENTS.md](../../AGENTS.md) and [START_HERE](workflow/START_HERE.md), then use [Khalid's guide](workflow/owners/KHALID.md) or [Suhita's guide](workflow/owners/SUHITA.md). Follow the authored-file limit of 1,000 lines, six maintained direct files per directory and grouped master tests tree in [code rules](workflow/CODE_RULES.md).
 
@@ -28,7 +28,7 @@ Preserve approved gameplay requirements. The blueprint explicitly identifies con
 | --- | --- | --- |
 | Planning | [Master plan](planning/MASTER_PLAN.md) | Dependency order, milestones, owners, gates, delivery strategy |
 | Planning | [Eight phases](planning/phases/README.md) | Detailed owner slices, context, dependencies and gates for P01-P08 |
-| Planning | [Workload and speed](planning/WORKLOAD.md) | Named responsibilities, 80/80 effort allocation and parallel handoffs |
+| Planning | [Workload and speed](planning/WORKLOAD.md) | Revised graphics/logic responsibilities, remaining estimates and shared-file handoffs |
 | Planning | [V1 scope](planning/V1_SCOPE.md) | Requirements traced to PDF pages and verification |
 | Planning | [Approved scoring](planning/SCORING.md) | Completion/stealth/pace formula, ranks, encounter counting and calibration |
 | Architecture | [Codebase](architecture/CODEBASE.md) | Package structure, dependency boundaries, runtime rules |
@@ -48,7 +48,7 @@ Preserve approved gameplay requirements. The blueprint explicitly identifies con
 
 Current runnable baseline: [P02 integrated handoff](tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) and [verification/screenshots](quality/reports/phase02/integration/VERIFICATION.md). The standard desktop app now runs the five-zone Human mission. The [public GitHub repository](https://github.com/khalid999devs/Echo_Heist) holds the incremental owner history. Follow [Status](tracking/STATUS.md) for current hosted CI evidence; Suhita's interactive Windows desktop QA is still pending.
 
-Suhita's workstation entry: [Windows x64 setup and P02 handoff](workflow/setup/WINDOWS_SUHITA.md), including PowerShell clone/run/check/native-build commands and the P02-S1/S2 boundary.
+Suhita's workstation entry: [Windows x64 setup and current P03 handoff](workflow/setup/WINDOWS_SUHITA.md), including PowerShell commands and the revised P03-SR1/SR2/SR3 starting prompt.
 
 Historical core baseline: [Khalid's P02 owner handoff](tracking/handoffs/khalid/day_01/P02.md), with fixed-point/mission/input contracts and the original diagnostic-room evidence. The subsequent P02 integration accepted both owners' work. Current map/movement consumers should retrieve the [two-floor/stair/sprint handoff](tracking/handoffs/khalid/day_02/TWO_FLOOR_LAB.md), which records the changed coordinates and actual current checks.
 

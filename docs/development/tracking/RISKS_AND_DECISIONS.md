@@ -1,6 +1,6 @@
 # Risks, decisions and open questions
 
-Updated: 2026-10-18. Decisions below are proposed engineering defaults unless identified as required by the source/user. Record validation and changes here as implementation proceeds.
+Updated: 2026-10-22; ownership revision only, existing unresolved risks remain open. Decisions below are proposed engineering defaults unless identified as required by the source/user. Record validation and changes here as implementation proceeds.
 
 ## Risk register
 
@@ -10,14 +10,14 @@ Updated: 2026-10-18. Decisions below are proposed engineering defaults unless id
 | RK02 | Windows/native Mac build or test access unavailable | Khalid confirms native runners/testers in P01; first available smoke build there; never infer Windows acceptance from Mac results | Khalid | OPEN |
 | RK03 | Python/dependency/architecture mismatch | P01 verifies Python 3.13.16/Mac arm64 package and Windows x64 locked-wheel resolution; complete actual Windows execution before a release claim | Khalid | OPEN |
 | RK04 | Hidden state leaks into Companion, NEXUS or rollouts | Explicit immutable observations, forbidden-import checks and noninterference tests at each controller boundary | Both | OPEN |
-| RK05 | Algorithm names hide placeholder or unused implementations | Log actual calls/metrics; compare minimax modes; test real MCTS stages; demonstrate policy changes in controlled scenarios | Khalid | OPEN |
-| RK06 | Determinism breaks through wall time, global RNG or ordering | Integer ticks, separate RNG streams, stable ties, full run header/action replay; compare target builds before broader claims | Khalid | OPEN |
+| RK05 | Algorithm names hide placeholder or unused implementations | Log actual calls/metrics; compare minimax modes; test real MCTS stages; demonstrate policy changes in controlled scenarios | Suhita (logic), Khalid (integration review) | OPEN |
+| RK06 | Determinism breaks through wall time, global RNG or ordering | Integer ticks, separate RNG streams, stable ties, full run header/action replay; compare target builds before broader claims | Suhita (logic), Khalid (integration review) | OPEN |
 | RK07 | Capture/doors/patrols create softlocks or unfair corners | Tick-boundary tests, lockdown connectivity, physical playtests, path-stall diagnostics; fix any unavoidable mandatory capture | Both | OPEN |
-| RK08 | MCTS/search stalls rendering or simulation | Event-driven bounded searches, profile named machines, spread fixed iterations across ticks if needed; keep safe legal fallback | Khalid | OPEN |
+| RK08 | MCTS/search stalls rendering or simulation | Event-driven bounded searches, profile named machines, spread fixed iterations across ticks if needed; keep safe legal fallback | Suhita (logic), Khalid (integration review) | OPEN |
 | RK09 | Save paths or missing resources break frozen apps | P01 resource/writable-path baseline; Suhita's profile/settings adapters; both validate native persistence | Khalid + Suhita | OPEN |
 | RK10 | Mac download security/permissions block real users | Test downloaded quarantined ZIP/.app, signing state and supported per-app opening steps on target OS; preserve bundle metadata | Khalid | OPEN |
 | RK11 | Asset/font/audio/source licensing incomplete | Record provenance on import, choose source license before public release, ship required notices and credits | Both | OPEN |
-| RK12 | Workshop choices are cosmetic or one policy stalls forever | Pair Khalid's planners with Suhita's actual profiles on same seeds, report timeout/stalls and tune from evidence | Khalid + Suhita | OPEN |
+| RK12 | Workshop choices are cosmetic or one policy stalls forever | Pair Suhita's planners with her validated profiles and Khalid's actual interface on same seeds, report timeout/stalls and tune from evidence | Khalid + Suhita | OPEN |
 | RK13 | Academic evidence arrives too late or misses rubric | Run headers/metrics on Day 2, draft demo on Day 3, record draft evidence on Day 4; resolve actual submission rubric/deadline | Both | OPEN |
 | RK14 | Telemetry grows without bounds or includes privileged data in normal UI | Separate debug/controller channels, bound history, retain compact summaries and link large raw artifacts | Khalid | OPEN |
 | RK15 | Scoring double-counts a team chase or discourages intended tactics | Implement approved shared encounter lifetime, no direct gadget penalty, integer pace/ranks and score breakdown tests | Both | OPEN |
@@ -40,7 +40,7 @@ Updated: 2026-10-18. Decisions below are proposed engineering defaults unless id
 | D10 | Complete working initial draft in eight phases over four development days; retain independent public-release gates | REQUIRED: user's schedule/phase overrides on 2026-10-18; actual start date unassigned | Only an explicit user change can replace the target; record missed gates honestly |
 | D11 | GPT-6.1 Sol Extra high for planning; High for bounded foundation/implementation | RECOMMENDATION: [workflow](../workflow/AI_WORKFLOW.md) | Actual quality/latency/cost on project tasks |
 | D12 | Score = 50 extraction + max(0, 40 - 12 per distinct detection encounter) + up to 10 pace; unchanged S/A/B/C thresholds; failure 0/F; no direct tool penalty | APPROVED by user in chat on 2026-10-18; [specification](../planning/SCORING.md) supersedes PDF scoring defaults | Further scoring-rule changes require proposal in chat and explicit approval before adoption |
-| D13 | P01 is Khalid-only; later slices give both developers frontend/backend work with strength-weighted 80/80 estimated points | REQUIRED ownership direction; concrete allocation in [Workload](../planning/WORKLOAD.md) | Rebalance actual effort through bounded task transfers without losing context |
+| D13 | P01 remains Khalid-only and complete; original future 80/80 estimate superseded on 2026-10-22. Khalid leads complex graphics/scenes, Suhita most logic; revised remaining estimates 48/60 with KR/SR IDs | REQUIRED: explicit user direction; [Workload](../planning/WORKLOAD.md) preserves completed credit and defines transfer/file seams | Review actual effort each gate; transfer bounded unstarted work rather than claim unmeasured lifetime equality |
 | D14 | At most 1,000 lines per authored file, six maintained direct files per directory and proportionate tests only under grouped root tests | REQUIRED: user codebase rules; [details](../workflow/CODE_RULES.md) | Group by real responsibility; no silent limit exceptions or test proliferation |
 
 ## Open decisions

@@ -1,5 +1,7 @@
 # P02 runtime integration: Khalid -> Suhita
 
+Ownership note, 2026-10-22: author/file assignments below describe that historical handoff. The [revised workload](../../planning/WORKLOAD.md) governs future work: Suhita may implement remaining core/AI logic, Khalid leads complex visuals/scenes. Use narrow shared-file claims and the latest fingerprint-7 consumer handoff from START_HERE.
+
 Owner: Khalid; work/khalid-p02. Status: P02-K1/K2 DONE; the full P02 was later integrated on work/p02-integration under the user's 2026-10-20 direction. This narrow contract was published before implementation to expose shared-file changes. The [actual P02 handoff](../../tracking/handoffs/khalid/day_01/P02.md) contains exact signatures and migration notes; [integration evidence](../../quality/reports/phase02/integration/VERIFICATION.md) records the consumer.
 
 ## Ownership and composition

@@ -4,10 +4,17 @@ P01 and P02 are complete. The [P01 handoff](handoffs/khalid/day_01/P01.md), [P02
 
 Suhita's original Windows x64 setup and branch workflow remain documented in [Windows setup](../workflow/setup/WINDOWS_SUHITA.md). Her `a98548a` source commit was accepted into the user-directed P02 integration review; she did not publish a separate P02 handoff or Windows interactive QA result on that branch.
 
+## Current ownership and next handoff
+
+Updated 2026-10-22 by Khalid's explicit request: [revised workload and transfer map](../planning/WORKLOAD.md). Khalid leads complex graphics/scenes; Suhita leads most gameplay logic. Future P03-P08 work uses **KR/SR** IDs; historical K/S IDs and authorship below remain preserved. Suhita next claims P03-SR1/SR2/SR3 from current main; Khalid next claims P03-KR1/KR2. This planning update claims neither runtime queue.
+
+P03-P05 integration is led by Suhita with Khalid's visual acceptance; P06-P08 by Khalid with Suhita's behavior/platform evidence. The [Windows setup and full prompt](../workflow/setup/WINDOWS_SUHITA.md) now target P03, not the completed P02.
+
 ## Active claims
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
+| Khalid | User-requested ownership rebalance and current-state handoff | Documentation-only change on main after ec8ca48 | None; revised plans/owner guides ready | DONE; 149 tests/full checks and one-off document/ownership audit pass; no runtime slice or Suhita queue claimed |
 | Khalid | User-requested cinematic opening/airlocks, boundary/audio fixes, facility variety, desktop icon and performance audit | Runtime 600698a; clean packages c2213c2; integration target main | None; [runnable handoff](handoffs/khalid/presentation/CINEMATIC_STARTUP.md) | DONE; 149 tests/full checks, both native wins/capture, 56 scene states, motion/performance/RSS review, nine-check native Mac app/ZIP and all three hosted jobs pass; matching Windows archive verified; shared phase gates and physical Windows QA unchanged |
 | Khalid | User-requested materials/crouch/audio plus natural human gait and confirmed-pursuit speed | Verified runtime bac3502; main integration ab6d734 | None; [runnable handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md) | DONE; 139 checks, both native route wins/capture, native Mac app/ZIP, matching Windows archive and all runtime/main hosted jobs pass; physical Windows QA and shared phase gates unchanged |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | main includes original source a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
@@ -15,6 +22,20 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
 
 P02 integration boundary: [runtime contract](../architecture/integration/P02_RUNTIME.md). The original owner slices stayed separate; under the user's later explicit request Khalid reviewed/refined Suhita's scene/render files on a new integration branch. Her commits and authorship remain preserved in main; obsolete branch labels were removed in the cleanup below. `ui/presenters/objective.py` and `ui/input/human.py` continue to define the core/UI boundary.
+
+## Ownership revision handoff — 2026-10-22
+
+Khalid requested a clean current-state list and a graphics/logic rebalance. The [Status](STATUS.md) list, [Workload](../planning/WORKLOAD.md), P03-P08 specs, Backlog, owner/startup guides and [Windows handoff/prompt](../workflow/setup/WINDOWS_SUHITA.md) now agree. Completed work stays credited. New KR/SR IDs apply only to remaining work; Suhita may implement previously Khalid-authored core/AI logic, while shared scene/map changes require exact single-writer claims.
+
+Remaining estimates: Khalid 48 / Suhita 60 points, reviewed against actual effort at phase gates. The former 80/80 estimate is historical, not an actual hours record. No runtime, scope, scoring, dependency lock or build artifact changed. Existing packages still name clean packaged source c2213c2 and runtime 600698a.
+
+Actual verification on this documentation revision:
+
+- `UV_CACHE_DIR="$PWD/.cache/uv" uv run --locked python scripts/checks/run.py`: PASS — structure, Ruff, format (226 files), mypy (108 source files), **149 tests in 19.04 seconds**.
+- One-off local Markdown/ownership audit (`python3 /tmp/echo_rebalance_audit.py`, local helper, not an added test): PASS — changed links resolve, all 28 revised slice definitions have correct owners and points, every Backlog/owner reference is defined, phase totals sum to 48/60, no active stale P03-P08 owner IDs, Markdown-only diff.
+- `git diff --check`: PASS. No native rebuild was required or claimed for these document-only changes; previous artifact/hardware results remain in the cinematic review.
+
+Next: Suhita separately invokes her agent with the Windows guide's prompt, claims P03-SR1/SR2/SR3 and pushes work/suhita-p03; Khalid can claim P03-KR1/KR2. No agent was spawned or teammate messaged. Shared P03 status remains IN_PROGRESS until the combined gate passes.
 
 ## Repository branch cleanup
 

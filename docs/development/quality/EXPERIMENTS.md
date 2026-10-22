@@ -2,7 +2,7 @@
 
 Blueprint basis: pp. 9-14, 18. Status: experiment design only; no results exist.
 
-Eight-phase schedule: P03/P04 introduce real telemetry/algorithm evidence; P06 verifies saved policy-sensitive choices; P07 supplies Khalid's harness and Suhita's scenario/metadata fixtures; P08 assigns Suhita the full matrix execution/analysis and Khalid the technical reproducibility review. Preserve the full denominator under time pressure and report incomplete runs explicitly.
+Eight-phase schedule: P03/P04 introduce real telemetry/algorithm evidence; P06 verifies saved policy-sensitive choices; P07 assigns Suhita the behavior/search/replay harness and scenario/metadata fixtures, while Khalid profiles rendering/resources; P08 assigns Suhita the full matrix execution/analysis and Khalid the technical delivery review. Preserve the full denominator under time pressure and report incomplete runs explicitly.
 
 ## Experiment protocol
 

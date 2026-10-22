@@ -4,7 +4,7 @@ Status: P01 and full P02 have 69 implemented passing cases; [combined P02 verifi
 
 Schedule: begin behavior checks on Day 1, exercise the full interface by Day 3, and run the integrated working-draft gate on Day 4. Public-release checks remain separate and evidence-based.
 
-Eight-phase ownership: each owner verifies their meaningful behavior in P01-P06; Khalid leads P07 fairness/replay/performance integration, Suhita leads P07 scenarios/usability/persistence checks, and both verify P08 delivery. Follow [code rules](../workflow/CODE_RULES.md): all automated tests and test-only fixtures belong under grouped root `tests/`, with unit/integration/smoke separated by purpose and subsystem. Add files only for necessary behavioral coverage, not every module or cosmetic change.
+Eight-phase ownership: each owner verifies their meaningful behavior in P01-P06; Suhita leads P07 fairness/replay/search/scenario/persistence checks; Khalid leads usability/accessibility/render/audio/memory review and combined integration. Both verify P08 delivery under the revised KR/SR queue. Follow [code rules](../workflow/CODE_RULES.md): all automated tests and test-only fixtures belong under grouped root `tests/`, with unit/integration/smoke separated by purpose and subsystem. Add files only for necessary behavioral coverage, not every module or cosmetic change.
 
 ## Blueprint acceptance scenarios
 
@@ -48,7 +48,7 @@ Use the [approved scoring cases](../planning/SCORING.md) for exact examples. Ass
 
 Run both modes on the same complete map. Review input and remapping, camera, pause/resume/focus loss, restart/quit confirmation, keyboard navigation, all Workshop fields, same/new seed behavior, memory toggle, results and epilogue. Verify the algorithm guide describes actual implementation, and Lab View displays measured metrics rather than fixed samples.
 
-Check 1366 x 768 and 1920 x 1080, window/fullscreen transitions, aspect/letterboxing and input coordinates. Verify text/icons without relying on color, readable critical subtitles, reduced flashing, separate music/SFX volume, mute and no-audio-device fallback. Gameplay-relevant audio must correspond to real NoiseEvents. Menus must remain usable when gameplay is paused.
+Check 1366 x 768 and 1920 x 1080, window/fullscreen transitions, full-display coverage, aspect-preserved artwork and input coordinates (no unintended letterbox bands). Verify text/icons without relying on color, readable critical subtitles, reduced flashing, separate music/SFX volume, mute and no-audio-device fallback. Gameplay-relevant audio must correspond to real NoiseEvents. Menus must remain usable when gameplay is paused.
 
 Observe whether a new player understands the objective, tool stock, sighting vs capture, core lockdown and the return route. Record confusion, unfair blind-corner captures, path stalls, repeated waits and unintended softlocks. Static connectivity alone is insufficient.
 

@@ -1,6 +1,8 @@
 # P07 - Integration, deterministic evidence and usability
 
-Day 4, first block. Integrator: **Khalid**. Effort: Khalid 9, Suhita 11. Status: TODO. Prerequisite: P06. Feature anchors: EH-026 and harness/fixtures portion of EH-027. Source: PDF pp. 15-19.
+Day 4, first block. Integrator: **Khalid**. Remaining effort: Khalid 9, Suhita 6. Status: TODO. Prerequisite: P06. Feature anchors: EH-026 and harness/fixtures portion of EH-027. Source: PDF pp. 15-19.
+
+Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.
 
 ## Inputs
 
@@ -8,18 +10,18 @@ Read P06's complete build/controls/known issues, [test plan](../../../quality/TE
 
 ## Owner slices
 
-| Slice | Owner / points | Deliverable |
+| Slice | Owner / remaining points | Deliverable |
 | --- | --- | --- |
-| P07-K1 | Khalid / 5 | Fairness/replay regressions, critical path/no-path fixes, fixed-seed benchmark harness and measured tick/search performance |
-| P07-K2 | Khalid / 2 | Accurate algorithm guide explanations linked to actual implementation and pruning/MCTS/fuzzy evidence |
-| P07-K3 | Khalid / 2 | Diagnostics UI readability, live metric correctness and exposure of actionable failure reasons |
-| P07-S1 | Suhita / 4 | Backend integration fixtures/scenario registry for the 24-scenario comparison; state/reset/policy-metadata validation |
-| P07-S2 | Suhita / 5 | Complete keyboard/camera/window/scaling/accessibility pass, readable scene/feedback corrections and all-mode navigation QA |
-| P07-S3 | Suhita / 2 | Save/settings/profile/audio-failure integration fixes, writable-path and no-audio validation |
+| P07-KR1 | Khalid / 5 | Full keyboard/mouse/camera/window/accessibility/navigation review, feedback fixes, real diagnostics and readable algorithm guide presentation |
+| P07-KR2 | Khalid / 4 | Render/audio/startup/frame and repeated-session memory profiling, resource/display robustness and integrated candidate engineering review |
+| P07-SR1 | Suhita / 4 | Fairness/replay/softlock regressions, path failure fixes, fixed-seed harness and measured simulation/search performance |
+| P07-SR2 | Suhita / 2 | 24-scenario registry/policy/reset metadata, backend save/profile recovery, genuine algorithm explanation/trace accuracy and harness trials |
 
 ## File boundaries and interfaces
 
-Khalid owns benchmark/check scripts, fairness/replay tests and AI diagnostic presenters. Suhita owns grouped scenario fixtures, UI/scene corrections and assigned persistence/audio adapters. Fixes to another owner's system are a bounded handoff or explicitly claimed change, not overlapping edits. Shared test fixtures remain under `tests/fixtures/<domain>/` and no test files are added to source packages.
+Suhita owns behavioral experiment/check scripts, fairness/replay/search tests, grouped scenario fixtures and backend persistence corrections. Khalid owns render/audio/memory profiling, scene/diagnostic/accessibility corrections and the combined candidate review. Suhita supplies technically accurate algorithm explanations/metrics; Khalid integrates the readable guide. Split shared performance files by responsibility or claim them sequentially.
+
+Both fix their own subsystems and record consumer effects. Tests/fixtures stay under grouped root `tests/`; do not add a generic test framework or duplicate existing tools. Use the current profiling baseline for comparison, then measure the complete AI-enabled game rather than recycling the earlier single-Sentinel results as full-V1 performance evidence.
 
 Implement only high-value regression coverage. Do not spend the integration block building a general testing framework, chasing cosmetic snapshot differences or requiring every preset to win every seed. The headless runner records complete metadata and a finite test-only timeout; there is no in-game deadline.
 

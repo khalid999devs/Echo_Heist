@@ -1,5 +1,5 @@
 {
-  "stage": "Final runtime and clean Mac app/ZIP verified; matching Windows CI archive downloading",
+  "stage": "Final runtime, clean Mac app/ZIP and matching Windows archive verified; integrated into main",
   "runtime_source_commit": "bac35029a3a81d3a1b0f5e98e8c937acf6ca4e8b",
   "local_checks": {
     "tests": 139,
@@ -81,7 +81,55 @@
     },
     "scope": "Linux headless tests; native Windows/Mac builds and muted dummy-video frozen smoke"
   },
-  "windows_download": "IN_PROGRESS; CI package/smoke passed, archive integrity/source matching will be recorded after transfer",
+  "windows_download": {
+    "manifest": {
+      "architecture": "AMD64",
+      "archive": "echo-heist-0.1.0a1-windows-x64.zip",
+      "archive_bytes": 101763414,
+      "archive_sha256": "deadc0ec8d0cba501e106fb4de2ff9e6313f40038fdc0dd7ebe5f3d4cf83879e",
+      "host_os": "Windows-2022Server-10.0.20348-SP0",
+      "lock_sha256": "f7e94248badd117c651bc96c4d74b8886477ab7d7e1b1b4e214b44c7e8c5aefe",
+      "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+      "pyinstaller": "6.22.3",
+      "python": "3.13.16",
+      "signing": "unsigned",
+      "source_commit": "bac35029a3a81d3a1b0f5e98e8c937acf6ca4e8b",
+      "stage": "Human stealth vertical slice; full V1 remains in development",
+      "target": "windows-x64",
+      "version": "0.1.0a1",
+      "working_tree_dirty": false
+    },
+    "archive_hash_matches": true,
+    "zip_crc_check": "PASS",
+    "contains_executable": true,
+    "gameplay_config_matches_runtime": true,
+    "current_scene_and_actor_binary_assets_match": [
+      "characters/operative/walk.png",
+      "characters/operative/run.png",
+      "characters/operative/crouch.png",
+      "tiles/laboratory/hiding-desk.png",
+      "tiles/materials/mineral-floor.png"
+    ],
+    "all_packaged_audio_hashes_match": 29,
+    "hosted_frozen_smoke": {
+      "artifact": "D:\\a\\Echo_Heist\\Echo_Heist\\dist\\EchoHeist\\EchoHeist.exe",
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "surface_saved": true
+      },
+      "passed": true,
+      "scope": "CI dummy video",
+      "video_driver": "dummy"
+    },
+    "physical_windows_interactive_qa": "NOT_RUN",
+    "local_archive": "dist/echo-heist-0.1.0a1-windows-x64.zip"
+  },
   "video": {
     "path": "output/gait-and-pursuit/walk-run-crouch.mp4",
     "frames": 780,
@@ -92,5 +140,19 @@
     "Physical Windows interactive display/audio QA NOT_RUN",
     "Mac is ad-hoc signed, not notarized",
     "Companion deployment, shared P03/full P05 and later V1 phase gates remain open"
-  ]
+  ],
+  "main_integration": {
+    "commit": "ab6d734e9be47d13eebe3c5dc1806e758ef9da84",
+    "run_id": 39734108371,
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/39734108371",
+    "conclusion": "success",
+    "scope": "All three jobs; package runtime unchanged from bac3502"
+  },
+  "branch_cleanup": {
+    "remaining_branch": "main",
+    "retired_remote_tip": "bac35029a3a81d3a1b0f5e98e8c937acf6ca4e8b",
+    "retired_local_tip": "ab6d734e9be47d13eebe3c5dc1806e758ef9da84",
+    "unique_commits_missing_from_main": 0,
+    "method": "Fast-forward integration, ancestor check, expected-tip remote deletion, merged local deletion"
+  }
 }

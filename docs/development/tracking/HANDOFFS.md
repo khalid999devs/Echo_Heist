@@ -8,7 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | User-requested materials/crouch/audio plus natural human gait and confirmed-pursuit speed | Verified runtime bac3502; main integration | None; [runnable handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md) | DONE; 139 checks, both native route wins/capture, native Mac app/ZIP and all hosted runtime jobs pass; Windows archive transfer/integrity recorded separately; shared phase gates unchanged |
+| Khalid | User-requested materials/crouch/audio plus natural human gait and confirmed-pursuit speed | Verified runtime bac3502; main integration ab6d734 | None; [runnable handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md) | DONE; 139 checks, both native route wins/capture, native Mac app/ZIP, matching Windows archive and all runtime/main hosted jobs pass; physical Windows QA and shared phase gates unchanged |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | main includes original source a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 
 This table is coordination metadata, not a distributed lock. When working in different checkouts, synchronize the relevant handoff/claim commits before editing shared files. Resolve conflicting claims before overlapping writes; do not assume a stale copy of this table proves exclusivity.
@@ -16,6 +16,8 @@ This table is coordination metadata, not a distributed lock. When working in dif
 P02 integration boundary: [runtime contract](../architecture/integration/P02_RUNTIME.md). The original owner slices stayed separate; under the user's later explicit request Khalid reviewed/refined Suhita's scene/render files on a new integration branch. Her commits and authorship remain preserved in main; obsolete branch labels were removed in the cleanup below. `ui/presenters/objective.py` and `ui/input/human.py` continue to define the core/UI boundary.
 
 ## Repository branch cleanup
+
+2026-10-22 follow-up: fast-forwarded `work/materials-and-crouch` into main at `ab6d734`, preserving its four implementation commits and evidence commit. Remote tip `bac3502` and local tip `ab6d734` were ancestors of main with zero unique commits missing. Deleted the remote label using its expected-tip lease, then the merged local branch; fresh remote/local listings show only main. The integrated main [run 39734108371](https://github.com/khalid999devs/Echo_Heist/actions/runs/39734108371) passes all three jobs. Runtime archives name their exact packaged source `bac3502`; later record-only commits do not alter it.
 
 2026-10-21, explicitly requested by Khalid. Audited fresh remote refs against `main` at `a964448e2ba081655b710b040782a251cce2265f`. Every branch tip below was an ancestor of main with **zero commits missing**; there were no open pull requests. Deleted the eight remote branches in one atomic push with expected-tip leases, then pruned tracking refs and deleted the seven corresponding merged local branches. GitHub and this checkout now retain only the main branch. Commit history, source, authorship and build artifacts are preserved; no source rewrite or gameplay change was made.
 

@@ -9,19 +9,34 @@ from echo_heist.ui.render.motifs import light_pool
 
 def bake_lighting(surface: pygame.Surface, level: LevelData) -> None:
     size = level.static_map.tile_size_px
-    light = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
-    mask = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
-    for tile in level.floor_tiles:
-        pygame.draw.rect(mask, (255, 255, 255, 255), (*[axis * size for axis in tile], size, size))
     for room in level.rooms:
         rect = pygame.Rect(room.left * size, room.top * size, room.width * size, room.height * size)
-        light.set_clip(rect)
+        # Room-local buffers avoid two full-facility alpha allocations/blits.
+        # This also bounds each C operation while the opening is animating.
+        light = pygame.Surface(rect.size, pygame.SRCALPHA)
+        mask = pygame.Surface(rect.size, pygame.SRCALPHA)
+        for x in range(room.left, room.left + room.width):
+            for y in range(room.top, room.top + room.height):
+                if (x, y) in level.floor_tiles:
+                    pygame.draw.rect(
+                        mask,
+                        (255, 255, 255, 255),
+                        ((x - room.left) * size, (y - room.top) * size, size, size),
+                    )
         clinical = room.style in ("laboratory", "office", "reception")
-        color = (188, 218, 211) if clinical else (220, 187, 130)
+        color = {
+            "laboratory": (215, 231, 238),
+            "office": (238, 219, 182),
+            "reception": (225, 231, 222),
+            "storage": (229, 196, 139),
+            "maintenance": (233, 184, 110),
+            "server": (132, 177, 218),
+            "reactor": (99, 193, 220),
+        }.get(room.style, (215, 211, 193))
         radius = max(95, min(rect.width, rect.height))
-        light_pool(light, rect.center, color, radius)
+        light_pool(light, (rect.width // 2, rect.height // 2), color, radius)
         if clinical:
-            light_pool(light, (rect.centerx, rect.top + size), (199, 231, 223), radius)
+            light_pool(light, (rect.width // 2, size), color, radius)
         # Wall-mounted linear luminaires, with a reflected wash rather than a neon grid.
         for x in (rect.left - 6, rect.right + 2):
             fixture = pygame.Rect(x, rect.top + size // 3, 4, size // 2)
@@ -29,10 +44,8 @@ def bake_lighting(surface: pygame.Surface, level: LevelData) -> None:
             if tile in level.floor_tiles or not level.static_map.contains(tile):
                 continue
             pygame.draw.rect(surface, (13, 30, 38), fixture.inflate(6, 6), border_radius=3)
-            pygame.draw.rect(
-                surface, (170, 214, 206) if clinical else (218, 179, 108), fixture, border_radius=2
-            )
-            light_pool(light, fixture.center, color, size * 2)
+            pygame.draw.rect(surface, color, fixture, border_radius=2)
+            light_pool(light, (fixture.centerx - rect.x, fixture.centery - rect.y), color, size * 2)
         if room.style == "laboratory":
             # Pale wall caps and a second clean edge give the laboratory a physical depth.
             pygame.draw.line(
@@ -49,10 +62,9 @@ def bake_lighting(surface: pygame.Surface, level: LevelData) -> None:
                 (rect.right - 4, rect.top + 7),
                 2,
             )
-    # Light affects floors, not adjacent sealed roof space or another storey.
-    light.set_clip(None)
-    light.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-    surface.blit(light, (0, 0))
+        # Light affects floors, not adjacent sealed roof space or another storey.
+        light.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        surface.blit(light, rect.topleft)
 
 
 def draw_equipment(

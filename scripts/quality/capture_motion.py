@@ -129,10 +129,11 @@ def main() -> int:
         canvas.blit(flow.map_surface, camera.to_screen((0, 0)))
         for item in flow.furnishings:
             feet = camera.to_screen(item.footprint.midbottom)
-            canvas.blit(
-                item.shadow.surface,
-                (feet[0] - item.shadow.pivot[0], feet[1] - item.shadow.pivot[1]),
-            )
+            if item.shadow is not None:
+                canvas.blit(
+                    item.shadow.surface,
+                    (feet[0] - item.shadow.pivot[0], feet[1] - item.shadow.pivot[1]),
+                )
         for item in flow.furnishings:
             draw_instrument(canvas, item, camera, 0)
         canvas.blit(

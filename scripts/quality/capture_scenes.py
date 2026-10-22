@@ -45,6 +45,7 @@ def main() -> int:
     shots: set[str] = set()
     tracks: set[str] = set()
     alarm_frames = 0
+    slow_frames: list[dict[str, object]] = []
 
     def render(flow: GameFlow) -> None:
         nonlocal alarm_frames
@@ -54,10 +55,23 @@ def main() -> int:
         tracks.add(str(audio.current_music))
         if audio.report()["lockdown_alarm_active"]:
             alarm_frames += 1
+        mixed = perf_counter()
         flow.draw(canvas)
+        drawn = perf_counter()
         screen.blit(canvas, (0, 0))
         pygame.display.flip()
-        timings.append((perf_counter() - began) * 1000)
+        presented = perf_counter()
+        timings.append((presented - began) * 1000)
+        if timings[-1] > 50:
+            slow_frames.append(
+                {
+                    "scene": flow.scene.value,
+                    "frame": len(timings),
+                    "audio_ms": round((mixed - began) * 1000, 2),
+                    "draw_ms": round((drawn - mixed) * 1000, 2),
+                    "present_ms": round((presented - drawn) * 1000, 2),
+                }
+            )
 
     def shot(flow: GameFlow, name: str) -> None:
         render(flow)
@@ -67,6 +81,11 @@ def main() -> int:
         shots.add(name)
 
     flow = GameFlow((1280, 720))
+    # Production primes this under the resource-loading opening. This direct
+    # scene harness records its separate cold cost before interactive timings.
+    priming = perf_counter()
+    audio.update(flow.audio_frame(), 0)
+    initial_music_ms = (perf_counter() - priming) * 1000
     flow.frame([], 2300)
     shot(flow, "menus/title")
     flow.frame([click(TITLE_BUTTONS[4])], 0)
@@ -96,6 +115,13 @@ def main() -> int:
     flow.frame([click(LAB_CONTROLS[2])], 0)
     flow.frame([click(WORKSHOP_CONTROLS[9])], 0)
     flow.frame([click(MODE_BUTTONS[2])], 0)
+    assert flow.session is not None
+    entrance_fingerprint = flow.session.simulation.fingerprint()
+    shot(flow, "airlock/entry-closed")
+    flow.frame([], 650)
+    shot(flow, "airlock/entry-opening")
+    flow.frame([], 650)
+    assert flow.session.simulation.fingerprint() == entrance_fingerprint
     shot(flow, "mission/entry")
     flow.frame([key(pygame.K_TAB)], 0)
     shot(flow, "mission/map")
@@ -190,6 +216,12 @@ def main() -> int:
         for _ in range(10):
             current.frame([], 34)
             render(current)
+        shot(current, f"airlock/{branch}-closing")
+        current.frame([], 500)
+        shot(current, f"airlock/{branch}-sealed")
+        current.frame([], 600)
+        shot(current, f"airlock/{branch}-opening")
+        current.frame([], 600)
         shot(current, f"ending/{branch}-extracted")
         current.frame([click(RESULT_STORY)], 0)
         assert current.scene == Scene.EPILOGUE
@@ -216,8 +248,12 @@ def main() -> int:
         "rooms_seen": sorted(rooms),
         "stair_views": sorted(stairs),
         "alarm_frames": alarm_frames,
+        "entrance_keeps_unseen_simulation_frozen": True,
+        "exit_airlock_requires_actual_win": True,
         "tracks": sorted(tracks),
         "frames": len(timings),
+        "initial_music_preparation_ms": round(initial_music_ms, 2),
+        "frames_over_50ms": slow_frames,
         "render_audio_display_ms": {
             "median": round(median(timings), 2),
             "p95": round(sorted(timings)[int(0.95 * len(timings))], 2),

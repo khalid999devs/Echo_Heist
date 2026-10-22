@@ -40,7 +40,7 @@ class FurnitureVisual:
     footprint: pygame.Rect
     render_rect: pygame.Rect
     sprite: pygame.Surface
-    shadow: GroundShadow
+    shadow: GroundShadow | None
     style: str
     indicators: tuple[tuple[int, int], ...]
 
@@ -139,7 +139,11 @@ def prepare_furniture(
         room = level.room_at(obj.tile)
         grade = room_grade(room.style if room else "corridor", condition)
         sprite.fill((*grade, 255), special_flags=pygame.BLEND_RGBA_MULT)
-        shadow = cast_shadow(sprite)
+        # Wall equipment already has contact shading; a second floor silhouette
+        # would make screens and cable panels look detached from their wall.
+        shadow = (
+            None if appearance in ("screen", "reagents", "cable-cabinet") else cast_shadow(sprite)
+        )
         result.append(
             FurnitureVisual(
                 obj.object_id, obj.tile, rect, render_rect, sprite, shadow, style, tuple(indicators)
@@ -189,7 +193,7 @@ def prepare_furniture(
                 rect,
                 render_rect,
                 sprite,
-                cast_shadow(sprite),
+                None,
                 "recess",
                 (),
             )

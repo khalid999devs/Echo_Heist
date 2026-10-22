@@ -92,11 +92,24 @@ class WorldArt:
             for x in range(3)
         )
         props += tuple(cell.subsurface(cell.get_bounding_rect(min_alpha=32)) for cell in interiors)
+        props += laboratory_props() + clinical_props() + research_props()
+
+        def resident(source: pygame.Surface) -> pygame.Surface:
+            # Detach crops from full source atlases. Keep enough detail for the
+            # largest fixture without retaining multi-megapixel parent sheets.
+            if max(source.get_size()) <= 512:
+                return source.copy()
+            scale = 512 / max(source.get_size())
+            return pygame.transform.smoothscale(
+                source, tuple(max(1, round(value * scale)) for value in source.get_size())
+            )
+
+        props = tuple(resident(source) for source in props)
 
         return cls(
             floor,
             bulkhead,
-            props + laboratory_props() + clinical_props() + research_props(),
+            props,
             sprite_grid(
                 "assets/characters/operative-directions.png",
                 4,
@@ -182,25 +195,33 @@ def _floor_shadows(surface: pygame.Surface, level: LevelData) -> None:
     """Bake soft wall contact shadows into the static map's walkable floor."""
     world_map = level.static_map
     size = world_map.tile_size_px
-    layer = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+    shades: dict[tuple[tuple[int, int], ...], pygame.Surface] = {}
     for y in range(world_map.height):
         for x in range(world_map.width):
             if not world_map.can_walk((x, y)):
                 continue
             left, top = x * size, y * size
-            for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-                if (x + dx, y + dy) in level.floor_tiles:
-                    continue
-                for offset in range(9):
-                    color = (0, 5, 9, round(83 * (1 - offset / 9) ** 2))
-                    if dx:
-                        px = left + offset if dx < 0 else left + size - 1 - offset
-                        start, end = (px, top), (px, top + size - 1)
-                    else:
-                        py = top + offset if dy < 0 else top + size - 1 - offset
-                        start, end = (left, py), (left + size - 1, py)
-                    pygame.draw.line(layer, color, start, end)
-    surface.blit(layer, (0, 0))
+            edges = tuple(
+                (dx, dy)
+                for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1))
+                if (x + dx, y + dy) not in level.floor_tiles
+            )
+            if not edges:
+                continue
+            if edges not in shades:
+                layer = pygame.Surface((size, size), pygame.SRCALPHA)
+                for dx, dy in edges:
+                    for offset in range(9):
+                        color = (0, 5, 9, round(83 * (1 - offset / 9) ** 2))
+                        if dx:
+                            px = offset if dx < 0 else size - 1 - offset
+                            start, end = (px, 0), (px, size - 1)
+                        else:
+                            py = offset if dy < 0 else size - 1 - offset
+                            start, end = (0, py), (size - 1, py)
+                        pygame.draw.line(layer, color, start, end)
+                shades[edges] = layer
+            surface.blit(shades[edges], (left, top))
 
 
 def _furniture_rects(level: LevelData) -> tuple[tuple[pygame.Rect, str, int], ...]:
@@ -443,10 +464,11 @@ def draw_world(
         ):
             continue
         feet = camera.to_screen(item.footprint.midbottom)
-        canvas.blit(
-            item.shadow.surface,
-            (feet[0] - item.shadow.pivot[0], feet[1] - item.shadow.pivot[1]),
-        )
+        if item.shadow is not None:
+            canvas.blit(
+                item.shadow.surface,
+                (feet[0] - item.shadow.pivot[0], feet[1] - item.shadow.pivot[1]),
+            )
         layers.append((item.depth, item.object_id, item))
     draw_vision(canvas, level.static_map, snapshot, camera)
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}

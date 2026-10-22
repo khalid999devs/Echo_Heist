@@ -168,11 +168,21 @@ def test_default_live_guard_allows_actual_lower_route_core_and_extraction() -> N
     flow = start(security_enabled=True)
     assert flow.session is not None
     first = flow.session.simulation.presentation_snapshot()
-    assert first.guards and first.guards[0].actor_id == "guard-service"
+    # The validated registry activates every authored post with its real role.
+    assert {(guard.actor_id, guard.algorithm) for guard in first.guards} == {
+        ("guard-core", "NONE"),
+        ("guard-research", "A*"),
+        ("guard-security", "BFS"),
+        ("guard-service", "BFS"),
+    }
     route = list(mission_path(flow.level, "lower"))
     back = list(mission_path(flow.level, "lower", returning=True))
     drive(flow, route, take_core=True, use_tools=True)
-    guard = flow.session.simulation.presentation_snapshot().guards[0]
+    guard = next(
+        view
+        for view in flow.session.simulation.presentation_snapshot().guards
+        if view.actor_id == "guard-service"
+    )
     # Actual pursuit has finite memory; it does not track the hidden carrier forever.
     assert guard.last_seen_tick == -1
     drive(flow, back, expected_end=RunOutcome.WIN, use_tools=True)

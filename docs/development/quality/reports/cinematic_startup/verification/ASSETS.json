@@ -1,0 +1,64 @@
+[
+  {
+    "path": "src/echo_heist/resources/assets/branding/concepts/core.png",
+    "bytes": 2736768,
+    "sha256": "1495b0a120256f10a6f6985c56aef3a0ad6a3f89ddcfdd2e6ef1eb6cc948fa33",
+    "size": [
+      1254,
+      1254
+    ],
+    "original": "exec-89015122-3832-4f23-86e6-48e38c203de9.png",
+    "source": "Built-in imagegen; no image reference",
+    "modified": false
+  },
+  {
+    "path": "src/echo_heist/resources/assets/branding/concepts/companion.png",
+    "bytes": 2157114,
+    "sha256": "3a87c0c66fd60aad05cb32637ad5e2d4ec6b5347f98d2838f761ecef309594f9",
+    "size": [
+      1254,
+      1254
+    ],
+    "original": "exec-a02c43a2-383d-4932-9acb-59c25fdcd913.png",
+    "source": "Built-in imagegen; no image reference",
+    "modified": false
+  },
+  {
+    "path": "src/echo_heist/resources/assets/branding/concepts/operative.png",
+    "bytes": 1713249,
+    "sha256": "6d45fd7a41c0132874d7e5ee89ac6d1f33d13d0c664ec8989db1d477d728e8b8",
+    "size": [
+      1254,
+      1254
+    ],
+    "original": "exec-e5ffef1e-4cde-4d2c-9b44-842b7a315ff4.png",
+    "source": "Built-in imagegen; no image reference",
+    "modified": false
+  },
+  {
+    "path": "src/echo_heist/resources/assets/scenes/airlock.png",
+    "bytes": 2479518,
+    "sha256": "81f780aec4bacffeb85ae00940bc24fa5ebd777dec959e604b3eb59a7867f160",
+    "size": [
+      1672,
+      941
+    ],
+    "original": "exec-3920114d-13a3-4c3b-a27e-5eeb686f20a4.png",
+    "source": "Built-in imagegen; no image reference",
+    "modified": false
+  },
+  {
+    "path": "packaging/icons/echo-heist.ico",
+    "bytes": 153258,
+    "sha256": "939d969ad29bf0c41493c99d09b250632c27d3728c5ec8daa904910a068daf5d",
+    "source": "Native packaging conversion of selected core.png",
+    "modified": true
+  },
+  {
+    "path": "packaging/icons/echo-heist.icns",
+    "bytes": 2979260,
+    "sha256": "f05cf36108248fd2b967f44b8363d12db51fb35d0f36a2bfd1d08c4c75443cc9",
+    "source": "Native packaging conversion of selected core.png",
+    "modified": true
+  }
+]

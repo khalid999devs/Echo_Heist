@@ -8,6 +8,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
+| Khalid | User-requested cinematic opening, boundary/audio fixes, facility variety, desktop icon and performance audit | work/cinematic-startup | Startup/bootstrap/audio, physical furniture alignment, bounded render caches, room materials/lights, branding/packaging, focused checks and delivery records | IN_PROGRESS; finish the opening plus latest collision/feedback/performance steering; shared phase gates unchanged |
 | Khalid | User-requested materials/crouch/audio plus natural human gait and confirmed-pursuit speed | Verified runtime bac3502; main integration ab6d734 | None; [runnable handoff](handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md) | DONE; 139 checks, both native route wins/capture, native Mac app/ZIP, matching Windows archive and all runtime/main hosted jobs pass; physical Windows QA and shared phase gates unchanged |
 | Suhita | None; P02-S1/S2 technical work accepted in combined review | main includes original source a98548a | None | P02-S1/S2 DONE for phase gate; Windows interactive QA NOT_RUN |
 

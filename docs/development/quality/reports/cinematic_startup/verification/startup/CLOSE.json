@@ -1,0 +1,43 @@
+{
+  "bootstrap": {
+    "diagnostic": "phase-2-game-scenes",
+    "version": "0.1.0a1",
+    "frames": 0,
+    "scene": "STARTUP",
+    "video_driver": "cocoa",
+    "window_size": [
+      1280,
+      720
+    ],
+    "audio": "ready",
+    "startup": {
+      "completed": false,
+      "cancelled": true,
+      "frames": 47,
+      "elapsed_ms": 991.31,
+      "resource_load_ms": null,
+      "skip_requested": false,
+      "sound_cues": 2,
+      "frame_gap_ms": {
+        "median": 17.1,
+        "p95": 21.69,
+        "max": 24.8
+      },
+      "first_logo_paint_ms": 129.29
+    },
+    "resources_loaded": false,
+    "settings_saved": true,
+    "settings_notice": null,
+    "settings_path": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/cinematic-startup/close/profile/settings.json"
+  },
+  "native_pointer_routes": [],
+  "opening_input_did_not_launch_mission": true,
+  "resize_requested": false,
+  "fullscreen_requested": false,
+  "captured_frames": 48,
+  "raw_video_size": [
+    768,
+    432
+  ],
+  "scope": "Native injected-input bootstrap review, not physical Windows QA; raw frames captured in memory"
+}

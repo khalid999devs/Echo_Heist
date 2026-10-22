@@ -1,0 +1,78 @@
+{
+  "video_driver": "cocoa",
+  "screens": 56,
+  "outcomes": {
+    "upper": {
+      "outcome": "WIN",
+      "ticks": 1488
+    },
+    "lower": {
+      "outcome": "WIN",
+      "ticks": 1566
+    }
+  },
+  "capture_ticks": 758,
+  "guard_states": [
+    "CHASE",
+    "INVESTIGATE",
+    "PATROL",
+    "RETURN",
+    "SEARCH",
+    "SPOTTED"
+  ],
+  "rooms_seen": [
+    "Containment Systems",
+    "Core Chamber",
+    "Entry / Extraction",
+    "Equipment Stores",
+    "Power & Ventilation",
+    "Sample Archive",
+    "Security Checkpoint",
+    "Service Servers"
+  ],
+  "stair_views": [
+    [
+      "down",
+      0
+    ],
+    [
+      "down",
+      1
+    ],
+    [
+      "down",
+      2
+    ],
+    [
+      "up",
+      0
+    ],
+    [
+      "up",
+      1
+    ],
+    [
+      "up",
+      2
+    ]
+  ],
+  "alarm_frames": 1537,
+  "entrance_keeps_unseen_simulation_frozen": true,
+  "exit_airlock_requires_actual_win": true,
+  "tracks": [
+    "pulse",
+    "sector",
+    "title",
+    "transmission",
+    "urgent"
+  ],
+  "frames": 3800,
+  "initial_music_preparation_ms": 0.43,
+  "frames_over_50ms": [],
+  "render_audio_display_ms": {
+    "median": 3.29,
+    "p95": 8.53,
+    "max": 32.24
+  },
+  "scope": "Accelerated native source input sweep; frame timings exclude simulation. AI scenes are designs; actual Human outcomes only."
+}

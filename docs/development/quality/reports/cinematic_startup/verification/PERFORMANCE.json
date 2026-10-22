@@ -1,0 +1,107 @@
+{
+  "video_driver": "cocoa",
+  "audio_ready": true,
+  "cycles": 12,
+  "frames": 3600,
+  "measured_frames_after_warmup": 3000,
+  "sizes": [
+    [
+      1280,
+      720
+    ],
+    [
+      1440,
+      900
+    ]
+  ],
+  "security_enabled": true,
+  "frame_ms": {
+    "update": {
+      "median": 0.995,
+      "p95": 1.306,
+      "max": 5.502
+    },
+    "draw": {
+      "median": 5.529,
+      "p95": 10.596,
+      "max": 12.219
+    },
+    "present": {
+      "median": 5.373,
+      "p95": 11.439,
+      "max": 13.926
+    },
+    "total": {
+      "median": 16.517,
+      "p95": 16.889,
+      "max": 19.91
+    }
+  },
+  "memory": [
+    {
+      "cycle": 1,
+      "rss_mb": 444.66,
+      "python_mb": 0.0
+    },
+    {
+      "cycle": 2,
+      "rss_mb": 254.98,
+      "python_mb": 0.0
+    },
+    {
+      "cycle": 3,
+      "rss_mb": 255.83,
+      "python_mb": 0.54
+    },
+    {
+      "cycle": 4,
+      "rss_mb": 266.91,
+      "python_mb": 0.597
+    },
+    {
+      "cycle": 5,
+      "rss_mb": 277.83,
+      "python_mb": 0.648
+    },
+    {
+      "cycle": 6,
+      "rss_mb": 292.8,
+      "python_mb": 0.698
+    },
+    {
+      "cycle": 7,
+      "rss_mb": 293.14,
+      "python_mb": 0.747
+    },
+    {
+      "cycle": 8,
+      "rss_mb": 292.3,
+      "python_mb": 0.799
+    },
+    {
+      "cycle": 9,
+      "rss_mb": 273.75,
+      "python_mb": 0.843
+    },
+    {
+      "cycle": 10,
+      "rss_mb": 191.28,
+      "python_mb": 0.887
+    },
+    {
+      "cycle": 11,
+      "rss_mb": 180.25,
+      "python_mb": 0.932
+    },
+    {
+      "cycle": 12,
+      "rss_mb": 191.31,
+      "python_mb": 0.977
+    }
+  ],
+  "last_six_rss_span_mb": 112.89,
+  "python_growth_after_warmup_mb": 0.977,
+  "rss_change_from_warmup_mb": -63.67,
+  "bounded_in_this_run": true,
+  "scope": "Native macOS uncapped CPU/presentation workload, 61.2 seconds of simulated play; 12 restarts and alternating resizes, 2 warmup cycles. Python tracing adds overhead. RSS includes OS compression and compositor buffers; bounded means final six samples stay within 64 MB of warmup and Python growth below 4 MB (including telemetry). A bounded short run is not proof against every long-session memory leak."
+}

@@ -1,5 +1,7 @@
 # Start or resume developer work
 
+Latest user-directed consumer revision: [cinematic opening, airlocks and physical fixtures](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [actual review](../quality/reports/cinematic_startup/REVIEW.md). Retrieve **fingerprint-7**, fine obstacle bounds versus conservative route tiles, 0.2-tile actor body, startup thread ownership and explicit audio serials before editing consumers. Existing crouch/full-display pointer contracts remain in force.
+
 Latest presentation/gameplay subset: [grounded materials and crouch handoff](../tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md), [actual review/build evidence](../quality/reports/material_cohesion/REVIEW.md). Retrieve its posture/under-desk clearance, fingerprint-6, material and explicit UI-feedback contracts plus the existing full-window pointer contract before editing consumers. The owner brought this crouch subset forward; remaining phase gates are unchanged.
 
 This is the operational entry point for either developer's coding agent. The goal is a complete working initial V1 draft in eight phases over four development days. P01 and P02 are implemented; retrieve the [actual P02 integrated handoff](../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md). P03 has a first verified Sentinel subset; P04-P08 are pending; inspect current tracking/code before assuming later modules exist.

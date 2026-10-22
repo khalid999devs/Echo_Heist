@@ -1,0 +1,64 @@
+{
+  "bootstrap": {
+    "diagnostic": "phase-2-game-scenes",
+    "version": "0.1.0a1",
+    "frames": 6,
+    "video_driver": "cocoa",
+    "window_size": [
+      1470,
+      923
+    ],
+    "logical_viewport": [
+      1280,
+      804
+    ],
+    "fullscreen": true,
+    "audio": "ready",
+    "startup": {
+      "completed": true,
+      "cancelled": false,
+      "frames": 152,
+      "elapsed_ms": 2782.32,
+      "resource_load_ms": 1377.32,
+      "skip_requested": false,
+      "sound_cues": 3,
+      "frame_gap_ms": {
+        "median": 17.08,
+        "p95": 20.69,
+        "max": 30.2
+      },
+      "first_logo_paint_ms": 781.0
+    },
+    "music_track": "title",
+    "audio_assets_loaded": 29,
+    "audio_cues_played": 4,
+    "lockdown_alarm_active": false,
+    "room_ambience_active": false,
+    "resources_loaded": true,
+    "scene": "TITLE",
+    "map_id": "vault-five-zone",
+    "seed": 1042,
+    "runs_started": 0,
+    "outcomes": {},
+    "simulation_steps": 0,
+    "settings_saved": true,
+    "settings_notice": null,
+    "settings_path": "/Users/khalid999devs/Programmings/Projects/Games/Echo_Heist/output/cinematic-startup/fullscreen/profile/settings.json"
+  },
+  "native_pointer_routes": [
+    "TITLE",
+    "MODE",
+    "TITLE",
+    "SETTINGS",
+    "TITLE"
+  ],
+  "opening_input_did_not_launch_mission": true,
+  "resize_requested": false,
+  "fullscreen_requested": true,
+  "captured_frames": 159,
+  "raw_video_size": [
+    768,
+    432
+  ],
+  "scope": "Native injected-input bootstrap review, not physical Windows QA; raw frames captured in memory"
+}

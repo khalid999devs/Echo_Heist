@@ -1,5 +1,9 @@
 # Music and event cue integration
 
+## Cinematic opening and single interaction cues
+
+2026-10-22: title/exploration/pursuit/lockdown/result gains are 0.40/0.34/0.38/0.40/0.34 before the saved preference. Ambient exploration is retained. Opening reuses discovery/ready/ventilation with SFX/mute applied; pressure-door transitions reuse the existing Kenney open_001/close_001 cues. No new recording was imported. Explicit interaction serials disable legacy selection hover inference; the chapter card and nested Play button share one hover target. Transition stage serials deduplicate door cues. Music fade-out is a frame-driven gain ramp, replacing the blocking pygame music.fadeout call; initial title streaming is primed while loading. Quiet walk/loud sprint and authoritative hearing remain unchanged. [Current handoff/review](../quality/reports/cinematic_startup/REVIEW.md) supersedes earlier gains below.
+
 ## Current material/crouch revision
 
 Title and exploration now use SRG774's original ambient Title/Airy OGGs, gains 0.32/0.24 before the music preference. Pursuit/lockdown retain Alexander Ehlers' higher tension tracks. Hover is Kenney select_001. Explicit pointer-entry/activation serials play hover at 0.26 and click at 0.48, including already-selected buttons, without retriggering stable hover. Crouch uses the existing filtered walking WAVs at 0.045 and 24-tick cadence; walking/sprint remain 0.09/0.42 and Simulation hearing stays authoritative. [Native playback/levels and current build evidence](../quality/reports/material_cohesion/REVIEW.md), [packaged manifest](../../../src/echo_heist/resources/assets/audio/manifest.json). All 29 hashes match. Native pointer review plays ten cues with audio ready; subjective device listening remains an owner check.

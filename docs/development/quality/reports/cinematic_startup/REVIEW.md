@@ -1,0 +1,36 @@
+# Cinematic opening and facility review
+
+2026-10-22, Khalid; user-directed refinement, baseline main `da1358c`. [Runnable handoff and consumer contracts](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [exact asset prompts](PROMPTS.md).
+
+The opening paints immediately, animates the original core emblem while actual resources prepare, then crossfades into a warmed title and primed music stream. Final native normal startup: first logo at 133.16 ms, resource preparation 2,673.69 ms, sequence 3,268.78 ms, 134 rendered frames. Recorded gaps: median 17.16 / p95 22.22 / max 59.93 ms, including in-memory screenshot/video instrumentation and concurrent check activity. This replaces the previous blank loading interval; it is not a promise of zero stalls on every machine. The opening can be skipped only once resources are ready; its click never launches gameplay.
+
+Entry pressure doors reveal the real facility in 1.25 seconds with the simulation frozen until visible. Successful extraction seals and opens the airlock into the contextual dawn results in 1.95 seconds. Input skips the presentation; capture/abort never receive a success transition. Three original desktop icon concepts were generated; the core/Echo-ring design is selected for the window, opening, Mac bundle and Windows executable. Source concept PNGs remain available for owner review.
+
+## Geometry, mix and scene detail
+
+The old placement grid reserved more floor than several visible fixtures occupied. Examples were a 46px cabinet inside a 96px tile and a narrow bench in a three-tile reservation. Explicit authored physical bounds now describe all 101 furnishings/five covers; continuous physics and sight/reach use them while conservative route validation stays intact. The operative's body radius is 0.2 tiles. Focused regressions cover visible floor gaps, exact edges, high-speed collision, LOS, crouch clearance, geometry validation and replay fingerprints.
+
+Chapter card/Play previously represented overlapping hover regions, and selection-change inference could add a second sound. One interaction region plus explicit serial-based feedback fixes both causes. Ambient music is slightly more present; quiet walking, loud sprint/hearing and context-sensitive pursuit/lockdown remain intact. Airlocks reuse the packaged CC0 Kenney open/close recordings; no unlicensed sound or extra audio dependency was added.
+
+White/neutral clinical light, warm office/service lamps, blue server light and cyan reactor illumination now distinguish rooms. Floor seam sizes/material treatments vary by function, with deterministic wear rather than per-frame randomness. Existing disordered equipment, lab feeds and plant conditions remain. Wall fixtures/recesses omit redundant cast silhouettes; actor and freestanding fixture contact shadows remain.
+
+## Actual checks
+
+- Full structure/lint/format/type suite and **149 tests PASS**, strict types across 106 source files. Authored limits: 1,000 lines/file and six direct maintained files/directory.
+- Native default-security source sweep: **upper WIN 1,488 ticks; lower WIN 1,566; CAPTURED 758**. 56 screen states, both stair directions, six actual Sentinel states, continuous lockdown alarm and all five contextual music tracks. AI configuration/spectator screens remain explicitly labeled presentation designs.
+- Native normal/skip-resize/fullscreen routes all pass TITLE → MODE → TITLE → SETTINGS → TITLE without starting a mission. Muted/reduced-motion startup plays zero cues. Close-during-load cancels/joins and returns without resources. Fullscreen uses the complete 1470×923 window with a proportional 1280×804 logical surface.
+- Native motion: 780 frames, all four facings and all walk/run/crouch poses, real desk entry, refused standing beneath the desk and permitted standing after exit. Rendering preserves the simulation fingerprint. Fourteen architectural room previews and five prepared recess previews are labeled separately from played missions.
+- Final scene sweep: 3,800 frames, median 3.29 / p95 8.53 / max 32.24 ms for audio/draw/presentation; no frame exceeds 50 ms. Simulation cost is excluded from this sweep, included in the separate performance harness.
+- Final native performance: 3,000 measured frames after 600 warmup frames; total median 16.517 / p95 16.889 / max 19.910 ms. Update p95 1.306, draw p95 10.596, presentation p95 11.439 ms. These component quantiles are not additive. RSS finishes 63.67 MB below the second warmup sample; Python-traced growth is 0.977 MB including telemetry. RSS fluctuates with OS compression; no sustained repeated-session growth is observed in this run.
+
+The slow-frame investigation found fourteen 89–305 ms audio stalls in the earlier sweep. Pygame documents that [music.fadeout blocks](https://www.pygame.org/docs/ref/music.html#pygame.mixer.music.fadeout); the old main-loop call waited during each context switch. Gain now ramps across frames before loading the next stream, retaining pause/mute behavior and handling transient target changes. Initial title-stream preparation runs under the opening. A regression rejects the blocking API and verifies the progressive gain, completed switch, canceled transient switch and zero music volume. Before/after traces are retained in verification/diagnostics.
+
+The performance harness uses the real simulation, native video/audio, 12 mission restarts, alternating 1280×720/1440×900 view sizes and 3,600 rendered frames. It reports simulation/audio, drawing and presentation costs separately. RSS includes native SDL allocations and OS compression; Python tracing also counts the harness's own timing records. A short bounded run is evidence against repeated-session growth, not a proof against every possible leak.
+
+Native Mac app/fresh-ZIP and hosted build results are recorded in verification/BUILD.json once completed. Earlier dist archives are not claimed as this runtime's build.
+
+Per-room/tile buffers replace full-map temporary alpha allocations. Decoding the mineral source is cached, and detached prop crops avoid retaining complete parent atlases. The startup worker prepares resources off-screen; cancellation joins it before shutdown. Pygame's [single-thread font rendering requirement](https://www.pygame.org/docs/ref/font.html) is respected by baking opening text before starting the worker. The game-owned opening works on Mac, where PyInstaller's [built-in splash is unsupported](https://pyinstaller.org/en/stable/usage.html#splash-screen-experimental).
+
+## Remaining scope
+
+This completes the requested opening/facility refinement, not V1/P08. Shared P03-P08 remain open. Locker/door/glass/canister lifecycles, remaining AI/NEXUS, profiles/scoring, public release and physical Windows interactive/audio QA retain their existing gates. Native macOS and hosted dummy-video checks have different scopes and are labeled accordingly.

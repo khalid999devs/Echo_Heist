@@ -1,0 +1,176 @@
+{
+  "video_driver": "cocoa",
+  "screens": 56,
+  "outcomes": {
+    "upper": {
+      "outcome": "WIN",
+      "ticks": 1488
+    },
+    "lower": {
+      "outcome": "WIN",
+      "ticks": 1566
+    }
+  },
+  "capture_ticks": 758,
+  "guard_states": [
+    "CHASE",
+    "INVESTIGATE",
+    "PATROL",
+    "RETURN",
+    "SEARCH",
+    "SPOTTED"
+  ],
+  "rooms_seen": [
+    "Containment Systems",
+    "Core Chamber",
+    "Entry / Extraction",
+    "Equipment Stores",
+    "Power & Ventilation",
+    "Sample Archive",
+    "Security Checkpoint",
+    "Service Servers"
+  ],
+  "stair_views": [
+    [
+      "down",
+      0
+    ],
+    [
+      "down",
+      1
+    ],
+    [
+      "down",
+      2
+    ],
+    [
+      "up",
+      0
+    ],
+    [
+      "up",
+      1
+    ],
+    [
+      "up",
+      2
+    ]
+  ],
+  "alarm_frames": 1537,
+  "entrance_keeps_unseen_simulation_frozen": true,
+  "exit_airlock_requires_actual_win": true,
+  "tracks": [
+    "pulse",
+    "sector",
+    "title",
+    "transmission",
+    "urgent"
+  ],
+  "frames": 3800,
+  "frames_over_50ms": [
+    {
+      "scene": "TITLE",
+      "frame": 1,
+      "audio_ms": 89.06,
+      "draw_ms": 9.66,
+      "present_ms": 1.69
+    },
+    {
+      "scene": "HEIST",
+      "frame": 226,
+      "audio_ms": 202.45,
+      "draw_ms": 2.22,
+      "present_ms": 0.76
+    },
+    {
+      "scene": "HEIST",
+      "frame": 389,
+      "audio_ms": 202.41,
+      "draw_ms": 1.85,
+      "present_ms": 0.77
+    },
+    {
+      "scene": "HEIST",
+      "frame": 741,
+      "audio_ms": 303.46,
+      "draw_ms": 3.26,
+      "present_ms": 0.74
+    },
+    {
+      "scene": "RESULTS",
+      "frame": 1499,
+      "audio_ms": 303.52,
+      "draw_ms": 1.56,
+      "present_ms": 0.76
+    },
+    {
+      "scene": "HEIST",
+      "frame": 1515,
+      "audio_ms": 303.45,
+      "draw_ms": 2.02,
+      "present_ms": 0.72
+    },
+    {
+      "scene": "HEIST",
+      "frame": 1708,
+      "audio_ms": 202.43,
+      "draw_ms": 2.26,
+      "present_ms": 0.77
+    },
+    {
+      "scene": "HEIST",
+      "frame": 1894,
+      "audio_ms": 303.45,
+      "draw_ms": 3.19,
+      "present_ms": 0.83
+    },
+    {
+      "scene": "HEIST",
+      "frame": 2267,
+      "audio_ms": 303.44,
+      "draw_ms": 3.16,
+      "present_ms": 0.72
+    },
+    {
+      "scene": "RESULTS",
+      "frame": 3046,
+      "audio_ms": 302.95,
+      "draw_ms": 1.66,
+      "present_ms": 0.76
+    },
+    {
+      "scene": "HEIST",
+      "frame": 3062,
+      "audio_ms": 303.47,
+      "draw_ms": 2.02,
+      "present_ms": 0.75
+    },
+    {
+      "scene": "HEIST",
+      "frame": 3255,
+      "audio_ms": 202.6,
+      "draw_ms": 3.04,
+      "present_ms": 0.97
+    },
+    {
+      "scene": "HEIST",
+      "frame": 3413,
+      "audio_ms": 202.44,
+      "draw_ms": 1.81,
+      "present_ms": 0.75
+    },
+    {
+      "scene": "HEIST",
+      "frame": 3756,
+      "audio_ms": 304.75,
+      "draw_ms": 8.63,
+      "present_ms": 1.58
+    }
+  ],
+  "render_audio_display_ms": {
+    "median": 2.93,
+    "p95": 3.9,
+    "max": 314.97
+  },
+  "scope": "Accelerated native source input sweep; frame timings exclude simulation. AI scenes are designs; actual Human outcomes only."
+}

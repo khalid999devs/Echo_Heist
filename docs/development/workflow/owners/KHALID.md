@@ -1,5 +1,7 @@
 # Khalid's agent guide
 
+Latest requested refinement: [cinematic/fixture consumer handoff](../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [review/evidence](../../quality/reports/cinematic_startup/REVIEW.md). Retrieve fingerprint-7, explicit physical bounds, startup/airlock lifecycle and audio contracts. This supersedes the preceding fingerprint-6 consumer baseline; shared phase ownership is unchanged.
+
 Latest user-directed handoff: [grounded materials and crouch](../../tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md), with [actual evidence](../../quality/reports/material_cohesion/REVIEW.md). Retrieve posture/under-desk clearance, fingerprint-6 and UI-feedback contracts. This explicitly requested early P05 subset does not close the shared phase gates; resume remaining P03 from this baseline.
 
 Identity: Khalid, the project owner in this conversation. Focus: software architecture, system design, core/AI strategy and logic, with real input/diagnostics/result presentation work. Estimated workload: 80 of 160 points. P01 is entirely yours.

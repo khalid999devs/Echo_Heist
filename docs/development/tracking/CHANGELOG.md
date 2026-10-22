@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-10-22 - P03 defender logic (Suhita, SR1/SR2/SR3)
+
+- Every authored guard post now runs through a validated typed registry: two BFS/FSM/fuzzy Sentinels, the Research Tracker with heuristic A* and last-seen search, and the Core post as a sensing-only POST until its P04 Interceptor controller exists. The temporary nearest-Sentinel selection is gone.
+- Guard goals record evidence provenance with original ticks; radio SIGHTING reports become Tracker leads without refreshing age or confirming identity; Sentinel cue investigation now expires. Concealed under-desk intruders are invisible unless a guard witnessed the entry and inspects that cover; capture requires legitimate current sight.
+- Added a geometry-revision adapter for later doors/glass, deterministic replay headers/logs with tick-by-tick verification, a headless evidence script and 40 focused tests. Fingerprint schema is now 8.
+- Windows 11 / i5-1235U: full checks pass except the pre-existing 30 s desktop smoke timeout (35–46 s resource loading on this laptop, failing identically on main). All three default-security routes win with tools, careless routes are captured, every replay matches, and Windows/Linux hashes are identical. [Handoff](handoffs/suhita/day_02/P03.md), [evidence](../quality/reports/phase03/windows/VERIFICATION.md). Shared P03 remains open for Khalid's KR1/KR2 and the combined gate; scoring unchanged.
+
 ## 2026-10-22 - Blue story opening and polished academic deck
 
 - Revised the proposal to 17 slides: original blue cinematic opening and a story-to-coursework explanation first, followed by the formal model, fair architecture and three core algorithm/behavior slides. Kept the main academic backgrounds white with blue/cyan typography, character panels and editable diagrams/tables.

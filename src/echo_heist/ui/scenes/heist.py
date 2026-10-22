@@ -10,11 +10,11 @@ import pygame
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.results import MissionEnd
-from echo_heist.core.contracts.security.model import GuardPatrol, SecuritySpec
-from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, ActorKind
+from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE
 from echo_heist.core.simulation.engine import Simulation
 from echo_heist.infrastructure.resources import load_sensor_rules
 from echo_heist.level.model import LevelData
+from echo_heist.level.security import build_security_registry
 from echo_heist.ui.input.human import HumanInput, UiCommand
 from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
@@ -69,27 +69,10 @@ class HeistSession:
         furnishings: tuple[FurnitureVisual, ...] | None = None,
     ) -> None:
         self.level, self.seed, self.fonts, self.rules = level, seed, fonts, rules
-        candidates = tuple(post for post in level.guards if post.kind == ActorKind.SENTINEL)
-        patrols: tuple[GuardPatrol, ...] = ()
-        if candidates and security_enabled:
-            # First milestone: activate the Sentinel nearest Entry using the
-            # already-validated P02 patrol data. The shared P03 registry remains separate.
-            post = min(
-                candidates,
-                key=lambda value: (
-                    abs(value.tile[0] - level.spawn_tile[0])
-                    + abs(value.tile[1] - level.spawn_tile[1]),
-                    value.guard_id,
-                ),
-            )
-            route = next(route for route in level.routes if route.route_id == post.route_id)
-            points = route.points[:-1] if route.points[0] == route.points[-1] else route.points
-            patrols = (GuardPatrol(post.guard_id, points),)
-        security = (
-            SecuritySpec(patrols, load_sensor_rules(), level.sound_blocking_tiles)
-            if patrols
-            else None
-        )
+        # P03 registry: every authored post gets its validated role (Sentinel BFS,
+        # Tracker A*, sensing-only post until P04). False remains a diagnostic fixture.
+        self.registry = build_security_registry(level, rules) if security_enabled else None
+        security = self.registry.spec(load_sensor_rules()) if self.registry else None
         self.simulation = Simulation(
             level.static_map,
             level.spawns(),
@@ -452,20 +435,13 @@ class HeistSession:
         panel(canvas, pygame.Rect(20, 158, 410, 200), border=theme.ACCENT_DIM)
         lines = ["AI LAB  /  F3 to close"]
         for guard in snapshot.guards:
-            age = (
-                "none"
-                if guard.last_seen_tick < 0
-                else f"{snapshot.tick - guard.last_seen_tick} ticks ago"
-            )
-            lines.extend(
-                (
-                    f"Sentinel  /  {guard.state.value}",
-                    f"BFS  {guard.expanded_nodes} expanded / {len(guard.path)} path tiles",
-                    f"Identification  {guard.identification_ticks}/"
-                    f"{guard.identification_required_ticks}",
-                    f"Last visual contact: {age}",
-                    f"Fuzzy urgency  {guard.fuzzy_urgency:.2f}",
-                )
+            age = "none" if guard.last_seen_tick < 0 else f"{snapshot.tick - guard.last_seen_tick}t"
+            # Compact single line per registry guard; KR1 owns richer diagnostics.
+            lines.append(
+                f"{guard.actor_id.removeprefix('guard-')} {guard.state.value} "
+                f"{guard.algorithm} {guard.expanded_nodes}n c{guard.path_cost} "
+                f"ID {guard.identification_ticks}/{guard.identification_required_ticks} "
+                f"fz {guard.fuzzy_urgency:.2f} seen {age}"
             )
         if not snapshot.guards:
             lines.append("No active controller in this diagnostic fixture.")

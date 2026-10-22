@@ -1,4 +1,6 @@
-"""Physical contact wind-ups; full guard sensing/decisions are P03 work."""
+"""Physical capture wind-ups gated by legitimate sight; tools resolve first."""
+
+from collections.abc import Mapping
 
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind
@@ -15,8 +17,14 @@ def update_captures(
     rules: GameRules,
     mission: MissionSpec | None,
     emit: Emit,
-    eligible_guards: frozenset[str] | None = None,
+    allowed_targets: Mapping[str, frozenset[str]] | None = None,
 ) -> None:
+    """Start, cancel or complete grabs.
+
+    Registry guards may grab only targets listed for them (actual current sight).
+    Guards outside the registry keep P02 contact capture, but nobody can grab an
+    intruder concealed in authored cover without legitimately seeing it.
+    """
     for guard in world.actors.values():
         if guard.kind not in GUARD_KINDS:
             continue
@@ -26,11 +34,21 @@ def update_captures(
                 for actor in world.actors.values()
                 if actor.kind in (ActorKind.OPERATIVE, ActorKind.COMPANION)
                 and (mission is None or actor.actor_id == mission.operative_id)
+                and (
+                    actor.actor_id in allowed_targets[guard.actor_id]
+                    if allowed_targets is not None and guard.actor_id in allowed_targets
+                    else not (actor.crouched and actor.tile in world_map.crouch_tiles)
+                )
                 and distance_squared(guard.position, actor.position) <= rules.capture_range_units**2
-                and clear_reach(world_map, guard.position, actor.position)
+                and clear_reach(
+                    world_map,
+                    guard.position,
+                    actor.position,
+                    # A revealed actor sits inside its cover's solid clearance.
+                    allow_solid_end=actor.crouched and actor.tile in world_map.crouch_tiles,
+                )
             ]
             if not guard.incapacitated(world.tick)
-            and (eligible_guards is None or guard.actor_id in eligible_guards)
             else []
         )
         targets.sort(

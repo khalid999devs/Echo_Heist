@@ -1,6 +1,6 @@
 # P03 - Fair perception, navigation and active defenders
 
-Day 2, first block. Integrator: **Suhita**. Remaining effort: Khalid 5, Suhita 12. Status: IN_PROGRESS (first Khalid Sentinel/perception subset; shared gate open). Prerequisite: P02. Feature anchors: EH-009, EH-010, EH-013, EH-014, EH-021. Source: PDF pp. 6-11, 16-18.
+Day 2, first block. Integrator: **Suhita**. Remaining effort: Khalid 5, Suhita 12. Status: IN_PROGRESS. Suhita's SR1/SR2/SR3 are DONE on `work/suhita-p03` ([handoff](../../../tracking/handoffs/suhita/day_02/P03.md)); KR1/KR2 and the shared gate remain open. Prerequisite: P02. Feature anchors: EH-009, EH-010, EH-013, EH-014, EH-021. Source: PDF pp. 6-11, 16-18.
 
 Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.
 

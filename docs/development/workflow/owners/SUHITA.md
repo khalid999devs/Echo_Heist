@@ -2,7 +2,7 @@
 
 Identity: **Suhita**, Windows x64. Khalid explicitly reassigned the remaining work on **2026-10-22**: you lead most gameplay logic; he leads complex visual graphics, scenes and presentation. This supersedes your original scene-heavy queue and his original exclusive core ownership. Read the [remaining workload and transfer map](../../planning/WORKLOAD.md). Remaining estimates are 60 points for you / 48 for Khalid, accounting provisionally for his completed foundation and large refinement pass; actual effort is reviewed at every gate.
 
-P01 belonged entirely to Khalid and is complete. Your original P02 map/loader/scene contribution is accepted and preserved. **Do not redo P02 or resume its deleted branch. P03-SR1/SR2/SR3 are next.** Use the [current Windows setup](../setup/WINDOWS_SUHITA.md) and start a fresh `work/suhita-p03` from current main, or safely resume that branch after inspecting its changes.
+P01 belonged entirely to Khalid and is complete. Your original P02 map/loader/scene contribution is accepted and preserved. **Do not redo P02 or resume its deleted branch.** P03-SR1/SR2/SR3 are DONE on `work/suhita-p03` ([handoff](../../tracking/handoffs/suhita/day_02/P03.md)); next is the combined P03 gate after Khalid's KR1/KR2, then P04. Use the [current Windows setup](../setup/WINDOWS_SUHITA.md) and start a fresh `work/suhita-p03` from current main, or safely resume that branch after inspecting its changes.
 
 ## Retrieve the baseline before editing
 

@@ -12,13 +12,13 @@ The latest integrated baseline is `ec8ca48` on main; runtime code is `600698a`, 
 | Human heist / P02 | Movement/collision, core theft, mandatory lockdown, original extraction, fair interruptible capture, pause/retry and basic Echo/EMP/melee | [Combined P02](handoffs/khalid/day_01/P02_INTEGRATION.md); Suhita's map/loader contribution and Khalid's core/refinement preserved |
 | Facility | Five zones, two decks, 14 rooms, two branch routes/cross-link/stairs, 101 furnishings, accurate fixture bodies and three under-desk clearances | Current fingerprint 7; conservative route tiles differ from physical obstacle bounds |
 | Character / movement | Close camera, walk/run/crouch animation, grounded shadow, C crouch/creep, timed 3-second sprint / 4-second recharge, quiet walking / louder sprint | Existing implementation reused; no separate sitting action |
-| First P03 subset | One live Sentinel with filtered sight/hearing, BFS/FSM/fuzzy, legitimate reports, chase/search/return and capture integration | Other three guard posts retain P02 contact behavior; no complete Tracker/Interceptor/NEXUS yet |
+| P03 logic (Suhita SR1/SR2/SR3) | Validated registry runs two BFS/FSM/fuzzy Sentinels, the A* Tracker with last-seen search and radio leads, and a sensing-only Core post; evidence provenance/expiry, witnessed vs unseen hiding, sight-gated capture, geometry revisions and exact replay | [Handoff on `work/suhita-p03`](handoffs/suhita/day_02/P03.md), [Windows evidence](../quality/reports/phase03/windows/VERIFICATION.md); not merged to main; Interceptor minimax/NEXUS are P04; KR1/KR2 visuals pending |
 | Presentation | Cinematic loading/title, desktop icon, entry/extraction pressure doors, responsive menus/HUD/settings, map, timed stairs, distinct win/capture/abort endings | Airlock animation does not implement P05 physical doors |
 | Scene detail / audio | Material/lighting variety, contextual laboratory props/aftermath, reduced flashing, event SFX, ambient/context music, nonblocking fades and single hover cues | 29 recordings with provenance; actual simulation events drive gameplay feedback |
 | Later scene designs | Workshop, Companion, Guide/Lab and epilogue designs/navigation | Existing previews must be connected to real logic before their phase gates pass |
 | Verification | 149 tests/full checks; 56 scene states, both default-security route wins/capture, 780 motion frames, startup variants | [Actual review](../quality/reports/cinematic_startup/REVIEW.md); no new runtime tests implied by this doc revision |
 | Performance | Native measured p95 16.889 ms, 3,000 measured frames, no sustained growth in 12-restart audit | Scoped to this baseline/hardware, not proof for future full AI or every machine |
-| Builds | Matching Mac arm64 / Windows x64 archives; Mac app and fresh ZIP each pass nine native Cocoa checks with audio | Windows native CI build + frozen dummy-video smoke pass; **physical Windows gameplay/audio NOT_RUN** |
+| Builds | Matching Mac arm64 / Windows x64 archives; Mac app and fresh ZIP each pass nine native Cocoa checks with audio | Windows native CI build + frozen dummy-video smoke pass. Physical Windows **source** gameplay/audio session run 2026-10-22 on Suhita's laptop (menus, heist, capture, retry, audio ready); packaged Windows gameplay still NOT_RUN |
 
 ## Phase checkpoints and remaining work
 
@@ -26,7 +26,7 @@ The latest integrated baseline is `ec8ca48` on main; runtime code is `600698a`, 
 | --- | --- | --- | --- |
 | P01 — Foundation | DONE | None | Khalid, complete |
 | P02 — Human heist | DONE | None; maintain regressions as later systems integrate | Complete combined review |
-| P03 — Perception/defenders | IN_PROGRESS | Tracker A*, full registry/geometry revisions, remaining fair sensing/hiding/capture integration, real guard diagnostics and replay evidence | Suhita; Khalid visual acceptance |
+| P03 — Perception/defenders | IN_PROGRESS | Suhita SR1/SR2/SR3 DONE on her branch; Khalid KR1/KR2 cue/diagnostic/geometry review and the combined gate remain | Suhita; Khalid visual acceptance |
 | P04 — Autonomous strategy | TODO | Companion FSM/utility/A*/real MCTS, Interceptor/minimax/alpha-beta, NEXUS dispatch/protocol persistence/reset and first-launch AI mode | Suhita; Khalid visual acceptance |
 | P05 — Tools/environment | IN_PROGRESS, early subset only | Finish shared Echo/EMP/melee edge cases; functional doors/glass/canisters/locker hiding and their scene/audio integration | Suhita; Khalid visual acceptance |
 | P06 — Workshop/full flow | TODO | Editable saved policies/profiles, seed/reset/retry semantics, approved scoring/encounters, history, full settings/accessibility and all screens connected | Khalid; Suhita behavior acceptance |
@@ -39,9 +39,9 @@ Required functionality remains R01-R27 in [scope](../planning/V1_SCOPE.md); no m
 
 The owner changed the split on 2026-10-22. **Khalid owns complex graphics/scenes/presentation and desktop delivery; Suhita owns most gameplay/AI/persistence logic.** See [Workload](../planning/WORKLOAD.md), including revised KR/SR IDs, file seams, historical-credit preservation and 48/60 remaining estimates. The old whole-project 80/80 estimate is not a measured effort record.
 
-- **Suhita next:** P03-SR1/SR2/SR3 on `work/suhita-p03`; finish the P03 logic from current main, verify on Windows and hand off real APIs/events. [Owner guide](../workflow/owners/SUHITA.md), [Windows commands and pasteable prompt](../workflow/setup/WINDOWS_SUHITA.md).
-- **Khalid next:** P03-KR1/KR2; guard cues, genuine diagnostics and scene/geometry integration. [Owner guide](../workflow/owners/KHALID.md).
-- No new runtime slice is claimed by this planning update. Check [claims/handoffs](HANDOFFS.md) before editing. P03 closes only after both queues and the combined gate pass; P04 then becomes ready.
+- **Suhita:** P03-SR1/SR2/SR3 DONE on `work/suhita-p03` with Windows evidence ([handoff](handoffs/suhita/day_02/P03.md)). Next action is the combined P03 gate after Khalid's KR1/KR2; do not start P04 before it passes.
+- **Khalid next:** P03-KR1/KR2 on top of `work/suhita-p03`: guard cues, genuine diagnostics from the appended `GuardView`/events, and both-deck geometry review. [Owner guide](../workflow/owners/KHALID.md).
+- Check [claims/handoffs](HANDOFFS.md) before editing. P03 closes only after both queues and the combined gate pass; P04 then becomes ready.
 
 The original four-development-day / eight-phase target remains, with actual progress reported honestly: implementation began 2026-10-18 and P03 is still open on 2026-10-22 after requested visual refinements. Day labels are the original sequence, not proof the target was met or a fresh four-day promise. Available hours/deadline, physical Windows QA, broader Mac/download testing and source licensing remain open inputs in [Risks](RISKS_AND_DECISIONS.md).
 

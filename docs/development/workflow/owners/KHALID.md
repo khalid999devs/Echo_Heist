@@ -18,7 +18,7 @@ The existing game already has cinematic title/loading/airlocks, room art and mat
 | --- | --- | --- | --- |
 | P01/P02 | Complete; no new claim | Foundation/core/integrated Human scene retained | Complete |
 | [P03](../../planning/phases/intelligence/PHASE_03.md) | DONE | Real guard feedback/diagnostics and both-deck combined gate | User-directed integration complete |
-| [P04](../../planning/phases/intelligence/PHASE_04.md) | P04-KR1 4; KR2 3 | Companion/Lab decision presentation, follow camera, NEXUS/deploy/protocol UI | Suhita |
+| [P04](../../planning/phases/intelligence/PHASE_04.md) | P04-KR1 4; KR2 3 | Implemented on work/khalid-p04; actual Companion/Lab/protocol visual acceptance awaits SR runtime | Suhita |
 | [P05](../../planning/phases/experience/PHASE_05.md) | P05-KR1 3; KR2 6 | Tool HUD/input, physical interaction animation, props/VFX/SFX and provenance | Suhita |
 | [P06](../../planning/phases/experience/PHASE_06.md) | P06-KR1 3; KR2 4; KR3 2 | Actual score/results, Workshop/full scene flow, settings/accessibility presentation | You |
 | [P07](../../planning/phases/delivery/PHASE_07.md) | P07-KR1 5; KR2 4 | Whole-game usability/accessibility and diagnostic clarity; render/audio/memory profiling | You |
@@ -26,7 +26,7 @@ The existing game already has cinematic title/loading/airlocks, room art and mat
 
 ## Start next
 
-Next queue: **P04-KR1/KR2** on a new `work/khalid-p04` from synchronized main. Read Suhita's P04 claims and agree immutable Companion/NEXUS decision/alert interfaces before shared edits. Reuse the completed P03 teaching view and existing scenes; connect real new logic. Do not implement her AI or count previews as finished behavior. Stop at the user-requested slice boundary.
+Current queue: **P04-KR1/KR2** presentation is implemented and independently verified on `work/khalid-p04`; read its [runnable handoff](../../tracking/handoffs/khalid/day_02/phase04/P04.md) and [typed runtime port](../../architecture/integration/autonomy/PRESENTATION.md). No SR backend was published at the 2026-10-25 handoff. Next action is visual acceptance against Suhita's actual runtime after she connects it. Do not rebuild the screens, implement her AI, close P04 on synthetic data or advance to P05 before the shared gate. The `heist.py`/`flow.py` implementation claim is released for her narrow adapter/composition connection; preserve the new graphics and input contracts.
 
 You own complex drawing/layout under `ui/render/`, visual scene files, startup/audio presentation and assets. Suhita may make narrow functional controller/deployment/result wiring in `ui/scenes/heist.py` / `flow.py`; designate one writer before either edits those shared files. Preserve her core/AI/persistence changes. You retain real nonvisual work in geometry/art calibration, display/input/resource integration, performance and build engineering.
 

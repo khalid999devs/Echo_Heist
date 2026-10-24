@@ -1,6 +1,8 @@
 # P04 - Autonomous Companion, Interceptor and NEXUS
 
-Day 2, second block. Integrator: **Suhita**. Remaining effort: Khalid 7, Suhita 18. Status: TODO. Prerequisite: P03; tool-action legality from P02. Feature anchors: EH-015, EH-016, EH-017, EH-018, EH-022. Source: PDF pp. 10-14, 16-18.
+Day 2, second block. Integrator: **Suhita**. Original remaining estimate: Khalid 7, Suhita 18. Status: IN_PROGRESS. Prerequisite: P03; tool-action legality from P02. Feature anchors: EH-015, EH-016, EH-017, EH-018, EH-022. Source: PDF pp. 10-14, 16-18.
+
+2026-10-25: Khalid's KR1/KR2 presentation and typed runtime port are implemented/independently verified on `work/khalid-p04`; [handoff](../../../tracking/handoffs/khalid/day_02/phase04/P04.md). Main remains the P03 baseline. No SR runtime was published at this checkpoint, so KR live-data acceptance and the combined phase gate remain open. Preserve the port/screens when connecting SR1/SR2/SR3; synthetic layout QA proves no autonomous algorithm.
 
 Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.
 

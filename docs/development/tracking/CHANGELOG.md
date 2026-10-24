@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-10-25 - P04 presentation and runtime handoff
+
+- Implemented Khalid's independent KR1/KR2 presentation on `work/khalid-p04`: immutable gateway/telemetry contracts, active-actor camera/robot stairs, spectator input, measured-data F2 tabs, confirmed protocol reset, policy/deploy and review/retry flow, plus explicit once-per-announcement audio. No gameplay/scoring/map/asset changes; Human fingerprint 9 and all five route replay hashes remain unchanged.
+- Full checks/207 tests, native Human both-route wins/capture/hiding, 34 separately labeled synthetic UI states, native Mac app/fresh ZIP 9/9 with audio and all three hosted jobs PASS at runtime `77bcf00`. [Verification](../quality/reports/phase04/khalid/VERIFICATION.md), [runnable handoff](handoffs/khalid/day_02/phase04/P04.md), [draft PR #2](https://github.com/khalid999devs/Echo_Heist/pull/2).
+- Main remains P03. Suhita's SR1/SR2/SR3 backend was not published; its real gateway, algorithms/persistence and connected KR visual acceptance remain required. P04 is IN_PROGRESS, not complete. Shared implementation claims are released for her narrow connection; no P05 work or teammate message.
+
 ## 2026-10-24 - Complete P03 visual integration and combined acceptance
 
 - Connected distinct guard-state/cone/cue feedback, real capture countdown/progress and a selectable live F3 teaching view. Original cue positions, path revisions and stored actual fuzzy inputs/memberships/weights/outputs are immutable telemetry; fingerprint is now 9. Rendering never runs AI or updates evidence.

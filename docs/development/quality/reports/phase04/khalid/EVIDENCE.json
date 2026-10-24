@@ -1,0 +1,460 @@
+{
+  "date": "2026-10-25",
+  "owner": "Khalid",
+  "phase": "P04-KR1/KR2",
+  "status": "Independent presentation implemented and verified; live SR runtime acceptance pending",
+  "branch": "work/khalid-p04",
+  "base_main": "65df8b50d6647c416d25f28cb74893f0fb773358",
+  "contracts_commit": "926d085d13275e4a57e9968fbbf52540cb932095",
+  "runtime_commit": "77bcf00d42e824f7b1645033a1b09495a03bc311",
+  "draft_pr": "https://github.com/khalid999devs/Echo_Heist/pull/2",
+  "fingerprint_schema": 9,
+  "gameplay_rules_map_scoring_unchanged": true,
+  "checks": {
+    "structure": "PASS",
+    "ruff": "PASS",
+    "format_files": 269,
+    "mypy_source_files": 129,
+    "pytest_passed": 207,
+    "pytest_seconds": 26.66
+  },
+  "ci": {
+    "run_id": 40139741234,
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/40139741234",
+    "commit": "77bcf00d42e824f7b1645033a1b09495a03bc311",
+    "jobs": {
+      "headless-checks": "success",
+      "windows-x64": "success",
+      "macos-arm64": "success"
+    },
+    "scope": "Linux source/headless checks; Windows x64 and macOS arm64 source checks, primary package build and frozen dummy-video smoke. Not physical Windows gameplay/audio."
+  },
+  "human_replay_same_as_p03": [
+    {
+      "name": "upper-tools",
+      "outcome": "WIN",
+      "ticks": 1514,
+      "event_chain_hash": "e26af4a1c097494b1f3ed984eb8861902be7d0d994fd841e9e42252d97ee3bc7",
+      "final_fingerprint": "fde84330aed7135a0ab16d2510a6d976ef1e49f5d534d490c7f815c0354e6a92",
+      "replay_matched": true
+    },
+    {
+      "name": "lower-tools",
+      "outcome": "WIN",
+      "ticks": 1581,
+      "event_chain_hash": "fa1aa3f98762972f0fac8186433be63cde5434612ffa7322e5d5fa5f6bc7b512",
+      "final_fingerprint": "a1c74c268c3ab04f78bc6a4171748bea04372a40233355913a12a90a6b6333e1",
+      "replay_matched": true
+    },
+    {
+      "name": "cross-tools",
+      "outcome": "WIN",
+      "ticks": 1603,
+      "event_chain_hash": "5361dd314c85f5407ddef7e81cfe203cbf3e2ff3fccb8f76a7376eb9b32986c7",
+      "final_fingerprint": "27ec817ae615701268c30e39506b29a283513bd43308ffa5e22df68522cf3aa5",
+      "replay_matched": true
+    },
+    {
+      "name": "upper-no-tools",
+      "outcome": "CAPTURED",
+      "ticks": 1174,
+      "event_chain_hash": "17bfabc682c06e25660eaa24e2effa8bdfdc814d56136d63ff0ea9dcd45eb212",
+      "final_fingerprint": "7bc4fe9eab947b84e169ca231d94ed071030aeadb1e38e547c539fe3041d3770",
+      "replay_matched": true
+    },
+    {
+      "name": "lower-no-tools",
+      "outcome": "CAPTURED",
+      "ticks": 349,
+      "event_chain_hash": "6061ff5d4bb2e92adca992edec013e2e63531345b224cc9168712c161a82ce7e",
+      "final_fingerprint": "588bc57315565f22f90b8055f6cfbd75f9f537dd14a394ece68dbfdd4b6ae22b",
+      "replay_matched": true
+    }
+  ],
+  "native_human": {
+    "driver": "cocoa",
+    "outcomes": {
+      "upper": {
+        "outcome": "WIN",
+        "ticks": 1483
+      },
+      "lower": {
+        "outcome": "WIN",
+        "ticks": 1604
+      },
+      "careless": {
+        "outcome": "CAPTURED",
+        "ticks": 694
+      }
+    },
+    "decks": [
+      "ground",
+      "upper"
+    ],
+    "states": [
+      "guard-core/PATROL",
+      "guard-research/CHASE",
+      "guard-research/INVESTIGATE",
+      "guard-research/PATROL",
+      "guard-research/RETURN",
+      "guard-research/SEARCH",
+      "guard-research/SPOTTED",
+      "guard-security/INVESTIGATE",
+      "guard-security/PATROL",
+      "guard-security/RETURN",
+      "guard-security/SEARCH",
+      "guard-security/SPOTTED",
+      "guard-service/CHASE",
+      "guard-service/INVESTIGATE",
+      "guard-service/PATROL",
+      "guard-service/RETURN",
+      "guard-service/SEARCH",
+      "guard-service/SPOTTED"
+    ],
+    "traces": {
+      "fuzzy/actual-emp": {
+        "evaluated_tick": 472,
+        "cue_tick": 472,
+        "cue_tile": [
+          22,
+          20
+        ],
+        "distance_tiles": 3,
+        "salience": 1.0,
+        "visibility": 0.0,
+        "memberships": [
+          [
+            "near",
+            0.25
+          ],
+          [
+            "far",
+            0.0
+          ],
+          [
+            "loud",
+            1.0
+          ],
+          [
+            "notable",
+            0.0
+          ],
+          [
+            "partial",
+            0.0
+          ],
+          [
+            "quiet",
+            0.0
+          ]
+        ],
+        "activations": [
+          0.25,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "outputs": [
+          0.95,
+          0.8,
+          0.45,
+          0.1,
+          0.6
+        ],
+        "urgency": 0.95
+      }
+    },
+    "capture_frames": {
+      "guard-service": 13,
+      "guard-research": 1
+    },
+    "screens": [
+      "capture/result",
+      "capture/wind-up",
+      "fuzzy/actual-emp",
+      "guards/guard-core-patrol",
+      "guards/guard-core-patrol-lab",
+      "guards/guard-research-chase",
+      "guards/guard-research-chase-lab",
+      "guards/guard-research-search",
+      "guards/guard-research-search-lab",
+      "guards/guard-research-spotted",
+      "guards/guard-research-spotted-lab",
+      "guards/guard-security-investigate",
+      "guards/guard-security-investigate-lab",
+      "guards/guard-security-patrol",
+      "guards/guard-security-patrol-lab",
+      "guards/guard-security-spotted",
+      "guards/guard-security-spotted-lab",
+      "guards/guard-service-chase",
+      "guards/guard-service-chase-lab",
+      "guards/guard-service-patrol",
+      "guards/guard-service-patrol-lab",
+      "guards/guard-service-spotted",
+      "guards/guard-service-spotted-lab",
+      "hiding/unseen-under-desk",
+      "layouts/1366x768-guard-1",
+      "layouts/1366x768-guard-2",
+      "layouts/1366x768-guard-3",
+      "layouts/1366x768-guard-4",
+      "layouts/1440x820-guard-1",
+      "layouts/1440x820-guard-2",
+      "layouts/1440x820-guard-3",
+      "layouts/1440x820-guard-4",
+      "layouts/1470x923-guard-1",
+      "layouts/1470x923-guard-2",
+      "layouts/1470x923-guard-3",
+      "layouts/1470x923-guard-4",
+      "routes/lower-lockdown",
+      "routes/lower-win",
+      "routes/upper-lockdown",
+      "routes/upper-win"
+    ],
+    "layouts": [
+      {
+        "actual": [
+          1366,
+          768
+        ],
+        "logical": [
+          1281,
+          720
+        ],
+        "fullscreen": false,
+        "guard_clicks": 4
+      },
+      {
+        "actual": [
+          1440,
+          820
+        ],
+        "logical": [
+          1280,
+          729
+        ],
+        "fullscreen": false,
+        "guard_clicks": 4
+      },
+      {
+        "actual": [
+          1470,
+          923
+        ],
+        "logical": [
+          1280,
+          804
+        ],
+        "fullscreen": true,
+        "guard_clicks": 4
+      }
+    ],
+    "unseen_hiding": "PASS",
+    "diagnostics_read_only": "PASS",
+    "frames": 4010,
+    "render_audio_present_ms": {
+      "median": 4.84,
+      "p95": 16.28,
+      "max": 115.48
+    },
+    "scope": "Accelerated native Human input, default four-guard security. Timing excludes simulation; room cameras are diagnostic only."
+  },
+  "synthetic_presentation_qa": {
+    "scope": "Presentation QA only. Synthetic search/protocol data; scripted inputs use real Simulation. NOT autonomous algorithm proof.",
+    "video_driver": "cocoa",
+    "audio_ready": true,
+    "screens": [
+      "shipped/unavailable-workshop",
+      "shipped/unavailable-reason",
+      "shipped/facility-floor-1",
+      "shipped/facility-floor-2",
+      "fixture/policy-0",
+      "fixture/policy-1",
+      "fixture/policy-2",
+      "fixture/custom-policy",
+      "fixture/reset-confirmation",
+      "fixture/reset-failure",
+      "fixture/reset-complete",
+      "fixture/entry",
+      "fixture/initial-live-view",
+      "fixture/live-tab-0",
+      "fixture/live-tab-1",
+      "fixture/live-tab-2",
+      "fixture/pause",
+      "fixture/settings",
+      "fixture/map",
+      "fixture/deck-ground",
+      "fixture/phase-infiltrate",
+      "fixture/stairs-up",
+      "fixture/deck-upper",
+      "fixture/phase-lockdown",
+      "fixture/stairs-down",
+      "fixture/phase-won",
+      "fixture/scripted-result-not-ai-proof",
+      "fixture/review-retry",
+      "layouts/1366x768-workshop",
+      "layouts/1366x768-live",
+      "layouts/1440x820-workshop",
+      "layouts/1440x820-live",
+      "layouts/1470x923-workshop",
+      "layouts/1470x923-live"
+    ],
+    "layouts": [
+      {
+        "actual": [
+          1366,
+          768
+        ],
+        "logical": [
+          1281,
+          720
+        ],
+        "fullscreen": false
+      },
+      {
+        "actual": [
+          1440,
+          820
+        ],
+        "logical": [
+          1280,
+          729
+        ],
+        "fullscreen": false
+      },
+      {
+        "actual": [
+          1470,
+          923
+        ],
+        "logical": [
+          1280,
+          804
+        ],
+        "fullscreen": true
+      }
+    ],
+    "frames": 405,
+    "decks": [
+      "ground",
+      "upper"
+    ],
+    "stair_directions": [
+      "down",
+      "up"
+    ],
+    "phases": [
+      "INFILTRATE",
+      "LOCKDOWN",
+      "WON"
+    ],
+    "scripted_simulation_outcome": "WIN",
+    "render_audio_present_ms": {
+      "median": 6.87,
+      "p95": 7.84,
+      "max": 14.91
+    }
+  },
+  "native_package_manifest": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 112218809,
+    "archive_sha256": "59cf47f0a211e2a62a52c2ca0dd386ec5fe0c0a2c019f48d6bec529a937db7c0",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "77bcf00d42e824f7b1645033a1b09495a03bc311",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "native_smoke": {
+    "native-app": {
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "startup_completed": true,
+        "surface_saved": true
+      },
+      "video_driver": "cocoa",
+      "audio": "ready",
+      "startup": {
+        "cancelled": false,
+        "completed": true,
+        "elapsed_ms": 3910.61,
+        "first_logo_paint_ms": 177.92,
+        "frame_gap_ms": {
+          "max": 30.71,
+          "median": 17.16,
+          "p95": 22.74
+        },
+        "frames": 109,
+        "resource_load_ms": 3316.78,
+        "skip_requested": false,
+        "sound_cues": 3
+      }
+    },
+    "native-zip": {
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "startup_completed": true,
+        "surface_saved": true
+      },
+      "video_driver": "cocoa",
+      "audio": "ready",
+      "startup": {
+        "cancelled": false,
+        "completed": true,
+        "elapsed_ms": 2205.23,
+        "first_logo_paint_ms": 144.74,
+        "frame_gap_ms": {
+          "max": 31.35,
+          "median": 17.15,
+          "p95": 22.9
+        },
+        "frames": 116,
+        "resource_load_ms": 1610.96,
+        "skip_requested": false,
+        "sound_cues": 3
+      }
+    }
+  },
+  "raw_log_sha256": {
+    "checks-final.log": "95f0226c91bc79b7caa2ba83c335eb1b0c47026a8835016a55d3b9aa93a12085",
+    "regressions.log": "2fb3d8c9319a3c7989b872ae12e20d2e2572eb7dfb81f25569958afde4b97b49",
+    "human-replay.json": "8d42dcaf150325f4af2163717ff8915005b2c2e5f4037eb6ca1d17521e303f8a",
+    "human-native/GATE.json": "bf1770cf6726c15718236bc7ac7af896ee099869bba834fe465af71abee6d1f5",
+    "final-native/QA.json": "9e4ea3efbb23cb94bcdf014e2cea5169aa815228fdaf9e33314b7c9d50fbc766",
+    "build.log": "90da6c493238b848914e1654471d5e2cd007ad36c0eabee9dd95c4d51f665a5b",
+    "native-app/summary.json": "99fff35594d3676f9308cb14fc6dfdc6afeaaf20e8f68313427694d960b6d81b",
+    "native-zip/summary.json": "0c60bb9628a37b6f5501969c021de5e5cc3a71afdfedad30bdbbc946ed130c29"
+  },
+  "not_run": [
+    "Real SR1/SR2/SR3 autonomous win/capture and connected visual acceptance: no published backend",
+    "Actual MCTS four-stage, belief fairness, minimax/alpha-beta parity, NEXUS coverage/adaptation and persisted reset proof: SR ownership",
+    "Physical Windows desktop/audio/gameplay on this branch",
+    "Optional Linux native archive/playthrough",
+    "P07 whole-game performance and memory acceptance; timings exclude simulation and contain resize/screenshot outliers",
+    "P05-P08 and public release gates"
+  ],
+  "presentation_checkpoint_commit": "b20585fcdda3114a0c7bd982442a79bc604d2332",
+  "human_replay_source_commit": "b20585fcdda3114a0c7bd982442a79bc604d2332",
+  "native_human_source_commit": "b20585fcdda3114a0c7bd982442a79bc604d2332",
+  "final_mode_fix_scope": "Mode-scoped protocol review and two Human gateway/fallback regressions; default Human, Simulation and rendering unchanged.",
+  "synthetic_presentation_qa_source_commit": "77bcf00d42e824f7b1645033a1b09495a03bc311"
+}

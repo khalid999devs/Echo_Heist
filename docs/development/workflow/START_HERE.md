@@ -1,8 +1,10 @@
 # Start or resume developer work
 
-Ownership updated **2026-10-22**: Khalid leads complex graphics/scenes; Suhita leads most gameplay logic. Read the [revised workload](../planning/WORKLOAD.md). **KR/SR** are the active remaining-work slice IDs; original P03-P08 assignments in dated handoffs are historical. P01/P02 are complete, P03 is next, and P05 has only an early crouch subset. P04/P06/P07/P08 remain open. Do not repeat completed work or count preview screens as finished behavior.
+Ownership updated **2026-10-22**: Khalid leads complex graphics/scenes; Suhita leads most gameplay logic. Read the [revised workload](../planning/WORKLOAD.md). **KR/SR** are the active remaining-work slice IDs; original P03-P08 assignments in dated handoffs are historical. P01/P02/P03 are complete, P04 is next and unstarted, and P05 has only an early crouch subset. P04/P06/P07/P08 remain open. Do not repeat completed work or count preview screens as finished behavior.
 
-Latest actual consumer baseline: [cinematic opening, airlocks and physical fixtures](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [actual review](../quality/reports/cinematic_startup/REVIEW.md). Retrieve **fingerprint-7**, precise obstacle bounds versus conservative route tiles, 0.2-tile actor body, two-deck stairs, posture/clearance, full-display pointer mapping, startup thread ownership and explicit audio serials before changing consumers. Earlier fingerprint-3/6 contracts and counts are superseded where noted.
+Latest actual consumer baseline: [P03 handoff](../tracking/handoffs/khalid/day_02/phase03/P03.md), [combined gate](../quality/reports/phase03/integration/VERIFICATION.md), [guard contract](../architecture/integration/defenders/GUARD_CONTRACT.md). Retrieve **fingerprint 9**, original evidence tiles, retained fuzzy traces, geometry revisions and the real Sentinel/Tracker registry. P03 is complete; do not resume its old queues.
+
+Historical physical/desktop baseline: [cinematic opening, airlocks and physical fixtures](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [actual review](../quality/reports/cinematic_startup/REVIEW.md). Retrieve **fingerprint-7**, precise obstacle bounds versus conservative route tiles, 0.2-tile actor body, two-deck stairs, posture/clearance, full-display pointer mapping, startup thread ownership and explicit audio serials before changing consumers. Earlier fingerprint-3/6 contracts and counts are superseded where noted.
 
 This is the operational entry point for either developer's separately invoked agent. The eight-phase/four-development-day functional target remains; [Status](../tracking/STATUS.md) records actual progress rather than a calendar guarantee. The [accepted P02 handoff](../tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) preserves the original contributions.
 
@@ -10,7 +12,7 @@ This is the operational entry point for either developer's separately invoked ag
 
 - If the user/context identifies Khalid, or explicitly points to his guide, use [Khalid's queue](owners/KHALID.md).
 - If the user/context identifies Suhita, or explicitly points to her guide, use [Suhita's queue](owners/SUHITA.md).
-- Suhita's Windows x64 machine uses the [Windows setup/handoff](setup/WINDOWS_SUHITA.md); it includes current clone/bootstrap commands, the P03-SR1/SR2/SR3 boundary and a complete starting prompt.
+- Suhita's Windows x64 machine uses the [Windows setup/handoff](setup/WINDOWS_SUHITA.md); it includes current clone/bootstrap commands, the P04-SR1/SR2/SR3 boundary and a complete starting prompt.
 - Keep that identity for later messages such as "start", "continue" or "finish my part" in the same conversation. Do not ask repeatedly.
 - If no identity is available, read the plan/state without mutations and ask one concise identity question. Do not guess or claim the other developer's slice.
 

@@ -1,0 +1,553 @@
+{
+  "authorization": "User requested KR1/KR2, combined gate and PR #1 merge",
+  "baseline_review_head": "acaa46150a0628eb147565b6962266c319b847eb",
+  "checks": {
+    "format_files": 250,
+    "mypy_source_files": 118,
+    "ruff": "PASS",
+    "structure": "PASS",
+    "test_seconds": 23.41,
+    "tests": 195
+  },
+  "ci": {
+    "conclusion": "success",
+    "jobs": [
+      "headless-checks",
+      "windows-x64",
+      "macos-arm64"
+    ],
+    "pr_run": 40113930755,
+    "push_run": 40113927918,
+    "source_commit": "11cee9b19feb55b863096f41cea5b11eb146d5ef"
+  },
+  "date": "2026-10-24",
+  "fingerprint_schema": 9,
+  "geometry_profiles_unchanged": 106,
+  "geometry_rooms_reviewed": 14,
+  "manifest": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 112187846,
+    "archive_sha256": "a9390f2ba62c4412fe1bc2b15b8b1dcbb554ae4069112fea7da077df671bfea2",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "11cee9b19feb55b863096f41cea5b11eb146d5ef",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "native_gate": {
+    "capture_frames": {
+      "guard-research": 1,
+      "guard-service": 13
+    },
+    "decks": [
+      "ground",
+      "upper"
+    ],
+    "diagnostics_read_only": "PASS",
+    "driver": "cocoa",
+    "frames": 4010,
+    "layouts": [
+      {
+        "actual": [
+          1366,
+          768
+        ],
+        "fullscreen": false,
+        "guard_clicks": 4,
+        "logical": [
+          1281,
+          720
+        ]
+      },
+      {
+        "actual": [
+          1440,
+          820
+        ],
+        "fullscreen": false,
+        "guard_clicks": 4,
+        "logical": [
+          1280,
+          729
+        ]
+      },
+      {
+        "actual": [
+          1470,
+          923
+        ],
+        "fullscreen": true,
+        "guard_clicks": 4,
+        "logical": [
+          1280,
+          804
+        ]
+      }
+    ],
+    "outcomes": {
+      "careless": {
+        "outcome": "CAPTURED",
+        "ticks": 694
+      },
+      "lower": {
+        "outcome": "WIN",
+        "ticks": 1604
+      },
+      "upper": {
+        "outcome": "WIN",
+        "ticks": 1483
+      }
+    },
+    "render_audio_present_ms": {
+      "max": 1187.86,
+      "median": 7.91,
+      "p95": 8.76
+    },
+    "scope": "Accelerated native Human input, default four-guard security. Timing excludes simulation; room cameras are diagnostic only.",
+    "screens": [
+      "capture/result",
+      "capture/wind-up",
+      "fuzzy/actual-emp",
+      "guards/guard-core-patrol",
+      "guards/guard-core-patrol-lab",
+      "guards/guard-research-chase",
+      "guards/guard-research-chase-lab",
+      "guards/guard-research-search",
+      "guards/guard-research-search-lab",
+      "guards/guard-research-spotted",
+      "guards/guard-research-spotted-lab",
+      "guards/guard-security-investigate",
+      "guards/guard-security-investigate-lab",
+      "guards/guard-security-patrol",
+      "guards/guard-security-patrol-lab",
+      "guards/guard-security-spotted",
+      "guards/guard-security-spotted-lab",
+      "guards/guard-service-chase",
+      "guards/guard-service-chase-lab",
+      "guards/guard-service-patrol",
+      "guards/guard-service-patrol-lab",
+      "guards/guard-service-spotted",
+      "guards/guard-service-spotted-lab",
+      "hiding/unseen-under-desk",
+      "layouts/1366x768-guard-1",
+      "layouts/1366x768-guard-2",
+      "layouts/1366x768-guard-3",
+      "layouts/1366x768-guard-4",
+      "layouts/1440x820-guard-1",
+      "layouts/1440x820-guard-2",
+      "layouts/1440x820-guard-3",
+      "layouts/1440x820-guard-4",
+      "layouts/1470x923-guard-1",
+      "layouts/1470x923-guard-2",
+      "layouts/1470x923-guard-3",
+      "layouts/1470x923-guard-4",
+      "routes/lower-lockdown",
+      "routes/lower-win",
+      "routes/upper-lockdown",
+      "routes/upper-win"
+    ],
+    "states": [
+      "guard-core/PATROL",
+      "guard-research/CHASE",
+      "guard-research/INVESTIGATE",
+      "guard-research/PATROL",
+      "guard-research/RETURN",
+      "guard-research/SEARCH",
+      "guard-research/SPOTTED",
+      "guard-security/INVESTIGATE",
+      "guard-security/PATROL",
+      "guard-security/RETURN",
+      "guard-security/SEARCH",
+      "guard-security/SPOTTED",
+      "guard-service/CHASE",
+      "guard-service/INVESTIGATE",
+      "guard-service/PATROL",
+      "guard-service/RETURN",
+      "guard-service/SEARCH",
+      "guard-service/SPOTTED"
+    ],
+    "traces": {
+      "fuzzy/actual-emp": {
+        "activations": [
+          0.25,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "cue_tick": 472,
+        "cue_tile": [
+          22,
+          20
+        ],
+        "distance_tiles": 3,
+        "evaluated_tick": 472,
+        "memberships": [
+          [
+            "near",
+            0.25
+          ],
+          [
+            "far",
+            0.0
+          ],
+          [
+            "loud",
+            1.0
+          ],
+          [
+            "notable",
+            0.0
+          ],
+          [
+            "partial",
+            0.0
+          ],
+          [
+            "quiet",
+            0.0
+          ]
+        ],
+        "outputs": [
+          0.95,
+          0.8,
+          0.45,
+          0.1,
+          0.6
+        ],
+        "salience": 1.0,
+        "urgency": 0.95,
+        "visibility": 0.0
+      }
+    },
+    "unseen_hiding": "PASS"
+  },
+  "native_smoke": {
+    "native-app": {
+      "audio": "ready",
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "startup_completed": true,
+        "surface_saved": true
+      },
+      "passed": true,
+      "scope": "native display smoke",
+      "startup": {
+        "cancelled": false,
+        "completed": true,
+        "elapsed_ms": 2380.32,
+        "first_logo_paint_ms": 556.51,
+        "frame_gap_ms": {
+          "max": 27.73,
+          "median": 17.15,
+          "p95": 22.55
+        },
+        "frames": 115,
+        "resource_load_ms": 1796.14,
+        "skip_requested": false,
+        "sound_cues": 3
+      },
+      "video_driver": "cocoa"
+    },
+    "native-zip": {
+      "audio": "ready",
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "startup_completed": true,
+        "surface_saved": true
+      },
+      "passed": true,
+      "scope": "native display smoke",
+      "startup": {
+        "cancelled": false,
+        "completed": true,
+        "elapsed_ms": 2365.7,
+        "first_logo_paint_ms": 162.53,
+        "frame_gap_ms": {
+          "max": 30.07,
+          "median": 17.37,
+          "p95": 22.48
+        },
+        "frames": 121,
+        "resource_load_ms": 1779.63,
+        "skip_requested": false,
+        "sound_cues": 3
+      },
+      "video_driver": "cocoa"
+    }
+  },
+  "not_run": [
+    "Physical Windows combined-build gameplay/audio retest",
+    "P04 autonomous gameplay",
+    "P05 deferred object lifecycle",
+    "P07 full performance/release gates"
+  ],
+  "owner": "Khalid",
+  "phase": "P03",
+  "raw_log_sha256": {
+    "build.log": "c0ca0fe6c7191201cb1a82add8a99ef292916cb7f7b565bd02f3d0a00b460fa4",
+    "evidence.log": "58c3a63d39c15de5c8ca7957242d717ca65271f949ef20170c1334dc2834c5ff",
+    "final-checks.log": "e550e6315ed75c8ef9e3943dbc96c2a7810a5555d1111576a9fccac780b675f4",
+    "final-native.log": "055ccf6a210a19075d674a2e9ed7f9fd14095e5ba6494d6588a11a8d45d6ac4c",
+    "native-app.log": "4ca2720bda658077baeebd4c9b146da0f89b5bde56f4c274a1d2f6e1fcb9fc69",
+    "native-zip.log": "716a2c77b9260998b8873f0eb84d0c32051db93b588d3cea6a04d66a5ee0c48c",
+    "performance.log": "5fa1afa28c5d2de44bafc1119b386b4c002b2de7de288b6eaddcb48f2b036024"
+  },
+  "restart_profile": {
+    "audio_ready": true,
+    "bounded_in_this_run": true,
+    "cycles": 12,
+    "frame_ms": {
+      "draw": {
+        "max": 28.696,
+        "median": 5.03,
+        "p95": 18.348
+      },
+      "present": {
+        "max": 1137.038,
+        "median": 2.469,
+        "p95": 10.261
+      },
+      "total": {
+        "max": 1152.639,
+        "median": 12.986,
+        "p95": 21.655
+      },
+      "update": {
+        "max": 5.574,
+        "median": 1.591,
+        "p95": 2.479
+      }
+    },
+    "frames": 3600,
+    "last_six_rss_span_mb": 27.61,
+    "measured_frames_after_warmup": 3000,
+    "memory": [
+      {
+        "cycle": 1,
+        "python_mb": 0.0,
+        "rss_mb": 363.06
+      },
+      {
+        "cycle": 2,
+        "python_mb": 0.0,
+        "rss_mb": 360.62
+      },
+      {
+        "cycle": 3,
+        "python_mb": 0.586,
+        "rss_mb": 358.42
+      },
+      {
+        "cycle": 4,
+        "python_mb": 0.657,
+        "rss_mb": 174.03
+      },
+      {
+        "cycle": 5,
+        "python_mb": 0.717,
+        "rss_mb": 195.16
+      },
+      {
+        "cycle": 6,
+        "python_mb": 0.773,
+        "rss_mb": 172.14
+      },
+      {
+        "cycle": 7,
+        "python_mb": 0.824,
+        "rss_mb": 170.73
+      },
+      {
+        "cycle": 8,
+        "python_mb": 0.876,
+        "rss_mb": 196.08
+      },
+      {
+        "cycle": 9,
+        "python_mb": 0.92,
+        "rss_mb": 181.66
+      },
+      {
+        "cycle": 10,
+        "python_mb": 0.963,
+        "rss_mb": 189.91
+      },
+      {
+        "cycle": 11,
+        "python_mb": 1.005,
+        "rss_mb": 193.44
+      },
+      {
+        "cycle": 12,
+        "python_mb": 1.048,
+        "rss_mb": 168.47
+      }
+    ],
+    "python_growth_after_warmup_mb": 1.048,
+    "rss_change_from_warmup_mb": -192.15,
+    "scope": "Native macOS uncapped CPU/presentation workload, 61.2 seconds of simulated play; 12 restarts and alternating resizes, 2 warmup cycles. Python tracing adds overhead. RSS includes OS compression and compositor buffers; bounded means final six samples stay within 64 MB of warmup and Python growth below 4 MB (including telemetry). A bounded short run is not proof against every long-session memory leak.",
+    "security_enabled": true,
+    "sizes": [
+      [
+        1280,
+        720
+      ],
+      [
+        1440,
+        900
+      ]
+    ],
+    "teaching_view": true,
+    "video_driver": "cocoa"
+  },
+  "route_header": {
+    "fingerprint_schema": 9,
+    "game_version": "0.1.0a1",
+    "map_hash": "967e2c0597e6584b887db9616efde7ae4e4b416e1b1d38d5d79763256ad3f697",
+    "map_id": "vault-five-zone",
+    "mode": "HUMAN",
+    "registry_revision": "29b5e21f3afa0e7ff65714617d96cc78401a8d09bcaa8a5ccd531e80d2b7e27b",
+    "replay_schema": 1,
+    "rules_hash": "c527d749f654adcbd1c0dfd89508c9f54eda69dafad7d5bb9382eb926cc49be4",
+    "seed": 1042,
+    "sensor_hash": "4594f530d051eb37885f50d3ab547330f510faa0ecf8c7115ba408a84dfd0546",
+    "simulation_hz": 30
+  },
+  "runtime_commit": "11cee9b19feb55b863096f41cea5b11eb146d5ef",
+  "same_action_outcomes_ticks_event_chains_match_schema8": true,
+  "scenarios": [
+    {
+      "capture_by": null,
+      "decisions_by_algorithm": {
+        "A*": 47,
+        "BFS": 95
+      },
+      "decisions_by_evidence": {
+        "REPORT": 40,
+        "ROUTINE": 23,
+        "SIGHT": 79
+      },
+      "event_chain_hash": "e26af4a1c097494b1f3ed984eb8861902be7d0d994fd841e9e42252d97ee3bc7",
+      "final_fingerprint": "fde84330aed7135a0ab16d2510a6d976ef1e49f5d534d490c7f815c0354e6a92",
+      "max_expanded_nodes": {
+        "A*": 41,
+        "BFS": 68
+      },
+      "name": "upper-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "ticks": 1514
+    },
+    {
+      "capture_by": null,
+      "decisions_by_algorithm": {
+        "A*": 67,
+        "BFS": 89
+      },
+      "decisions_by_evidence": {
+        "NOISE": 1,
+        "REPORT": 4,
+        "ROUTINE": 64,
+        "SIGHT": 87
+      },
+      "event_chain_hash": "fa1aa3f98762972f0fac8186433be63cde5434612ffa7322e5d5fa5f6bc7b512",
+      "final_fingerprint": "a1c74c268c3ab04f78bc6a4171748bea04372a40233355913a12a90a6b6333e1",
+      "max_expanded_nodes": {
+        "A*": 35,
+        "BFS": 68
+      },
+      "name": "lower-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "ticks": 1581
+    },
+    {
+      "capture_by": null,
+      "decisions_by_algorithm": {
+        "A*": 46,
+        "BFS": 87
+      },
+      "decisions_by_evidence": {
+        "REPORT": 39,
+        "ROUTINE": 43,
+        "SIGHT": 51
+      },
+      "event_chain_hash": "5361dd314c85f5407ddef7e81cfe203cbf3e2ff3fccb8f76a7376eb9b32986c7",
+      "final_fingerprint": "27ec817ae615701268c30e39506b29a283513bd43308ffa5e22df68522cf3aa5",
+      "max_expanded_nodes": {
+        "A*": 49,
+        "BFS": 101
+      },
+      "name": "cross-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "ticks": 1603
+    },
+    {
+      "capture_by": "guard-service",
+      "decisions_by_algorithm": {
+        "A*": 41,
+        "BFS": 68
+      },
+      "decisions_by_evidence": {
+        "NOISE": 1,
+        "REPORT": 34,
+        "ROUTINE": 23,
+        "SIGHT": 51
+      },
+      "event_chain_hash": "17bfabc682c06e25660eaa24e2effa8bdfdc814d56136d63ff0ea9dcd45eb212",
+      "final_fingerprint": "7bc4fe9eab947b84e169ca231d94ed071030aeadb1e38e547c539fe3041d3770",
+      "max_expanded_nodes": {
+        "A*": 82,
+        "BFS": 68
+      },
+      "name": "upper-no-tools",
+      "outcome": "CAPTURED",
+      "replay_matched": true,
+      "ticks": 1174
+    },
+    {
+      "capture_by": "guard-research",
+      "decisions_by_algorithm": {
+        "A*": 18,
+        "BFS": 28
+      },
+      "decisions_by_evidence": {
+        "REPORT": 4,
+        "ROUTINE": 20,
+        "SIGHT": 22
+      },
+      "event_chain_hash": "6061ff5d4bb2e92adca992edec013e2e63531345b224cc9168712c161a82ce7e",
+      "final_fingerprint": "588bc57315565f22f90b8055f6cfbd75f9f537dd14a394ece68dbfdd4b6ae22b",
+      "max_expanded_nodes": {
+        "A*": 35,
+        "BFS": 68
+      },
+      "name": "lower-no-tools",
+      "outcome": "CAPTURED",
+      "replay_matched": true,
+      "ticks": 349
+    }
+  ],
+  "status": "DONE"
+}

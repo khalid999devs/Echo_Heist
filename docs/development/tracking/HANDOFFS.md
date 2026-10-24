@@ -6,7 +6,7 @@ Suhita's original Windows x64 setup and branch workflow remain documented in [Wi
 
 ## Current ownership and next handoff
 
-Updated 2026-10-22 by Khalid's explicit request: [revised workload and transfer map](../planning/WORKLOAD.md). Khalid leads complex graphics/scenes; Suhita leads most gameplay logic. Future P03-P08 work uses **KR/SR** IDs; historical K/S IDs and authorship below remain preserved. Suhita next claims P03-SR1/SR2/SR3 from current main; Khalid next claims P03-KR1/KR2. This planning update claims neither runtime queue.
+Updated 2026-10-22 by Khalid's explicit request: [revised workload and transfer map](../planning/WORKLOAD.md). Khalid leads complex graphics/scenes; Suhita leads most gameplay logic. Future P03-P08 work uses **KR/SR** IDs; historical K/S IDs and authorship below remain preserved. P03 is now complete under the 2026-10-24 user-directed combined integration. Suhita next claims P04-SR1/SR2/SR3; Khalid next claims P04-KR1/KR2. No P04 queue is claimed by the completed P03 work.
 
 P03-P05 integration is led by Suhita with Khalid's visual acceptance; P06-P08 by Khalid with Suhita's behavior/platform evidence. The [Windows setup and full prompt](../workflow/setup/WINDOWS_SUHITA.md) now target P03, not the completed P02.
 
@@ -14,7 +14,7 @@ P03-P05 integration is led by Suhita with Khalid's visual acceptance; P06-P08 by
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
-| Khalid | P03-KR1/KR2 and user-authorized combined acceptance / PR #1 integration | work/khalid-p03 from main plus reviewed acaa461 | Guard cue/diagnostic presenters and rendering; narrow `heist.py` / `flow.py` event/draw/audio wiring; immutable guard telemetry exports; necessary behavior tests and phase evidence | IN_PROGRESS; preserve Suhita's logic and original commits; no P04 work |
+| Khalid | P03-KR1/KR2 and user-authorized combined acceptance / PR #1 integration | work/khalid-p03 incorporates Suhita; runtime 11cee9b | None; [handoff](handoffs/khalid/day_02/phase03/P03.md), [combined gate](../quality/reports/phase03/integration/VERIFICATION.md) | DONE; 195 tests/full checks, both native wins/capture, actual fuzzy trace, five replays, bounded restart audit, native Mac app/ZIP and three-platform CI PASS. P03 complete; P04 next and unclaimed |
 | Khalid | User-requested PR #1 review and regression fixes | work/suhita-p03; fixes c562fff after ed22396 | None; [review and runnable handoff](../quality/reports/phase03/review/REVIEW.md) | DONE; 194 tests/full checks, five exact route replays, native Mac app/ZIP and all three hosted jobs pass. Fixes pushed; main unchanged. PR stays open for KR1/KR2 and the combined P03 gate |
 | Khalid | AI lab project proposal draft and screenshot/algorithm presentation handoff | Local proposal documents and ignored output/proposal-deck | None; [structure](../academic/proposal/STRUCTURE.md) and [refinement guide](../academic/proposal/SUHITA_HANDOFF.md) ready | DONE; all nine source slides/notes reviewed; 17-slide blue story/academic edition, three core AI explanations, native review and transfer pack verified; no gameplay gate changed |
 | Khalid | User-requested ownership rebalance and current-state handoff | Documentation-only change on main after ec8ca48 | None; revised plans/owner guides ready | DONE; 149 tests/full checks and one-off document/ownership audit pass; no runtime slice or Suhita queue claimed |

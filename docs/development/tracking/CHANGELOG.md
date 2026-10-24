@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-10-24 - Complete P03 visual integration and combined acceptance
+
+- Connected distinct guard-state/cone/cue feedback, real capture countdown/progress and a selectable live F3 teaching view. Original cue positions, path revisions and stored actual fuzzy inputs/memberships/weights/outputs are immutable telemetry; fingerprint is now 9. Rendering never runs AI or updates evidence.
+- Preserved Suhita's logic and incremental commits. Full checks/195 tests, five exact route replays, both native default-security Human wins/capture, under-desk hiding, 40 captured states, real no-sight fuzzy inference and full-display tab input pass. A 12-restart audit is bounded in this run; its performance outliers are documented rather than hidden. Clean Mac app/fresh ZIP and all three hosted source jobs pass.
+- [Combined gate](../quality/reports/phase03/integration/VERIFICATION.md) and [Khalid handoff](handoffs/khalid/day_02/phase03/P03.md) close P03 under the user's explicit integration request. Owner/startup/Windows guides now point to P04, which remains unstarted. P05-P08/full V1/public release and physical Windows combined-build retest remain open. Approved scoring is unchanged.
+
 ## 2026-10-24 - Review Suhita's P03 pull request
 
 - Reviewed PR #1 and pushed fixes to `work/suhita-p03`, preserving Suhita's commits: partial-identification hiding witnesses, physical barriers during cover inspection, geometry refresh before controller decisions, complete pending-map fingerprints and explicit careless-route capture assertions.

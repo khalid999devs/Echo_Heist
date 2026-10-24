@@ -1,6 +1,6 @@
 # Contract targets and implemented foundation
 
-Current implemented consumer baseline is [fingerprint 7 and precise fixture geometry](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). The full-game designs below are targets unless verified; old numerical examples do not override current configs/approved changes. Remaining ownership follows [Workload](../planning/WORKLOAD.md): Suhita logic, Khalid graphics/scenes, with explicit shared-contract handoffs.
+Current implemented consumer baseline is [P03 fingerprint 9, guard telemetry and fair perception](../tracking/handoffs/khalid/day_02/phase03/P03.md). The [physical fixture contract](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md) still governs exact bounds/posture/stairs; its schema-7 hashes are historical. The full-game designs below are targets unless verified; old numerical examples do not override current configs/approved changes. Remaining ownership follows [Workload](../planning/WORKLOAD.md): Suhita logic, Khalid graphics/scenes, with explicit shared-contract handoffs.
 
 Blueprint basis: pp. 5-17. P01 established immutable DTOs; Khalid's [P02 handoff](../tracking/handoffs/khalid/day_01/P02.md) now records continuous motion, mission/capture/tools and input/presentation extensions. Use that exact implemented contract when integrating. The table below remains a full-game target; sensing/scoring and later systems are not inferred as complete.
 

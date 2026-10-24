@@ -1,10 +1,12 @@
 # ECHO HEIST development hub
 
-Current state, **2026-10-22**: **P01/P02 complete; P03 in progress**; P05 has an early crouch subset and the other later gates remain open. See the clean [completed/remaining list](tracking/STATUS.md).
+Current state, **2026-10-24**: **P01/P02/P03 complete; P04 next and unstarted**; P05 has an early crouch subset and the other later gates remain open. See the clean [completed/remaining list](tracking/STATUS.md).
 
-Latest verified refinement: [cinematic opening/airlocks, physical fixtures, audio/performance and app icon](quality/reports/cinematic_startup/REVIEW.md), [runnable consumer handoff](tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Current baseline is fingerprint 7 with 149 passing tests and separately recorded native/hosted build results; physical Windows gameplay/audio remains pending.
+Latest combined gate: [P03 acceptance](quality/reports/phase03/integration/VERIFICATION.md), [runnable schema-9 handoff](tracking/handoffs/khalid/day_02/phase03/P03.md): 195 tests/full checks, native both-route wins/capture, live fuzzy traces, responsive diagnostics, native Mac app/ZIP and three-platform CI. Physical Windows retest is separate. Suhita's next queue is P04-SR1/SR2/SR3.
 
-The owner revised responsibilities: **Khalid handles complex visual graphics/scenes; Suhita handles most gameplay logic.** The [remaining workload](planning/WORKLOAD.md) and revised KR/SR slices replace the original future 80/80 allocation, while preserving completed work. Remaining estimates are 48 Khalid / 60 Suhita to provisionally offset Khalid's foundation/refinement effort; review actual effort at each gate. Both still touch frontend/backend through explicit contracts.
+Historical verified refinement: [cinematic opening/airlocks, physical fixtures, audio/performance and app icon](quality/reports/cinematic_startup/REVIEW.md), [runnable consumer handoff](tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Current baseline is fingerprint 7 with 149 passing tests and separately recorded native/hosted build results; physical Windows gameplay/audio remains pending.
+
+After P03, remaining estimates are **43 Khalid / 48 Suhita points**; these are estimates, not logged hours. The owner revised responsibilities: **Khalid handles complex visual graphics/scenes; Suhita handles most gameplay logic.** The [remaining workload](planning/WORKLOAD.md) and revised KR/SR slices replace the original future 80/80 allocation, while preserving completed work. Remaining estimates are 48 Khalid / 60 Suhita to provisionally offset Khalid's foundation/refinement effort; review actual effort at each gate. Both still touch frontend/backend through explicit contracts.
 
 The target remains a complete functional initial V1 draft in eight phases over four development days. Work began 2026-10-18; the target has not been demonstrated complete. Day labels describe the original sequence, not a restarted clock. Required mechanics must work by P08; public release retains its independent checks.
 
@@ -47,7 +49,7 @@ Preserve approved gameplay requirements. The blueprint explicitly identifies con
 | Tracking | [Changelog](tracking/CHANGELOG.md) | Dated development handoffs and verification |
 | Tracking | [Claims and handoffs](tracking/HANDOFFS.md) | Owner/file coordination, runnable integration evidence and shared-task completion |
 
-Current runnable baseline: [P02 integrated handoff](tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) and [verification/screenshots](quality/reports/phase02/integration/VERIFICATION.md). The standard desktop app now runs the five-zone Human mission. The [public GitHub repository](https://github.com/khalid999devs/Echo_Heist) holds the incremental owner history. Follow [Status](tracking/STATUS.md) for current hosted CI evidence; Suhita's interactive Windows desktop QA is still pending.
+Historical Human foundation: [P02 integrated handoff](tracking/handoffs/khalid/day_01/P02_INTEGRATION.md) and [verification/screenshots](quality/reports/phase02/integration/VERIFICATION.md). The standard desktop app now runs the five-zone Human mission. The [public GitHub repository](https://github.com/khalid999devs/Echo_Heist) holds the incremental owner history. Follow [Status](tracking/STATUS.md) for current hosted CI evidence; Suhita's interactive Windows desktop QA is still pending.
 
 Suhita's workstation entry: [Windows x64 setup and current P03 handoff](workflow/setup/WINDOWS_SUHITA.md), including PowerShell commands and the revised P03-SR1/SR2/SR3 starting prompt.
 

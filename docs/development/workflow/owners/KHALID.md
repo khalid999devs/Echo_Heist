@@ -1,12 +1,12 @@
 # Khalid's agent guide
 
-Identity: **Khalid**. The owner explicitly changed the remaining split on **2026-10-22**: lead complex visual graphics, scene design, animation, camera, UI/audio presentation, rendering performance and desktop delivery. Suhita now leads most gameplay logic, including core systems previously authored by you. The [remaining workload](../../planning/WORKLOAD.md) estimates 48 points for you and 60 for Suhita to offset completed foundation/refinement work; equal lifetime effort is a target, not a measured fact.
+Identity: **Khalid**. The owner explicitly changed the remaining split on **2026-10-22**: lead complex visual graphics, scene design, animation, camera, UI/audio presentation, rendering performance and desktop delivery. Suhita now leads most gameplay logic, including core systems previously authored by you. The [remaining workload](../../planning/WORKLOAD.md) now estimates 43 points for you and 48 for Suhita after P03 to offset completed foundation/refinement work; equal lifetime effort is a target, not a measured fact.
 
-Read [START_HERE](../START_HERE.md), [Status](../../tracking/STATUS.md), [claims](../../tracking/HANDOFFS.md), [code rules](../CODE_RULES.md), the assigned phase and its source/contracts. P01/P02 are DONE; **P03 is the earliest open phase**. P05 has only an early crouch subset. Preview scenes do not complete their future behavior gates.
+Read [START_HERE](../START_HERE.md), [Status](../../tracking/STATUS.md), [claims](../../tracking/HANDOFFS.md), [code rules](../CODE_RULES.md), the assigned phase and its source/contracts. P01/P02/P03 are DONE; **P04 is the earliest open phase**. P05 has only an early crouch subset. Preview scenes do not complete their future behavior gates.
 
 ## Actual baseline
 
-Start from current main containing `ec8ca48` and this ownership revision. Retrieve [cinematic/physical-fixture handoff](../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [scene contract](../../architecture/integration/SCENE_PRESENTATION.md) and [actual evidence](../../quality/reports/cinematic_startup/REVIEW.md). Latest contracts are fingerprint **7**, explicit physical obstacle bounds versus conservative route tiles, 0.2-tile body, two decks/stairs, posture/under-desk clearance, full-display input mapping, explicit UI audio serials and loading/airlock lifecycles. Older fingerprint-3/6 handoffs are historical subsets.
+Start from synchronized main containing the [P03 handoff](../../tracking/handoffs/khalid/day_02/phase03/P03.md) and [combined gate](../../quality/reports/phase03/integration/VERIFICATION.md). Current fingerprint is **9**, with original evidence locations, retained actual fuzzy traces, two Sentinels, Tracker A* and a sensing-only Core POST. All P03 slices are complete; P04 is next. Physical contracts below remain valid; their old schema-7 hashes are historical. Retrieve [cinematic/physical-fixture handoff](../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [scene contract](../../architecture/integration/SCENE_PRESENTATION.md) and [actual evidence](../../quality/reports/cinematic_startup/REVIEW.md). The physical baseline used fingerprint **7**; current P03 uses **9**, explicit physical obstacle bounds versus conservative route tiles, 0.2-tile body, two decks/stairs, posture/under-desk clearance, full-display input mapping, explicit UI audio serials and loading/airlock lifecycles. Older fingerprint-3/6 handoffs are historical subsets.
 
 The existing game already has cinematic title/loading/airlocks, room art and material variety, character walk/run/crouch, quiet steps/louder sprint, lockdown presentation, real Human wins/capture and first Sentinel behavior. Preserve these and adapt to real new logic; do not restart the visual foundation.
 
@@ -17,7 +17,7 @@ The existing game already has cinematic title/loading/airlocks, room art and mat
 | Phase | Your slices / points | Remaining result | Integration lead |
 | --- | --- | --- | --- |
 | P01/P02 | Complete; no new claim | Foundation/core/integrated Human scene retained | Complete |
-| [P03](../../planning/phases/intelligence/PHASE_03.md) | P03-KR1 3; KR2 2 | Guard states/cues and genuine diagnostics; geometry/scene integration review | Suhita |
+| [P03](../../planning/phases/intelligence/PHASE_03.md) | DONE | Real guard feedback/diagnostics and both-deck combined gate | User-directed integration complete |
 | [P04](../../planning/phases/intelligence/PHASE_04.md) | P04-KR1 4; KR2 3 | Companion/Lab decision presentation, follow camera, NEXUS/deploy/protocol UI | Suhita |
 | [P05](../../planning/phases/experience/PHASE_05.md) | P05-KR1 3; KR2 6 | Tool HUD/input, physical interaction animation, props/VFX/SFX and provenance | Suhita |
 | [P06](../../planning/phases/experience/PHASE_06.md) | P06-KR1 3; KR2 4; KR3 2 | Actual score/results, Workshop/full scene flow, settings/accessibility presentation | You |
@@ -26,7 +26,7 @@ The existing game already has cinematic title/loading/airlocks, room art and mat
 
 ## Start next
 
-Claim **P03-KR1/KR2** on `work/khalid-p03` from synchronized main. Read Suhita's P03 claims/contract first. Use the current real Sentinel to review cue readability now; connect Tracker telemetry after her handoff. Your queue does not include implementing her remaining AI to avoid waiting. Complete independent visual work and record exact consumer dependencies.
+Next queue: **P04-KR1/KR2** on a new `work/khalid-p04` from synchronized main. Read Suhita's P04 claims and agree immutable Companion/NEXUS decision/alert interfaces before shared edits. Reuse the completed P03 teaching view and existing scenes; connect real new logic. Do not implement her AI or count previews as finished behavior. Stop at the user-requested slice boundary.
 
 You own complex drawing/layout under `ui/render/`, visual scene files, startup/audio presentation and assets. Suhita may make narrow functional controller/deployment/result wiring in `ui/scenes/heist.py` / `flow.py`; designate one writer before either edits those shared files. Preserve her core/AI/persistence changes. You retain real nonvisual work in geometry/art calibration, display/input/resource integration, performance and build engineering.
 

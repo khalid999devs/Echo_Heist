@@ -149,6 +149,7 @@ def decide(
                 evidence_kind="HIDE_ENTRY",
                 evidence_id=hidden.cue_id,
                 evidence_tick=hidden.tick,
+                evidence_tile=hidden.tile,
             )
         elif memory.state != GuardState.CHASE:
             lead = report_lead(observation, memory)
@@ -163,6 +164,7 @@ def decide(
                     evidence_kind="REPORT",
                     evidence_id=lead.event_id,
                     evidence_tick=lead.tick,
+                    evidence_tile=lead.tile,
                 )
             elif cue is not None and memory.state != GuardState.SEARCH:
                 memory = replace(investigate(observation, rules, memory), search_tiles=())

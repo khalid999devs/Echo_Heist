@@ -81,6 +81,7 @@ def decide(
                 evidence_kind="HIDE_ENTRY",
                 evidence_id=hidden.cue_id,
                 evidence_tick=hidden.tick,
+                evidence_tile=hidden.tile,
             )
         elif memory.state not in (GuardState.CHASE, GuardState.SEARCH):
             memory = investigate(observation, rules, memory)

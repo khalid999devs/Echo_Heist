@@ -13,6 +13,7 @@ from echo_heist.core.perception.sensors import sight_ray
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.actors.model import DEFENDER_SIZE
 from echo_heist.ui.render.camera import Camera
+from echo_heist.ui.render.security.signals import STATE_COLORS
 
 
 @lru_cache(maxsize=64)
@@ -39,7 +40,7 @@ def draw_vision(
         actor = actors[view.actor_id]
         if actor.position is None or actor.disabled or actor.stunned:
             continue
-        color = theme.DANGER if view.state == GuardState.CHASE else theme.WARNING
+        color = theme.WARNING if view.state == GuardState.PATROL else STATE_COLORS[view.state]
         points = [
             camera.to_screen((p[0] * size / UNIT, p[1] * size / UNIT))
             for p in _fan(

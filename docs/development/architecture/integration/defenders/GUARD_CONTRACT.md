@@ -37,7 +37,13 @@ The fingerprint-7 baseline in the [cinematic/fixture handoff](../../../tracking/
 
 `GuardView` gains `role`, `algorithm` (`BFS`, `A*` or `NONE`), `evidence_kind`, `evidence_tick`, `path_cost` and `search_tiles`, appended with defaults so current drawing keeps working. `POLICY_DECISION` details add `algorithm`, `path_cost`, `evidence_kind` and `evidence_tick`. These are privileged display values, never controller inputs.
 
+Khalid's KR1/KR2 integration appends `path_revision`, original `evidence_tile` and optional immutable `FuzzyTrace` to the view. `FuzzyTrace` stores the actual controller evaluation tick, original cue tick/tile, distance, salience, visibility, memberships, five rule activations/singletons and urgency. It is created only when the controller actually calls Sugeno inference, then retains its original time. Drawing never re-runs inference or refreshes evidence. The original cue stays separate from a reachable approach/goal tile.
+
+F3 opens the live teaching overlay; keys 1-4 or guard tabs select a registry guard. Its current filtered Observation supplies live sight/sound/cue counts; last-plan and last-evaluation metrics are labeled separately. World paths, last sighting, cue and goal markers are teaching-only privileged display. Stair segments never draw across the atlas gap. Normal play keeps state badges, clipped physical sight cones, transient committed cue rings and the real capture countdown/progress. Tab/map, pause, fullscreen and pointer mapping retain their existing ownership rules.
+
 ## Replay
+
+**Current fingerprint schema: 9**, including the retained fuzzy trace and original evidence location. Schema-8/7 hashes are historical and not comparable; outcomes and event chains can still be compared for unchanged action streams. The paragraph below records Suhita's original schema-8 addition.
 
 `core/simulation/replay.py` records a header (game/fingerprint schema, map/rules/sensor hashes, registry revision, seed, rate) plus per-tick intruder actions, and verifies a re-run tick by tick against event and fingerprint hashes. Fingerprint schema becomes **8** because guard memory/evidence/witness state and geometry revision enter the canonical state; schema-7 hashes are not comparable.
 

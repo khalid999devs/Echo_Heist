@@ -7,6 +7,7 @@ from echo_heist.core.contracts.world import MissionPhase
 from echo_heist.diagnostics.facility_routes import mission_path, walk_path
 from echo_heist.diagnostics.human_driver import HumanDriver
 from echo_heist.ui.bootstrap import _logical_events
+from echo_heist.ui.render.security.lab import GUARD_TABS
 from echo_heist.ui.scenes.flow import GameFlow, Scene
 from echo_heist.ui.scenes.menus import LAUNCH_BUTTON, MODE_BUTTONS, TITLE_BUTTONS
 
@@ -124,6 +125,23 @@ def test_mouse_menu_and_responsive_coordinates() -> None:
         0,
     )
     assert flow.scene == Scene.HEIST
+    assert flow.session is not None
+    flow.frame([key(pygame.KEYDOWN, pygame.K_F3), key(pygame.KEYUP, pygame.K_F3)], 0)
+    target = GUARD_TABS[1]
+    flow.frame(
+        [
+            pygame.event.Event(
+                pygame.MOUSEBUTTONDOWN, button=1, pos=(target.centerx, target.centery + 360)
+            )
+        ],
+        0,
+    )
+    assert flow.session.lab_note and flow.session.lab_selected == 1
+    assert flow.session.simulation.presentation_snapshot().guards[1].algorithm == "A*"
+    fingerprint = flow.session.simulation.fingerprint()
+    for _ in range(3):
+        flow.draw(pygame.Surface((1280, 1440)))
+    assert flow.session.simulation.fingerprint() == fingerprint
 
 
 def test_art_and_gait_follow_committed_movement_without_changing_simulation() -> None:

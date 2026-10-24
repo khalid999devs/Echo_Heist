@@ -12,6 +12,7 @@ from echo_heist.ai.navigation.grid import PathResult, neighbors
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.observations import EntityView, Observation
 from echo_heist.core.contracts.security.model import (
+    FuzzyTrace,
     GuardDecision,
     GuardMemory,
     GuardState,
@@ -99,6 +100,7 @@ def identify(
         evidence_kind="SIGHT",
         evidence_id=f"sight:{observation.agent_id}:{observation.tick}",
         evidence_tick=observation.tick,
+        evidence_tile=intruder.tile,
     )
 
 
@@ -144,6 +146,19 @@ def investigate(observation: Observation, rules: SensorRules, memory: GuardMemor
         evidence_kind=cue.kind,
         evidence_id=cue.cue_id,
         evidence_tick=cue.tick,
+        evidence_tile=cue.tile,
+        fuzzy_trace=FuzzyTrace(
+            observation.tick,
+            cue.tick,
+            cue.tile,
+            distance(observation.own_status.tile, cue.tile),
+            cue.salience,
+            cue.visibility,
+            fuzzy.memberships,
+            fuzzy.activations,
+            fuzzy.outputs,
+            fuzzy.urgency,
+        ),
     )
 
 

@@ -17,6 +17,8 @@ def triangle(value: float, left: float, peak: float, right: float) -> float:
 class FuzzyResult:
     urgency: float
     activations: tuple[float, ...]
+    memberships: tuple[tuple[str, float], ...]
+    outputs: tuple[float, ...]
 
 
 def investigate_urgency(distance_tiles: int, salience: float, visibility: float) -> FuzzyResult:
@@ -40,4 +42,16 @@ def investigate_urgency(distance_tiles: int, salience: float, visibility: float)
         if total
         else 0.1
     )
-    return FuzzyResult(round(clamp(urgency), 4), activations)
+    return FuzzyResult(
+        round(clamp(urgency), 4),
+        activations,
+        (
+            ("near", near),
+            ("far", far),
+            ("loud", loud),
+            ("notable", notable),
+            ("partial", partial),
+            ("quiet", quiet),
+        ),
+        outputs,
+    )

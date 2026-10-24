@@ -97,6 +97,28 @@ class VisualCue:
 
 
 @dataclass(frozen=True, slots=True)
+class FuzzyTrace:
+    """The last inference actually evaluated by a controller, for teaching/QA."""
+
+    evaluated_tick: int
+    cue_tick: int
+    cue_tile: Tile
+    distance_tiles: int
+    salience: float
+    visibility: float
+    memberships: tuple[tuple[str, float], ...]
+    activations: tuple[float, ...]
+    outputs: tuple[float, ...]
+    urgency: float
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "cue_tile", immutable_tile(self.cue_tile))
+        object.__setattr__(self, "memberships", tuple(tuple(item) for item in self.memberships))
+        object.__setattr__(self, "activations", tuple(self.activations))
+        object.__setattr__(self, "outputs", tuple(self.outputs))
+
+
+@dataclass(frozen=True, slots=True)
 class GuardMemory:
     state: GuardState = GuardState.PATROL
     patrol_index: int = 0
@@ -122,9 +144,11 @@ class GuardMemory:
     search_tiles: tuple[Tile, ...] = ()
     path_cost: int = 0
     path_revision: int = 0
+    evidence_tile: Tile | None = None
+    fuzzy_trace: FuzzyTrace | None = None
 
     def __post_init__(self) -> None:
-        for name in ("last_seen_tile", "target", "path_goal", "search_origin"):
+        for name in ("last_seen_tile", "target", "path_goal", "search_origin", "evidence_tile"):
             value = getattr(self, name)
             if value is not None:
                 object.__setattr__(self, name, immutable_tile(value))
@@ -163,3 +187,6 @@ class GuardView:
     evidence_tick: int = -1
     path_cost: int = 0
     search_tiles: tuple[Tile, ...] = ()
+    path_revision: int = 0
+    evidence_tile: Tile | None = None
+    fuzzy_trace: FuzzyTrace | None = None

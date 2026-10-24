@@ -2,6 +2,7 @@ from dataclasses import replace
 
 from echo_heist.ai.guards.fuzzy import investigate_urgency
 from echo_heist.ai.guards.sentinel import decide
+from echo_heist.core.contracts.events import HeardCue
 from echo_heist.core.contracts.observations import Observation, OwnStatus
 from echo_heist.core.contracts.security.model import GuardMemory, GuardPatrol, GuardState, VisualCue
 from echo_heist.core.contracts.world import Inventory, MissionPhase, StaticMap, tile_center
@@ -56,3 +57,34 @@ def test_lost_contact_search_expires_into_return_without_secret_target() -> None
     assert search.memory.state == GuardState.SEARCH
     returned = decide(replace(observation, tick=200), patrol, load_sensor_rules(), search.memory)
     assert returned.memory.state == GuardState.RETURN and returned.memory.target in patrol.points
+
+
+def test_fuzzy_trace_keeps_observed_origin_and_original_evaluation_time() -> None:
+    cue_tile = (6, 3)
+    world = StaticMap("trace", 10, 8, frozenset({cue_tile}), frozenset({cue_tile}))
+    observation = Observation(
+        "sentinel",
+        12,
+        world,
+        MissionPhase.INFILTRATE,
+        OwnStatus((3, 3), Inventory(), position=tile_center((3, 3))),
+        heard_events=(HeardCue("step", "SPRINT", cue_tile, 9),),
+    )
+    patrol = GuardPatrol("sentinel", ((3, 3), (3, 5)))
+    memory = decide(observation, patrol, load_sensor_rules(), GuardMemory()).memory
+    trace = memory.fuzzy_trace
+    assert trace is not None and trace.cue_tile == memory.evidence_tile == cue_tile
+    assert trace.evaluated_tick == 12 and trace.cue_tick == memory.evidence_tick == 9
+    assert memory.path_goal != cue_tile  # Solid cover needs a reachable approach.
+    assert trace.distance_tiles == 3 and trace.salience == 0.75 and trace.visibility == 0
+    assert dict(trace.memberships)["near"] == 0.25
+    assert len(trace.activations) == len(trace.outputs) == 5
+    total = sum(trace.activations)
+    assert trace.urgency == round(
+        sum(w * v for w, v in zip(trace.activations, trace.outputs, strict=True)) / total, 4
+    )
+    assert memory.identity_ticks == 0 and memory.last_seen_tile is None
+    later = decide(
+        replace(observation, tick=13, heard_events=()), patrol, load_sensor_rules(), memory
+    )
+    assert later.memory.fuzzy_trace == trace  # Drawing later must not imply fresh evidence.

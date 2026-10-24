@@ -4,6 +4,7 @@ from math import atan2, cos, sin
 
 import pygame
 
+from echo_heist.core.contracts.results import CaptureView
 from echo_heist.core.contracts.security.model import GuardState, GuardView
 from echo_heist.core.contracts.world import MissionPhase, Tile
 from echo_heist.level.model import LevelData
@@ -89,6 +90,8 @@ def _objective(
     operative_tile: Tile,
     phase: MissionPhase,
     fonts: Fonts,
+    capture: CaptureView | None,
+    ticks_per_second: int,
 ) -> None:
     rect = pygame.Rect(20, 20, 400, 72)
     color = theme.ACCENT if view.core_held else theme.WARNING
@@ -122,6 +125,8 @@ def _objective(
     ]
     pygame.draw.polygon(canvas, color, points)
     prompt = view.warning or view.interaction
+    if capture is not None:
+        prompt = f"GRAB IN {capture.remaining_ticks / ticks_per_second:.1f}s / ESCAPE, EMP OR STUN"
     if prompt:
         panel(
             canvas,
@@ -131,7 +136,10 @@ def _objective(
         _label(
             canvas, fonts.micro, prompt, theme.DANGER if view.warning else theme.WARNING, (34, 114)
         )
-    if view.interaction_progress is not None:
+    if capture is not None:
+        progress = 1 - capture.remaining_ticks / max(1, capture.total_ticks)
+        pygame.draw.rect(canvas, theme.DANGER, (22, 138, round(396 * progress), 3))
+    elif view.interaction_progress is not None:
         done, total = view.interaction_progress
         pygame.draw.rect(
             canvas, theme.WARNING, (22, 138, round(396 * min(done, total) / max(1, total)), 3)
@@ -156,8 +164,12 @@ def draw_hud(
     ticks_per_second: int = 30,
     crouched: bool = False,
     concealed: bool = False,
+    teaching_view: bool = False,
+    capture: CaptureView | None = None,
 ) -> None:
-    _objective(canvas, view, zone_label, level, operative_tile, phase, fonts)
+    _objective(
+        canvas, view, zone_label, level, operative_tile, phase, fonts, capture, ticks_per_second
+    )
     status = pygame.Rect(canvas.get_width() - 236, 20, 216, 72)
     panel(canvas, status, fill=(5, 15, 25, 180))
     states = {guard.state for guard in guards if guard.actor_id not in unavailable_guards}
@@ -188,7 +200,8 @@ def draw_hud(
     )
     _label(canvas, fonts.body, view.elapsed, theme.TEXT, (status.x + 13, 54))
     _label(canvas, fonts.micro, alert, color, (status.x + 98, 62))
-    draw_minimap(canvas, level, operative_tile, phase, fonts)
+    if not teaching_view:
+        draw_minimap(canvas, level, operative_tile, phase, fonts)
     boost = pygame.Rect(canvas.get_width() - 372, canvas.get_height() - 140, 346, 34)
     panel(canvas, boost, fill=(5, 15, 25, 175), border=theme.BORDER)
     recharge = view.sprint_recharge_remaining
@@ -234,7 +247,7 @@ def draw_hud(
         banner.centerx = canvas.get_width() // 2
         panel(canvas, banner, border=theme.WARNING)
         _label(canvas, fonts.small, notice, theme.TEXT, (banner.x + 15, banner.y + 8))
-    elif clock_ms < 7_000:
+    elif clock_ms < 7_000 and not teaching_view:
         hint = "WASD  Move    C  Crouch    SHIFT  Sprint    ESC  Pause"
         _label(
             canvas,

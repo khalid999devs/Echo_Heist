@@ -117,6 +117,9 @@ def presentation(
                 memory.evidence_tick,
                 memory.path_cost,
                 memory.search_tiles,
+                memory.path_revision,
+                memory.evidence_tile,
+                memory.fuzzy_trace,
             )
             for patrol in security.patrols
             for actor_id, memory in ((patrol.actor_id, world.guard_memories[patrol.actor_id]),)

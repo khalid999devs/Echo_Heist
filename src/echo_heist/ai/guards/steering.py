@@ -16,6 +16,7 @@ from echo_heist.core.contracts.security.model import (
     GuardMemory,
     GuardState,
     SensorRules,
+    VisualCue,
 )
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
 from echo_heist.core.contracts.world import (
@@ -146,14 +147,14 @@ def investigate(observation: Observation, rules: SensorRules, memory: GuardMemor
     )
 
 
-def witnessed_hide(observation: Observation, memory: GuardMemory) -> Tile | None:
+def witnessed_hide(observation: Observation, memory: GuardMemory) -> VisualCue | None:
     """Cover this guard saw the intruder enter after its latest direct sighting."""
     cues = [
         cue
         for cue in observation.visual_cues
         if cue.kind == HIDE_ENTRY and cue.tick >= memory.last_seen_tick
     ]
-    return max(cues, key=lambda cue: (cue.tick, cue.cue_id)).tile if cues else None
+    return max(cues, key=lambda cue: (cue.tick, cue.cue_id)) if cues else None
 
 
 def evidence_expired(observation: Observation, rules: SensorRules, memory: GuardMemory) -> bool:

@@ -2,6 +2,9 @@
 
 from dataclasses import replace
 
+import pytest
+
+from echo_heist.ai.guards import sentinel, tracker
 from echo_heist.ai.guards.tracker import decide, plausible_neighbors
 from echo_heist.core.contracts.events import SecurityReport
 from echo_heist.core.contracts.observations import EntityView, Observation, OwnStatus
@@ -10,6 +13,7 @@ from echo_heist.core.contracts.security.model import (
     GuardPatrol,
     GuardRole,
     GuardState,
+    VisualCue,
 )
 from echo_heist.core.contracts.world import (
     ActorKind,
@@ -93,3 +97,27 @@ def test_decision_depends_only_on_its_observation() -> None:
     first = decide(observation, PATROL, RULES, memory)
     second = decide(observation, PATROL, RULES, memory)
     assert first == second
+
+
+@pytest.mark.parametrize("role", [GuardRole.SENTINEL, GuardRole.TRACKER])
+def test_partial_identification_still_investigates_witnessed_cover(role: GuardRole) -> None:
+    cover = (6, 6)
+    world = StaticMap("witness", 12, 10, frozenset({cover}), frozenset({cover}))
+    cue = VisualCue("hide:tracker:11", cover, 11, "HIDE_ENTRY")
+    observation = observe((2, 2), 12, world, visual_cues=(cue,))
+    memory = GuardMemory(
+        state=GuardState.SPOTTED,
+        identity_ticks=3,
+        last_seen_tile=(6, 7),
+        last_seen_tick=10,
+        target=(6, 7),
+    )
+    controller = sentinel if role == GuardRole.SENTINEL else tracker
+    decision = controller.decide(observation, replace(PATROL, role=role), RULES, memory)
+    assert decision.memory.state == GuardState.INVESTIGATE
+    assert decision.memory.evidence_kind == "HIDE_ENTRY"
+    assert decision.memory.evidence_tick == cue.tick
+    assert decision.memory.last_seen_tile == (6, 7)  # no invented sight of the hidden actor
+    assert decision.memory.identity_ticks < RULES.identification_ticks
+    # Either equally short legal approach is valid, rather than the previous sighting tile.
+    assert decision.memory.path_goal in {(5, 6), (6, 5)}

@@ -24,12 +24,14 @@ The fingerprint-7 baseline in the [cinematic/fixture handoff](../../../tracking/
 
 - An intruder is concealed when crouched inside an authored under-desk clearance. Concealed actors are excluded from every guard's sight.
 - If an active guard saw the intruder on the previous tick and the intruder becomes concealed, Simulation gives that guard a `VisualCue(kind="HIDE_ENTRY")` at the cover tile. Only that guard may then reveal the actor by inspecting from capture range with clear reach while the cue is unexpired. An unseen entry gives no cue, so an adjacent guard cannot see or capture the hidden actor.
+- A witnessed entry becomes an INVESTIGATE goal even if identification was incomplete. It preserves the original cue ID/tick and last sighting; it never grants CHASE or confirmed identity by itself. A guard already chasing keeps CHASE. Inspection checks exact physical reach, including barriers between adjacent tiles.
 - Capture still needs CHASE plus current sight for active controllers; POST guards need current sight. Tools still resolve before capture.
 
 ## Geometry revisions
 
 - `Observation.geometry_revision` (default 0) is public facility knowledge. `Simulation.request_geometry_revision(map, reason)` validates a same-size replacement map (same stairs; every actor still fits), applies it at the start of the next tick and emits `GEOMETRY_REVISED`. P05 doors/glass will use this adapter; P03 adds no door state.
 - Guards store `path_revision` and replan whenever it differs. Physical bounds/LOS use the replacement map directly; no invisible tile-sized barriers are created.
+- The replacement map and current sight/motion cues are refreshed **before** that tick's controller decisions and action validation. Previously heard sounds retain their original provenance. The revision event uses the new tick; an abort does not apply a pending revision.
 
 ## Presentation values for KR1/KR2
 
@@ -38,6 +40,8 @@ The fingerprint-7 baseline in the [cinematic/fixture handoff](../../../tracking/
 ## Replay
 
 `core/simulation/replay.py` records a header (game/fingerprint schema, map/rules/sensor hashes, registry revision, seed, rate) plus per-tick intruder actions, and verifies a re-run tick by tick against event and fingerprint hashes. Fingerprint schema becomes **8** because guard memory/evidence/witness state and geometry revision enter the canonical state; schema-7 hashes are not comparable.
+
+Queued geometry contributes its full map payload and reason to the fingerprint, so distinct pending changes cannot share a state hash merely because their reason text matches. The replay header records game version/configuration; it does not pin an exact Git commit or dependency lock. Keep source/lock identities alongside exported evidence when comparing builds.
 
 ## Actual values (packaged map, 2026-10-22)
 

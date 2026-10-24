@@ -48,6 +48,32 @@ ROLE_KINDS = {
 }
 
 
+def _map_payload(world_map: StaticMap) -> dict[str, object]:
+    return {
+        "id": world_map.map_id,
+        "width": world_map.width,
+        "height": world_map.height,
+        "tile_size_px": world_map.tile_size_px,
+        "blocked": sorted(world_map.blocked_tiles),
+        "opaque": sorted(world_map.opaque_tiles),
+        "crouch_tiles": sorted(world_map.crouch_tiles),
+        "obstacles": [
+            (
+                obj.object_id,
+                obj.left,
+                obj.top,
+                obj.right,
+                obj.bottom,
+                sorted(obj.reserved_tiles),
+                obj.opaque,
+            )
+            for obj in world_map.obstacles
+        ],
+        "objects": [asdict(obj) for obj in world_map.objects],
+        "stairs": [asdict(link) for link in world_map.stairs],
+    }
+
+
 class Simulation:
     def __init__(
         self,
@@ -181,6 +207,15 @@ class Simulation:
     def step(self, actions: Iterable[Action] = (), *, abort: bool = False) -> StepResult:
         if self._world.mission_end is not None:
             return self._result(())
+        geometry_reason: str | None = None
+        if not abort and self._pending_geometry is not None:
+            self._map, geometry_reason = self._pending_geometry
+            self._pending_geometry = None
+            self._world.geometry_revision += 1
+            if self._security is not None:
+                # Decisions must see the new map and its current visibility.
+                # Already-heard sounds retain their original provenance.
+                guard_security.refresh(self._world, self._map, self._security, None)
         choices = (
             guard_security.decisions(
                 self._security,
@@ -233,14 +268,11 @@ class Simulation:
             )
             end_mission(self._world, operative, RunOutcome.ABORTED, emit)
             return self._result(tuple(events))
-        if self._pending_geometry is not None:
-            self._map, reason = self._pending_geometry
-            self._pending_geometry = None
-            self._world.geometry_revision += 1
+        if geometry_reason is not None:
             emit(
                 EventKind.GEOMETRY_REVISED,
                 "facility",
-                (("revision", self._world.geometry_revision), ("reason", reason)),
+                (("revision", self._world.geometry_revision), ("reason", geometry_reason)),
             )
         for actor in self._world.actors.values():
             actor.traversed_tiles = (actor.tile,)
@@ -385,7 +417,12 @@ class Simulation:
             "schema_version": 8,
             "seed": self._seed,
             "rules": asdict(self._rules),
-            "pending_geometry": self._pending_geometry[1] if self._pending_geometry else None,
+            "pending_geometry": {
+                "map": _map_payload(self._pending_geometry[0]),
+                "reason": self._pending_geometry[1],
+            }
+            if self._pending_geometry
+            else None,
             "mission": asdict(self._mission) if self._mission else None,
             "security": {
                 "patrols": [asdict(patrol) for patrol in self._security.patrols],
@@ -395,29 +432,7 @@ class Simulation:
             if self._security
             else None,
             "world": asdict(self._world),
-            "map": {
-                "id": self._map.map_id,
-                "width": self._map.width,
-                "height": self._map.height,
-                "tile_size_px": self._map.tile_size_px,
-                "blocked": sorted(self._map.blocked_tiles),
-                "opaque": sorted(self._map.opaque_tiles),
-                "crouch_tiles": sorted(self._map.crouch_tiles),
-                "obstacles": [
-                    (
-                        obj.object_id,
-                        obj.left,
-                        obj.top,
-                        obj.right,
-                        obj.bottom,
-                        sorted(obj.reserved_tiles),
-                        obj.opaque,
-                    )
-                    for obj in self._map.obstacles
-                ],
-                "objects": [asdict(obj) for obj in self._map.objects],
-                "stairs": [asdict(link) for link in self._map.stairs],
-            },
+            "map": _map_payload(self._map),
         }
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False)
         return sha256(canonical.encode()).hexdigest()

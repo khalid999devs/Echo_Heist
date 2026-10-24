@@ -25,6 +25,7 @@ from echo_heist.core.perception.concealment import (
     witnessed_entry,
 )
 from echo_heist.core.perception.sensors import can_see, line_of_sight, sound_reaches
+from echo_heist.core.simulation.systems.motion import clear_reach
 from echo_heist.core.simulation.world import Emit, WorldState
 
 INTRUDERS = frozenset({ActorKind.OPERATIVE, ActorKind.COMPANION})
@@ -169,7 +170,7 @@ def _sees(
                 world.hide_witnesses.get(viewer, ()),
                 world.tick,
                 rules.memory_ticks,
-            )
+            ) and clear_reach(world_map, actor.position, target.position, allow_solid_end=True)
         return can_see(
             world_map,
             actor.position,
@@ -226,15 +227,17 @@ def refresh(
     world: WorldState,
     world_map: StaticMap,
     spec: SecuritySpec,
-    events: tuple[GameEvent, ...],
+    events: tuple[GameEvent, ...] | None,
     emit: Emit | None = None,
 ) -> None:
+    """Refresh sensors; a geometry-only refresh preserves already-heard cues."""
     rules = spec.rules
     active = {patrol.actor_id for patrol in spec.patrols}
     previous = dict(world.visible_entities)
     _witness(world, world_map, spec, previous, emit)
     world.visible_entities.clear()
-    world.heard_cues.clear()
+    if events is not None:
+        world.heard_cues.clear()
     world.visual_cues.clear()
     world.security_reports = tuple(
         report for report in world.security_reports if world.tick <= report.expires_at_tick
@@ -267,7 +270,7 @@ def refresh(
         if actor_id not in active:
             continue
         cues: list[HeardCue] = []
-        for event in events:
+        for event in events or ():
             if event.kind != EventKind.NOISE_CREATED or event.actor_id == actor_id:
                 continue
             details = dict(event.details)
@@ -281,7 +284,8 @@ def refresh(
                 cues.append(
                     HeardCue(event.event_id, str(details.get("kind", "NOISE")), (x, y), event.tick)
                 )
-        world.heard_cues[actor_id] = tuple(cues)
+        if events is not None:
+            world.heard_cues[actor_id] = tuple(cues)
         motion: list[VisualCue] = [
             VisualCue(
                 echo.echo_id,

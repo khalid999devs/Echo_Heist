@@ -71,9 +71,18 @@ def decide(
             # unreachable or stale origin cannot hold the guard forever.
             memory = _return(observation, patrol, memory)
         hidden = witnessed_hide(observation, memory)
-        if memory.state == GuardState.CHASE and hidden is not None:
-            memory = replace(memory, target=hidden)
-        if memory.state not in (GuardState.CHASE, GuardState.SEARCH):
+        if hidden is not None:
+            memory = replace(
+                memory,
+                state=GuardState.CHASE
+                if memory.state == GuardState.CHASE
+                else GuardState.INVESTIGATE,
+                target=hidden.tile,
+                evidence_kind="HIDE_ENTRY",
+                evidence_id=hidden.cue_id,
+                evidence_tick=hidden.tick,
+            )
+        elif memory.state not in (GuardState.CHASE, GuardState.SEARCH):
             memory = investigate(observation, rules, memory)
     target = memory.target
     if memory.state == GuardState.PATROL:

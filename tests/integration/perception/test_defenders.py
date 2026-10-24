@@ -8,13 +8,25 @@ from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind
 from echo_heist.core.contracts.security.model import (
+    GuardMemory,
     GuardPatrol,
     GuardRole,
     GuardState,
     SecuritySpec,
+    VisualCue,
 )
-from echo_heist.core.contracts.world import ActorKind, ActorSpawn, StaticMap, Tile, tile_center
+from echo_heist.core.contracts.world import (
+    ActorKind,
+    ActorSpawn,
+    ObstacleBounds,
+    StaticMap,
+    Tile,
+    tile_center,
+)
 from echo_heist.core.simulation.engine import Simulation
+from echo_heist.core.simulation.systems import security
+from echo_heist.core.simulation.systems.motion import clear_reach
+from echo_heist.core.simulation.world import ActorState, WorldState
 from echo_heist.infrastructure.resources import load_sensor_rules
 
 KINDS = {GuardRole.SENTINEL: ActorKind.SENTINEL, GuardRole.TRACKER: ActorKind.TRACKER}
@@ -259,9 +271,61 @@ def test_geometry_revision_replans_and_refuses_to_enclose_actors(rules: GameRule
         event.kind == EventKind.GEOMETRY_REVISED and dict(event.details)["revision"] == 1
         for event in result.events
     )
-    sim.step()
     observation = sim.observe("tracker")
     assert observation.geometry_revision == 1 and observation.map_static.can_walk((7, 2)) is False
     path = sim.presentation_snapshot().guards[0].path
     assert path and not barrier & set(path)
     assert path[-1] == (11, 2) and (7, 5) in path
+
+
+def test_geometry_revision_removes_blocked_sight_before_guard_decisions(rules: GameRules) -> None:
+    sim = secured(
+        bordered(14, 9),
+        rules,
+        (5, 2),
+        GuardPatrol("tracker", ((2, 2), (11, 2)), GuardRole.TRACKER),
+    )
+    sim.step((Action("operative", ActionKind.MOVE, sim.tick, (0, 1), sprint=True),))
+    previous = sim.presentation_snapshot().guards[0]
+    assert previous.state == GuardState.SPOTTED
+    assert sim.observe("tracker").heard_events
+    base = sim.observe("tracker").map_static
+    barrier = frozenset((4, y) for y in range(1, 8))
+    sim.request_geometry_revision(
+        StaticMap(
+            base.map_id,
+            base.width,
+            base.height,
+            base.blocked_tiles | barrier,
+            base.opaque_tiles | barrier,
+        ),
+        "close partition",
+    )
+    sim.step()
+    guard = sim.presentation_snapshot().guards[0]
+    assert guard.last_seen_tick == previous.last_seen_tick
+    assert guard.identification_ticks < previous.identification_ticks
+    assert guard.evidence_kind == "NOISE"  # a sound already heard survives the revision
+    assert not sim.observe("tracker").visible_entities
+
+
+def test_witnessed_cover_inspection_cannot_reveal_through_a_physical_barrier() -> None:
+    cover, guard_tile = (5, 3), (4, 3)
+    wall = ObstacleBounds("partition", 144_000, 90_000, 147_000, 120_000, frozenset({guard_tile}))
+    tiles = frozenset({cover, guard_tile})
+    world_map = StaticMap(
+        "inspection", 10, 8, tiles, tiles, crouch_tiles=frozenset({cover}), obstacles=(wall,)
+    )
+    guard = ActorState("guard", ActorKind.SENTINEL, tile_center(guard_tile))
+    intruder = ActorState("operative", ActorKind.OPERATIVE, tile_center(cover), crouched=True)
+    world = WorldState(
+        {"guard": guard, "operative": intruder},
+        tick=1,
+        guard_memories={"guard": GuardMemory(state=GuardState.CHASE)},
+        hide_witnesses={"guard": (VisualCue("hide", cover, 0, "HIDE_ENTRY"),)},
+    )
+    spec = SecuritySpec((GuardPatrol("guard", ((4, 4), (4, 5))),), load_sensor_rules())
+    assert not clear_reach(world_map, guard.position, intruder.position, allow_solid_end=True)
+    security.refresh(world, world_map, spec, ())
+    assert not world.visible_entities["guard"]
+    assert not security.capture_targets(world, spec)["guard"]

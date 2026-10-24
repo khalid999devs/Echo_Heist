@@ -139,9 +139,18 @@ def decide(
         ) and evidence_expired(observation, rules, memory):
             memory = _return(observation, patrol, memory)
         hidden = witnessed_hide(observation, memory)
-        if memory.state == GuardState.CHASE and hidden is not None:
-            memory = replace(memory, target=hidden)
-        if memory.state != GuardState.CHASE:
+        if hidden is not None:
+            memory = replace(
+                memory,
+                state=GuardState.CHASE
+                if memory.state == GuardState.CHASE
+                else GuardState.INVESTIGATE,
+                target=hidden.tile,
+                evidence_kind="HIDE_ENTRY",
+                evidence_id=hidden.cue_id,
+                evidence_tick=hidden.tick,
+            )
+        elif memory.state != GuardState.CHASE:
             lead = report_lead(observation, memory)
             cue = strongest_cue(observation)
             if lead is not None and (cue is None or lead.tick >= cue.tick):

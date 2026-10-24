@@ -91,10 +91,15 @@ def main() -> int:
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
-    expected = {"upper-tools": "WIN", "lower-tools": "WIN", "cross-tools": "WIN"}
+    expected = {
+        "upper-tools": "WIN",
+        "lower-tools": "WIN",
+        "cross-tools": "WIN",
+        "upper-no-tools": "CAPTURED",
+        "lower-no-tools": "CAPTURED",
+    }
     ok = all(
-        item["replay_matched"] and expected.get(item["name"], item["outcome"]) == item["outcome"]
-        for item in results
+        item["replay_matched"] and expected[item["name"]] == item["outcome"] for item in results
     )
     return 0 if ok else 1
 

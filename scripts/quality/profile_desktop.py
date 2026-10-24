@@ -40,6 +40,7 @@ def distribution(values: list[float]) -> dict[str, float]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=Path("output/cinematic-startup/performance"))
+    parser.add_argument("--teaching", action="store_true", help="Include the live F3 diagnostics")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     pygame.display.init()
@@ -57,6 +58,14 @@ def main() -> int:
         flow.resize(view)
         # Exercise the actual restart factory; no positions or AI state are injected.
         flow._start_run()
+        if args.teaching:
+            flow.frame(
+                [
+                    pygame.event.Event(pygame.KEYDOWN, key=pygame.K_F3),
+                    pygame.event.Event(pygame.KEYUP, key=pygame.K_F3),
+                ],
+                0,
+            )
         canvas = opaque_surface(view)
         previous_key = None
         for frame in range(300):
@@ -107,6 +116,7 @@ def main() -> int:
         "measured_frames_after_warmup": len(samples["total"]),
         "sizes": [[1280, 720], [1440, 900]],
         "security_enabled": True,
+        "teaching_view": args.teaching,
         "frame_ms": {name: distribution(values) for name, values in samples.items()},
         "memory": memory,
         "last_six_rss_span_mb": round(max(tail) - min(tail), 2),

@@ -18,7 +18,7 @@ from echo_heist.core.contracts.results import (
     RunOutcome,
     StepResult,
 )
-from echo_heist.core.contracts.security.model import GuardMemory, SecuritySpec
+from echo_heist.core.contracts.security.model import GuardMemory, GuardRole, SecuritySpec
 from echo_heist.core.contracts.world import ActorKind, ActorSpawn, Scalar, StaticMap, tile_center
 from echo_heist.core.simulation import views
 from echo_heist.core.simulation.systems import security as guard_security
@@ -41,6 +41,37 @@ from echo_heist.core.simulation.systems.traversal import (
 from echo_heist.core.simulation.world import GUARD_KINDS, ActorState, WorldState
 
 TOOL_ACTIONS = frozenset({ActionKind.ECHO, ActionKind.EMP, ActionKind.MELEE})
+ROLE_KINDS = {
+    GuardRole.SENTINEL: frozenset({ActorKind.SENTINEL}),
+    GuardRole.TRACKER: frozenset({ActorKind.TRACKER}),
+    GuardRole.POST: GUARD_KINDS,
+}
+
+
+def _map_payload(world_map: StaticMap) -> dict[str, object]:
+    return {
+        "id": world_map.map_id,
+        "width": world_map.width,
+        "height": world_map.height,
+        "tile_size_px": world_map.tile_size_px,
+        "blocked": sorted(world_map.blocked_tiles),
+        "opaque": sorted(world_map.opaque_tiles),
+        "crouch_tiles": sorted(world_map.crouch_tiles),
+        "obstacles": [
+            (
+                obj.object_id,
+                obj.left,
+                obj.top,
+                obj.right,
+                obj.bottom,
+                sorted(obj.reserved_tiles),
+                obj.opaque,
+            )
+            for obj in world_map.obstacles
+        ],
+        "objects": [asdict(obj) for obj in world_map.objects],
+        "stairs": [asdict(link) for link in world_map.stairs],
+    }
 
 
 class Simulation:
@@ -67,6 +98,7 @@ class Simulation:
             raise ValueError("Actor spawn must fit on a walkable map tile")
         self._map, self._rules, self._mission, self._seed = world_map, rules, mission, seed
         self._security = security
+        self._pending_geometry: tuple[StaticMap, str] | None = None
         self._world = WorldState(
             actors={
                 spawn.actor_id: ActorState(
@@ -98,8 +130,8 @@ class Simulation:
         if security is not None:
             for patrol in security.patrols:
                 guard = self._world.actors.get(patrol.actor_id)
-                if guard is None or guard.kind != ActorKind.SENTINEL:
-                    raise ValueError("The active Sentinel slice requires a Sentinel actor")
+                if guard is None or guard.kind not in ROLE_KINDS[patrol.role]:
+                    raise ValueError(f"Guard {patrol.actor_id!r} cannot take role {patrol.role}")
                 if any(
                     not body_fits(world_map, tile_center(tile), rules.actor_radius_units)
                     for tile in patrol.points
@@ -141,12 +173,49 @@ class Simulation:
     def observe(self, actor_id: str) -> Observation:
         return views.observe(self._world, self._map, self._rules, self._mission, actor_id)
 
+    @property
+    def geometry_revision(self) -> int:
+        return self._world.geometry_revision
+
+    def request_geometry_revision(self, world_map: StaticMap, reason: str) -> None:
+        """Queue a validated static-geometry change for the start of the next tick.
+
+        This is the adapter later door/glass lifecycles use. It keeps stairs and
+        map identity, never moves an actor and refuses a map in which any actor's
+        current physical body would no longer fit.
+        """
+        current = self._map
+        if (
+            world_map.map_id != current.map_id
+            or (world_map.width, world_map.height) != (current.width, current.height)
+            or world_map.stairs != current.stairs
+            or not reason
+        ):
+            raise ValueError("A geometry revision must keep map identity, size and stairs")
+        if any(
+            not body_fits(
+                world_map, actor.position, self._rules.actor_radius_units, crouched=actor.crouched
+            )
+            for actor in self._world.actors.values()
+        ):
+            raise ValueError("A geometry revision cannot enclose an actor's body")
+        self._pending_geometry = (world_map, reason)
+
     def presentation_snapshot(self) -> PresentationSnapshot:
         return views.presentation(self._world, self._map, self._rules, self._security)
 
     def step(self, actions: Iterable[Action] = (), *, abort: bool = False) -> StepResult:
         if self._world.mission_end is not None:
             return self._result(())
+        geometry_reason: str | None = None
+        if not abort and self._pending_geometry is not None:
+            self._map, geometry_reason = self._pending_geometry
+            self._pending_geometry = None
+            self._world.geometry_revision += 1
+            if self._security is not None:
+                # Decisions must see the new map and its current visibility.
+                # Already-heard sounds retain their original provenance.
+                guard_security.refresh(self._world, self._map, self._security, None)
         choices = (
             guard_security.decisions(
                 self._security,
@@ -199,6 +268,12 @@ class Simulation:
             )
             end_mission(self._world, operative, RunOutcome.ABORTED, emit)
             return self._result(tuple(events))
+        if geometry_reason is not None:
+            emit(
+                EventKind.GEOMETRY_REVISED,
+                "facility",
+                (("revision", self._world.geometry_revision), ("reason", geometry_reason)),
+            )
         for actor in self._world.actors.values():
             actor.traversed_tiles = (actor.tile,)
         if self._security is not None:
@@ -267,7 +342,7 @@ class Simulation:
         update_theft(self._world, self._rules, self._mission, tuple(interactions), emit)
         advance_stairs(self._world, self._map, self._rules, emit)
         if self._security is not None:
-            guard_security.refresh(self._world, self._map, self._security, tuple(events))
+            guard_security.refresh(self._world, self._map, self._security, tuple(events), emit)
         # Tools precede capture; completed contact capture precedes extraction.
         update_captures(
             self._world,
@@ -275,7 +350,7 @@ class Simulation:
             self._rules,
             self._mission,
             emit,
-            guard_security.capture_eligible(self._world) if self._security else None,
+            guard_security.capture_targets(self._world, self._security) if self._security else None,
         )
         check_extraction(self._world, self._map, self._mission, emit)
         remember_paths(self._world, self._rules)
@@ -339,9 +414,15 @@ class Simulation:
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 7,
+            "schema_version": 9,
             "seed": self._seed,
             "rules": asdict(self._rules),
+            "pending_geometry": {
+                "map": _map_payload(self._pending_geometry[0]),
+                "reason": self._pending_geometry[1],
+            }
+            if self._pending_geometry
+            else None,
             "mission": asdict(self._mission) if self._mission else None,
             "security": {
                 "patrols": [asdict(patrol) for patrol in self._security.patrols],
@@ -351,29 +432,7 @@ class Simulation:
             if self._security
             else None,
             "world": asdict(self._world),
-            "map": {
-                "id": self._map.map_id,
-                "width": self._map.width,
-                "height": self._map.height,
-                "tile_size_px": self._map.tile_size_px,
-                "blocked": sorted(self._map.blocked_tiles),
-                "opaque": sorted(self._map.opaque_tiles),
-                "crouch_tiles": sorted(self._map.crouch_tiles),
-                "obstacles": [
-                    (
-                        obj.object_id,
-                        obj.left,
-                        obj.top,
-                        obj.right,
-                        obj.bottom,
-                        sorted(obj.reserved_tiles),
-                        obj.opaque,
-                    )
-                    for obj in self._map.obstacles
-                ],
-                "objects": [asdict(obj) for obj in self._map.objects],
-                "stairs": [asdict(link) for link in self._map.stairs],
-            },
+            "map": _map_payload(self._map),
         }
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False)
         return sha256(canonical.encode()).hexdigest()

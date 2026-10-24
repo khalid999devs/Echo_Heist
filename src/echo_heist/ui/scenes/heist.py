@@ -10,11 +10,11 @@ import pygame
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.results import MissionEnd
-from echo_heist.core.contracts.security.model import GuardPatrol, SecuritySpec
-from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, ActorKind
+from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE
 from echo_heist.core.simulation.engine import Simulation
 from echo_heist.infrastructure.resources import load_sensor_rules
 from echo_heist.level.model import LevelData
+from echo_heist.level.security import build_security_registry
 from echo_heist.ui.input.human import HumanInput, UiCommand
 from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
@@ -29,6 +29,8 @@ from echo_heist.ui.render.environment.stairwell import Stairwell
 from echo_heist.ui.render.hud import draw_hud, panel
 from echo_heist.ui.render.layout.viewport import interface_canvas
 from echo_heist.ui.render.motifs import ActorMotion
+from echo_heist.ui.render.security.lab import GUARD_TABS, draw_lab
+from echo_heist.ui.render.security.signals import CuePulse, draw_cues, draw_debug_path
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import (
     VisualPulse,
@@ -69,27 +71,10 @@ class HeistSession:
         furnishings: tuple[FurnitureVisual, ...] | None = None,
     ) -> None:
         self.level, self.seed, self.fonts, self.rules = level, seed, fonts, rules
-        candidates = tuple(post for post in level.guards if post.kind == ActorKind.SENTINEL)
-        patrols: tuple[GuardPatrol, ...] = ()
-        if candidates and security_enabled:
-            # First milestone: activate the Sentinel nearest Entry using the
-            # already-validated P02 patrol data. The shared P03 registry remains separate.
-            post = min(
-                candidates,
-                key=lambda value: (
-                    abs(value.tile[0] - level.spawn_tile[0])
-                    + abs(value.tile[1] - level.spawn_tile[1]),
-                    value.guard_id,
-                ),
-            )
-            route = next(route for route in level.routes if route.route_id == post.route_id)
-            points = route.points[:-1] if route.points[0] == route.points[-1] else route.points
-            patrols = (GuardPatrol(post.guard_id, points),)
-        security = (
-            SecuritySpec(patrols, load_sensor_rules(), level.sound_blocking_tiles)
-            if patrols
-            else None
-        )
+        # P03 registry: every authored post gets its validated role (Sentinel BFS,
+        # Tracker A*, sensing-only post until P04). False remains a diagnostic fixture.
+        self.registry = build_security_registry(level, rules) if security_enabled else None
+        security = self.registry.spec(load_sensor_rules()) if self.registry else None
         self.simulation = Simulation(
             level.static_map,
             level.spawns(),
@@ -115,6 +100,8 @@ class HeistSession:
         }
         self.actor_motion: dict[str, ActorMotion] = {}
         self.pulses: list[VisualPulse] = []
+        self.cue_pulses: list[CuePulse] = []
+        self.lab_selected = 0
         self.audio_events: deque[GameEvent] = deque(maxlen=512)
         self.reduced_flashing = reduced_flashing
         self.notice = ""
@@ -200,6 +187,32 @@ class HeistSession:
             self.input.clear()
         if UiCommand.LAB in commands:
             self.lab_note = not self.lab_note
+            if self.lab_note:
+                snapshot = self.simulation.presentation_snapshot()
+                actors = {actor.actor_id: actor for actor in snapshot.actors}
+                own = actors[self.level.operative_id]
+                deck = self.level.deck_at(own.tile)
+                candidates = [
+                    (i, actors[guard.actor_id])
+                    for i, guard in enumerate(snapshot.guards)
+                    if deck is None or deck.contains(actors[guard.actor_id].tile)
+                ]
+                if candidates:
+                    self.lab_selected = min(
+                        candidates,
+                        key=lambda item: sum(
+                            abs(a - b) for a, b in zip(item[1].tile, own.tile, strict=True)
+                        ),
+                    )[0]
+        if self.lab_note:
+            for event in events:
+                if event.type == pygame.KEYDOWN and not getattr(event, "repeat", False):
+                    if pygame.K_1 <= event.key <= pygame.K_4:
+                        self.lab_selected = event.key - pygame.K_1
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    selected = hit(GUARD_TABS, event.pos)
+                    if selected is not None:
+                        self.lab_selected = selected
         return None
 
     def _handle_paused(self, events: Sequence[pygame.event.Event]) -> HeistRequest | None:
@@ -263,6 +276,9 @@ class HeistSession:
         if not self.paused and not self.summary and self.mission_end is None:
             self.clock_ms += elapsed_ms
             self.pulses = [pulse for pulse in self.pulses if self.clock_ms - pulse.started_ms < 650]
+            self.cue_pulses = [
+                cue for cue in self.cue_pulses if self.clock_ms - cue.started_ms < 900
+            ]
         if self.paused or self.summary or self.mission_end is not None:
             self.accumulator = 0
         else:
@@ -325,6 +341,7 @@ class HeistSession:
     def _record_events(self, events: tuple[GameEvent, ...]) -> None:
         self.audio_events.extend(events)
         actors = {actor.actor_id: actor for actor in self.simulation.presentation_snapshot().actors}
+        guards = {guard.actor_id: guard for guard in self.simulation.presentation_snapshot().guards}
         for event in events:
             if event.kind == EventKind.STAIR_USED and event.actor_id == self.level.operative_id:
                 self.notice = ""
@@ -338,11 +355,27 @@ class HeistSession:
                 self.notice = "LOW CLEARANCE / CROUCH OUT FIRST"
                 self.notice_until_ms = self.clock_ms + 1800
             elif event.kind == EventKind.CAPTURE_STARTED:
-                self.notice = "GUARD GRAB INCOMING  /  BREAK RANGE"
-                self.notice_until_ms = self.clock_ms + 1800
+                self.notice = ""  # The authoritative wind-up meter owns this warning.
             elif event.kind == EventKind.CAPTURE_CANCELED:
                 self.notice = "GRAB ESCAPED"
                 self.notice_until_ms = self.clock_ms + 1200
+            elif event.kind == EventKind.HIDE_WITNESSED:
+                own = actors[self.level.operative_id]
+                details = dict(event.details)
+                if own.concealed and own.tile == (details.get("x"), details.get("y")):
+                    self.notice = "COVER ENTRY SEEN"
+                    self.notice_until_ms = self.clock_ms + 1600
+            elif event.kind == EventKind.POLICY_DECISION:
+                guard = guards.get(event.actor_id)
+                if (
+                    guard is not None
+                    and guard.evidence_tile is not None
+                    and guard.evidence_kind in ("NOISE", "MOTION", "HIDE_ENTRY")
+                ):
+                    self.cue_pulses.append(
+                        CuePulse(guard.evidence_tile, guard.evidence_kind, self.clock_ms)
+                    )
+                    self.cue_pulses = self.cue_pulses[-16:]
             elif event.kind == EventKind.ACTION_REJECTED:
                 reason = dict(event.details).get("reason")
                 self.notice = {
@@ -394,6 +427,10 @@ class HeistSession:
             furnishings=self.furnishings,
             fraction=self.render_fraction,
         )
+        draw_cues(canvas, self.level, snapshot, self.camera, tuple(self.cue_pulses), self.clock_ms)
+        if self.lab_note and snapshot.guards:
+            selected = snapshot.guards[self.lab_selected % len(snapshot.guards)]
+            draw_debug_path(canvas, self.level, snapshot, self.camera, selected, self.fonts)
         age = self.clock_ms - self.floor_changed_ms
         if not self.reduced_flashing and 0 <= age < 240:
             fade = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
@@ -435,6 +472,15 @@ class HeistSession:
                 concealed=self.simulation.observe(self.level.operative_id).own_status.concealed,
                 sprint_recharge_ticks=self.rules.sprint_recharge_ticks,
                 ticks_per_second=self.rules.simulation_hz,
+                teaching_view=self.lab_note,
+                capture=next(
+                    (
+                        capture
+                        for capture in snapshot.captures
+                        if capture.target_id == self.level.operative_id
+                    ),
+                    None,
+                ),
             )
         if self.lab_note:
             self._draw_lab(canvas)
@@ -449,31 +495,17 @@ class HeistSession:
 
     def _draw_lab(self, canvas: pygame.Surface) -> None:
         snapshot = self.simulation.presentation_snapshot()
-        panel(canvas, pygame.Rect(20, 158, 410, 200), border=theme.ACCENT_DIM)
-        lines = ["AI LAB  /  F3 to close"]
-        for guard in snapshot.guards:
-            age = (
-                "none"
-                if guard.last_seen_tick < 0
-                else f"{snapshot.tick - guard.last_seen_tick} ticks ago"
-            )
-            lines.extend(
-                (
-                    f"Sentinel  /  {guard.state.value}",
-                    f"BFS  {guard.expanded_nodes} expanded / {len(guard.path)} path tiles",
-                    f"Identification  {guard.identification_ticks}/"
-                    f"{guard.identification_required_ticks}",
-                    f"Last visual contact: {age}",
-                    f"Fuzzy urgency  {guard.fuzzy_urgency:.2f}",
-                )
-            )
         if not snapshot.guards:
-            lines.append("No active controller in this diagnostic fixture.")
-        for index, line in enumerate(lines):
-            canvas.blit(
-                self.fonts.micro.render(line, True, theme.ACCENT if index == 0 else theme.TEXT),
-                (34, 173 + index * 29),
-            )
+            return
+        guard = snapshot.guards[self.lab_selected % len(snapshot.guards)]
+        draw_lab(
+            interface_canvas(canvas),
+            snapshot,
+            guard,
+            self.simulation.observe(guard.actor_id),
+            self.fonts,
+            ticks_per_second=self.rules.simulation_hz,
+        )
 
     def _draw_pause(self, canvas: pygame.Surface) -> None:
         veil = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)

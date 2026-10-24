@@ -1,115 +1,98 @@
-# Suhita: Windows setup and current P03 handoff
+# Suhita: Windows setup and P04 handoff
 
-Updated **2026-10-22**. Repository: [khalid999devs/Echo_Heist](https://github.com/khalid999devs/Echo_Heist). Use **native Windows x64 / PowerShell**, not WSL for desktop QA. P01/P02 are complete. Your next assignment is **P03-SR1/SR2/SR3**, with most gameplay logic now yours and complex graphics/scenes Khalid's. The [owner guide](../owners/SUHITA.md) and [revised workload](../../planning/WORKLOAD.md) replace the original P02 start instructions.
+Updated **2026-10-24**. Repository: [khalid999devs/Echo_Heist](https://github.com/khalid999devs/Echo_Heist). Use native Windows x64 / PowerShell for desktop QA. **P01-P03 are complete; P04-SR1/SR2/SR3 are next.** You lead logic and Khalid leads complex visuals. Read the [owner guide](../owners/SUHITA.md), [P03 combined handoff](../../tracking/handoffs/khalid/day_02/phase03/P03.md) and [P04 specification](../../planning/phases/intelligence/PHASE_04.md).
 
-## 1. Inspect prerequisites and checkout
+## Inspect and create the checkout
 
-Check `git --version` and `uv --version`. Install only missing tools, using official installers; these WinGet IDs are the existing project setup path:
+Check Git and uv; install only missing tools through their official installers. Existing project WinGet path:
 
 ```powershell
 winget install --id Git.Git --exact --source winget
 winget install --id astral-sh.uv --exact --source winget
 ```
 
-Reopen the terminal after installation if PATH needs refreshing. Official references: [Git for Windows](https://git-scm.com/install/windows), [uv](https://docs.astral.sh/uv/getting-started/installation/). Do not alter system-wide PowerShell execution policy.
+[Git for Windows](https://git-scm.com/install/windows), [uv installation](https://docs.astral.sh/uv/getting-started/installation/). Reopen the terminal if PATH needs refreshing. Do not change system-wide PowerShell execution policy.
 
-If absent, clone into a new directory:
+Clone if absent:
 
 ```powershell
 git clone https://github.com/khalid999devs/Echo_Heist.git
 Set-Location Echo_Heist
 ```
 
-For an existing checkout, inspect `git status --short --branch`, `git remote -v` and local commits first. Preserve local changes and never reset/overwrite them. Fetch `git fetch origin --prune`; if the checkout is clean and this is a fresh assignment, create the branch directly from the fetched main:
+For an existing checkout inspect status, remotes and local commits first. Preserve local changes; never reset/overwrite them. On a clean checkout for this new assignment:
 
 ```powershell
-git switch -c work/suhita-p03 origin/main
+git status --short --branch
+git fetch origin --prune
+git switch -c work/suhita-p04 origin/main
 ```
 
-If that branch already exists, inspect/resume it and integrate current main with a normal merge as needed. A clean separate worktree is an alternative when unrelated local edits would be disturbed. Deleted `work/suhita-p02` is historical; its work is already merged. Verify main includes the cinematic/fixture handoff and this revised queue before claiming work.
+If P04 already exists, inspect/resume it and merge current main normally as needed. A separate worktree is appropriate when unrelated edits must be preserved. P02/P03 branches are historical; do not redo their completed work. Verify main contains the schema-9 P03 handoff before dependent implementation. Use Suhita's own Git identity/account; ask her name/email once only if missing. Public clone access does not prove push access.
 
-Use Suhita's own Git identity/account. If identity is absent, request her name/email once; never borrow Khalid's credentials or invent identity. Read-only public clone access does not prove push access.
+## Verify the locked source baseline
 
-## 2. Reproduce the locked source baseline
-
-Run sequentially and inspect each exit code before dependent commands; PowerShell may otherwise continue after a native command fails.
+Run sequentially and inspect exit codes before dependent commands; PowerShell may otherwise continue after failure.
 
 ```powershell
 uv python install 3.13
 uv sync --locked --all-extras --python 3.13
 uv run --locked python -c "import platform; assert platform.machine().lower() in {'amd64', 'x86_64'}, platform.machine(); print(platform.python_version(), platform.machine())"
-uv run --locked echo-heist --headless --seed 1042 --report output/windows-p03/baseline-headless.json
 uv run --locked python scripts/checks/run.py
-uv run --locked echo-heist --data-dir .local/suhita-profile
+uv run --locked python scripts/experiments/p03_evidence.py --output output/windows-p04/baseline-evidence.json
+uv run --locked echo-heist --data-dir .local/suhita-p04
 ```
 
-The recorded baseline has **149 passing tests**, structure/Ruff/format/strict types and Python 3.13.16. Record your actual fetched commit/count/version; do not edit the lock to make reproduction easier. The headless diagnostic alone is not full gameplay acceptance.
+Recorded integrated baseline: **195 tests**, structure/Ruff/format/strict types PASS, Python 3.13.16, fingerprint **9**; record your actual fetched commit/version/count. Keep the dependency lock. Suhita's earlier Windows laptop had a 30-second smoke timeout with 35-46-second resource loading; record a recurrence honestly. Current hosted Windows checks/build/frozen dummy smoke pass; that does not prove your physical display/audio or packaged playthrough.
 
-Expected desktop: animated loading/core emblem → cinematic chapter menu → Play / Human / Launch → pressure-door entrance → real two-floor Human heist. WASD moves; **C** crouches/creeps; Shift sprints three seconds then recharges four; E uses stairs/hold at Core; Q Echo; F EMP; Space stun; Tab map; Esc pause. Inspect both routes, real core theft/lockdown/extraction and capture/retry. Companion/Workshop screens are currently previews. There is no separate seated action.
+Desktop: cinematic loading → Chapter → Play / Human / Launch → pressure-door entrance → actual two-floor mission. WASD/arrows move; C crouches/creeps; Shift uses 3-second sprint / 4-second recharge; E stairs/hold Core; Q Echo; F EMP; Space stun; Tab paused map; Esc pause. F3 opens real defender teaching data; 1-4 or tabs select guards. Inspect both routes, core/lockdown/extraction, capture/interrupt/retry, witnessed/unseen cover, pointer alignment and audio/window/fullscreen. Companion/Workshop are still previews before P04. No separate sitting action exists.
 
-Inspect keyboard/mouse, window/fullscreen, audio and muted behavior. The latest recorded Mac QA and Windows hosted dummy-video smoke do not prove your physical Windows display/audio works. Use `--mute` to isolate an audio failure and record it. Data lives in the isolated `.local` profile above; do not copy Mac `.venv`, `.app` or ZIP files to Windows.
+Use an isolated profile; do not copy Mac environments/apps to Windows. A muted run can isolate audio failure but cannot prove audio works.
 
-## 3. Retrieve context and implement the current slice
+## Implement P04 only
 
-Read root AGENTS, START_HERE, your owner guide, development hub, current Status/claims, Workload, **P03**, code rules, architecture/data contracts, approved scoring and PDF pp. 6-11, 16-18. Retrieve the accepted P02 handoff, first Sentinel contract and then the superseding [cinematic/physical-fixture handoff](../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md) / [scene contract](../../architecture/integration/SCENE_PRESENTATION.md).
+Retrieve AGENTS, START_HERE, your owner guide, development hub, current Status/claims, Workload, P04, code rules, architecture/guard contracts, approved scoring and blueprint pp. 10-14, 16-18. Retrieve the schema-9 P03 handoff plus historical physical fixture/stair/posture contracts.
 
-Claim P03-SR1/SR2/SR3 and exact files. Finish fair perception/report/capture gaps; implement Tracker A* and legitimate last-seen search; complete validated patrol/chokepoint/geometry revision integration and replay evidence. Reuse Sentinel BFS/FSM/fuzzy, fingerprint-7 geometry, crouch, stair and sprint behavior. Current `can_walk` tiles are conservative; never replace precise fixture bounds with the old invisible barriers.
+Claim **P04-SR1/SR2/SR3**. Implement Companion FSM/utility/observed-risk A*/real bounded belief-only MCTS; Interceptor minimax/alpha-beta and physical movement; evidence-limited NEXUS, versioned protocols/reset and functional first-launch deployment. Expose real immutable metrics/events to Khalid. Preserve the verified Sentinel/Tracker, geometry, hiding, Human mode, input/audio and cinematic flow. No hidden-state cheats, recorded path pretending to be AI, scene redesign or P05 lifecycle work.
 
-You own logic under core/AI/level registry/persistence and meaningful tests. Khalid owns complex rendering, art, animation, camera and scene layouts. Narrow functional wiring in shared scene roots is permitted with a clear claim and consumer contract. Do not rewrite the visual game, add fake AI, inspect privileged hidden state or implement P04 algorithms ahead of its gate.
+## Packaging and handoff
 
-## 4. Native verification when packaging is affected
-
-After a passing source baseline, build/run native checks when code/resource/entry-point changes require a package check:
+When code/resource/entry changes require a native package check:
 
 ```powershell
 uv run --locked --all-extras python scripts/packaging/build.py
-uv run --locked --all-extras python scripts/packaging/smoke.py dist/EchoHeist/EchoHeist.exe --output-dir output/windows-p03/native-smoke
+uv run --locked --all-extras python scripts/packaging/smoke.py dist/EchoHeist/EchoHeist.exe --output-dir output/windows-p04/native-smoke
 ```
 
-The current smoke tool has **nine** checks; inspect its actual summary rather than hard-coding a future count. Native display/audio requires running without `--dummy-video` and without `--mute`. A separate muted run is useful recovery evidence, not audio proof. Open the executable interactively and inspect normal gameplay too. Preserve `EchoHeist.exe` **with its support files**, not the executable alone.
+Inspect actual smoke results; nine checks currently exist. Native audio/display requires no mute/dummy-video. Open the executable with its support files and inspect gameplay; never ship the EXE alone. Record actual platform/hardware/commit/commands/hash/results under `docs/development/quality/reports/phase04/windows/` when produced. Large artifacts stay in ignored output/dist; unavailable hardware/builds remain NOT_RUN.
 
-Outputs are `dist/EchoHeist/`, a versioned Windows ZIP and manifest. Record Windows/hardware/Python/commit/commands, archive hash and actual results under `docs/development/quality/reports/phase03/windows/` when produced; keep large captures/logs/builds in ignored output/dist. Packaging or hardware unavailable means NOT_RUN, not a reason to stop independent pure-logic work.
+Record `docs/development/tracking/handoffs/suhita/day_02/P04.md` with APIs/files, real autonomous win/failure/search evidence, tests, visual dependencies and exact inspection steps. Commit naturally with your own identity and push `work/suhita-p04` when access permits. Keep main for integration; no force push. Stop after P04 SR slices. KR1/KR2 and combined acceptance are required before closing P04; no automatic P05 work, scoring-rule change, spawned agent or external teammate message.
 
-## 5. Handoff and stop
-
-Run appropriate checks plus real default-security win/capture/regression scenarios. Record `docs/development/tracking/handoffs/suhita/day_02/P03.md`: implemented behavior, APIs/files, test results, exact visible inspection steps, Windows evidence and remaining Khalid visual dependencies. Update your revised slices only; the shared P03 gate needs both owners and integrated evidence.
-
-Make short natural commits with your identity and no assistant attribution. Push when your own access permits:
-
-```powershell
-git push -u origin work/suhita-p03
-```
-
-If push is denied, keep local commits and report the access blocker. Keep main for integration; no force-push or destructive cleanup. **Stop after P03-SR1/SR2/SR3.** Do not silently continue P04, claim Khalid's work complete or send external teammate messages.
-
-## Ready-to-paste starting prompt
+## Starting prompt
 
 ```text
 I'm Suhita, on Windows x64.
-
-Clone https://github.com/khalid999devs/Echo_Heist.git, or safely reuse the
-existing checkout and preserve local changes. Fetch current main.
+Clone https://github.com/khalid999devs/Echo_Heist.git or safely reuse my checkout,
+preserving local changes. Fetch current main and verify it contains the P03
+schema-9 combined handoff.
 
 Read AGENTS.md, docs/development/workflow/START_HERE.md,
 docs/development/workflow/owners/SUHITA.md and
-docs/development/workflow/setup/WINDOWS_SUHITA.md. Follow their context
-sequence to retrieve the blueprint, revised WORKLOAD, current Status/claims,
-P03, latest cinematic/fixture handoff, contracts, code rules and scoring.
+docs/development/workflow/setup/WINDOWS_SUHITA.md.
+Follow their context sequence for Status/claims, blueprint, Workload, P04,
+P03 handoff/guard contracts, code rules and approved scoring.
 
-The split has changed: I own most gameplay logic; Khalid owns complex
-visuals/scenes. P01/P02 are complete. Set up and verify the locked Windows
-environment, then create or resume work/suhita-p03 from current main.
-Claim and finish only P03-SR1, P03-SR2 and P03-SR3: remaining fair perception,
-Tracker A*/defender behavior, registry/geometry integration and replay proof.
-Reuse verified Sentinel, collision, crouch, stair and sprint behavior.
-Preserve Khalid's graphics and make only claimed functional scene wiring.
+Set up and verify the locked Windows environment. Create/resume work/suhita-p04,
+check claims, then implement only P04-SR1/SR2/SR3: real Companion FSM/utility/A*/
+belief-only MCTS, Interceptor minimax/alpha-beta, evidence-limited NEXUS,
+protocol persistence/reset and functional deployment. Preserve existing Human
+play, Sentinel/Tracker, visuals, geometry, stairs, posture and audio/input.
+Agree typed metrics/events and claim shared scene wiring before editing.
 
-Run meaningful checks and real gameplay scenarios; record actual Windows
-results, a runnable handoff and the exact steps for me to inspect the game.
-Use my Git identity, make short natural commits without assistant attribution,
-and push my branch when access permits. Keep main for integration.
-
-Stop at my P03 boundary. Do not start P04 or close the shared P03 gate until
-Khalid's visual slices and combined verification are complete. Do not change
-approved scoring rules, spawn agents or send external teammate messages.
+Prove real autonomous win/capture and algorithm execution, run meaningful
+checks, record actual Windows results and a runnable handoff, then guide me
+through inspecting it. Use my Git identity and short natural commits without
+assistant attribution; push my branch when access permits. Keep main for
+integration. Stop at my P04 slices; do not start P05, change scoring rules,
+spawn agents or send external teammate messages.
 ```

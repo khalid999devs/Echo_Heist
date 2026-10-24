@@ -7,6 +7,7 @@ from echo_heist.core.contracts.world import MissionPhase
 from echo_heist.diagnostics.facility_routes import mission_path, walk_path
 from echo_heist.diagnostics.human_driver import HumanDriver
 from echo_heist.ui.bootstrap import _logical_events
+from echo_heist.ui.render.security.lab import GUARD_TABS
 from echo_heist.ui.scenes.flow import GameFlow, Scene
 from echo_heist.ui.scenes.menus import LAUNCH_BUTTON, MODE_BUTTONS, TITLE_BUTTONS
 
@@ -124,6 +125,23 @@ def test_mouse_menu_and_responsive_coordinates() -> None:
         0,
     )
     assert flow.scene == Scene.HEIST
+    assert flow.session is not None
+    flow.frame([key(pygame.KEYDOWN, pygame.K_F3), key(pygame.KEYUP, pygame.K_F3)], 0)
+    target = GUARD_TABS[1]
+    flow.frame(
+        [
+            pygame.event.Event(
+                pygame.MOUSEBUTTONDOWN, button=1, pos=(target.centerx, target.centery + 360)
+            )
+        ],
+        0,
+    )
+    assert flow.session.lab_note and flow.session.lab_selected == 1
+    assert flow.session.simulation.presentation_snapshot().guards[1].algorithm == "A*"
+    fingerprint = flow.session.simulation.fingerprint()
+    for _ in range(3):
+        flow.draw(pygame.Surface((1280, 1440)))
+    assert flow.session.simulation.fingerprint() == fingerprint
 
 
 def test_art_and_gait_follow_committed_movement_without_changing_simulation() -> None:
@@ -168,11 +186,21 @@ def test_default_live_guard_allows_actual_lower_route_core_and_extraction() -> N
     flow = start(security_enabled=True)
     assert flow.session is not None
     first = flow.session.simulation.presentation_snapshot()
-    assert first.guards and first.guards[0].actor_id == "guard-service"
+    # The validated registry activates every authored post with its real role.
+    assert {(guard.actor_id, guard.algorithm) for guard in first.guards} == {
+        ("guard-core", "NONE"),
+        ("guard-research", "A*"),
+        ("guard-security", "BFS"),
+        ("guard-service", "BFS"),
+    }
     route = list(mission_path(flow.level, "lower"))
     back = list(mission_path(flow.level, "lower", returning=True))
     drive(flow, route, take_core=True, use_tools=True)
-    guard = flow.session.simulation.presentation_snapshot().guards[0]
+    guard = next(
+        view
+        for view in flow.session.simulation.presentation_snapshot().guards
+        if view.actor_id == "guard-service"
+    )
     # Actual pursuit has finite memory; it does not track the hidden carrier forever.
     assert guard.last_seen_tick == -1
     drive(flow, back, expected_end=RunOutcome.WIN, use_tools=True)

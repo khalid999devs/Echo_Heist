@@ -17,6 +17,17 @@ class GuardState(StrEnum):
     RETURN = "RETURN"
 
 
+class GuardRole(StrEnum):
+    """Controller assigned by the validated level registry."""
+
+    SENTINEL = "SENTINEL"  # BFS patrol, FSM and fuzzy cue urgency
+    TRACKER = "TRACKER"  # heuristic A* and last-seen memory
+    POST = "POST"  # sensing-only post until its P04 controller exists
+
+
+ROLE_ALGORITHMS = {GuardRole.SENTINEL: "BFS", GuardRole.TRACKER: "A*", GuardRole.POST: "NONE"}
+
+
 @dataclass(frozen=True, slots=True)
 class SensorRules:
     sight_range_tiles: int
@@ -48,9 +59,11 @@ class SensorRules:
 class GuardPatrol:
     actor_id: str
     points: tuple[Tile, ...]
+    role: GuardRole = GuardRole.SENTINEL
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "points", tuple(immutable_tile(point) for point in self.points))
+        object.__setattr__(self, "role", GuardRole(self.role))
         if not self.actor_id or len(self.points) < 2:
             raise ValueError("A patrol needs an actor ID and at least two waypoints")
 
@@ -84,6 +97,28 @@ class VisualCue:
 
 
 @dataclass(frozen=True, slots=True)
+class FuzzyTrace:
+    """The last inference actually evaluated by a controller, for teaching/QA."""
+
+    evaluated_tick: int
+    cue_tick: int
+    cue_tile: Tile
+    distance_tiles: int
+    salience: float
+    visibility: float
+    memberships: tuple[tuple[str, float], ...]
+    activations: tuple[float, ...]
+    outputs: tuple[float, ...]
+    urgency: float
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "cue_tile", immutable_tile(self.cue_tile))
+        object.__setattr__(self, "memberships", tuple(tuple(item) for item in self.memberships))
+        object.__setattr__(self, "activations", tuple(self.activations))
+        object.__setattr__(self, "outputs", tuple(self.outputs))
+
+
+@dataclass(frozen=True, slots=True)
 class GuardMemory:
     state: GuardState = GuardState.PATROL
     patrol_index: int = 0
@@ -100,13 +135,28 @@ class GuardMemory:
     expanded_nodes: int = 0
     last_report_tick: int = -1
     search_origin: Tile | None = None
+    # Provenance of the current goal: what the guard actually perceived or was
+    # told, with the original observation tick rather than its delivery tick.
+    evidence_kind: str = ""
+    evidence_id: str = ""
+    evidence_tick: int = -1
+    last_seen_heading: Tile = (0, 0)
+    search_tiles: tuple[Tile, ...] = ()
+    path_cost: int = 0
+    path_revision: int = 0
+    evidence_tile: Tile | None = None
+    fuzzy_trace: FuzzyTrace | None = None
 
     def __post_init__(self) -> None:
-        for name in ("last_seen_tile", "target", "path_goal", "search_origin"):
+        for name in ("last_seen_tile", "target", "path_goal", "search_origin", "evidence_tile"):
             value = getattr(self, name)
             if value is not None:
                 object.__setattr__(self, name, immutable_tile(value))
         object.__setattr__(self, "path", tuple(immutable_tile(tile) for tile in self.path))
+        object.__setattr__(self, "last_seen_heading", immutable_tile(self.last_seen_heading))
+        object.__setattr__(
+            self, "search_tiles", tuple(immutable_tile(tile) for tile in self.search_tiles)
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -131,3 +181,12 @@ class GuardView:
     path: tuple[Tile, ...]
     expanded_nodes: int
     fuzzy_urgency: float
+    role: GuardRole = GuardRole.SENTINEL
+    algorithm: str = "BFS"
+    evidence_kind: str = ""
+    evidence_tick: int = -1
+    path_cost: int = 0
+    search_tiles: tuple[Tile, ...] = ()
+    path_revision: int = 0
+    evidence_tile: Tile | None = None
+    fuzzy_trace: FuzzyTrace | None = None

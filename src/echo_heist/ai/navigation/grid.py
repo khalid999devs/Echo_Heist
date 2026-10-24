@@ -10,6 +10,7 @@ from echo_heist.core.contracts.world import StaticMap, Tile
 class PathResult:
     path: tuple[Tile, ...]
     expanded: int
+    cost: int = 0
 
 
 def neighbors(tile: Tile) -> tuple[Tile, ...]:
@@ -32,7 +33,7 @@ def bfs(world_map: StaticMap, start: Tile, goal: Tile) -> PathResult:
             while previous is not None:
                 reverse.append(previous)
                 previous = parent[previous]
-            return PathResult(tuple(reversed(reverse)), expanded)
+            return PathResult(tuple(reversed(reverse)), expanded, len(reverse) - 1)
         for tile in world_map.connections(current):
             if world_map.can_walk(tile) and tile not in parent:
                 parent[tile] = current

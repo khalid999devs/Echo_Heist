@@ -1,5 +1,24 @@
 # Development changelog
 
+## 2026-10-24 - Complete P03 visual integration and combined acceptance
+
+- Connected distinct guard-state/cone/cue feedback, real capture countdown/progress and a selectable live F3 teaching view. Original cue positions, path revisions and stored actual fuzzy inputs/memberships/weights/outputs are immutable telemetry; fingerprint is now 9. Rendering never runs AI or updates evidence.
+- Preserved Suhita's logic and incremental commits. Full checks/195 tests, five exact route replays, both native default-security Human wins/capture, under-desk hiding, 40 captured states, real no-sight fuzzy inference and full-display tab input pass. A 12-restart audit is bounded in this run; its performance outliers are documented rather than hidden. Clean Mac app/fresh ZIP and all three hosted source jobs pass.
+- [Combined gate](../quality/reports/phase03/integration/VERIFICATION.md) and [Khalid handoff](handoffs/khalid/day_02/phase03/P03.md) close P03 under the user's explicit integration request. Owner/startup/Windows guides now point to P04, which remains unstarted. P05-P08/full V1/public release and physical Windows combined-build retest remain open. Approved scoring is unchanged.
+
+## 2026-10-24 - Review Suhita's P03 pull request
+
+- Reviewed PR #1 and pushed fixes to `work/suhita-p03`, preserving Suhita's commits: partial-identification hiding witnesses, physical barriers during cover inspection, geometry refresh before controller decisions, complete pending-map fingerprints and explicit careless-route capture assertions.
+- Added five meaningful regression cases and strengthened first-tick geometry coverage. Full checks/194 tests, five exact route replays, native Mac app/fresh ZIP and all three hosted jobs pass; [review, evidence and Windows resume commands](../quality/reports/phase03/review/REVIEW.md).
+- Main remains unchanged. KR1/KR2 visuals and the combined P03 gate are still required before merge; P04 and later mechanics were not started.
+
+## 2026-10-22 - P03 defender logic (Suhita, SR1/SR2/SR3)
+
+- Every authored guard post now runs through a validated typed registry: two BFS/FSM/fuzzy Sentinels, the Research Tracker with heuristic A* and last-seen search, and the Core post as a sensing-only POST until its P04 Interceptor controller exists. The temporary nearest-Sentinel selection is gone.
+- Guard goals record evidence provenance with original ticks; radio SIGHTING reports become Tracker leads without refreshing age or confirming identity; Sentinel cue investigation now expires. Concealed under-desk intruders are invisible unless a guard witnessed the entry and inspects that cover; capture requires legitimate current sight.
+- Added a geometry-revision adapter for later doors/glass, deterministic replay headers/logs with tick-by-tick verification, a headless evidence script and 40 focused tests. Fingerprint schema is now 8.
+- Windows 11 / i5-1235U: full checks pass except the pre-existing 30 s desktop smoke timeout (35–46 s resource loading on this laptop, failing identically on main). All three default-security routes win with tools, careless routes are captured, every replay matches, and Windows/Linux hashes are identical. [Handoff](handoffs/suhita/day_02/P03.md), [evidence](../quality/reports/phase03/windows/VERIFICATION.md). Shared P03 remains open for Khalid's KR1/KR2 and the combined gate; scoring unchanged.
+
 ## 2026-10-22 - Blue story opening and polished academic deck
 
 - Revised the proposal to 17 slides: original blue cinematic opening and a story-to-coursework explanation first, followed by the formal model, fair architecture and three core algorithm/behavior slides. Kept the main academic backgrounds white with blue/cyan typography, character panels and editable diagrams/tables.

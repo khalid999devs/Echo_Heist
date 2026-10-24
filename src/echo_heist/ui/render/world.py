@@ -35,6 +35,7 @@ from echo_heist.ui.render.environment.furnishings.catalogue import FurnitureVisu
 from echo_heist.ui.render.environment.furnishings.story import paint_room_story
 from echo_heist.ui.render.environment.interiors import draw_details, draw_room_trim, room_floors
 from echo_heist.ui.render.environment.lighting import bake_lighting, draw_equipment
+from echo_heist.ui.render.security.signals import draw_badges
 from echo_heist.ui.render.surfaces.formats import opaque_surface
 from echo_heist.ui.render.surfaces.glass import alert_frame
 from echo_heist.ui.render.surfaces.vision import draw_vision
@@ -470,7 +471,7 @@ def draw_world(
                 (feet[0] - item.shadow.pivot[0], feet[1] - item.shadow.pivot[1]),
             )
         layers.append((item.depth, item.object_id, item))
-    draw_vision(canvas, level.static_map, snapshot, camera)
+    draw_vision(canvas, snapshot.world_map, snapshot, camera)
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
     _anchor(
         canvas,
@@ -583,6 +584,7 @@ def draw_world(
             ring = pygame.Rect(0, 0, 38, 38)
             ring.center = point
             pygame.draw.arc(canvas, theme.WARNING, ring, pi / 2, pi / 2 + 2 * pi * progress, 4)
+    draw_badges(canvas, level, snapshot, camera, fonts)
     if snapshot.phase == MissionPhase.LOCKDOWN:
         cycle = 0.55 if reduced_motion else (1 + sin(clock_ms / 440)) / 2
         canvas.fill(

@@ -10,19 +10,19 @@ Revised **2026-10-22**, explicitly requested by Khalid. This replaces the origin
 
 The original **80/80 whole-project estimate is retired**, not an actual time record. Khalid has already delivered all P01, substantial P02/core integration and extensive visual/build refinements; Suhita's original P02 contribution remains credited. Actual historical hours were not logged, so exact lifetime equality cannot be claimed.
 
-The **remaining estimate is 48 Khalid / 60 Suhita points**, including verification, integration and handoffs. The modest extra remaining logic allocation compensates for Khalid's completed foundation/refinement work. This is a provisional route toward equal total effort, not a measured equality or an instruction to add unnecessary art. Reuse finished scenes; charge only missing connections, needed adaptations and evidenced defects.
+The rebalance estimated **48 Khalid / 60 Suhita points**; after completed P03 on 2026-10-24, **43 Khalid / 48 Suhita points remain**, including verification, integration and handoffs. The modest extra remaining logic allocation compensates for Khalid's completed foundation/refinement work. This is a provisional route toward equal total effort, not a measured equality or an instruction to add unnecessary art. Reuse finished scenes; charge only missing connections, needed adaptations and evidenced defects.
 
 | Phase | Original work block | Khalid remaining | Suhita remaining | Integration lead |
 | --- | --- | --- | --- | --- |
 | P01 | Day 1 / foundation | 0 — DONE, original 12 | 0 — no P01 assignment | Khalid, complete |
 | P02 | Day 1 / Human heist | 0 — DONE, original 8 | 0 — DONE, original 12 | Complete combined review |
-| P03 | Day 2 / defenders | 5 — cues, diagnostics, geometry review | 12 — fair sensing, Tracker, registry, replay | Suhita; Khalid verifies visuals |
+| P03 | Day 2 / defenders | 0 — DONE, five estimated points completed | 0 — DONE, twelve estimated points completed | User-directed combined gate complete |
 | P04 | Day 2 / autonomous AI | 7 — Companion/Lab/NEXUS presentation | 18 — Companion, MCTS, Interceptor, NEXUS | Suhita; Khalid verifies visuals |
 | P05 | Day 3 / interactions | 9 — tools/props animation, sound and scene fit | 10 — tool rules and environment lifecycles | Suhita; Khalid verifies visuals |
 | P06 | Day 3 / complete flow | 9 — Workshop, settings, results and full UI | 9 — profiles, scoring, persistence and deployment | Khalid; Suhita verifies behavior |
 | P07 | Day 4 / integration | 9 — UX/accessibility, render performance | 6 — fairness/replay/AI evidence and recovery | Khalid; both verify candidate |
 | P08 | Day 4 / delivery | 9 — builds, Mac QA, demo/media and handoff | 5 — Windows gameplay QA and experiment report | Khalid; both verify delivery |
-| Remaining | Six open phase gates | **48** | **60** | Shared functional result |
+| Remaining | Five open phase gates | **43** | **48** | Shared functional result |
 
 Days are the original four-development-day sequence, not a claim that the target was met or a new four-day countdown. Work began 2026-10-18; on 2026-10-22 P03 is still open after requested refinements. Resume by dependencies and report actual progress. Do not cut required mechanics to make a date appear achieved.
 
@@ -56,7 +56,7 @@ No blanket prohibition on the other owner's directory may prevent necessary inte
 
 ## Execution order and effort review
 
-1. **Now:** Suhita starts P03-SR1 → SR2 → SR3 from current main on `work/suhita-p03`. Khalid can prepare P03-KR1/KR2 on `work/khalid-p03` using existing real Sentinel data while the Tracker contract is finalized.
+1. **Now (2026-10-24):** P03 is complete. Suhita next starts P04-SR1/SR2/SR3 on `work/suhita-p04` from synchronized main; Khalid next owns P04-KR1/KR2. Retrieve schema-9 P03 evidence and agree Companion/NEXUS contracts before shared edits.
 2. Publish the typed guard/registry/event contract first. Both branches use it; Suhita wires the runtime and Khalid connects/refines the visible cues. No placeholder search metrics or hidden-state shortcuts.
 3. Integrate P03 and verify its shared gate before starting P04 logic. Apply the same pattern through P08. Agents stop at the explicitly requested owner/phase boundary.
 4. At each phase gate record actual active effort if known, remaining estimates, blockers and files touched. If forecasts differ by more than about 20%, transfer a bounded **unstarted** slice (for example a fixture/persistence task to Khalid or integration QA to Suhita), update its owner/context, and keep the primary specialisms above. Never invent historical hours.

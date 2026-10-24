@@ -8,11 +8,11 @@ Current refinement adds coherent neutral floor/wall materials, attached contact 
 
 Latest scene pass: fullscreen fills the display, the closer camera follows a larger animated operative, laboratories show distinct equipment and interrupted research, and quiet walking contrasts with the louder timed sprint. [Verified scene/build record](docs/development/quality/reports/facility_finish/REVIEW.md) and [runnable handoff](docs/development/tracking/handoffs/khalid/presentation/SCENE_FINISH.md).
 
-Current development: **Phase 2 Human mission complete** (`0.1.0a1`). The five-zone facility, title/briefing/game/results flow, Core theft, lockdown, extraction, capture and basic tools are playable. The first P03 stealth slice adds one active Sentinel with fair sight/hearing, BFS patrol, investigation/chase/search, compact HUD, event audio and Settings. Companion, the remaining advanced defenders, Workshop and scoring are pending. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
+Current development: **Phases 1-3 complete** (`0.1.0a1`). Both Human routes are playable with two real Sentinels, a Tracker, fair sight/hearing/hiding/capture, and optional live AI teaching diagnostics. Companion/MCTS, Interceptor/minimax, NEXUS, full environment lifecycles, Workshop and scoring remain in P04-P08. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
 
 ## Development setup
 
-Suhita on Windows: use the [Windows setup and current Phase 3 handoff](docs/development/workflow/setup/WINDOWS_SUHITA.md) for PowerShell commands, your work branch and assigned implementation boundaries.
+Suhita on Windows: use the [Windows setup and next Phase 4 handoff](docs/development/workflow/setup/WINDOWS_SUHITA.md) for PowerShell commands, your work branch and assigned implementation boundaries.
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.13. The project requires that minor version; uv can provision it on your development machine when needed.
 
@@ -33,7 +33,7 @@ The older diagnostic contact room is still available for focused core-rule inspe
 uv run --locked python -m echo_heist.diagnostics.human_preview
 ```
 
-The research facility spans two floors with 14 purposeful rooms and 101 physical furnishings. Entry and Service are downstairs; Security, Research and Core are upstairs. Press E on either stair landing to change floors. The original alternative routes and cross-link remain connected. Walk at 2.4 tiles/s; hold Shift for a louder 4 tiles/s sprint lasting up to three seconds, followed by four seconds of recharge. C toggles slower, quieter crouch movement and permits clearance beneath three open desks. The HUD shows readiness; pause/map freeze recharge. A confirmed Sentinel pursuit is 15% faster; lockdown's 20% boost takes precedence. Three other posts retain P02 contact behavior while the remaining P03/P04 algorithms are developed. F3 opens real Sentinel telemetry; Tab shows both floors with mission time paused. Settings groups Audio and Display controls. Successful extraction has its own exterior cinematic. See the [current facility review](docs/development/quality/reports/material_cohesion/REVIEW.md) for actual checks and screenshots.
+The research facility spans two floors with 14 purposeful rooms and 101 physical furnishings. Entry and Service are downstairs; Security, Research and Core are upstairs. Press E on either stair landing to change floors. The original alternative routes and cross-link remain connected. Walk at 2.4 tiles/s; hold Shift for a louder 4 tiles/s sprint lasting up to three seconds, followed by four seconds of recharge. C toggles slower, quieter crouch movement and permits clearance beneath three open desks. The HUD shows readiness; pause/map freeze recharge. A confirmed Sentinel pursuit is 15% faster; lockdown's 20% boost takes precedence. The registry runs two BFS/FSM/fuzzy Sentinels, the A* Tracker and a sensing-only Core post until P04 adds Interceptor strategy. F3 opens actual sensor/path/evidence/fuzzy teaching data; 1-4 or tabs select guards; Tab shows both floors with mission time paused. Settings groups Audio and Display controls. Successful extraction has its own exterior cinematic. See the [P03 combined review](docs/development/quality/reports/phase03/integration/VERIFICATION.md) and [runnable handoff](docs/development/tracking/handoffs/khalid/day_02/phase03/P03.md) for actual checks and current contracts.
 
 For an isolated window check:
 
@@ -59,7 +59,7 @@ uv run --locked --all-extras python scripts/packaging/smoke.py "dist/Echo Heist.
 
 Use `dist/EchoHeist/EchoHeist.exe` on Windows. The smoke helper runs the frozen app from an unrelated directory, compares headless hashes and checks resources/settings. `--dummy-video` is available for CI and does not verify a real desktop. See [current Status](docs/development/tracking/STATUS.md) for hosted CI evidence. Windows wheel availability is verified; native Windows desktop QA remains pending.
 
-See the [P01 handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md) and [Phase 2 evidence](docs/development/quality/reports/phase02/integration/VERIFICATION.md). P03 is in progress; P04-P08 remain in the development plan.
+See the [P01 handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md) and [Phase 2 evidence](docs/development/quality/reports/phase02/integration/VERIFICATION.md). P03 is complete with 195 passing tests and combined native/hosted evidence; P04-P08 remain in the development plan.
 
 Current camera/detail pass: a closer 13⅓×7½-tile view, larger foot-anchored operative, distance-driven walk/run cycles, depth-sorted furniture, translucent glass and room-local lighting. [Screenshots and actual checks](docs/development/quality/reports/close_camera/REVIEW.md); [developer handoff](docs/development/tracking/handoffs/khalid/day_02/CLOSE_CAMERA.md). Movement rules and approved scoring are unchanged.
 

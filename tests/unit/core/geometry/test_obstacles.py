@@ -74,3 +74,12 @@ def test_invalid_geometry_is_rejected_before_simulation() -> None:
         replace(rack_map().obstacles[0], right=121_000)
     with pytest.raises(ValueError, match="Duplicate"):
         replace(rack_map(), obstacles=rack_map().obstacles * 2)
+
+
+def test_queued_geometry_content_is_part_of_the_replay_fingerprint(rules: GameRules) -> None:
+    world = StaticMap("revision", 10, 8)
+    spawn = (ActorSpawn("operative", (1, 1)),)
+    first, second = (Simulation(world, spawn, rules=rules) for _ in range(2))
+    first.request_geometry_revision(replace(world, blocked_tiles=frozenset({(4, 4)})), "door")
+    second.request_geometry_revision(replace(world, blocked_tiles=frozenset({(5, 5)})), "door")
+    assert first.fingerprint() != second.fingerprint()

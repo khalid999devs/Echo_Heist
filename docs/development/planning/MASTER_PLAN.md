@@ -1,6 +1,6 @@
 # Eight-phase, four-day functional V1 draft plan
 
-Status: P01/P02 DONE; P03 IN_PROGRESS; P05 early crouch subset only; remaining gates open. Ownership revised 2026-10-22. Owners: Khalid and Suhita. The user requires the complete working initial draft after Phase 8, with all defined functionality; later work improves accuracy, balance and polish.
+Status: P01/P02/P03 DONE; P04 next and unstarted; P05 early crouch subset only; remaining gates open. Ownership revised 2026-10-22. Owners: Khalid and Suhita. The user requires the complete working initial draft after Phase 8, with all defined functionality; later work improves accuracy, balance and polish.
 
 ## Authority and boundaries
 

@@ -1,6 +1,6 @@
 # Contract targets and implemented foundation
 
-Current implemented consumer baseline is [fingerprint 7 and precise fixture geometry](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). The full-game designs below are targets unless verified; old numerical examples do not override current configs/approved changes. Remaining ownership follows [Workload](../planning/WORKLOAD.md): Suhita logic, Khalid graphics/scenes, with explicit shared-contract handoffs.
+Current implemented consumer baseline is [P03 fingerprint 9, guard telemetry and fair perception](../tracking/handoffs/khalid/day_02/phase03/P03.md). The [physical fixture contract](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md) still governs exact bounds/posture/stairs; its schema-7 hashes are historical. The full-game designs below are targets unless verified; old numerical examples do not override current configs/approved changes. Remaining ownership follows [Workload](../planning/WORKLOAD.md): Suhita logic, Khalid graphics/scenes, with explicit shared-contract handoffs.
 
 Blueprint basis: pp. 5-17. P01 established immutable DTOs; Khalid's [P02 handoff](../tracking/handoffs/khalid/day_01/P02.md) now records continuous motion, mission/capture/tools and input/presentation extensions. Use that exact implemented contract when integrating. The table below remains a full-game target; sensing/scoring and later systems are not inferred as complete.
 
@@ -78,3 +78,7 @@ Keep these in a versioned configuration resource with units and bounds. Log tuni
 ## Implemented first Sentinel subset (2026-10-21)
 
 The [stealth runtime contract](integration/STEALTH_SLICE.md) extends these targets with SecuritySpec, filtered visible/heard/anonymous-motion values, Simulation-owned GuardMemory, real BFS/fuzzy decisions, expiring original-tick reports and privileged GuardView telemetry. The [two-floor contract](integration/TWO_FLOOR_LAB.md) now adds immutable reciprocal stair edges, own-only sprint/recharge values and fingerprint schema 4. The active atlas is 64×40 at 48 px/tile; physics retains fixed-point units. Walking/sprinting is 2.5/3.7 tiles/s with the owner's approved 90-tick burst/120-tick recharge. Full P03 and later AI/scoring targets above remain open.
+
+## P03 defender logic (2026-10-22, Suhita)
+
+The [guard registry/evidence/geometry contract](integration/defenders/GUARD_CONTRACT.md) adds `GuardRole` assignments from the validated level registry, evidence provenance on every guard goal, Tracker A* and last-seen search, witnessed versus unseen under-desk hiding, sight-gated capture, `Observation.geometry_revision` with `GEOMETRY_REVISED`, `HIDE_WITNESSED`, and replay headers/logs. Fingerprint schema is **8**. Interceptor minimax, NEXUS and P05 object lifecycles remain open.

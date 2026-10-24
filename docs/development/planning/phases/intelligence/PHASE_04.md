@@ -6,7 +6,7 @@ Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **
 
 ## Inputs
 
-Read P03 reports/navigation/telemetry, the [approved observation boundary](../../../architecture/CODEBASE.md), [policy defaults](../../../architecture/DATA_CONTRACTS.md) and [algorithm evidence plan](../../../quality/EXPERIMENTS.md). The Companion gets no hidden guard state, pretrained recording or human completion prerequisite.
+P03 prerequisite now passes: read the [combined gate](../../../quality/reports/phase03/integration/VERIFICATION.md), [schema-9 consumer handoff](../../../tracking/handoffs/khalid/day_02/phase03/P03.md) and guard contract before editing. Read P03 reports/navigation/telemetry, the [approved observation boundary](../../../architecture/CODEBASE.md), [policy defaults](../../../architecture/DATA_CONTRACTS.md) and [algorithm evidence plan](../../../quality/EXPERIMENTS.md). The Companion gets no hidden guard state, pretrained recording or human completion prerequisite.
 
 ## Owner slices
 

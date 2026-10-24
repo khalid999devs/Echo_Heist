@@ -79,6 +79,8 @@ class Observation:
     schema_version: int = 1
     interactions: tuple[InteractionHint, ...] = ()
     visual_cues: tuple[VisualCue, ...] = ()
+    # Public facility geometry revision: bumps whenever the static map changes.
+    geometry_revision: int = 0
 
     def __post_init__(self) -> None:
         for field in (

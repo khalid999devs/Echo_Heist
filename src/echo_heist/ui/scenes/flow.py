@@ -17,6 +17,7 @@ from echo_heist.ui.audio.feedback import UiFeedback
 from echo_heist.ui.audio.model import AudioFrame
 from echo_heist.ui.render.environment.furnishings.catalogue import prepare_furniture
 from echo_heist.ui.render.layout.viewport import interface_canvas, interface_events
+from echo_heist.ui.render.security.lab import GUARD_TABS
 from echo_heist.ui.render.surfaces.cinematic import draw_scene
 from echo_heist.ui.render.surfaces.glass import edge_veil
 from echo_heist.ui.render.theme import Fonts
@@ -128,6 +129,8 @@ class GameFlow:
                 return (MAP_CLOSE,)
             if self.session.paused:
                 return ABORT_BUTTONS if self.session.confirm_abort else PAUSE_BUTTONS
+            if self.session.lab_note:
+                return GUARD_TABS
         return ()
 
     def _start_run(self) -> None:

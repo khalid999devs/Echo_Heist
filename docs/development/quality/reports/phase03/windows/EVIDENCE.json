@@ -1,0 +1,424 @@
+{
+  "machine": "AMD64",
+  "python": "3.13.16",
+  "registry": [
+    {
+      "chokepoints": [
+        "choke-research-core",
+        "choke-security-core"
+      ],
+      "guard": "guard-core",
+      "kind": "INTERCEPTOR",
+      "role": "POST",
+      "zone": "core-chamber"
+    },
+    {
+      "chokepoints": [
+        "choke-cross-link",
+        "choke-research-core",
+        "choke-service-research"
+      ],
+      "guard": "guard-research",
+      "kind": "TRACKER",
+      "role": "TRACKER",
+      "zone": "research-floor"
+    },
+    {
+      "chokepoints": [
+        "choke-cross-link",
+        "choke-security-core",
+        "choke-service-security"
+      ],
+      "guard": "guard-security",
+      "kind": "SENTINEL",
+      "role": "SENTINEL",
+      "zone": "security-control"
+    },
+    {
+      "chokepoints": [
+        "choke-entry-service",
+        "choke-service-research",
+        "choke-service-security"
+      ],
+      "guard": "guard-service",
+      "kind": "SENTINEL",
+      "role": "SENTINEL",
+      "zone": "service-wing"
+    }
+  ],
+  "replay_header": {
+    "fingerprint_schema": 8,
+    "game_version": "0.1.0a1",
+    "map_hash": "967e2c0597e6584b887db9616efde7ae4e4b416e1b1d38d5d79763256ad3f697",
+    "map_id": "vault-five-zone",
+    "mode": "HUMAN",
+    "registry_revision": "29b5e21f3afa0e7ff65714617d96cc78401a8d09bcaa8a5ccd531e80d2b7e27b",
+    "replay_schema": 1,
+    "rules_hash": "c527d749f654adcbd1c0dfd89508c9f54eda69dafad7d5bb9382eb926cc49be4",
+    "seed": 1042,
+    "sensor_hash": "4594f530d051eb37885f50d3ab547330f510faa0ecf8c7115ba408a84dfd0546",
+    "simulation_hz": 30
+  },
+  "scenarios": [
+    {
+      "capture_by": null,
+      "decisions_by_algorithm": {
+        "A*": 47,
+        "BFS": 95
+      },
+      "decisions_by_evidence": {
+        "REPORT": 40,
+        "ROUTINE": 23,
+        "SIGHT": 79
+      },
+      "event_chain_hash": "e26af4a1c097494b1f3ed984eb8861902be7d0d994fd841e9e42252d97ee3bc7",
+      "events": {
+        "ACTION_ACCEPTED": 2521,
+        "ACTION_REJECTED": 134,
+        "ACTOR_MOVED": 4908,
+        "CAPTURE_CANCELED": 1,
+        "CAPTURE_STARTED": 1,
+        "CORE_TAKEN": 1,
+        "GUARD_DISABLED": 1,
+        "GUARD_STUNNED": 1,
+        "LOCKDOWN_STARTED": 1,
+        "MISSION_ENDED": 1,
+        "NOISE_CREATED": 171,
+        "POLICY_DECISION": 142,
+        "REPORT_SENT": 7,
+        "SIGHTING_CONFIRMED": 3,
+        "STAIR_STARTED": 5,
+        "STAIR_USED": 5,
+        "TOOL_USED": 2
+      },
+      "final_fingerprint": "2125873e08e9ffcba763afa0283ba4c7b2e188cb85abd931f99182b9bfd844ae",
+      "max_expanded_nodes": {
+        "A*": 41,
+        "BFS": 68
+      },
+      "name": "upper-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "state_trails": {
+        "guard-research": [
+          "PATROL",
+          "INVESTIGATE",
+          "RETURN",
+          "PATROL",
+          "INVESTIGATE",
+          "RETURN"
+        ],
+        "guard-security": [
+          "PATROL",
+          "SPOTTED",
+          "INVESTIGATE",
+          "SEARCH",
+          "RETURN",
+          "PATROL"
+        ],
+        "guard-service": [
+          "PATROL",
+          "SPOTTED",
+          "INVESTIGATE",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH",
+          "RETURN",
+          "PATROL",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH"
+        ]
+      },
+      "ticks": 1514,
+      "tools": {
+        "EMP": 1,
+        "MELEE": 2
+      },
+      "wall_seconds": 3.093
+    },
+    {
+      "capture_by": null,
+      "decisions_by_algorithm": {
+        "A*": 67,
+        "BFS": 89
+      },
+      "decisions_by_evidence": {
+        "NOISE": 1,
+        "REPORT": 4,
+        "ROUTINE": 64,
+        "SIGHT": 87
+      },
+      "event_chain_hash": "fa1aa3f98762972f0fac8186433be63cde5434612ffa7322e5d5fa5f6bc7b512",
+      "events": {
+        "ACTION_ACCEPTED": 2704,
+        "ACTION_REJECTED": 133,
+        "ACTOR_MOVED": 5058,
+        "CORE_TAKEN": 1,
+        "GUARD_DISABLED": 1,
+        "GUARD_STUNNED": 1,
+        "LOCKDOWN_STARTED": 1,
+        "MISSION_ENDED": 1,
+        "NOISE_CREATED": 183,
+        "POLICY_DECISION": 156,
+        "REPORT_SENT": 12,
+        "SIGHTING_CONFIRMED": 4,
+        "STAIR_STARTED": 8,
+        "STAIR_USED": 8,
+        "TOOL_USED": 2
+      },
+      "final_fingerprint": "1a3001edad5d4afb010814a57b33202bc2fe4dfdf7c7d3b6eb55ede2e4e41868",
+      "max_expanded_nodes": {
+        "A*": 35,
+        "BFS": 68
+      },
+      "name": "lower-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "state_trails": {
+        "guard-research": [
+          "PATROL",
+          "INVESTIGATE",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH",
+          "SPOTTED",
+          "INVESTIGATE",
+          "SEARCH",
+          "RETURN",
+          "PATROL",
+          "INVESTIGATE",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH",
+          "RETURN"
+        ],
+        "guard-security": [
+          "PATROL"
+        ],
+        "guard-service": [
+          "PATROL",
+          "SPOTTED",
+          "INVESTIGATE",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH",
+          "RETURN",
+          "PATROL"
+        ]
+      },
+      "ticks": 1581,
+      "tools": {
+        "EMP": 1,
+        "MELEE": 1
+      },
+      "wall_seconds": 3.419
+    },
+    {
+      "capture_by": null,
+      "decisions_by_algorithm": {
+        "A*": 46,
+        "BFS": 87
+      },
+      "decisions_by_evidence": {
+        "REPORT": 39,
+        "ROUTINE": 43,
+        "SIGHT": 51
+      },
+      "event_chain_hash": "5361dd314c85f5407ddef7e81cfe203cbf3e2ff3fccb8f76a7376eb9b32986c7",
+      "events": {
+        "ACTION_ACCEPTED": 2565,
+        "ACTION_REJECTED": 600,
+        "ACTOR_MOVED": 4845,
+        "CORE_TAKEN": 1,
+        "GUARD_DISABLED": 1,
+        "LOCKDOWN_STARTED": 1,
+        "MISSION_ENDED": 1,
+        "NOISE_CREATED": 182,
+        "POLICY_DECISION": 133,
+        "REPORT_SENT": 13,
+        "SIGHTING_CONFIRMED": 3,
+        "STAIR_STARTED": 4,
+        "STAIR_USED": 4,
+        "TOOL_USED": 1
+      },
+      "final_fingerprint": "ddaa33e018d4dcc4272e6c170a5aab05d391b4502d4d881c2fc75f896200d379",
+      "max_expanded_nodes": {
+        "A*": 49,
+        "BFS": 101
+      },
+      "name": "cross-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "state_trails": {
+        "guard-research": [
+          "PATROL",
+          "INVESTIGATE",
+          "RETURN",
+          "PATROL",
+          "INVESTIGATE"
+        ],
+        "guard-security": [
+          "PATROL",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH",
+          "RETURN"
+        ],
+        "guard-service": [
+          "PATROL",
+          "SPOTTED",
+          "INVESTIGATE",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH",
+          "RETURN",
+          "PATROL",
+          "SPOTTED",
+          "CHASE"
+        ]
+      },
+      "ticks": 1603,
+      "tools": {
+        "EMP": 1
+      },
+      "wall_seconds": 4.435
+    },
+    {
+      "capture_by": "guard-service",
+      "decisions_by_algorithm": {
+        "A*": 41,
+        "BFS": 68
+      },
+      "decisions_by_evidence": {
+        "NOISE": 1,
+        "REPORT": 34,
+        "ROUTINE": 23,
+        "SIGHT": 51
+      },
+      "event_chain_hash": "17bfabc682c06e25660eaa24e2effa8bdfdc814d56136d63ff0ea9dcd45eb212",
+      "events": {
+        "ACTION_ACCEPTED": 2065,
+        "ACTION_REJECTED": 8,
+        "ACTOR_MOVED": 3793,
+        "CAPTURE_COMPLETED": 1,
+        "CAPTURE_STARTED": 1,
+        "CORE_TAKEN": 1,
+        "LOCKDOWN_STARTED": 1,
+        "MISSION_ENDED": 1,
+        "NOISE_CREATED": 131,
+        "POLICY_DECISION": 109,
+        "REPORT_SENT": 2,
+        "SIGHTING_CONFIRMED": 2,
+        "STAIR_STARTED": 4,
+        "STAIR_USED": 4
+      },
+      "final_fingerprint": "0786934baa7023f49ed9e3302e2467f55de0c924a4accbd849191a810cd0201c",
+      "max_expanded_nodes": {
+        "A*": 82,
+        "BFS": 68
+      },
+      "name": "upper-no-tools",
+      "outcome": "CAPTURED",
+      "replay_matched": true,
+      "state_trails": {
+        "guard-research": [
+          "PATROL",
+          "INVESTIGATE",
+          "RETURN",
+          "PATROL",
+          "INVESTIGATE"
+        ],
+        "guard-security": [
+          "PATROL",
+          "SPOTTED",
+          "INVESTIGATE",
+          "SEARCH",
+          "RETURN",
+          "PATROL"
+        ],
+        "guard-service": [
+          "PATROL",
+          "SPOTTED",
+          "INVESTIGATE",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH",
+          "RETURN",
+          "PATROL",
+          "INVESTIGATE",
+          "SPOTTED",
+          "CHASE"
+        ]
+      },
+      "ticks": 1174,
+      "tools": {},
+      "wall_seconds": 2.581
+    },
+    {
+      "capture_by": "guard-research",
+      "decisions_by_algorithm": {
+        "A*": 18,
+        "BFS": 28
+      },
+      "decisions_by_evidence": {
+        "REPORT": 4,
+        "ROUTINE": 20,
+        "SIGHT": 22
+      },
+      "event_chain_hash": "6061ff5d4bb2e92adca992edec013e2e63531345b224cc9168712c161a82ce7e",
+      "events": {
+        "ACTION_ACCEPTED": 643,
+        "ACTION_REJECTED": 17,
+        "ACTOR_MOVED": 1084,
+        "CAPTURE_COMPLETED": 1,
+        "CAPTURE_STARTED": 1,
+        "MISSION_ENDED": 1,
+        "NOISE_CREATED": 42,
+        "POLICY_DECISION": 46,
+        "REPORT_SENT": 8,
+        "SIGHTING_CONFIRMED": 2,
+        "STAIR_STARTED": 1,
+        "STAIR_USED": 1
+      },
+      "final_fingerprint": "cf4130b9947c3fc099d0c39efb525967d8d15458d3a95c63187f5bed8196222f",
+      "max_expanded_nodes": {
+        "A*": 35,
+        "BFS": 68
+      },
+      "name": "lower-no-tools",
+      "outcome": "CAPTURED",
+      "replay_matched": true,
+      "state_trails": {
+        "guard-research": [
+          "PATROL",
+          "INVESTIGATE",
+          "SPOTTED",
+          "CHASE"
+        ],
+        "guard-security": [
+          "PATROL"
+        ],
+        "guard-service": [
+          "PATROL",
+          "SPOTTED",
+          "INVESTIGATE",
+          "SPOTTED",
+          "CHASE",
+          "SEARCH"
+        ]
+      },
+      "ticks": 349,
+      "tools": {},
+      "wall_seconds": 0.821
+    }
+  ],
+  "system": "Windows-11-10.0.26300-SP0",
+  "version": "0.1.0a1"
+}

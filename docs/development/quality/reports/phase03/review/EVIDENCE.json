@@ -1,0 +1,302 @@
+{
+  "ci": {
+    "conclusion": "success",
+    "gitguardian": "pass",
+    "jobs": [
+      "headless-checks",
+      "windows-x64",
+      "macos-arm64"
+    ],
+    "pr_run": 40103390736,
+    "push_run": 40103386584,
+    "source_commit": "c562fffc61327fea129b255b9ad26d6dd95a62f6"
+  },
+  "date": "2026-10-24",
+  "decision": "Fixes pushed; PR remains open for KR1/KR2 and combined P03 gate",
+  "fixed_runtime_commit": "c562fffc61327fea129b255b9ad26d6dd95a62f6",
+  "full_checks": {
+    "baseline_tests": 189,
+    "formatted_files": 245,
+    "passed": true,
+    "strict_mypy_source_files": 115,
+    "test_seconds": 21.83,
+    "tests": 194
+  },
+  "local_raw_log_sha256": {
+    "build.log": "9030bcd989c2f6b05d536cabfef6bc27e67f6252c9abc6a1659424cc01e01a4e",
+    "checks.log": "5cf6c7ff7e9fc63d9c1daddf224bf8d4069bf25ddb97971abdca9634f5559f89",
+    "evidence.log": "58c3a63d39c15de5c8ca7957242d717ca65271f949ef20170c1334dc2834c5ff",
+    "native-app.log": "2ddd2aaf03f8e97bea03b198209b787ee629fa0c85bccf8e6df8441504180c13",
+    "native-zip.log": "81670eb8bbb47834f64677f001a85a4b41d536040647a309ba16b0b72c372773"
+  },
+  "main_unchanged": "dba2e9ad83a366947c2cffe3e1fbd982ef3c0045",
+  "manifest": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 112174896,
+    "archive_sha256": "fb0bd275abfaee78f70743bc4388af1dc3acb516a54935c4580637123a8616ee",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "c562fffc61327fea129b255b9ad26d6dd95a62f6",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "native_smoke": {
+    "native-app": {
+      "audio": "ready",
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "startup_completed": true,
+        "surface_saved": true
+      },
+      "passed": true,
+      "scope": "native display smoke",
+      "startup": {
+        "cancelled": false,
+        "completed": true,
+        "elapsed_ms": 3963.01,
+        "first_logo_paint_ms": 381.36,
+        "frame_gap_ms": {
+          "max": 29.46,
+          "median": 17.01,
+          "p95": 22.4
+        },
+        "frames": 127,
+        "resource_load_ms": 3364.92,
+        "skip_requested": false,
+        "sound_cues": 3
+      },
+      "video_driver": "cocoa"
+    },
+    "native-zip": {
+      "audio": "ready",
+      "checks": {
+        "frames_rendered": true,
+        "frozen_desktop": true,
+        "frozen_headless": true,
+        "resources_loaded": true,
+        "same_event_hash": true,
+        "same_state_hash": true,
+        "settings_saved": true,
+        "startup_completed": true,
+        "surface_saved": true
+      },
+      "passed": true,
+      "scope": "native display smoke",
+      "startup": {
+        "cancelled": false,
+        "completed": true,
+        "elapsed_ms": 2402.85,
+        "first_logo_paint_ms": 396.57,
+        "frame_gap_ms": {
+          "max": 33.81,
+          "median": 17.01,
+          "p95": 23.06
+        },
+        "frames": 125,
+        "resource_load_ms": 1806.98,
+        "skip_requested": false,
+        "sound_cues": 3
+      },
+      "video_driver": "cocoa"
+    }
+  },
+  "not_run": [
+    "Physical Windows retest after review fixes",
+    "Full KR1/KR2 visual gate",
+    "Combined P03 acceptance"
+  ],
+  "original_pr_head": "ed2239690aae28575bf8d1a9efb60d2296844cff",
+  "pr": "https://github.com/khalid999devs/Echo_Heist/pull/1",
+  "reviewer": "Khalid",
+  "route_header": {
+    "fingerprint_schema": 8,
+    "game_version": "0.1.0a1",
+    "map_hash": "967e2c0597e6584b887db9616efde7ae4e4b416e1b1d38d5d79763256ad3f697",
+    "map_id": "vault-five-zone",
+    "mode": "HUMAN",
+    "registry_revision": "29b5e21f3afa0e7ff65714617d96cc78401a8d09bcaa8a5ccd531e80d2b7e27b",
+    "replay_schema": 1,
+    "rules_hash": "c527d749f654adcbd1c0dfd89508c9f54eda69dafad7d5bb9382eb926cc49be4",
+    "seed": 1042,
+    "sensor_hash": "4594f530d051eb37885f50d3ab547330f510faa0ecf8c7115ba408a84dfd0546",
+    "simulation_hz": 30
+  },
+  "scenarios": [
+    {
+      "capture_by": null,
+      "decisions_by_algorithm": {
+        "A*": 47,
+        "BFS": 95
+      },
+      "decisions_by_evidence": {
+        "REPORT": 40,
+        "ROUTINE": 23,
+        "SIGHT": 79
+      },
+      "event_chain_hash": "e26af4a1c097494b1f3ed984eb8861902be7d0d994fd841e9e42252d97ee3bc7",
+      "final_fingerprint": "2125873e08e9ffcba763afa0283ba4c7b2e188cb85abd931f99182b9bfd844ae",
+      "max_expanded_nodes": {
+        "A*": 41,
+        "BFS": 68
+      },
+      "name": "upper-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "ticks": 1514,
+      "tools": {
+        "EMP": 1,
+        "MELEE": 2
+      }
+    },
+    {
+      "capture_by": null,
+      "decisions_by_algorithm": {
+        "A*": 67,
+        "BFS": 89
+      },
+      "decisions_by_evidence": {
+        "NOISE": 1,
+        "REPORT": 4,
+        "ROUTINE": 64,
+        "SIGHT": 87
+      },
+      "event_chain_hash": "fa1aa3f98762972f0fac8186433be63cde5434612ffa7322e5d5fa5f6bc7b512",
+      "final_fingerprint": "1a3001edad5d4afb010814a57b33202bc2fe4dfdf7c7d3b6eb55ede2e4e41868",
+      "max_expanded_nodes": {
+        "A*": 35,
+        "BFS": 68
+      },
+      "name": "lower-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "ticks": 1581,
+      "tools": {
+        "EMP": 1,
+        "MELEE": 1
+      }
+    },
+    {
+      "capture_by": null,
+      "decisions_by_algorithm": {
+        "A*": 46,
+        "BFS": 87
+      },
+      "decisions_by_evidence": {
+        "REPORT": 39,
+        "ROUTINE": 43,
+        "SIGHT": 51
+      },
+      "event_chain_hash": "5361dd314c85f5407ddef7e81cfe203cbf3e2ff3fccb8f76a7376eb9b32986c7",
+      "final_fingerprint": "ddaa33e018d4dcc4272e6c170a5aab05d391b4502d4d881c2fc75f896200d379",
+      "max_expanded_nodes": {
+        "A*": 49,
+        "BFS": 101
+      },
+      "name": "cross-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "ticks": 1603,
+      "tools": {
+        "EMP": 1
+      }
+    },
+    {
+      "capture_by": "guard-service",
+      "decisions_by_algorithm": {
+        "A*": 41,
+        "BFS": 68
+      },
+      "decisions_by_evidence": {
+        "NOISE": 1,
+        "REPORT": 34,
+        "ROUTINE": 23,
+        "SIGHT": 51
+      },
+      "event_chain_hash": "17bfabc682c06e25660eaa24e2effa8bdfdc814d56136d63ff0ea9dcd45eb212",
+      "final_fingerprint": "0786934baa7023f49ed9e3302e2467f55de0c924a4accbd849191a810cd0201c",
+      "max_expanded_nodes": {
+        "A*": 82,
+        "BFS": 68
+      },
+      "name": "upper-no-tools",
+      "outcome": "CAPTURED",
+      "replay_matched": true,
+      "ticks": 1174,
+      "tools": {}
+    },
+    {
+      "capture_by": "guard-research",
+      "decisions_by_algorithm": {
+        "A*": 18,
+        "BFS": 28
+      },
+      "decisions_by_evidence": {
+        "REPORT": 4,
+        "ROUTINE": 20,
+        "SIGHT": 22
+      },
+      "event_chain_hash": "6061ff5d4bb2e92adca992edec013e2e63531345b224cc9168712c161a82ce7e",
+      "final_fingerprint": "cf4130b9947c3fc099d0c39efb525967d8d15458d3a95c63187f5bed8196222f",
+      "max_expanded_nodes": {
+        "A*": 35,
+        "BFS": 68
+      },
+      "name": "lower-no-tools",
+      "outcome": "CAPTURED",
+      "replay_matched": true,
+      "ticks": 349,
+      "tools": {}
+    }
+  ],
+  "targeted_tests": {
+    "passed": 37,
+    "seconds": 1.91
+  },
+  "unchanged_baseline_routes": true,
+  "visual": {
+    "diagnostic_available_width_px": 382,
+    "diagnostic_line_widths": [
+      {
+        "guard": "guard-core",
+        "width_px": 368
+      },
+      {
+        "guard": "guard-research",
+        "width_px": 375
+      },
+      {
+        "guard": "guard-security",
+        "width_px": 380
+      },
+      {
+        "guard": "guard-service",
+        "width_px": 374
+      }
+    ],
+    "driver": "cocoa",
+    "guard_count": 4,
+    "screens": [
+      "briefing.png",
+      "entry.png",
+      "guard-diagnostics.png",
+      "title.png"
+    ],
+    "size": [
+      1280,
+      720
+    ]
+  }
+}

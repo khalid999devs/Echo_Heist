@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-10-24 - Review Suhita's P03 pull request
+
+- Reviewed PR #1 and pushed fixes to `work/suhita-p03`, preserving Suhita's commits: partial-identification hiding witnesses, physical barriers during cover inspection, geometry refresh before controller decisions, complete pending-map fingerprints and explicit careless-route capture assertions.
+- Added five meaningful regression cases and strengthened first-tick geometry coverage. Full checks/194 tests, five exact route replays, native Mac app/fresh ZIP and all three hosted jobs pass; [review, evidence and Windows resume commands](../quality/reports/phase03/review/REVIEW.md).
+- Main remains unchanged. KR1/KR2 visuals and the combined P03 gate are still required before merge; P04 and later mechanics were not started.
+
 ## 2026-10-22 - P03 defender logic (Suhita, SR1/SR2/SR3)
 
 - Every authored guard post now runs through a validated typed registry: two BFS/FSM/fuzzy Sentinels, the Research Tracker with heuristic A* and last-seen search, and the Core post as a sensing-only POST until its P04 Interceptor controller exists. The temporary nearest-Sentinel selection is gone.

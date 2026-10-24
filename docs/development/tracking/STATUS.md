@@ -4,6 +4,8 @@ Updated **2026-10-22, Asia/Dhaka**. **P01 and P02 are DONE. P03 is IN_PROGRESS a
 
 The latest integrated baseline is `ec8ca48` on main; runtime code is `600698a`, clean packaged source `c2213c2`. The current ownership revision is documentation only. Main's [three CI jobs passed](https://github.com/khalid999devs/Echo_Heist/actions/runs/39746051343). Retrieve the [consumer handoff](handoffs/khalid/presentation/CINEMATIC_STARTUP.md), [review](../quality/reports/cinematic_startup/REVIEW.md) and [exact build evidence](../quality/reports/cinematic_startup/verification/BUILD.json).
 
+**PR review, 2026-10-24:** main is still `dba2e9a` (later proposal documents included). Suhita's unmerged P03 branch now includes review fixes `c562fff` for witnessed hiding/physical inspection and geometry timing/fingerprints. **194 tests/full checks, five route replays, native Mac app/ZIP and all three hosted jobs PASS**; [actual review and next steps](../quality/reports/phase03/review/REVIEW.md). PR #1 remains open for KR1/KR2 and combined acceptance. No phase status or scoring changed.
+
 ## Completed and verified
 
 | Area | Working now | Evidence / boundary |

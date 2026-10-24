@@ -23,7 +23,7 @@ class DeploymentUnavailable(RuntimeError):
 class RuntimeAvailability:
     modes: frozenset[ControlMode] = frozenset()
     protocols: bool = False
-    reason: str = "Companion controller is not connected yet."
+    reason: str = "Companion mode is not available in this build."
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "modes", frozenset(ControlMode(mode) for mode in self.modes))

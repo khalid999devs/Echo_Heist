@@ -7,6 +7,8 @@ from math import hypot
 
 import pygame
 
+from echo_heist.core.contracts.autonomy.model import AutonomyTelemetry, ControlMode
+from echo_heist.core.contracts.autonomy.runtime import AutonomousRun, MissionRuntime
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.results import MissionEnd
@@ -19,6 +21,8 @@ from echo_heist.ui.input.human import HumanInput, UiCommand
 from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.actors.model import position_at
+from echo_heist.ui.render.autonomy.panel import AUTONOMY_TABS, draw_telemetry
+from echo_heist.ui.render.autonomy.world import draw_route
 from echo_heist.ui.render.camera import Camera
 from echo_heist.ui.render.environment.furnishings.catalogue import (
     FurnitureVisual,
@@ -69,21 +73,35 @@ class HeistSession:
         reduced_flashing: bool = False,
         security_enabled: bool = True,
         furnishings: tuple[FurnitureVisual, ...] | None = None,
+        run: AutonomousRun | None = None,
     ) -> None:
         self.level, self.seed, self.fonts, self.rules = level, seed, fonts, rules
-        # P03 registry: every authored post gets its validated role (Sentinel BFS,
-        # Tracker A*, sensing-only post until P04). False remains a diagnostic fixture.
-        self.registry = build_security_registry(level, rules) if security_enabled else None
-        security = self.registry.spec(load_sensor_rules()) if self.registry else None
-        self.simulation = Simulation(
-            level.static_map,
-            level.spawns(),
-            rules=rules,
-            mission=level.mission(),
-            seed=seed,
-            security=security,
+        self.run = run
+        self.control_mode = run.mode if run else ControlMode.HUMAN
+        self.observer_id = run.actor_id if run else level.operative_id
+        self.autonomous = self.control_mode == ControlMode.COMPANION
+        self.registry = (
+            build_security_registry(level, rules) if security_enabled and run is None else None
         )
-        self.input = HumanInput(level.operative_id)
+        security = self.registry.spec(load_sensor_rules()) if self.registry else None
+        self.simulation: MissionRuntime = (
+            run.runtime
+            if run
+            else Simulation(
+                level.static_map,
+                level.spawns(),
+                rules=rules,
+                mission=level.mission(),
+                seed=seed,
+                security=security,
+            )
+        )
+        self.input = HumanInput(self.observer_id)
+        self.autonomy_panel = self.autonomous
+        self.autonomy_tab = 0 if self.autonomous else 1
+        self.telemetry = run.telemetry() if run else AutonomyTelemetry()
+        self.announcement_serial = 0
+        self._last_announcement: tuple[int | None, str] | None = None
         self.art = art or WorldArt.load()
         self.map_surface = map_surface or build_map_surface(level, fonts, self.art)
         self.furnishings = (
@@ -118,7 +136,7 @@ class HeistSession:
 
     def _follow(self, seconds: float, *, snap: bool = False) -> None:
         snapshot = self.simulation.presentation_snapshot()
-        actor = next(a for a in snapshot.actors if a.actor_id == self.level.operative_id)
+        actor = next(a for a in snapshot.actors if a.actor_id == self.observer_id)
         if actor.position is not None:
             size = self.level.static_map.tile_size_px
             deck = self.level.deck_at(actor.tile)
@@ -143,6 +161,13 @@ class HeistSession:
                 seconds,
                 snap=snap,
             )
+
+    @property
+    def panels_interactive(self) -> bool:
+        return (
+            self.stairwell.active is None
+            and not self.simulation.observe(self.observer_id).own_status.stair_ticks_remaining
+        )
 
     @property
     def render_fraction(self) -> float:
@@ -173,6 +198,25 @@ class HeistSession:
             self.input.clear()
             return None
         commands = self.input.feed(events)
+        if self.autonomous:
+            self.input.clear()  # Spectator keys never become movement or tool actions.
+        for event in events:
+            if (
+                self.run is not None
+                and event.type == pygame.KEYDOWN
+                and event.key == pygame.K_F2
+                and not getattr(event, "repeat", False)
+            ):
+                self.autonomy_panel = not self.autonomy_panel
+                self.lab_note = False
+        if self.autonomy_panel and self.panels_interactive:
+            for event in events:
+                if event.type == pygame.KEYDOWN and pygame.K_1 <= event.key <= pygame.K_3:
+                    self.autonomy_tab = event.key - pygame.K_1
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    tab = hit(AUTONOMY_TABS, event.pos)
+                    if tab is not None:
+                        self.autonomy_tab = tab
         if UiCommand.QUIT in commands:
             return HeistRequest.QUIT
         if UiCommand.PAUSE in commands and self.summary:
@@ -187,10 +231,11 @@ class HeistSession:
             self.input.clear()
         if UiCommand.LAB in commands:
             self.lab_note = not self.lab_note
+            self.autonomy_panel = False
             if self.lab_note:
                 snapshot = self.simulation.presentation_snapshot()
                 actors = {actor.actor_id: actor for actor in snapshot.actors}
-                own = actors[self.level.operative_id]
+                own = actors[self.observer_id]
                 deck = self.level.deck_at(own.tile)
                 candidates = [
                     (i, actors[guard.actor_id])
@@ -204,7 +249,7 @@ class HeistSession:
                             abs(a - b) for a, b in zip(item[1].tile, own.tile, strict=True)
                         ),
                     )[0]
-        if self.lab_note:
+        if self.lab_note and self.panels_interactive:
             for event in events:
                 if event.type == pygame.KEYDOWN and not getattr(event, "repeat", False):
                     if pygame.K_1 <= event.key <= pygame.K_4:
@@ -285,10 +330,13 @@ class HeistSession:
             hz = self.simulation.ticks_per_second
             self.accumulator = min(self.accumulator + elapsed_ms * hz, MAX_CATCH_UP)
             while self.accumulator >= 1000:
-                observation = self.simulation.observe(self.level.operative_id)
-                result = self.simulation.step((self.input.action_for(observation),))
+                observation = self.simulation.observe(self.observer_id)
+                result = self.simulation.step(
+                    () if self.autonomous else (self.input.action_for(observation),)
+                )
                 self._record_motion()
                 self._record_events(result.events)
+                self._record_telemetry()
                 self.accumulator -= 1000
                 self.steps += 1
                 if result.mission_end is not None:
@@ -321,7 +369,7 @@ class HeistSession:
                     if moving
                     else actor.facing
                 )
-                sprinting = actor.actor_id == self.level.operative_id and (
+                sprinting = actor.actor_id == self.observer_id and (
                     dx * dx + dy * dy > sprint_delta * sprint_delta
                 )
                 phase_step = hypot(dx, dy) / (
@@ -343,7 +391,7 @@ class HeistSession:
         actors = {actor.actor_id: actor for actor in self.simulation.presentation_snapshot().actors}
         guards = {guard.actor_id: guard for guard in self.simulation.presentation_snapshot().guards}
         for event in events:
-            if event.kind == EventKind.STAIR_USED and event.actor_id == self.level.operative_id:
+            if event.kind == EventKind.STAIR_USED and event.actor_id == self.observer_id:
                 self.notice = ""
             elif event.kind == EventKind.CORE_TAKEN:
                 self.notice = "CORE SECURED  /  RETURN TO THE GREEN EXIT"
@@ -360,7 +408,7 @@ class HeistSession:
                 self.notice = "GRAB ESCAPED"
                 self.notice_until_ms = self.clock_ms + 1200
             elif event.kind == EventKind.HIDE_WITNESSED:
-                own = actors[self.level.operative_id]
+                own = actors[self.observer_id]
                 details = dict(event.details)
                 if own.concealed and own.tile == (details.get("x"), details.get("y")):
                     self.notice = "COVER ENTRY SEEN"
@@ -397,8 +445,21 @@ class HeistSession:
                 if actor is not None and actor.position is not None and tool in ("ECHO", "EMP"):
                     self.pulses.append(VisualPulse(actor.position, str(tool), self.clock_ms))
 
+    def _record_telemetry(self) -> None:
+        if self.run is None:
+            return
+        self.telemetry = self.run.telemetry()
+        nexus = self.telemetry.nexus
+        if nexus is not None and nexus.announcement:
+            key = (nexus.announcement_tick, nexus.announcement)
+            if key != self._last_announcement:
+                self._last_announcement = key
+                self.announcement_serial += 1
+                self.notice = "NEXUS / " + nexus.announcement
+                self.notice_until_ms = self.clock_ms + 3500
+
     def zone_label(self) -> str:
-        observation = self.simulation.observe(self.level.operative_id)
+        observation = self.simulation.observe(self.observer_id)
         room = self.level.room_at(observation.own_status.tile)
         if room is not None:
             label = room.label
@@ -426,32 +487,47 @@ class HeistSession:
             reduced_motion=self.reduced_flashing,
             furnishings=self.furnishings,
             fraction=self.render_fraction,
+            observer_id=self.observer_id,
         )
-        draw_cues(canvas, self.level, snapshot, self.camera, tuple(self.cue_pulses), self.clock_ms)
+        draw_cues(
+            canvas,
+            self.level,
+            snapshot,
+            self.camera,
+            tuple(self.cue_pulses),
+            self.clock_ms,
+            observer_id=self.observer_id,
+        )
         if self.lab_note and snapshot.guards:
             selected = snapshot.guards[self.lab_selected % len(snapshot.guards)]
-            draw_debug_path(canvas, self.level, snapshot, self.camera, selected, self.fonts)
+            draw_debug_path(
+                canvas,
+                self.level,
+                snapshot,
+                self.camera,
+                selected,
+                self.fonts,
+                observer_id=self.observer_id,
+            )
+        if self.autonomy_panel:
+            draw_route(
+                canvas,
+                self.level,
+                snapshot,
+                self.camera,
+                self.telemetry.companion,
+                self.observer_id,
+            )
         age = self.clock_ms - self.floor_changed_ms
         if not self.reduced_flashing and 0 <= age < 240:
             fade = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
             fade.fill((3, 10, 18, round(170 * (1 - age / 240))))
             canvas.blit(fade, (0, 0))
-        travel = next(
-            (stair for stair in snapshot.stairs if stair.actor_id == self.level.operative_id), None
-        )
-        self.stairwell.draw(
-            canvas,
-            travel,
-            self.art.operative,
-            self.fonts,
-            self.clock_ms,
-            reduced_motion=self.reduced_flashing,
-        )
         view = build_objective_view(
-            self.simulation.observe(self.level.operative_id),
+            self.simulation.observe(self.observer_id),
             ticks_per_second=self.simulation.ticks_per_second,
         )
-        operative_tile = self.simulation.observe(self.level.operative_id).own_status.tile
+        operative_tile = self.simulation.observe(self.observer_id).own_status.tile
         if snapshot.mission_end is None:
             draw_hud(
                 canvas,
@@ -468,22 +544,44 @@ class HeistSession:
                     actor.actor_id for actor in snapshot.actors if actor.disabled or actor.stunned
                 ),
                 sprint_duration_ticks=self.rules.sprint_duration_ticks,
-                crouched=self.simulation.observe(self.level.operative_id).own_status.crouched,
-                concealed=self.simulation.observe(self.level.operative_id).own_status.concealed,
+                crouched=self.simulation.observe(self.observer_id).own_status.crouched,
+                concealed=self.simulation.observe(self.observer_id).own_status.concealed,
                 sprint_recharge_ticks=self.rules.sprint_recharge_ticks,
                 ticks_per_second=self.rules.simulation_hz,
-                teaching_view=self.lab_note,
+                teaching_view=self.lab_note or self.autonomy_panel,
+                autonomous=self.autonomous,
                 capture=next(
                     (
                         capture
                         for capture in snapshot.captures
-                        if capture.target_id == self.level.operative_id
+                        if capture.target_id == self.observer_id
                     ),
                     None,
                 ),
             )
+        if self.autonomy_panel:
+            draw_telemetry(
+                interface_canvas(canvas),
+                self.fonts,
+                self.telemetry,
+                self.autonomy_tab,
+                snapshot.tick,
+                self.simulation.ticks_per_second,
+            )
         if self.lab_note:
             self._draw_lab(canvas)
+        travel = next(
+            (stair for stair in snapshot.stairs if stair.actor_id == self.observer_id), None
+        )
+        self.stairwell.draw(
+            canvas,
+            travel,
+            self.art.companion if self.autonomous else self.art.operative,
+            self.fonts,
+            self.clock_ms,
+            reduced_motion=self.reduced_flashing,
+            autonomous=self.autonomous,
+        )
         if self.paused:
             self._draw_pause(canvas)
         elif self.summary:
@@ -525,5 +623,11 @@ class HeistSession:
                     canvas, ABORT_BUTTONS[index], label, self.fonts, self.pause_selected == index
                 )
             return
-        for index, label in enumerate(("RESUME", "RESTART MISSION", "SETTINGS", "ABORT RUN")):
+        labels = (
+            "RESUME",
+            "REVIEW DEPLOYMENT" if self.autonomous else "RESTART MISSION",
+            "SETTINGS",
+            "ABORT RUN",
+        )
+        for index, label in enumerate(labels):
             button(canvas, PAUSE_BUTTONS[index], label, self.fonts, self.pause_selected == index)

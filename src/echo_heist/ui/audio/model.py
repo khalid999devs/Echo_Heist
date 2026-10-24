@@ -26,5 +26,6 @@ class AudioFrame:
     ui_feedback_serial: int = 0
     ui_feedback_cue: str = "hover"
     explicit_ui_feedback: bool = False
+    nexus_serial: int = 0
     transition_serial: int = 0
     transition_cue: str = "stair-start"

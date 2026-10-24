@@ -1,4 +1,4 @@
-"""In-memory presentation choices; these are never used as live AI policy."""
+"""In-memory policy selections; validated snapshots are handed to the actual runtime."""
 
 from dataclasses import dataclass, field
 

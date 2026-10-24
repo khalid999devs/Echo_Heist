@@ -185,7 +185,7 @@ class GameFlow:
             restore_selection(self.designs.draft, request.policy)
             self.mode_choice = 1
             self._go(Scene.WORKSHOP)
-        elif self.deployment.available.protocols:
+        elif self.deployment.protocols_for(ControlMode.HUMAN) is not None:
             self.mode_choice = 0
             self._go(Scene.MODE)
         else:
@@ -479,7 +479,9 @@ class GameFlow:
                 mode_choice=self.mode_choice,
                 report_available=end is not None,
                 companion_available=self.deployment.can_deploy,
-                protocols=self.deployment.protocol_state,
+                protocols=self.deployment.protocols_for(
+                    ControlMode.COMPANION if self.mode_choice else ControlMode.HUMAN
+                ),
                 paint_background=False,
             )
         elif self.scene == Scene.SETTINGS:

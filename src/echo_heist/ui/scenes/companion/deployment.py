@@ -60,6 +60,9 @@ class DeploymentPanel:
     def can_reset(self) -> bool:
         return self.protocol_state is not None and self.protocol_state.can_reset
 
+    def protocols_for(self, mode: ControlMode) -> ProtocolState | None:
+        return self.protocol_state if mode in self.available.modes else None
+
     def refresh(self) -> None:
         if self.gateway is None:
             return

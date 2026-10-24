@@ -136,6 +136,33 @@ def test_protocol_reset_requires_confirmation_and_uses_actual_backend_results() 
     assert gateway.state.active is None and not flow.designs.reset_confirmation
 
 
+@pytest.mark.parametrize("gateway_supports_human", [False, True])
+def test_human_control_and_protocol_review_follow_actual_gateway_support(
+    gateway_supports_human: bool,
+) -> None:
+    flow, gateway = prepared()
+    if gateway_supports_human:
+        gateway.modes = frozenset(ControlMode)
+    flow.frame(key(pygame.K_ESCAPE), 0)
+    click(flow, CHAPTER_CARD)
+    click(flow, MODE_BUTTONS[0])
+    assert (flow.deployment.protocols_for(ControlMode.HUMAN) is not None) == gateway_supports_human
+    click(flow, MODE_BUTTONS[2])
+    assert flow.session and not flow.session.autonomous
+    assert flow.session.observer_id == flow.level.operative_id
+    flow.frame([], 700)
+    flow.frame([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_d)], 34)
+    if gateway_supports_human:
+        assert gateway.requests[-1].mode == ControlMode.HUMAN
+        assert gateway.runs[-1].supplied[0].actor_id == flow.level.operative_id
+        assert gateway.runs[-1].supplied[0].direction == (1, 0)
+    else:
+        assert not gateway.requests
+    flow.frame(key(pygame.K_ESCAPE), 0)
+    flow.frame(key(pygame.K_r), 0)
+    assert flow.scene == (Scene.MODE if gateway_supports_human else Scene.HEIST)
+
+
 @pytest.mark.parametrize("failure", ["fail_deploy", "wrong_mode"])
 def test_failed_or_mismatched_runtime_does_not_create_an_attempt(failure: str) -> None:
     flow, gateway = prepared()

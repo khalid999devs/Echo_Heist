@@ -45,10 +45,10 @@ class ScriptedRun:
         route: bool = False,
     ) -> None:
         self.mode = request.mode
-        self.actor_id = ACTOR_ID
+        self.actor_id = ACTOR_ID if self.mode == ControlMode.COMPANION else level.operative_id
         spawns = tuple(
-            replace(spawn, actor_id=ACTOR_ID, kind=ActorKind.COMPANION)
-            if spawn.actor_id == level.operative_id
+            replace(spawn, actor_id=self.actor_id, kind=ActorKind.COMPANION)
+            if spawn.actor_id == level.operative_id and self.mode == ControlMode.COMPANION
             else spawn
             for spawn in level.spawns()
         )
@@ -57,7 +57,7 @@ class ScriptedRun:
             level.static_map,
             spawns,
             rules=rules,
-            mission=replace(level.mission(), operative_id=ACTOR_ID, mode="COMPANION"),
+            mission=replace(level.mission(), operative_id=self.actor_id, mode=self.mode.value),
             seed=request.seed,
             security=registry.spec(load_sensor_rules()),
         )
@@ -66,7 +66,7 @@ class ScriptedRun:
         self.protocol_state = protocols
         self.telemetry_calls = 0
         self.supplied: list[Action] = []
-        self.route_driver = RouteDriver(rules, ACTOR_ID, use_tools=True)
+        self.route_driver = RouteDriver(rules, self.actor_id, use_tools=True)
         self.pending = route_steps(level, "upper", "upper") if route else []
         self.route_enabled = route
 
@@ -92,6 +92,8 @@ class ScriptedRun:
         self.supplied.extend(supplied)
         if abort:
             return self.simulation.step(abort=True)
+        if self.mode == ControlMode.HUMAN:
+            return self.simulation.step(supplied)
         assert not supplied, "Companion presentation must not issue player movement/tools"
         observation = self.observe(ACTOR_ID)
         if self.route_enabled:
@@ -117,7 +119,7 @@ class ScriptedRun:
 
     def telemetry(self) -> AutonomyTelemetry:
         self.telemetry_calls += 1
-        own = self.observe(ACTOR_ID).own_status
+        own = self.observe(self.actor_id).own_status
         return AutonomyTelemetry(
             CompanionTrace(
                 ACTOR_ID,
@@ -137,7 +139,9 @@ class ScriptedRun:
                 7,
                 "RETREAT" if self.tick > 20 else "",
                 "Synthetic utility row for layout QA.",
-            ),
+            )
+            if self.mode == ControlMode.COMPANION
+            else None,
             NexusTrace(
                 0,
                 "Synthetic announcement / presentation QA",
@@ -152,6 +156,7 @@ class ScriptedRun:
 class ScriptedGateway:
     def __init__(self, level: LevelData, rules: GameRules, *, route: bool = False) -> None:
         self.level, self.rules, self.route = level, rules, route
+        self.modes = frozenset({ControlMode.COMPANION})
         self.state = ProtocolState(
             3,
             True,
@@ -171,9 +176,7 @@ class ScriptedGateway:
         self.runs: list[ScriptedRun] = []
 
     def availability(self) -> RuntimeAvailability:
-        return RuntimeAvailability(
-            frozenset({ControlMode.COMPANION}), True, "Scripted QA fixture only"
-        )
+        return RuntimeAvailability(self.modes, True, "Scripted QA fixture only")
 
     def protocols(self) -> ProtocolState:
         return self.state

@@ -207,7 +207,9 @@ class CompanionController:
             self._branch_threatened(observation, legs),
             observation.tick - self.progress_tick >= STALL_TICKS,
         )
-        result = search(model, iterations=ITERATIONS, max_depth=MAX_DEPTH, rng=self.rng)
+        result: MctsResult[str] = search(
+            model, iterations=ITERATIONS, max_depth=MAX_DEPTH, rng=self.rng
+        )
         self.last_result, self.last_search_tick = result, observation.tick
         choice = result.best or tactics.WAIT
         ranked = sorted(
@@ -662,8 +664,8 @@ class CompanionController:
                 self.directive = Directive(
                     FLEE, max(directive.until_tick, tick + 30), directive.goal
                 )
-                target = directive.goal if directive.goal not in (None, own.tile) else goal
-                return self._steer(observation, target, not own.crouched)
+                aim = directive.goal if directive.goal not in (None, own.tile) else goal
+                return self._steer(observation, aim or goal, not own.crouched)
             self.directive = Directive(tactics.ADVANCE)
             self.flee_started = -1
             self.pending = "breaking line of sight"  # re-plan now that contact is broken

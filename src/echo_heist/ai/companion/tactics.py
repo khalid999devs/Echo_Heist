@@ -9,6 +9,7 @@ guard rules: a guard sharing the Companion's zone may detect it, a detection
 may become a capture, and guards drift between neighboring sectors.
 """
 
+from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from random import Random
 
@@ -203,7 +204,7 @@ class CompanionModel:
         detected (or the Core alarm sounds) defenders converge on its sector."""
         graph = self.briefing.graph
         alert = state.carrying or state.detections >= ALERT_DETECTIONS
-        moved = []
+        moved: list[tuple[str, str, bool]] = []
         for guard_id, zone, active in state.guards:
             if follow is not None and zone == state.zone and active:
                 moved.append((guard_id, follow, active))
@@ -334,7 +335,7 @@ class CompanionModel:
                 )
         return cost
 
-    def playout(self, state: TacticalState, legal: tuple[str, ...], rng: Random) -> str:
+    def playout(self, state: TacticalState, legal: Sequence[str], rng: Random) -> str:
         """Default rollout policy: usually keep moving, otherwise a random legal reply."""
         if ADVANCE in legal and rng.random() < PLAYOUT_ADVANCE:
             return ADVANCE

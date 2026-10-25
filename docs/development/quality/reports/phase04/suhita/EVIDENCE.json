@@ -1,0 +1,227 @@
+{
+ "deterministic": {
+  "human_routes": {
+   "cross-upper": "WIN",
+   "lower-lower": "CAPTURED",
+   "lower-upper": "WIN",
+   "upper-upper": "WIN"
+  },
+  "interceptor_parity": [
+   {
+    "agree": true,
+    "alphabeta": {
+     "leaves": 9,
+     "post": "choke-research-core",
+     "pruned": 7,
+     "value": 0.255333
+    },
+    "guard_tile": [
+     59,
+     26
+    ],
+    "hypotheses": [
+     "choke-security-core>choke-service-security>choke-entry-service",
+     "choke-research-core>choke-service-research>choke-entry-service",
+     "choke-research-core>choke-cross-link>choke-service-security>choke-entry-service"
+    ],
+    "minimax": {
+     "leaves": 23,
+     "post": "choke-research-core",
+     "value": 0.255333
+    }
+   },
+   {
+    "agree": true,
+    "alphabeta": {
+     "leaves": 9,
+     "post": "choke-research-core",
+     "pruned": 7,
+     "value": 0.167333
+    },
+    "guard_tile": [
+     50,
+     29
+    ],
+    "hypotheses": [
+     "choke-security-core>choke-service-security>choke-entry-service",
+     "choke-research-core>choke-service-research>choke-entry-service",
+     "choke-research-core>choke-cross-link>choke-service-security>choke-entry-service"
+    ],
+    "minimax": {
+     "leaves": 23,
+     "post": "choke-research-core",
+     "value": 0.167333
+    }
+   },
+   {
+    "agree": true,
+    "alphabeta": {
+     "leaves": 16,
+     "post": "choke-security-core",
+     "pruned": 7,
+     "value": 0.123333
+    },
+    "guard_tile": [
+     50,
+     13
+    ],
+    "hypotheses": [
+     "choke-security-core>choke-service-security>choke-entry-service",
+     "choke-research-core>choke-service-research>choke-entry-service",
+     "choke-research-core>choke-cross-link>choke-service-security>choke-entry-service"
+    ],
+    "minimax": {
+     "leaves": 23,
+     "post": "choke-security-core",
+     "value": 0.123333
+    }
+   },
+   {
+    "agree": true,
+    "alphabeta": {
+     "leaves": 17,
+     "post": "choke-security-core",
+     "pruned": 6,
+     "value": 0.182
+    },
+    "guard_tile": [
+     55,
+     18
+    ],
+    "hypotheses": [
+     "choke-security-core>choke-service-security>choke-entry-service",
+     "choke-research-core>choke-service-research>choke-entry-service",
+     "choke-research-core>choke-cross-link>choke-service-security>choke-entry-service"
+    ],
+    "minimax": {
+     "leaves": 23,
+     "post": "choke-security-core",
+     "value": 0.182
+    }
+   }
+  ],
+  "protocol_reset": {
+   "adapted_differs": true,
+   "protocol": "REINFORCE_ROUTE:security-control",
+   "reason": "Repeated confirmed contacts on the security-control route",
+   "reset_matches_baseline": true
+  },
+  "registry_revision": "8df64eef74a3640c4924e185aeb63a24de35d9da1f83e53bba0ef9f640aade03",
+  "repeat_balanced_seed_6_matches": true,
+  "summary": {
+   "BALANCED": {
+    "mean_confirmed_sightings": 14.42,
+    "mean_tools": 11.75,
+    "median_win_ticks": 5141,
+    "outcomes": {
+     "CAPTURED": 12,
+     "TIMEOUT": 1,
+     "WIN": 11
+    }
+   },
+   "GHOST": {
+    "mean_confirmed_sightings": 7.5,
+    "mean_tools": 7.5,
+    "median_win_ticks": 5512.0,
+    "outcomes": {
+     "CAPTURED": 18,
+     "TIMEOUT": 4,
+     "WIN": 2
+    }
+   },
+   "RUSH": {
+    "mean_confirmed_sightings": 9.58,
+    "mean_tools": 8.54,
+    "median_win_ticks": 2794.5,
+    "outcomes": {
+     "CAPTURED": 15,
+     "TIMEOUT": 1,
+     "WIN": 8
+    }
+   }
+  }
+ },
+ "deterministic_hash": "a492cd19208e0f49393f8b3aa7ec5c809bc76baa5c42d36a64e8d37b0cc2b224",
+ "evidence": "p04-suhita",
+ "machine": "x86_64",
+ "python": "3.13.17",
+ "seconds": 206.8,
+ "seeds_per_preset": 24,
+ "system": "Linux",
+ "tick_cap": 9000,
+ "version": "0.1.0a1",
+ "companion_runs": [
+  {"capture_by": "guard-research", "confirmed_sightings": 10, "fingerprint": "ef08caa08e431ef6", "mcts_decisions": 19, "mean_best_visits": 27.16, "mean_visited_alternatives": 3.684, "nexus_dispatches": {"SUPPORT PURSUIT": 2}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 0, "stages": {"backpropagations": 1216, "expansions": 1199, "rollout_steps": 1451, "selections": 2214}, "ticks": 1702, "tools": 10, "utility_override_ticks": 337},
+  {"capture_by": "guard-service", "confirmed_sightings": 2, "fingerprint": "516dc8f436c4406b", "mcts_decisions": 6, "mean_best_visits": 28.5, "mean_visited_alternatives": 3.333, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 1, "stages": {"backpropagations": 384, "expansions": 384, "rollout_steps": 474, "selections": 678}, "ticks": 660, "tools": 4, "utility_override_ticks": 62},
+  {"capture_by": "guard-core", "confirmed_sightings": 9, "fingerprint": "4b36dde7463a0215", "mcts_decisions": 34, "mean_best_visits": 33.32, "mean_visited_alternatives": 3.324, "nexus_dispatches": {"CHECK SOUND": 1, "SUPPORT PURSUIT": 1}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 2, "stages": {"backpropagations": 2176, "expansions": 1950, "rollout_steps": 2138, "selections": 4616}, "ticks": 2454, "tools": 8, "utility_override_ticks": 236},
+  {"capture_by": null, "confirmed_sightings": 4, "fingerprint": "7aad22c994ccedd7", "mcts_decisions": 8, "mean_best_visits": 26.75, "mean_visited_alternatives": 3.875, "nexus_dispatches": {"SUPPORT PURSUIT": 1}, "outcome": "TIMEOUT", "preset": "GHOST", "seed": 3, "stages": {"backpropagations": 512, "expansions": 494, "rollout_steps": 645, "selections": 909}, "ticks": 9000, "tools": 7, "utility_override_ticks": 4345},
+  {"capture_by": "guard-service", "confirmed_sightings": 2, "fingerprint": "e1dea6fd00900777", "mcts_decisions": 7, "mean_best_visits": 25.71, "mean_visited_alternatives": 3.429, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 4, "stages": {"backpropagations": 448, "expansions": 448, "rollout_steps": 566, "selections": 778}, "ticks": 660, "tools": 4, "utility_override_ticks": 62},
+  {"capture_by": "guard-service", "confirmed_sightings": 10, "fingerprint": "4ea6ab676b5cd72c", "mcts_decisions": 35, "mean_best_visits": 38.51, "mean_visited_alternatives": 3.143, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "PROTECT EXIT": 1}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 5, "stages": {"backpropagations": 2240, "expansions": 1877, "rollout_steps": 2011, "selections": 4955}, "ticks": 3346, "tools": 10, "utility_override_ticks": 284},
+  {"capture_by": "guard-service", "confirmed_sightings": 2, "fingerprint": "bb093eb5fd51fd93", "mcts_decisions": 7, "mean_best_visits": 25.57, "mean_visited_alternatives": 3.429, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 6, "stages": {"backpropagations": 448, "expansions": 448, "rollout_steps": 565, "selections": 779}, "ticks": 660, "tools": 4, "utility_override_ticks": 62},
+  {"capture_by": "guard-service", "confirmed_sightings": 2, "fingerprint": "33f8c67e8096129c", "mcts_decisions": 6, "mean_best_visits": 28.83, "mean_visited_alternatives": 3.333, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 7, "stages": {"backpropagations": 384, "expansions": 384, "rollout_steps": 480, "selections": 672}, "ticks": 660, "tools": 4, "utility_override_ticks": 62},
+  {"capture_by": "guard-research", "confirmed_sightings": 8, "fingerprint": "3ed14cdfcd1c3e5e", "mcts_decisions": 15, "mean_best_visits": 25.8, "mean_visited_alternatives": 3.733, "nexus_dispatches": {"SUPPORT PURSUIT": 2}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 8, "stages": {"backpropagations": 960, "expansions": 958, "rollout_steps": 1249, "selections": 1633}, "ticks": 1632, "tools": 12, "utility_override_ticks": 337},
+  {"capture_by": "guard-research", "confirmed_sightings": 9, "fingerprint": "a20c3fac73959746", "mcts_decisions": 38, "mean_best_visits": 33.08, "mean_visited_alternatives": 3.421, "nexus_dispatches": {"CHECK SOUND": 1, "SUPPORT PURSUIT": 3}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 9, "stages": {"backpropagations": 2432, "expansions": 2185, "rollout_steps": 2420, "selections": 5123}, "ticks": 3101, "tools": 11, "utility_override_ticks": 500},
+  {"capture_by": "guard-service", "confirmed_sightings": 2, "fingerprint": "a435a1181218fcb5", "mcts_decisions": 6, "mean_best_visits": 28.33, "mean_visited_alternatives": 3.333, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 10, "stages": {"backpropagations": 384, "expansions": 384, "rollout_steps": 481, "selections": 671}, "ticks": 660, "tools": 4, "utility_override_ticks": 62},
+  {"capture_by": null, "confirmed_sightings": 6, "fingerprint": "1b4d3a2125f85cce", "mcts_decisions": 152, "mean_best_visits": 33.67, "mean_visited_alternatives": 2.993, "nexus_dispatches": {"CHECK SOUND": 1}, "outcome": "TIMEOUT", "preset": "GHOST", "seed": 11, "stages": {"backpropagations": 9728, "expansions": 9172, "rollout_steps": 9612, "selections": 20128}, "ticks": 9000, "tools": 8, "utility_override_ticks": 234},
+  {"capture_by": null, "confirmed_sightings": 0, "fingerprint": "e62992a5dafbea4d", "mcts_decisions": 178, "mean_best_visits": 30.22, "mean_visited_alternatives": 2.972, "nexus_dispatches": {}, "outcome": "TIMEOUT", "preset": "GHOST", "seed": 12, "stages": {"backpropagations": 11392, "expansions": 11345, "rollout_steps": 12646, "selections": 21577}, "ticks": 9000, "tools": 3, "utility_override_ticks": 0},
+  {"capture_by": "guard-service", "confirmed_sightings": 2, "fingerprint": "4b99b3fe1ecda57c", "mcts_decisions": 7, "mean_best_visits": 25.43, "mean_visited_alternatives": 3.429, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 13, "stages": {"backpropagations": 448, "expansions": 448, "rollout_steps": 565, "selections": 779}, "ticks": 660, "tools": 4, "utility_override_ticks": 62},
+  {"capture_by": null, "confirmed_sightings": 44, "fingerprint": "7366877810ca83d6", "mcts_decisions": 68, "mean_best_visits": 31.26, "mean_visited_alternatives": 3.544, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 7}, "outcome": "WIN", "preset": "GHOST", "seed": 14, "stages": {"backpropagations": 4352, "expansions": 3826, "rollout_steps": 4330, "selections": 8938}, "ticks": 6527, "tools": 19, "utility_override_ticks": 303},
+  {"capture_by": "guard-service", "confirmed_sightings": 2, "fingerprint": "3f4d4db83c092e16", "mcts_decisions": 7, "mean_best_visits": 26.29, "mean_visited_alternatives": 3.571, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 15, "stages": {"backpropagations": 448, "expansions": 448, "rollout_steps": 571, "selections": 773}, "ticks": 659, "tools": 4, "utility_override_ticks": 68},
+  {"capture_by": null, "confirmed_sightings": 16, "fingerprint": "fba42abc3cfbc428", "mcts_decisions": 47, "mean_best_visits": 38.04, "mean_visited_alternatives": 3.553, "nexus_dispatches": {"CHECK SOUND": 2, "INTERCEPT": 1, "SUPPORT PURSUIT": 4}, "outcome": "WIN", "preset": "GHOST", "seed": 16, "stages": {"backpropagations": 3008, "expansions": 2313, "rollout_steps": 2638, "selections": 6317}, "ticks": 4497, "tools": 11, "utility_override_ticks": 424},
+  {"capture_by": null, "confirmed_sightings": 6, "fingerprint": "46bc1d75ddc5ccf4", "mcts_decisions": 9, "mean_best_visits": 24.67, "mean_visited_alternatives": 4.222, "nexus_dispatches": {"CHECK SOUND": 1}, "outcome": "TIMEOUT", "preset": "GHOST", "seed": 17, "stages": {"backpropagations": 576, "expansions": 576, "rollout_steps": 790, "selections": 938}, "ticks": 9000, "tools": 5, "utility_override_ticks": 4287},
+  {"capture_by": "guard-service", "confirmed_sightings": 2, "fingerprint": "f633b5e9eb18210f", "mcts_decisions": 7, "mean_best_visits": 27.43, "mean_visited_alternatives": 3.571, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 18, "stages": {"backpropagations": 448, "expansions": 448, "rollout_steps": 567, "selections": 777}, "ticks": 659, "tools": 4, "utility_override_ticks": 68},
+  {"capture_by": "guard-service", "confirmed_sightings": 2, "fingerprint": "a9c194e9e463cdca", "mcts_decisions": 7, "mean_best_visits": 24.86, "mean_visited_alternatives": 3.571, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 19, "stages": {"backpropagations": 448, "expansions": 448, "rollout_steps": 577, "selections": 767}, "ticks": 659, "tools": 5, "utility_override_ticks": 68},
+  {"capture_by": "guard-research", "confirmed_sightings": 3, "fingerprint": "d367d1ee9ffe2d46", "mcts_decisions": 8, "mean_best_visits": 23.62, "mean_visited_alternatives": 3.75, "nexus_dispatches": {"SUPPORT PURSUIT": 1}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 20, "stages": {"backpropagations": 512, "expansions": 512, "rollout_steps": 675, "selections": 861}, "ticks": 749, "tools": 5, "utility_override_ticks": 43},
+  {"capture_by": "guard-core", "confirmed_sightings": 12, "fingerprint": "0e28e1f2abd51cf8", "mcts_decisions": 49, "mean_best_visits": 35.35, "mean_visited_alternatives": 3.204, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 21, "stages": {"backpropagations": 3136, "expansions": 2934, "rollout_steps": 3044, "selections": 6566}, "ticks": 4339, "tools": 13, "utility_override_ticks": 485},
+  {"capture_by": "guard-service", "confirmed_sightings": 3, "fingerprint": "33631f46ca27a8fa", "mcts_decisions": 10, "mean_best_visits": 24.7, "mean_visited_alternatives": 3.8, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 22, "stages": {"backpropagations": 640, "expansions": 640, "rollout_steps": 829, "selections": 1091}, "ticks": 741, "tools": 8, "utility_override_ticks": 59},
+  {"capture_by": "guard-research", "confirmed_sightings": 22, "fingerprint": "6ed451f79f886609", "mcts_decisions": 48, "mean_best_visits": 36.88, "mean_visited_alternatives": 3.104, "nexus_dispatches": {"SUPPORT PURSUIT": 3}, "outcome": "CAPTURED", "preset": "GHOST", "seed": 23, "stages": {"backpropagations": 3072, "expansions": 2807, "rollout_steps": 3082, "selections": 6399}, "ticks": 3848, "tools": 13, "utility_override_ticks": 386},
+  {"capture_by": "guard-core", "confirmed_sightings": 38, "fingerprint": "7a3155b244c8ea40", "mcts_decisions": 36, "mean_best_visits": 38.44, "mean_visited_alternatives": 3.194, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 0, "stages": {"backpropagations": 2304, "expansions": 2013, "rollout_steps": 2153, "selections": 5050}, "ticks": 3893, "tools": 15, "utility_override_ticks": 485},
+  {"capture_by": "guard-service", "confirmed_sightings": 6, "fingerprint": "64c989d36b6dd356", "mcts_decisions": 13, "mean_best_visits": 30.85, "mean_visited_alternatives": 3.462, "nexus_dispatches": {"CHECK SOUND": 1}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 1, "stages": {"backpropagations": 832, "expansions": 815, "rollout_steps": 980, "selections": 1533}, "ticks": 1505, "tools": 7, "utility_override_ticks": 161},
+  {"capture_by": "guard-core", "confirmed_sightings": 10, "fingerprint": "bfa600947f1c08c2", "mcts_decisions": 16, "mean_best_visits": 27.62, "mean_visited_alternatives": 4.062, "nexus_dispatches": {"SUPPORT PURSUIT": 1}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 2, "stages": {"backpropagations": 1024, "expansions": 1020, "rollout_steps": 1319, "selections": 1757}, "ticks": 1613, "tools": 10, "utility_override_ticks": 243},
+  {"capture_by": null, "confirmed_sightings": 14, "fingerprint": "e5d21cd004680c9a", "mcts_decisions": 81, "mean_best_visits": 41.12, "mean_visited_alternatives": 3.148, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1}, "outcome": "WIN", "preset": "BALANCED", "seed": 3, "stages": {"backpropagations": 5184, "expansions": 4306, "rollout_steps": 4350, "selections": 11246}, "ticks": 6365, "tools": 11, "utility_override_ticks": 265},
+  {"capture_by": null, "confirmed_sightings": 6, "fingerprint": "59bcaab6920b602f", "mcts_decisions": 54, "mean_best_visits": 40.89, "mean_visited_alternatives": 3.204, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 2}, "outcome": "WIN", "preset": "BALANCED", "seed": 4, "stages": {"backpropagations": 3456, "expansions": 2749, "rollout_steps": 2974, "selections": 6892}, "ticks": 4500, "tools": 9, "utility_override_ticks": 149},
+  {"capture_by": "guard-service", "confirmed_sightings": 10, "fingerprint": "9816d9723d521c9c", "mcts_decisions": 28, "mean_best_visits": 32.21, "mean_visited_alternatives": 3.893, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 2}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 5, "stages": {"backpropagations": 1792, "expansions": 1505, "rollout_steps": 1899, "selections": 3311}, "ticks": 2583, "tools": 9, "utility_override_ticks": 192},
+  {"capture_by": null, "confirmed_sightings": 13, "fingerprint": "d66c0d41f678706b", "mcts_decisions": 54, "mean_best_visits": 38.63, "mean_visited_alternatives": 3.407, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "PROTECT EXIT": 1}, "outcome": "WIN", "preset": "BALANCED", "seed": 6, "stages": {"backpropagations": 3456, "expansions": 2690, "rollout_steps": 2995, "selections": 7433}, "ticks": 4411, "tools": 12, "utility_override_ticks": 201},
+  {"capture_by": "guard-research", "confirmed_sightings": 20, "fingerprint": "f9f9672f5b6f13b4", "mcts_decisions": 30, "mean_best_visits": 34.73, "mean_visited_alternatives": 3.233, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 7, "stages": {"backpropagations": 1920, "expansions": 1907, "rollout_steps": 2087, "selections": 3686}, "ticks": 2990, "tools": 13, "utility_override_ticks": 404},
+  {"capture_by": "guard-service", "confirmed_sightings": 11, "fingerprint": "f97fa0944b9243ab", "mcts_decisions": 34, "mean_best_visits": 34.74, "mean_visited_alternatives": 3.5, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 1}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 8, "stages": {"backpropagations": 2176, "expansions": 1899, "rollout_steps": 2158, "selections": 4155}, "ticks": 3131, "tools": 12, "utility_override_ticks": 225},
+  {"capture_by": null, "confirmed_sightings": 12, "fingerprint": "3ad055fd09e89792", "mcts_decisions": 68, "mean_best_visits": 41.9, "mean_visited_alternatives": 3.324, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1}, "outcome": "WIN", "preset": "BALANCED", "seed": 9, "stages": {"backpropagations": 4352, "expansions": 3204, "rollout_steps": 3468, "selections": 9362}, "ticks": 5141, "tools": 11, "utility_override_ticks": 323},
+  {"capture_by": "guard-research", "confirmed_sightings": 15, "fingerprint": "e0bb57a2f5b53b91", "mcts_decisions": 97, "mean_best_visits": 33.46, "mean_visited_alternatives": 3.402, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "PROTECT EXIT": 1}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 10, "stages": {"backpropagations": 6208, "expansions": 5670, "rollout_steps": 6221, "selections": 12142}, "ticks": 6448, "tools": 12, "utility_override_ticks": 290},
+  {"capture_by": null, "confirmed_sightings": 20, "fingerprint": "e7c9278cbc167719", "mcts_decisions": 61, "mean_best_visits": 40.36, "mean_visited_alternatives": 3.475, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 1}, "outcome": "WIN", "preset": "BALANCED", "seed": 11, "stages": {"backpropagations": 3904, "expansions": 2911, "rollout_steps": 3307, "selections": 7933}, "ticks": 5642, "tools": 17, "utility_override_ticks": 793},
+  {"capture_by": "guard-service", "confirmed_sightings": 3, "fingerprint": "e8aa7b4a2155fdbe", "mcts_decisions": 20, "mean_best_visits": 30.25, "mean_visited_alternatives": 3.4, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 12, "stages": {"backpropagations": 1280, "expansions": 1267, "rollout_steps": 1482, "selections": 2371}, "ticks": 1596, "tools": 5, "utility_override_ticks": 118},
+  {"capture_by": null, "confirmed_sightings": 12, "fingerprint": "7eb11a617f2dc2c1", "mcts_decisions": 55, "mean_best_visits": 42.67, "mean_visited_alternatives": 2.6, "nexus_dispatches": {"CHECK SOUND": 11}, "outcome": "TIMEOUT", "preset": "BALANCED", "seed": 13, "stages": {"backpropagations": 3520, "expansions": 3017, "rollout_steps": 2876, "selections": 8187}, "ticks": 9000, "tools": 11, "utility_override_ticks": 2880},
+  {"capture_by": null, "confirmed_sightings": 9, "fingerprint": "bcd0c9820fb07418", "mcts_decisions": 70, "mean_best_visits": 37.83, "mean_visited_alternatives": 3.486, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 1}, "outcome": "WIN", "preset": "BALANCED", "seed": 14, "stages": {"backpropagations": 4480, "expansions": 3619, "rollout_steps": 4061, "selections": 9002}, "ticks": 4546, "tools": 9, "utility_override_ticks": 131},
+  {"capture_by": null, "confirmed_sightings": 20, "fingerprint": "2a2749eb581c4873", "mcts_decisions": 69, "mean_best_visits": 39.67, "mean_visited_alternatives": 3.203, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 1}, "outcome": "WIN", "preset": "BALANCED", "seed": 15, "stages": {"backpropagations": 4416, "expansions": 3754, "rollout_steps": 3961, "selections": 9425}, "ticks": 6003, "tools": 11, "utility_override_ticks": 210},
+  {"capture_by": null, "confirmed_sightings": 17, "fingerprint": "cc4fe67dc3b306f8", "mcts_decisions": 41, "mean_best_visits": 35.9, "mean_visited_alternatives": 3.805, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "PROTECT EXIT": 1}, "outcome": "WIN", "preset": "BALANCED", "seed": 16, "stages": {"backpropagations": 2624, "expansions": 2071, "rollout_steps": 2518, "selections": 4920}, "ticks": 3865, "tools": 18, "utility_override_ticks": 585},
+  {"capture_by": null, "confirmed_sightings": 17, "fingerprint": "c363285140bb7c78", "mcts_decisions": 114, "mean_best_visits": 33.89, "mean_visited_alternatives": 3.167, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1}, "outcome": "WIN", "preset": "BALANCED", "seed": 17, "stages": {"backpropagations": 7296, "expansions": 7002, "rollout_steps": 7877, "selections": 13850}, "ticks": 7121, "tools": 11, "utility_override_ticks": 225},
+  {"capture_by": "guard-research", "confirmed_sightings": 18, "fingerprint": "89a35443a09b6a28", "mcts_decisions": 26, "mean_best_visits": 28.0, "mean_visited_alternatives": 3.731, "nexus_dispatches": {"SUPPORT PURSUIT": 1}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 18, "stages": {"backpropagations": 1664, "expansions": 1631, "rollout_steps": 1910, "selections": 3115}, "ticks": 2841, "tools": 17, "utility_override_ticks": 588},
+  {"capture_by": "guard-core", "confirmed_sightings": 30, "fingerprint": "6862803a97451ee9", "mcts_decisions": 51, "mean_best_visits": 34.71, "mean_visited_alternatives": 3.294, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 1}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 19, "stages": {"backpropagations": 3264, "expansions": 3004, "rollout_steps": 3198, "selections": 6854}, "ticks": 4739, "tools": 14, "utility_override_ticks": 415},
+  {"capture_by": null, "confirmed_sightings": 13, "fingerprint": "51091e8f8481f3a3", "mcts_decisions": 71, "mean_best_visits": 38.65, "mean_visited_alternatives": 3.155, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 3}, "outcome": "WIN", "preset": "BALANCED", "seed": 20, "stages": {"backpropagations": 4544, "expansions": 3876, "rollout_steps": 4156, "selections": 9041}, "ticks": 6286, "tools": 18, "utility_override_ticks": 601},
+  {"capture_by": null, "confirmed_sightings": 20, "fingerprint": "5e5818c67877ff00", "mcts_decisions": 52, "mean_best_visits": 39.37, "mean_visited_alternatives": 3.5, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 1}, "outcome": "WIN", "preset": "BALANCED", "seed": 21, "stages": {"backpropagations": 3328, "expansions": 2656, "rollout_steps": 2962, "selections": 6899}, "ticks": 4348, "tools": 16, "utility_override_ticks": 586},
+  {"capture_by": "guard-research", "confirmed_sightings": 3, "fingerprint": "9ef4fb5c73210473", "mcts_decisions": 19, "mean_best_visits": 26.37, "mean_visited_alternatives": 3.789, "nexus_dispatches": {"SUPPORT PURSUIT": 1}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 22, "stages": {"backpropagations": 1216, "expansions": 1205, "rollout_steps": 1435, "selections": 2224}, "ticks": 1459, "tools": 6, "utility_override_ticks": 61},
+  {"capture_by": "guard-core", "confirmed_sightings": 9, "fingerprint": "92b7d989ca64321f", "mcts_decisions": 24, "mean_best_visits": 29.62, "mean_visited_alternatives": 3.667, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "BALANCED", "seed": 23, "stages": {"backpropagations": 1536, "expansions": 1536, "rollout_steps": 1862, "selections": 2746}, "ticks": 2283, "tools": 8, "utility_override_ticks": 222},
+  {"capture_by": null, "confirmed_sightings": 9, "fingerprint": "3aa147427dbf5e5e", "mcts_decisions": 19, "mean_best_visits": 34.89, "mean_visited_alternatives": 3.684, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "SUPPORT PURSUIT": 2}, "outcome": "WIN", "preset": "RUSH", "seed": 0, "stages": {"backpropagations": 1216, "expansions": 1011, "rollout_steps": 1190, "selections": 2179}, "ticks": 2386, "tools": 10, "utility_override_ticks": 319},
+  {"capture_by": null, "confirmed_sightings": 3, "fingerprint": "d3ebc2a644ba2baf", "mcts_decisions": 16, "mean_best_visits": 33.31, "mean_visited_alternatives": 3.188, "nexus_dispatches": {"CHECK SOUND": 2}, "outcome": "TIMEOUT", "preset": "RUSH", "seed": 1, "stages": {"backpropagations": 1024, "expansions": 1020, "rollout_steps": 1135, "selections": 1941}, "ticks": 9000, "tools": 6, "utility_override_ticks": 4084},
+  {"capture_by": "guard-service", "confirmed_sightings": 5, "fingerprint": "5cd1dac865c4e1ff", "mcts_decisions": 9, "mean_best_visits": 32.0, "mean_visited_alternatives": 3.333, "nexus_dispatches": {"SUPPORT PURSUIT": 2}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 2, "stages": {"backpropagations": 576, "expansions": 574, "rollout_steps": 675, "selections": 1055}, "ticks": 1201, "tools": 10, "utility_override_ticks": 313},
+  {"capture_by": "guard-research", "confirmed_sightings": 3, "fingerprint": "a2c5fa98e3069ba4", "mcts_decisions": 9, "mean_best_visits": 27.89, "mean_visited_alternatives": 3.667, "nexus_dispatches": {"CHECK SOUND": 1}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 3, "stages": {"backpropagations": 576, "expansions": 576, "rollout_steps": 722, "selections": 1006}, "ticks": 788, "tools": 6, "utility_override_ticks": 223},
+  {"capture_by": "guard-research", "confirmed_sightings": 3, "fingerprint": "e43d258fdae50d8e", "mcts_decisions": 9, "mean_best_visits": 30.0, "mean_visited_alternatives": 3.778, "nexus_dispatches": {"CHECK SOUND": 1}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 4, "stages": {"backpropagations": 576, "expansions": 576, "rollout_steps": 720, "selections": 1008}, "ticks": 788, "tools": 6, "utility_override_ticks": 223},
+  {"capture_by": "guard-research", "confirmed_sightings": 10, "fingerprint": "8cadfa10632b436c", "mcts_decisions": 25, "mean_best_visits": 34.12, "mean_visited_alternatives": 3.28, "nexus_dispatches": {"SUPPORT PURSUIT": 1}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 5, "stages": {"backpropagations": 1600, "expansions": 1489, "rollout_steps": 1558, "selections": 3353}, "ticks": 1914, "tools": 7, "utility_override_ticks": 155},
+  {"capture_by": "guard-service", "confirmed_sightings": 5, "fingerprint": "86a47410fa38c605", "mcts_decisions": 9, "mean_best_visits": 33.56, "mean_visited_alternatives": 3.333, "nexus_dispatches": {"SUPPORT PURSUIT": 2}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 6, "stages": {"backpropagations": 576, "expansions": 566, "rollout_steps": 661, "selections": 1077}, "ticks": 1201, "tools": 10, "utility_override_ticks": 313},
+  {"capture_by": "guard-research", "confirmed_sightings": 10, "fingerprint": "9a4de1467853ccb5", "mcts_decisions": 48, "mean_best_visits": 38.15, "mean_visited_alternatives": 3.083, "nexus_dispatches": {"CHECK SOUND": 2, "INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 1}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 7, "stages": {"backpropagations": 3072, "expansions": 2840, "rollout_steps": 2829, "selections": 6619}, "ticks": 3918, "tools": 13, "utility_override_ticks": 595},
+  {"capture_by": null, "confirmed_sightings": 9, "fingerprint": "f1c67aed3c25ce43", "mcts_decisions": 19, "mean_best_visits": 34.79, "mean_visited_alternatives": 3.632, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "SUPPORT PURSUIT": 2}, "outcome": "WIN", "preset": "RUSH", "seed": 8, "stages": {"backpropagations": 1216, "expansions": 1067, "rollout_steps": 1222, "selections": 2278}, "ticks": 2382, "tools": 10, "utility_override_ticks": 311},
+  {"capture_by": null, "confirmed_sightings": 13, "fingerprint": "e76ffe130561c19f", "mcts_decisions": 43, "mean_best_visits": 41.93, "mean_visited_alternatives": 3.256, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 2}, "outcome": "WIN", "preset": "RUSH", "seed": 9, "stages": {"backpropagations": 2752, "expansions": 2128, "rollout_steps": 2174, "selections": 5863}, "ticks": 3769, "tools": 9, "utility_override_ticks": 492},
+  {"capture_by": null, "confirmed_sightings": 8, "fingerprint": "048237a138d22f23", "mcts_decisions": 43, "mean_best_visits": 33.58, "mean_visited_alternatives": 3.512, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "PROTECT EXIT": 1}, "outcome": "WIN", "preset": "RUSH", "seed": 10, "stages": {"backpropagations": 2752, "expansions": 2437, "rollout_steps": 2552, "selections": 5442}, "ticks": 3186, "tools": 8, "utility_override_ticks": 226},
+  {"capture_by": "guard-service", "confirmed_sightings": 34, "fingerprint": "3902b413647eaa29", "mcts_decisions": 33, "mean_best_visits": 38.24, "mean_visited_alternatives": 3.273, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 1}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 11, "stages": {"backpropagations": 2112, "expansions": 1827, "rollout_steps": 1911, "selections": 4498}, "ticks": 2814, "tools": 8, "utility_override_ticks": 340},
+  {"capture_by": null, "confirmed_sightings": 9, "fingerprint": "fda93e3f4f6ff419", "mcts_decisions": 19, "mean_best_visits": 34.11, "mean_visited_alternatives": 3.684, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "SUPPORT PURSUIT": 2}, "outcome": "WIN", "preset": "RUSH", "seed": 12, "stages": {"backpropagations": 1216, "expansions": 1011, "rollout_steps": 1196, "selections": 2166}, "ticks": 2386, "tools": 10, "utility_override_ticks": 319},
+  {"capture_by": "guard-research", "confirmed_sightings": 14, "fingerprint": "95bc5f2801f0012a", "mcts_decisions": 21, "mean_best_visits": 28.9, "mean_visited_alternatives": 3.81, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "SUPPORT PURSUIT": 4}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 13, "stages": {"backpropagations": 1344, "expansions": 1270, "rollout_steps": 1497, "selections": 2431}, "ticks": 2396, "tools": 13, "utility_override_ticks": 501},
+  {"capture_by": "guard-research", "confirmed_sightings": 14, "fingerprint": "34530d16d0d3cb2b", "mcts_decisions": 41, "mean_best_visits": 36.63, "mean_visited_alternatives": 2.976, "nexus_dispatches": {"CHECK SOUND": 2, "INTERCEPT": 1, "SUPPORT PURSUIT": 10}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 14, "stages": {"backpropagations": 2624, "expansions": 2440, "rollout_steps": 2386, "selections": 5670}, "ticks": 3562, "tools": 10, "utility_override_ticks": 402},
+  {"capture_by": null, "confirmed_sightings": 18, "fingerprint": "d3d99ac187b22978", "mcts_decisions": 38, "mean_best_visits": 40.97, "mean_visited_alternatives": 3.316, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 1}, "outcome": "WIN", "preset": "RUSH", "seed": 15, "stages": {"backpropagations": 2432, "expansions": 1926, "rollout_steps": 2018, "selections": 5040}, "ticks": 2890, "tools": 7, "utility_override_ticks": 223},
+  {"capture_by": "guard-security", "confirmed_sightings": 8, "fingerprint": "a50d19d0726745dd", "mcts_decisions": 14, "mean_best_visits": 27.71, "mean_visited_alternatives": 3.714, "nexus_dispatches": {"SUPPORT PURSUIT": 2}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 16, "stages": {"backpropagations": 896, "expansions": 884, "rollout_steps": 1067, "selections": 1633}, "ticks": 1656, "tools": 9, "utility_override_ticks": 488},
+  {"capture_by": "guard-core", "confirmed_sightings": 5, "fingerprint": "114b30137b0fb9ee", "mcts_decisions": 10, "mean_best_visits": 29.6, "mean_visited_alternatives": 3.4, "nexus_dispatches": {"SUPPORT PURSUIT": 2}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 17, "stages": {"backpropagations": 640, "expansions": 640, "rollout_steps": 744, "selections": 1176}, "ticks": 1037, "tools": 7, "utility_override_ticks": 161},
+  {"capture_by": null, "confirmed_sightings": 3, "fingerprint": "1c555bae2ea4a8fe", "mcts_decisions": 35, "mean_best_visits": 40.34, "mean_visited_alternatives": 3.2, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1}, "outcome": "WIN", "preset": "RUSH", "seed": 18, "stages": {"backpropagations": 2240, "expansions": 1792, "rollout_steps": 1836, "selections": 4772}, "ticks": 2699, "tools": 5, "utility_override_ticks": 149},
+  {"capture_by": "guard-security", "confirmed_sightings": 5, "fingerprint": "2a4aae756b6e15a5", "mcts_decisions": 15, "mean_best_visits": 26.8, "mean_visited_alternatives": 3.733, "nexus_dispatches": {"SUPPORT PURSUIT": 2}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 19, "stages": {"backpropagations": 960, "expansions": 960, "rollout_steps": 1121, "selections": 1759}, "ticks": 1303, "tools": 6, "utility_override_ticks": 295},
+  {"capture_by": "guard-research", "confirmed_sightings": 6, "fingerprint": "d8ea4281d8818986", "mcts_decisions": 23, "mean_best_visits": 26.74, "mean_visited_alternatives": 3.739, "nexus_dispatches": {}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 20, "stages": {"backpropagations": 1472, "expansions": 1472, "rollout_steps": 1726, "selections": 2690}, "ticks": 1790, "tools": 7, "utility_override_ticks": 213},
+  {"capture_by": "guard-service", "confirmed_sightings": 10, "fingerprint": "de7ef9b920a97185", "mcts_decisions": 18, "mean_best_visits": 32.89, "mean_visited_alternatives": 3.556, "nexus_dispatches": {"CHECK SOUND": 1, "INTERCEPT": 1, "SUPPORT PURSUIT": 2}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 21, "stages": {"backpropagations": 1152, "expansions": 1050, "rollout_steps": 1204, "selections": 2147}, "ticks": 2285, "tools": 10, "utility_override_ticks": 292},
+  {"capture_by": "guard-research", "confirmed_sightings": 18, "fingerprint": "c94cee66306da4f9", "mcts_decisions": 38, "mean_best_visits": 34.71, "mean_visited_alternatives": 3.263, "nexus_dispatches": {"CHECK SOUND": 2, "INTERCEPT": 1, "PROTECT EXIT": 1}, "outcome": "CAPTURED", "preset": "RUSH", "seed": 22, "stages": {"backpropagations": 2432, "expansions": 2241, "rollout_steps": 2278, "selections": 5209}, "ticks": 2835, "tools": 10, "utility_override_ticks": 369},
+  {"capture_by": null, "confirmed_sightings": 8, "fingerprint": "b00d2d2f165b759c", "mcts_decisions": 37, "mean_best_visits": 40.46, "mean_visited_alternatives": 3.216, "nexus_dispatches": {"INTERCEPT": 1, "PROTECT EXIT": 1, "SUPPORT PURSUIT": 2}, "outcome": "WIN", "preset": "RUSH", "seed": 23, "stages": {"backpropagations": 2368, "expansions": 1912, "rollout_steps": 1962, "selections": 4956}, "ticks": 3317, "tools": 8, "utility_override_ticks": 278}
+ ]
+}

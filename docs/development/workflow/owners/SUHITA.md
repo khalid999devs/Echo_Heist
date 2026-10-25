@@ -1,5 +1,7 @@
 # Suhita's agent guide
 
+**2026-10-25:** P04-SR1/SR2/SR3 are implemented on `work/suhita-p04` ([handoff](../../tracking/handoffs/suhita/day_02/P04.md)). Next for Suhita: run its Windows block, record results, push; then the combined P04 gate with Khalid. Do not start P05 before that gate.
+
 Identity: **Suhita**, Windows x64. You lead most gameplay logic; Khalid leads complex graphics/scenes. [Workload](../../planning/WORKLOAD.md): after P03, estimated remaining effort is 48 points for you / 43 for Khalid, provisionally balancing his completed foundation/refinements. Actual historical hours are unknown.
 
 **P01/P02/P03 are complete. Your next queue is P04-SR1/SR2/SR3.** Do not redo Tracker, guard registry or P03. Preserve your original commits and [P03 handoff](../../tracking/handoffs/suhita/day_02/P03.md), then retrieve the superseding [combined schema-9 handoff](../../tracking/handoffs/khalid/day_02/phase03/P03.md) and [actual acceptance](../../quality/reports/phase03/integration/VERIFICATION.md). Main must contain this integration before dependent work begins. Use the [Windows setup and prompt](../setup/WINDOWS_SUHITA.md).

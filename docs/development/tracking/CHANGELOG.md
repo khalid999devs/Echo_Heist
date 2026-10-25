@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-10-25 - P04 SR logic: Companion, Interceptor, NEXUS and protocols
+
+- Suhita's `work/suhita-p04` (on Khalid's presentation branch): Companion mission FSM, utility overrides, observed-risk A* and bounded belief-only MCTS; Interceptor minimax/alpha-beta with physical gate travel; evidence-limited NEXUS dispatch, coverage and lockdown; versioned protocol memory with one announced adaptation and full reset; the real gateway injected at startup.
+- Fingerprint schema 10; registry Core guard role INTERCEPTOR (`ALPHA-BETA`). Blind lower->lower Human return is now intercepted; the alternate corridor still wins.
+- Agent container: 184 non-pygame tests, structure/Ruff/strict types; actual evidence in [verification](../quality/reports/phase04/suhita/VERIFICATION.md). Locked pygame suite, Windows desktop and hosted CI pending Suhita's run/push. P04 not complete.
+
 ## 2026-10-25 - P04 presentation and runtime handoff
 
 - Implemented Khalid's independent KR1/KR2 presentation on `work/khalid-p04`: immutable gateway/telemetry contracts, active-actor camera/robot stairs, spectator input, measured-data F2 tabs, confirmed protocol reset, policy/deploy and review/retry flow, plus explicit once-per-announcement audio. No gameplay/scoring/map/asset changes; Human fingerprint 9 and all five route replay hashes remain unchanged.

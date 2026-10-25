@@ -1,5 +1,7 @@
 # Suhita: Windows setup and P04 handoff
 
+**2026-10-25 update:** SR1/SR2/SR3 code is on `work/suhita-p04`. Resume that branch and run the Windows block in the [SR handoff](../../tracking/handoffs/suhita/day_02/P04.md); the steps below remain the general setup reference.
+
 Updated **2026-10-25**. Repository: [khalid999devs/Echo_Heist](https://github.com/khalid999devs/Echo_Heist). Use native Windows x64 / PowerShell for desktop QA. **P01-P03 are complete; P04-SR1/SR2/SR3 are next.** You lead logic and Khalid leads complex visuals. Read the [owner guide](../owners/SUHITA.md), [P03 combined handoff](../../tracking/handoffs/khalid/day_02/phase03/P03.md), [P04 specification](../../planning/phases/intelligence/PHASE_04.md) and Khalid's new [P04 presentation handoff](../../tracking/handoffs/khalid/day_02/phase04/P04.md) on `work/khalid-p04`.
 
 ## Inspect and create the checkout

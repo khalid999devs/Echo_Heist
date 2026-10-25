@@ -202,6 +202,23 @@ def decide(
     )
 
 
+PROTOCOL_ANNOUNCEMENTS = {
+    "VERIFY_ECHO": "PROTOCOL VERIFY ECHO / DECOYS ARE CHECKED NEARBY",
+    "REINFORCE_ROUTE": "PROTOCOL REINFORCE ROUTE / {sector} GATE HELD",
+    "SPREAD_FORMATION": "PROTOCOL SPREAD FORMATION / PATROLS KEEP COVERAGE",
+}
+
+
+def initial_memory(rules: DirectorRules) -> NexusMemory:
+    """The attempt starts by announcing its single active protocol (if any)."""
+    if rules.protocol is None:
+        return NexusMemory()
+    text = PROTOCOL_ANNOUNCEMENTS[rules.protocol.protocol_id.value].format(
+        sector=rules.protocol.sector.upper()
+    )
+    return NexusMemory(announcement=text, announcement_tick=0)
+
+
 def dispatch_reports(memory: NexusMemory) -> tuple[SecurityReport, ...]:
     """Addressed radio orders carrying the original evidence tick and a TTL."""
     return tuple(

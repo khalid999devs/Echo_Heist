@@ -40,7 +40,7 @@ TASK_LABELS = {
     "INVESTIGATE_NOISE": "CHECK SOUND",
 }
 
-type AttemptEnded = Callable[[MissionEnd, NexusStatus | None], None]
+type AttemptEnded = Callable[[MissionEnd, NexusStatus | None], ProtocolState | None]
 
 
 def build_briefing(level: LevelData, registry: SecurityRegistry) -> MissionBriefing:
@@ -145,8 +145,11 @@ class AutonomousMission:
         if result.mission_end is not None and not self._ended:
             self._ended = True
             if self._on_end is not None:
-                self._on_end(result.mission_end, self.simulation.nexus_status())
-                self._protocol_state = None  # the service now holds the updated state
+                # The service records this attempt once and returns its new state.
+                self._protocol_state = self._on_end(
+                    result.mission_end, self.simulation.nexus_status()
+                )
+                self._telemetry = self._sample()
         return result
 
     # AutonomousRun --------------------------------------------------------

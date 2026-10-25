@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from dataclasses import asdict
 from hashlib import sha256
 
+from echo_heist.ai.director.nexus import initial_memory
 from echo_heist.ai.navigation.grid import bfs
 from echo_heist.core.abilities.tools import advance_echoes, tool_reason, use_tool
 from echo_heist.core.contracts.actions import Action, ActionKind
@@ -167,6 +168,8 @@ class Simulation:
                     else 0,
                 )
                 self._world.guard_memories[patrol.actor_id] = GuardMemory()
+            if security.director is not None:
+                self._world.nexus = initial_memory(security.director)
             guard_security.refresh(self._world, world_map, security, ())
 
     @property

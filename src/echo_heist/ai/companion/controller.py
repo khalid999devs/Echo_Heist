@@ -105,7 +105,6 @@ class CompanionController:
         self.crumbs: deque[Tile] = deque(maxlen=BREADCRUMBS)
         self.melee_ready_at: dict[str, int] = {}
         self.echo_ready_at = 0
-        self.hide_tile: Tile | None = None
         self.hidden_since = -1
         self.utility = ("", "")
         self.geometry_revision = 0

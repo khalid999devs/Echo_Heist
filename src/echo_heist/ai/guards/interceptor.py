@@ -22,6 +22,8 @@ from echo_heist.ai.guards.steering import (
 )
 from echo_heist.ai.navigation.astar import astar
 from echo_heist.ai.navigation.grid import distances_from
+from echo_heist.ai.navigation.routes import ZoneRoute as Hypothesis
+from echo_heist.ai.navigation.routes import zone_routes as route_hypotheses
 from echo_heist.ai.planning.minimax import GameTree, SearchResult, alphabeta
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.observations import Observation
@@ -40,24 +42,7 @@ from echo_heist.core.contracts.security.model import (
 )
 from echo_heist.core.contracts.world import MissionPhase, Tile, tile_center
 
-MAX_ROUTES = 3
-MAX_ROUTE_NODES = 4
 BLOCK_HORIZON_TICKS = 300
-GOAL = "GOAL"
-
-
-@dataclass(frozen=True, slots=True)
-class Hypothesis:
-    """One plausible branch: ordered chokepoints and the walking steps to reach each."""
-
-    nodes: tuple[str, ...]
-    arrival_steps: tuple[int, ...]
-    total_steps: int
-    weight: float
-
-    @property
-    def label(self) -> str:
-        return ">".join(self.nodes) or "direct"
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,53 +62,6 @@ class InterceptProblem:
 
 
 type Node = tuple[str | None, int | None, str | None]  # (post, hypothesis index, final post)
-
-
-def route_hypotheses(
-    graph: RouteGraph, evidence: Tile, goal: Tile, steps: dict[Tile, int]
-) -> tuple[Hypothesis, ...]:
-    """Up to three cheapest simple chokepoint routes from the evidence zone to the goal."""
-    start_zone, goal_zone = graph.zone_of(evidence), graph.zone_of(goal)
-    if not start_zone or not goal_zone or start_zone == goal_zone:
-        return ()
-    goal_name = "CORE" if goal == graph.core_tile else "EXIT"
-    found: list[tuple[int, tuple[str, ...], tuple[int, ...]]] = []
-
-    def extend(zone: str, path: tuple[str, ...], arrivals: tuple[int, ...]) -> None:
-        if zone == goal_zone and path:
-            tail = graph.distance(path[-1], goal_name)
-            if tail is not None:
-                found.append((arrivals[-1] + tail, path, arrivals))
-            return
-        if len(path) >= MAX_ROUTE_NODES:
-            return
-        for node in graph.nodes:
-            if zone not in node.zones or node.node_id in path:
-                continue
-            reach = (
-                steps.get(node.tile)
-                if not path
-                else (
-                    None
-                    if (leg := graph.distance(path[-1], node.node_id)) is None
-                    else arrivals[-1] + leg
-                )
-            )
-            if reach is None:
-                continue
-            other = node.zones[1] if node.zones[0] == zone else node.zones[0]
-            extend(other, (*path, node.node_id), (*arrivals, reach))
-
-    extend(start_zone, (), ())
-    found.sort(key=lambda item: (item[0], item[1]))
-    chosen = found[:MAX_ROUTES]
-    if not chosen:
-        return ()
-    best = chosen[0][0]
-    return tuple(
-        Hypothesis(path, arrivals, total, 1.0 / (1.0 + (total - best) / 12.0))
-        for total, path, arrivals in chosen
-    )
 
 
 def build_tree(problem: InterceptProblem, depth: int) -> GameTree[Node, str | int]:

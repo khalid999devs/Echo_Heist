@@ -188,13 +188,15 @@ def test_default_live_guard_allows_actual_lower_route_core_and_extraction() -> N
     first = flow.session.simulation.presentation_snapshot()
     # The validated registry activates every authored post with its real role.
     assert {(guard.actor_id, guard.algorithm) for guard in first.guards} == {
-        ("guard-core", "NONE"),
+        ("guard-core", "ALPHA-BETA"),
         ("guard-research", "A*"),
         ("guard-security", "BFS"),
         ("guard-service", "BFS"),
     }
     route = list(mission_path(flow.level, "lower"))
-    back = list(mission_path(flow.level, "lower", returning=True))
+    # P04: after the alarm the Interceptor holds the gate it predicts (here the
+    # Research Return), so the escape uses the alternate Security corridor.
+    back = list(mission_path(flow.level, "upper", returning=True))
     drive(flow, route, take_core=True, use_tools=True)
     guard = next(
         view

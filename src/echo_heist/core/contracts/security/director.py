@@ -60,7 +60,17 @@ class RouteGraph:
             raise ValueError("Route nodes need unique IDs")
 
     def zone_of(self, tile: Tile) -> str:
-        return next((zone.zone_id for zone in self.zones if zone.contains(tile)), "")
+        """Containing sector; a doorway/gate tile between rectangles maps to the nearest."""
+        inside = next((zone.zone_id for zone in self.zones if zone.contains(tile)), "")
+        if inside or not self.zones:
+            return inside
+
+        def gap(zone: ZoneArea) -> tuple[int, str]:
+            dx = max(zone.left - tile[0], 0, tile[0] - (zone.left + zone.width - 1))
+            dy = max(zone.top - tile[1], 0, tile[1] - (zone.top + zone.height - 1))
+            return dx + dy, zone.zone_id
+
+        return min(self.zones, key=gap).zone_id
 
     def node(self, node_id: str) -> RouteNode:
         return next(node for node in self.nodes if node.node_id == node_id)

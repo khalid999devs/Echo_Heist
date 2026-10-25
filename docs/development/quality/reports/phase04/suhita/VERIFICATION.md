@@ -1,6 +1,6 @@
 # P04-SR1/SR2/SR3 verification (Suhita)
 
-2026-10-25. Branch `work/suhita-p04`, logic runtime **`e57562b`** (main `65df8b5` + Khalid's `work/khalid-p04` `1d24b4b`, merged as a fast-forward). [Handoff](../../../tracking/handoffs/suhita/day_02/P04.md), [runtime contract](../../../architecture/integration/autonomy/RUNTIME.md), [exact evidence](EVIDENCE.json).
+2026-10-25. Branch `work/suhita-p04`, logic runtime **`e57562b`** (main `65df8b5` + Khalid's `work/khalid-p04` `1d24b4b`, merged as a fast-forward). [Handoff](../../../../tracking/handoffs/suhita/day_02/P04.md), [runtime contract](../../../../architecture/integration/autonomy/RUNTIME.md), [exact evidence](EVIDENCE.json).
 
 ## Where each check actually ran
 

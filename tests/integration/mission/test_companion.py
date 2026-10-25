@@ -16,6 +16,7 @@ from echo_heist.core.contracts.results import RunOutcome
 from echo_heist.core.contracts.security.model import SensorRules
 from echo_heist.core.contracts.world import ActorKind, Inventory
 from echo_heist.core.simulation.engine import Simulation
+from echo_heist.core.simulation.randomness import seeded_rng
 from echo_heist.diagnostics.guard_evidence import RouteDriver, route_steps
 from echo_heist.infrastructure.resources import load_sensor_rules, resource_bytes
 from echo_heist.level.io import load_tiled_map
@@ -112,7 +113,7 @@ def test_controller_depends_only_on_its_observations_and_seed(
         build_briefing(level, registry),
         PolicySelection(),
         rules,
-        seed=CAPTURE_SEED,
+        rng=seeded_rng(CAPTURE_SEED, "companion-mcts"),
         sight_range_tiles=sensors.sight_range_tiles,
         half_angle_degrees=sensors.half_angle_degrees,
     )

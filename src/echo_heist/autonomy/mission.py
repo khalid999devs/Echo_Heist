@@ -29,6 +29,7 @@ from echo_heist.core.contracts.security.director import ActiveProtocol, NexusSta
 from echo_heist.core.contracts.security.model import SensorRules
 from echo_heist.core.contracts.world import ActorKind
 from echo_heist.core.simulation.engine import Simulation
+from echo_heist.core.simulation.randomness import seeded_rng
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import SecurityRegistry
 
@@ -99,7 +100,7 @@ class AutonomousMission:
                 build_briefing(level, registry),
                 request.policy,
                 rules,
-                seed=request.seed,
+                rng=seeded_rng(request.seed, "companion-mcts"),
                 sight_range_tiles=sensors.sight_range_tiles,
                 half_angle_degrees=sensors.half_angle_degrees,
             )

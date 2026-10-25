@@ -11,6 +11,7 @@ the same movement, tool and mission rules as for the Human operative.
 
 from collections import deque
 from dataclasses import dataclass
+from random import Random
 
 from echo_heist.ai.companion import tactics
 from echo_heist.ai.companion.belief import Beliefs
@@ -27,7 +28,6 @@ from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.observations import Observation
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
 from echo_heist.core.contracts.world import MissionPhase, Position, Tile, tile_center
-from echo_heist.core.simulation.randomness import seeded_rng
 
 ITERATIONS = 64
 MAX_DEPTH = 4
@@ -70,7 +70,7 @@ class CompanionController:
         policy: PolicySelection,
         rules: GameRules,
         *,
-        seed: int,
+        rng: Random,
         sight_range_tiles: int,
         half_angle_degrees: int,
     ) -> None:
@@ -78,7 +78,7 @@ class CompanionController:
         self.policy = policy
         self.weights: PolicyWeights = policy_weights(policy)
         self.beliefs = Beliefs(briefing, sight_range_tiles, half_angle_degrees)
-        self.rng = seeded_rng(seed, "companion-mcts")
+        self.rng = rng  # a dedicated, seeded decision stream supplied by the runtime
         self.state = "INFILTRATE"
         self.directive = Directive(tactics.ADVANCE)
         self.legs: tuple[tactics.Leg, ...] = ()

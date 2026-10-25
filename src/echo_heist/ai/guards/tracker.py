@@ -14,6 +14,7 @@ from echo_heist.ai.guards.steering import (
     arrived,
     distance,
     evidence_expired,
+    follow_dispatch,
     identify,
     investigate,
     phase_rules,
@@ -110,7 +111,12 @@ def _search(observation: Observation, rules: SensorRules, memory: GuardMemory) -
 
 
 def decide(
-    observation: Observation, patrol: GuardPatrol, rules: SensorRules, memory: GuardMemory
+    observation: Observation,
+    patrol: GuardPatrol,
+    rules: SensorRules,
+    memory: GuardMemory,
+    *,
+    verify_within: int | None = None,
 ) -> GuardDecision:
     own = observation.own_status
     position = own.position or tile_center(own.tile)
@@ -153,7 +159,7 @@ def decide(
             )
         elif memory.state != GuardState.CHASE:
             lead = report_lead(observation, memory)
-            cue = strongest_cue(observation)
+            cue = strongest_cue(observation, verify_within)
             if lead is not None and (cue is None or lead.tick >= cue.tick):
                 memory = replace(
                     memory,
@@ -167,7 +173,11 @@ def decide(
                     evidence_tile=lead.tile,
                 )
             elif cue is not None and memory.state != GuardState.SEARCH:
-                memory = replace(investigate(observation, rules, memory), search_tiles=())
+                memory = replace(
+                    investigate(observation, rules, memory, verify_within), search_tiles=()
+                )
+            if memory.state != GuardState.SEARCH:
+                memory = follow_dispatch(observation, memory)
     target = memory.target
     if memory.state == GuardState.PATROL:
         target = patrol.points[memory.patrol_index]

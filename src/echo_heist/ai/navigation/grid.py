@@ -39,3 +39,18 @@ def bfs(world_map: StaticMap, start: Tile, goal: Tile) -> PathResult:
                 parent[tile] = current
                 pending.append(tile)
     return PathResult((), expanded)
+
+
+def distances_from(world_map: StaticMap, start: Tile) -> dict[Tile, int]:
+    """Legal-graph step counts from ``start`` to every reachable walkable tile."""
+    if not world_map.can_walk(start):
+        return {}
+    found = {start: 0}
+    pending = deque([start])
+    while pending:
+        current = pending.popleft()
+        for tile in world_map.connections(current):
+            if tile not in found and world_map.can_walk(tile):
+                found[tile] = found[current] + 1
+                pending.append(tile)
+    return found

@@ -24,7 +24,7 @@ def test_packaged_posts_get_real_roles_and_a_stable_revision(
     registry = build_security_registry(level, rules)
     roles = {value.guard_id: value.role for value in registry.assignments}
     assert roles == {
-        "guard-core": GuardRole.POST,
+        "guard-core": GuardRole.INTERCEPTOR,
         "guard-research": GuardRole.TRACKER,
         "guard-security": GuardRole.SENTINEL,
         "guard-service": GuardRole.SENTINEL,
@@ -35,6 +35,16 @@ def test_packaged_posts_get_real_roles_and_a_stable_revision(
     assert all(value.patrol.points[0] != value.patrol.points[-1] for value in registry.assignments)
     spec = registry.spec(load_sensor_rules())
     assert {patrol.actor_id for patrol in spec.patrols} == set(roles)
+    # The shipped team always has the public route graph and NEXUS (no protocol).
+    assert spec.graph is not None and spec.director is not None
+    assert spec.director.protocol is None
+    assert {node.node_id for node in spec.graph.nodes} == {
+        point.point_id for point in level.chokepoints
+    }
+    assert spec.graph.zone_of(spec.graph.core_tile) == "core-chamber"
+    assert spec.graph.distance("choke-security-core", "CORE") == spec.graph.distance(
+        "CORE", "choke-security-core"
+    )
     assert build_security_registry(level, rules).revision == registry.revision
 
 

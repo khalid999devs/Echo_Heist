@@ -3,10 +3,13 @@
 from collections.abc import Mapping
 from dataclasses import replace
 
-from echo_heist.ai.guards import sentinel, tracker
+from echo_heist.ai.director import nexus
+from echo_heist.ai.guards import interceptor, sentinel, tracker
+from echo_heist.ai.guards.steering import VERIFY_ECHO_TILES
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.events import EventKind, GameEvent, HeardCue, SecurityReport
 from echo_heist.core.contracts.observations import EntityView, Observation
+from echo_heist.core.contracts.security.director import DirectorRules, ProtocolId
 from echo_heist.core.contracts.security.model import (
     ROLE_ALGORITHMS,
     GuardDecision,
@@ -29,18 +32,34 @@ from echo_heist.core.simulation.systems.motion import clear_reach
 from echo_heist.core.simulation.world import Emit, WorldState
 
 INTRUDERS = frozenset({ActorKind.OPERATIVE, ActorKind.COMPANION})
-CONTROLLED = frozenset({GuardRole.SENTINEL, GuardRole.TRACKER})
+CONTROLLED = frozenset({GuardRole.SENTINEL, GuardRole.TRACKER, GuardRole.INTERCEPTOR})
 REPORT_INTERVAL_TICKS = 15
+
+
+def _verify_within(spec: SecuritySpec) -> int | None:
+    protocol = spec.director.protocol if spec.director else None
+    verify = protocol is not None and protocol.protocol_id == ProtocolId.VERIFY_ECHO
+    return VERIFY_ECHO_TILES if verify else None
 
 
 def _decide(
     patrol: GuardPatrol, observation: Observation, spec: SecuritySpec, memory: GuardMemory
 ) -> GuardDecision:
+    verify = _verify_within(spec)
     if patrol.role == GuardRole.SENTINEL:
-        return sentinel.decide(observation, patrol, spec.rules, memory)
+        return sentinel.decide(observation, patrol, spec.rules, memory, verify_within=verify)
     if patrol.role == GuardRole.TRACKER:
-        return tracker.decide(observation, patrol, spec.rules, memory)
-    # A POST senses for capture fairness but has no strategy until P04.
+        return tracker.decide(observation, patrol, spec.rules, memory, verify_within=verify)
+    if patrol.role == GuardRole.INTERCEPTOR:
+        return interceptor.decide(
+            observation,
+            patrol,
+            spec.rules,
+            memory,
+            graph=spec.graph,
+            director=spec.director or DirectorRules(),
+        )
+    # A POST senses for capture fairness but has no strategy.
     wait = Action(observation.agent_id, ActionKind.WAIT, observation.tick)
     return GuardDecision(wait, memory, observation.own_status.facing)
 
@@ -303,6 +322,50 @@ def refresh(
             )
         ]
         world.visual_cues[actor_id] = (*motion, *world.hide_witnesses.get(actor_id, ()))
+
+
+def direct(world: WorldState, world_map: StaticMap, spec: SecuritySpec) -> None:
+    """Run NEXUS on its permitted view and publish addressed dispatch orders.
+
+    Called before guard decisions so a guard sees an order on the same tick.
+    The view never contains an intruder actor, position or controller memory.
+    """
+    if spec.director is None or spec.graph is None:
+        return
+    guards = tuple(
+        nexus.GuardStatus(
+            patrol.actor_id,
+            patrol.role,
+            world.actors[patrol.actor_id].tile,
+            not world.actors[patrol.actor_id].incapacitated(world.tick)
+            and world.actors[patrol.actor_id].stair_source_id is None,
+            world.guard_memories[patrol.actor_id].state,
+        )
+        for patrol in spec.patrols
+    )
+    heard = {
+        cue.event_id: cue
+        for patrol in spec.patrols
+        for cue in world.heard_cues.get(patrol.actor_id, ())
+    }
+    motion = {
+        cue.cue_id: cue
+        for patrol in spec.patrols
+        for cue in world.visual_cues.get(patrol.actor_id, ())
+        if cue.kind == "UNIDENTIFIED_MOTION"
+    }
+    radio = tuple(report for report in world.security_reports if report.report_kind != "DISPATCH")
+    view = nexus.DirectorView(
+        world.tick,
+        world.phase,
+        world_map,
+        guards,
+        radio,
+        tuple(heard[key] for key in sorted(heard)),
+        tuple(motion[key] for key in sorted(motion)),
+    )
+    world.nexus = nexus.decide(view, spec.director, spec.graph, world.nexus)
+    world.security_reports = (*radio, *nexus.dispatch_reports(world.nexus))
 
 
 def capture_targets(world: WorldState, spec: SecuritySpec) -> Mapping[str, frozenset[str]]:

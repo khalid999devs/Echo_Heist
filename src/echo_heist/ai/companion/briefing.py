@@ -62,7 +62,7 @@ class PolicyWeights:
 
 def policy_weights(policy: PolicySelection) -> PolicyWeights:
     risk = {Navigation.SAFEST: 8, Navigation.BALANCED: 4, Navigation.SHORTEST: 0}
-    time = {Navigation.SAFEST: 0.4, Navigation.BALANCED: 0.8, Navigation.SHORTEST: 1.0}
+    time = {Navigation.SAFEST: 0.5, Navigation.BALANCED: 1.0, Navigation.SHORTEST: 1.8}
     scale = {Risk.CAUTIOUS: 1.5, Risk.BALANCED: 1.0, Risk.BOLD: 0.6}[policy.risk]
     preferred = {
         GuardReaction.HIDE: "HIDE",

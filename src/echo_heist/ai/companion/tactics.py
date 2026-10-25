@@ -28,6 +28,7 @@ ALERT_DETECTIONS = 0.3
 CONVERGE = 0.5
 RESUME = 0.3
 SWITCH_SECONDS = 4.0
+ARRIVAL = 0.5
 
 
 def _draw(belief: dict[str, float], rng: Random) -> str:
@@ -131,6 +132,7 @@ class CompanionModel:
     echo_useful: bool  # an active guard is in view now, so a decoy is plausible
     priors: dict[str, dict[str, float]]  # briefed home-sector prior per guard
     reroute_ready: bool  # observed danger on the current branch justifies a switch
+    committed: bool = False  # no progress for long: holds are excluded at the root
 
     def _legs(self, state: TacticalState) -> tuple[Leg, ...]:
         return self.homeward if state.carrying else self.outbound
@@ -161,6 +163,8 @@ class CompanionModel:
             legal.append(EMP)
         if root and self.melee_ready:
             legal.append(MELEE)
+        if root and self.committed:
+            legal = [action for action in legal if action not in (WAIT, HIDE, RETREAT)]
         preferred = self.weights.preferred
         return tuple(sorted(legal, key=lambda action: (action != preferred, ORDER.index(action))))
 
@@ -175,7 +179,7 @@ class CompanionModel:
             if not active or guard_zone != zone:
                 continue
             # Observed-risk routing keeps a cautious path out of more cones.
-            care = 1.15 - self.weights.risk_weight / 16
+            care = 1.0
             chance = (
                 EXPOSURE.get(self.kinds.get(guard_id, ActorKind.SENTINEL), 0.25) * factor * care
             )
@@ -238,7 +242,13 @@ class CompanionModel:
                 state = replace(state, carrying=True, leg=0, progress=0, seconds=state.seconds + 1)
                 return self._drift(replace(state, zone=leg.zones[-1]), rng, leg.zones[-1])
             next_zone = leg.zones[progress]
-            return self._drift(replace(state, progress=progress, zone=next_zone), rng, None)
+            # Stepping through the gate exposes the Companion to whoever holds the next sector.
+            state = self._exposed(
+                replace(state, progress=progress, zone=next_zone), next_zone, ARRIVAL, rng
+            )
+            if state.captured:
+                return state
+            return self._drift(state, rng, None)
         if action == ALTERNATE:
             return replace(state, leg=state.leg + 1, seconds=state.seconds + SWITCH_SECONDS)
         if action == RETREAT and leg is not None:
@@ -249,7 +259,8 @@ class CompanionModel:
                 progress=back,
                 zone=leg.zones[back],
                 seconds=state.seconds + 3,
-                advanced=state.advanced - (state.progress > 0),
+                # Backing off always gives up ground that must be re-crossed later.
+                advanced=state.advanced - 1,
             )
             return self._drift(self._exposed(state, state.zone, factor, rng), rng, None)
         if action == HIDE:
@@ -306,10 +317,10 @@ class CompanionModel:
         legs_now = self._legs(state)
         zones: list[str] = []
         if legs_now:
-            zones.extend(legs_now[state.leg % len(legs_now)].zones[state.progress + 1 :])
+            zones.extend(legs_now[state.leg % len(legs_now)].zones[state.progress :])
         if not state.carrying and self.homeward:
             zones.extend(self.homeward[0].zones[1:])
-        care = 1.15 - self.weights.risk_weight / 16
+        care = 1.0
         cost = 0.0
         for zone in zones:
             for guard_id, prior in self.priors.items():

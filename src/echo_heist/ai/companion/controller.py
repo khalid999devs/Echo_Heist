@@ -45,6 +45,7 @@ JAM_TICKS = 90
 FLEE_LIMIT_TICKS = 180
 JAM_COST = 400
 ALERT_TICKS = 150
+STALL_TICKS = 600
 FLEE_TICKS = 75
 
 
@@ -98,6 +99,7 @@ class CompanionController:
         self.last_watched = -10_000
         self.jammed: dict[Tile, int] = {}
         self.flee_started = -1
+        self.progress_tick = 0
         self.previous: Position | None = None
         self.still_ticks = 0
         self.crumbs: deque[Tile] = deque(maxlen=BREADCRUMBS)
@@ -203,6 +205,7 @@ class CompanionController:
             bool(threats),
             {gid: self.beliefs.prior(brief) for gid, brief in guards.items()},
             self._branch_threatened(observation, legs),
+            observation.tick - self.progress_tick >= STALL_TICKS,
         )
         result = search(model, iterations=ITERATIONS, max_depth=MAX_DEPTH, rng=self.rng)
         self.last_result, self.last_search_tick = result, observation.tick
@@ -288,6 +291,7 @@ class CompanionController:
             if not passed:
                 return node.tile
             self.progress += 1
+            self.progress_tick = observation.tick
             self.trigger = f"reaching junction {node.node_id}"
         return self._goal(observation)
 
@@ -507,6 +511,8 @@ class CompanionController:
             self.crumbs.append(own.tile)
         phase = self._phase(observation)
         changed = phase != self.state
+        if changed:
+            self.progress_tick = tick
         self.state = phase
         if own.stair_ticks_remaining or phase in ("WIN", "CAPTURED"):
             return Action(self.actor_id, ActionKind.WAIT, tick)
@@ -531,6 +537,8 @@ class CompanionController:
                 if changed and phase in ("EXTRACT", "REACH_CORE")
                 else f"seeing {sorted(appeared)[0]}"
                 if appeared
+                else "inability to progress"
+                if tick - self.progress_tick == STALL_TICKS
                 else "being stuck"
                 if self.still_ticks >= STUCK_TICKS and self.directive.action == tactics.ADVANCE
                 else "finishing a hold"

@@ -26,6 +26,8 @@ The existing game already has cinematic title/loading/airlocks, room art and mat
 
 ## Start next
 
+User override, 2026-10-25: proceed with independent P05-KR1/KR2 presentation on `work/khalid-p05-visuals` while Suhita owns P04 logic. Order: props/animation, tool feedback, spatial sound/reduced flash, then scoped performance. Preserve the P04 branch and Suhita's controller/deployment/startup connection. Claim only narrow event/draw/audio consumer hooks; no SR world lifecycle or scoring changes. Full P04/P05 gates still require combined behavior. This supersedes the wait-only instruction below for this explicitly authorized subset.
+
 Current queue: **P04-KR1/KR2** presentation is implemented and independently verified on `work/khalid-p04`; read its [runnable handoff](../../tracking/handoffs/khalid/day_02/phase04/P04.md) and [typed runtime port](../../architecture/integration/autonomy/PRESENTATION.md). No SR backend was published at the 2026-10-25 handoff. Next action is visual acceptance against Suhita's actual runtime after she connects it. Do not rebuild the screens, implement her AI, close P04 on synthetic data or advance to P05 before the shared gate. The `heist.py`/`flow.py` implementation claim is released for her narrow adapter/composition connection; preserve the new graphics and input contracts.
 
 You own complex drawing/layout under `ui/render/`, visual scene files, startup/audio presentation and assets. Suhita may make narrow functional controller/deployment/result wiring in `ui/scenes/heist.py` / `flow.py`; designate one writer before either edits those shared files. Preserve her core/AI/persistence changes. You retain real nonvisual work in geometry/art calibration, display/input/resource integration, performance and build engineering.

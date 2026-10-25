@@ -6,6 +6,8 @@ Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **
 
 ## Inputs
 
+2026-10-25: Khalid explicitly authorized independent P05-KR1/KR2 presentation ahead of the unfinished P04 gate, in this order: interactive prop/animation components, existing tool feedback, spatial sound/reduced flash, then scoped rendering performance. Work on `work/khalid-p05-visuals` builds on the P04 presentation branch. This does not authorize SR lifecycle implementation or close either phase. New environment state is supplied through a typed presentation contract; diagnostic fixture transitions are labeled and cannot change the shipped mission's mechanics.
+
 User-directed early subset, 2026-10-22: Khalid implemented crouch/creep and three physical under-desk clearances during the presentation refinement. [Actual handoff](../../../tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md). This does not close the full phase gate. Suhita owns remaining locker HideSpot entry/exit, glass, doors and canister rules under SR2; Khalid owns their visible/audio effects under KR2. Reuse the authoritative posture/clearance contract rather than duplicating it; approved scoring remains unchanged.
 
 Read P04's actual run, action legality and event handoff, the [ability defaults](../../../architecture/DATA_CONTRACTS.md), [asset register](../../../assets/ASSETS.md) and T05 in the [test plan](../../../quality/TEST_PLAN.md). Keep real event/noise semantics tied to visible effects.

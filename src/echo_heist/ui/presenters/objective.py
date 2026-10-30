@@ -21,6 +21,8 @@ class ObjectiveView:
     core_held: bool = False
     sprint_ticks_remaining: int = 0
     sprint_recharge_remaining: int = 0
+    melee_charges: int = 0
+    melee_cooldown_remaining: int = 0
 
 
 def build_objective_view(observation: Observation, *, ticks_per_second: int) -> ObjectiveView:
@@ -55,6 +57,7 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
         objective,
         interaction,
         f"Echo {inventory.echo_charges} | EMP {inventory.emp_charges} | "
+        f"Stun {inventory.melee_charges} | "
         f"Core {'YES' if inventory.core_held else 'NO'}",
         f"{seconds // 60:02d}:{seconds % 60:02d}",
         "CAPTURE WIND-UP - Escape, EMP or melee" if remaining is not None else "",
@@ -64,6 +67,8 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
         inventory.core_held,
         observation.own_status.sprint_ticks_remaining,
         observation.own_status.sprint_recharge_remaining,
+        inventory.melee_charges,
+        observation.own_status.melee_cooldown_remaining,
     )
 
 

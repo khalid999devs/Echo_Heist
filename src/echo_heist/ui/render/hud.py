@@ -1,6 +1,6 @@
 """Compact mission overlays; all counters come from committed observations."""
 
-from math import atan2, cos, sin
+from math import atan2, ceil, cos, sin
 
 import pygame
 
@@ -237,7 +237,7 @@ def draw_hud(
         (
             ("Q", "ECHO", str(view.echo_charges)),
             ("F", "EMP", str(view.emp_charges)),
-            ("SPACE", "STUN", "CLOSE"),
+            ("SPACE", "STUN", str(view.melee_charges)),
         )
     ):
         left = canvas.get_width() - 372 + index * 118
@@ -256,13 +256,24 @@ def draw_hud(
         if active and feedback is not None:
             state = {
                 "USED": "USED",
-                "RESISTED": "RESISTED",
+                "RESISTED": "RESIST",
                 "REJECTED": "EMPTY" if count == "0" else "MISS",
             }[feedback.status]
-            count = f"{count} / {state}" if name != "STUN" else state
+            count = f"{count} / {state}"
+        cooling = name == "STUN" and view.melee_cooldown_remaining > 0 and view.melee_charges > 0
+        if cooling:
+            seconds = ceil(view.melee_cooldown_remaining * 10 / ticks_per_second) / 10
+            count = f"{view.melee_charges} / {seconds:.1f}s"
+            color = theme.MUTED
         _label(canvas, fonts.micro, "AI" if autonomous else key, color, (left + 10, rect.y + 9))
         _label(canvas, fonts.small, name, theme.TEXT, (left + 10, rect.y + 29))
-        _label(canvas, fonts.micro, count, color, (left + 10, rect.y + 53))
+        _label(
+            canvas,
+            fonts.micro,
+            fit(fonts.micro, count, rect.w - 20),
+            color,
+            (left + 10, rect.y + 53),
+        )
     if notice:
         width = min(620, fonts.small.size(notice)[0] + 30)
         banner = pygame.Rect(0, canvas.get_height() - 194, width, 36)

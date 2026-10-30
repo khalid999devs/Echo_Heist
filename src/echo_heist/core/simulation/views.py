@@ -50,6 +50,7 @@ def observe(
             sprinting=actor.sprinting,
             stair_ticks_remaining=max(0, actor.stair_arrives_at - world.tick),
             crouched=actor.crouched,
+            melee_cooldown_remaining=max(0, actor.melee_ready_at - world.tick),
         ),
         visible_entities=world.visible_entities.get(actor_id, ()),
         heard_events=world.heard_cues.get(actor_id, ()),

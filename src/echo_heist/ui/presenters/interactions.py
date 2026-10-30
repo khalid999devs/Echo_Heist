@@ -12,6 +12,8 @@ from echo_heist.core.contracts.world import Position
 REJECTIONS = {
     "echo_empty": ("ECHO", "OUT OF CHARGES"),
     "emp_empty": ("EMP", "OUT OF CHARGES"),
+    "melee_empty": ("MELEE", "NO STUN CHARGES LEFT"),
+    "melee_cooldown": ("MELEE", "STUN RECOVERING / KEEP MOVING"),
     "no_reachable_guard": ("MELEE", "NO GUARD IN REACH"),
     "stair_landing_occupied": ("", "STAIRS BLOCKED / WAIT FOR THE LANDING"),
     "low_headroom": ("", "LOW CLEARANCE / CROUCH OUT FIRST"),

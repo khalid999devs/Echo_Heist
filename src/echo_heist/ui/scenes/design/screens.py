@@ -21,7 +21,7 @@ GUIDE_COPY = (
         (
             "READ THE ROOM",
             "Walls block sight. A guard needs time to identify you.",
-            "Break line of sight before the warning fills.",
+            "Break sight early. Space: two loud stuns, with 4s recovery.",
         ),
         (
             "LISTEN TO YOUR FOOTSTEPS",

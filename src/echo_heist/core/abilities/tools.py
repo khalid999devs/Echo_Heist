@@ -30,15 +30,25 @@ def melee_target(
 
 
 def tool_reason(
-    world: WorldState, world_map: StaticMap, rules: GameRules, action: Action
+    world: WorldState,
+    world_map: StaticMap,
+    rules: GameRules,
+    action: Action,
+    *,
+    at_tick: int | None = None,
 ) -> str | None:
     actor = world.actors[action.actor_id]
     if action.kind == ActionKind.ECHO and actor.inventory.echo_charges <= 0:
         return "echo_empty"
     if action.kind == ActionKind.EMP and actor.inventory.emp_charges <= 0:
         return "emp_empty"
-    if action.kind == ActionKind.MELEE and melee_target(world, world_map, rules, action) is None:
-        return "no_reachable_guard"
+    if action.kind == ActionKind.MELEE:
+        if actor.inventory.melee_charges <= 0:
+            return "melee_empty"
+        if (world.tick if at_tick is None else at_tick) < actor.melee_ready_at:
+            return "melee_cooldown"
+        if melee_target(world, world_map, rules, action) is None:
+            return "no_reachable_guard"
     return None
 
 
@@ -83,6 +93,11 @@ def use_tool(
     else:
         target = melee_target(world, world_map, rules, action)
         assert target is not None  # validated before dispatch; no actor moves during tools
+        actor.inventory = replace(actor.inventory, melee_charges=actor.inventory.melee_charges - 1)
+        actor.melee_ready_at = world.tick + rules.melee_cooldown_ticks
+        details.extend(
+            (("remaining", actor.inventory.melee_charges), ("ready_at_tick", actor.melee_ready_at))
+        )
         guard = target
         affected = world.tick >= guard.melee_immune_until
         if affected:

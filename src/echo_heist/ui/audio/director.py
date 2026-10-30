@@ -78,6 +78,8 @@ def event_cue(event: GameEvent) -> tuple[str, float, bool] | None:
     if event.kind == EventKind.ACTION_REJECTED and details.get("reason") in (
         "echo_empty",
         "emp_empty",
+        "melee_empty",
+        "melee_cooldown",
         "no_reachable_guard",
         "stair_landing_occupied",
         "low_headroom",

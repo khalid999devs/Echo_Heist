@@ -36,7 +36,7 @@ def setup(rules):
 
 
 def test_actual_melee_resistance_and_rejection_are_not_success(rules):
-    sim, presenter = setup(rules)
+    sim, presenter = setup(replace(rules, melee_cooldown_ticks=1))
     for expected in ("USED", "RESISTED"):
         result = sim.step((Action("operative", ActionKind.MELEE, sim.tick),))
         presenter.observe(sim.presentation_snapshot(), sim.observe("operative"), result.events)

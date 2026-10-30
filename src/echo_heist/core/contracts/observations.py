@@ -50,6 +50,7 @@ class OwnStatus:
     sprinting: bool = False
     stair_ticks_remaining: int = 0
     crouched: bool = False
+    melee_cooldown_remaining: int = 0
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "tile", immutable_tile(self.tile))

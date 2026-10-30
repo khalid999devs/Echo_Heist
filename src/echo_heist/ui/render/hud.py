@@ -8,6 +8,7 @@ from echo_heist.core.contracts.results import CaptureView
 from echo_heist.core.contracts.security.model import GuardState, GuardView
 from echo_heist.core.contracts.world import MissionPhase, Tile
 from echo_heist.level.model import LevelData
+from echo_heist.ui.presenters.interactions import Feedback
 from echo_heist.ui.presenters.objective import ObjectiveView
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.layout.text import fit
@@ -168,6 +169,7 @@ def draw_hud(
     teaching_view: bool = False,
     autonomous: bool = False,
     capture: CaptureView | None = None,
+    feedback: Feedback | None = None,
 ) -> None:
     _objective(
         canvas, view, zone_label, level, operative_tile, phase, fonts, capture, ticks_per_second
@@ -241,7 +243,23 @@ def draw_hud(
         left = canvas.get_width() - 372 + index * 118
         rect = pygame.Rect(left, canvas.get_height() - 94, 110, 74)
         color = theme.DISABLED if count == "0" else theme.ACCENT
-        panel(canvas, rect, fill=(5, 15, 25, 175), border=theme.BORDER)
+        tool = "MELEE" if name == "STUN" else name
+        active = feedback is not None and feedback.tool == tool
+        border = (
+            theme.WARNING
+            if active and feedback is not None and feedback.status != "USED"
+            else color
+            if active
+            else theme.BORDER
+        )
+        panel(canvas, rect, fill=(5, 15, 25, 175), border=border)
+        if active and feedback is not None:
+            state = {
+                "USED": "USED",
+                "RESISTED": "RESISTED",
+                "REJECTED": "EMPTY" if count == "0" else "MISS",
+            }[feedback.status]
+            count = f"{count} / {state}" if name != "STUN" else state
         _label(canvas, fonts.micro, "AI" if autonomous else key, color, (left + 10, rect.y + 9))
         _label(canvas, fonts.small, name, theme.TEXT, (left + 10, rect.y + 29))
         _label(canvas, fonts.micro, count, color, (left + 10, rect.y + 53))

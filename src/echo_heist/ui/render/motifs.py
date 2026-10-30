@@ -231,6 +231,7 @@ def actor(
     run: tuple[pygame.Surface, ...] = (),
     crouch: tuple[pygame.Surface, ...] = (),
     fraction: float = 1.0,
+    cover: float = 0.0,
 ) -> None:
     """Animate a facing armored silhouette without changing actor location or hitbox."""
     if sprites is not None:
@@ -248,6 +249,7 @@ def actor(
             run=run,
             crouch=crouch,
             fraction=fraction,
+            cover=cover,
         )
         return
     x, y = point

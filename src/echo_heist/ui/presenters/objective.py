@@ -37,8 +37,16 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
     interaction_progress = None
     if observation.interactions:
         hint = observation.interactions[0]
-        interaction = "E  Use stairs" if hint.kind == "Stair" else "Hold E  Recover core"
-        if hint.kind != "Stair":
+        label = {
+            "Stair": "Use stairs",
+            "Core": "Recover core",
+            "Door": "Use door",
+            "HideSpot": "Enter cover",
+            "LeaveHide": "Leave cover",
+            "Canister": "Push canister",
+        }.get(hint.kind, "Interact")
+        interaction = ("Hold E  " if hint.required_ticks > 1 else "E  ") + label
+        if hint.required_ticks > 1:
             interaction_progress = hint.progress_ticks, hint.required_ticks
     inventory = observation.own_status.inventory
     seconds = observation.tick // ticks_per_second

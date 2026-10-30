@@ -2,9 +2,10 @@
 
 from dataclasses import dataclass
 
-from echo_heist.core.contracts.events import GameEvent
+from echo_heist.core.contracts.environment.presentation import EnvironmentCue
+from echo_heist.core.contracts.events import GameEvent, HeardCue
 from echo_heist.core.contracts.results import RunOutcome
-from echo_heist.core.contracts.world import MissionPhase
+from echo_heist.core.contracts.world import MissionPhase, Position
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,3 +30,8 @@ class AudioFrame:
     nexus_serial: int = 0
     transition_serial: int = 0
     transition_cue: str = "stair-start"
+    environment_cues: tuple[EnvironmentCue, ...] = ()
+    heard_events: tuple[HeardCue, ...] = ()
+    listener_position: Position | None = None
+    tick: int = 0
+    hz: int = 30

@@ -25,3 +25,13 @@ Khalid owns the new prop/effect drawing and bounded presentation state, tool HUD
 SR2 later populates the environment view from authoritative objects and emits these cues after successful state changes. It implements door collision/LOS, canister travel, one-time glass, legal locker entry/exit and guard investigation. SR1 supplies actual tool results, stock and immunity/invalid-action reasons. The UI consumes them without optimistic world mutation or invented cooldowns.
 
 Independent visual fixtures belong under `tests/fixtures/` and are visibly labeled. They can demonstrate animation, sound filtering, pause/reset and layout, but cannot satisfy P05's actual lifecycle or both-mode gate. Full connected acceptance still requires P04 and Suhita's P05 behavior handoff.
+
+## Implemented consumer checkpoint — 2026-10-30
+
+Runtime `59fffba` supplies `ui/presenters/interactions.py`, `ui/render/interactions/`, and `ui/audio/spatial.py`; see the [runnable handoff](../../../tracking/handoffs/khalid/day_03/P05.md). The map currently uses **96 render pixels/tile**; consumers read that scale rather than assuming the historical 48-pixel base.
+
+The new effect clock interpolates simulation progress and freezes on pause. State is reconstructed from each snapshot; transient effects are deduplicated/expired from original ticks, with a new presenter for each attempt. Foreign tool feedback cannot overwrite the active actor's status, and hit graphics require an actually visible target. Perception and geometry remain backend-owned.
+
+Recognized `InteractionHint.kind` strings are `Core`, `Stair`, `Door`, `HideSpot`, `LeaveHide`, and `Canister`; unknown kinds display generic `Interact`. Required ticks above one enable a hold/progress prompt. Existing E input returns `INTERACT` with the supplied target ID. SR2 must connect legal dispatch and stable priority; the prompt itself does not create an interaction. No new tool cooldown exists in current observations, so none is invented by the HUD. Actual stock and sprint timing remain authoritative.
+
+The environment frame carries original cue IDs, committed tick/rate, own position and actual `HeardCue` values. Four mono PCM sounds are spatialized only after listener filtering. Repeated IDs do not replay; scene exit/restart stops transient world channels. Panning survives SFX volume/pause changes. The mixer uses ordinary mono gain for centered/muted channels because pygame's channel volume getter excludes stereo separation; [upstream documentation](https://pyga.me/docs/ref/mixer.html#pygame.mixer.Channel.get_volume) describes that distinction.

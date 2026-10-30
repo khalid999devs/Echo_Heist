@@ -177,3 +177,9 @@ Future entries should record task IDs, resulting behavior, actual checks with ou
 ## 2026-10-21 — Cinematic UI, licensed audio and first live stealth cluster
 
 Khalid followed the owner's new brief and grouped screenshot inspirations, replaced the title with the approved perspective cinematic, blended shared UI surfaces, integrated CC0 context music/event sounds and real Settings, then began the first P03 subset. One Sentinel now uses immutable filtered sensors, actual BFS/fuzzy/FSM behavior, identification, investigation/chase/search/return and expiring evidence. Physical Entry/Service furniture, compact HUD, sensor cones and real F3 telemetry are connected. 89 behavior cases and native playthrough/screens pass; see the [review](../quality/reports/phase02/presentation/REVIEW.md). Remaining shared P03/P04-P08 functionality stays open, including the owner-deferred P05 environment mechanics.
+
+## 2026-10-30 - Independent P05 presentation
+
+- Completed the authorized prop/tool/audio consumers on `work/khalid-p05-visuals`: immutable environment snapshots, depth/deck-aware door/glass/canister/locker art, paused/bounded effects, truthful stock/rejection/resisted-melee feedback and hearing-filtered stereo. Four original synthesized sounds have exact provenance; existing map, scoring and actual Human replays are preserved.
+- Full checks/216 tests, native Human wins/capture, 16 component/tool views, short restart/memory profiling, clean Mac app/fresh ZIP 9/9 with audio and all three runtime CI jobs pass. [Handoff](handoffs/khalid/day_03/P05.md), [verification](../quality/reports/phase05/khalid/VERIFICATION.md), [draft PR #3](https://github.com/khalid999devs/Echo_Heist/pull/3).
+- P04/SR and connected P05 lifecycle/placement gates remain open. The presentation fixture is explicitly labeled; main and the existing P04 branch are unchanged.

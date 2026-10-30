@@ -1,6 +1,6 @@
 # P05 - Complete tools, interactive environment and feedback
 
-Day 3, first block. Integrator: **Suhita**. Remaining effort: Khalid 9, Suhita 10. Status: IN_PROGRESS (early owner-requested crouch subset only). Prerequisite for the full phase: P04. Feature anchors: completion of EH-019, EH-020 and environment part of EH-025. Source: PDF pp. 4-8, 15, 17, 19.
+Day 3, first block. Integrator: **Suhita**. Remaining effort: Khalid 9, Suhita 10. Status: IN_PROGRESS (early crouch and independent presentation implemented; connected lifecycle acceptance pending). Prerequisite for the full phase: P04. Feature anchors: completion of EH-019, EH-020 and environment part of EH-025. Source: PDF pp. 4-8, 15, 17, 19.
 
 Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.
 
@@ -28,6 +28,10 @@ Suhita owns `core/abilities/`, capture ordering, environment modules and map obj
 The existing cinematic pressure doors are presentation only and do not satisfy physical door locks/lifecycles. Already working locomotion, alarm, tools and basic sound mappings must be reused and extended only for the remaining rules. Keep directories at six direct files or fewer.
 
 Use stable event/object IDs and deterministic interaction priority. Glass breaks once; the canister emits its final collision cue once; door changes affect collision/LOS/navigation consistently. Echo is nonphysical, cannot carry core/extract and does not erase legitimate reports. EMP is single-charge; melee never destroys guards. Audio playback consumes the committed event and cannot create duplicate simulation noises.
+
+## Actual independent checkpoint — 2026-10-30
+
+Khalid's authorized KR1/KR2 presentation is implemented on `work/khalid-p05-visuals`, runtime `59fffba`: prop/effect consumers, truthful existing tool feedback, listener-filtered audio/reduced effects, 216 tests, unchanged Human replays and native review. [Handoff](../../../tracking/handoffs/khalid/day_03/P05.md), [verification](../../../quality/reports/phase05/khalid/VERIFICATION.md). The default environment view remains empty until SR2 provides real committed lifecycle state and placements. Both KR connected acceptance and the shared gate remain pending P04/SR1/SR2; the labeled fixture does not close them.
 
 ## Gate and evidence
 

@@ -53,7 +53,15 @@ def props(tick: int) -> tuple[PropView, ...]:
                 kind,
                 position,
                 (round(size[0] * U), round(size[1] * U)),
-                openness=openness,
+                openness=(
+                    max(0, 1 - (t - 0.35) / 0.15)
+                    if 0.35 < t < 0.75
+                    else min(1, (t - 0.75) / 0.08)
+                    if 0.75 <= t < 0.85
+                    else openness
+                )
+                if kind == PropKind.LOCKER
+                else openness,
                 broken=t >= 0.5,
                 locked=t < 0.12,
                 previous_position=previous,
@@ -283,6 +291,22 @@ def main() -> int:
     # Check committed fixed-point interpolation, independent of camera/view size.
     canister = props(30)[2]
     assert footprint(canister, 48, 0).centerx <= footprint(canister, 48, 1).centerx
+    # Exercise the two narrow-axis branches at native scale, outside gameplay.
+    for openness, name in ((0.0, "vertical-closed"), (1.0, "vertical-open")):
+        screen.fill(theme.BACKGROUND)
+        for y in range(150, 450, 96):
+            for x in range(0, 1280, 96):
+                screen.blit(floor, (x, y))
+        for prop in props(60):
+            if prop.kind in (PropKind.DOOR, PropKind.GLASS):
+                prop = replace(prop, size=prop.size[::-1], openness=openness, broken=openness == 1)
+            draw_prop(screen, prop, camera, size, 1, session.art.props[46])
+        screen.blit(label, (30, 25))
+        screen.blit(
+            session.fonts.small.render("NARROW AXIS / " + name.upper(), True, theme.TEXT), (30, 80)
+        )
+        pygame.image.save(screen, str(args.output / (name + ".png")))
+        shots.append(name + ".png")
     # These HUD captures use real ordinary Human tool actions, not injected tool results.
     session._follow(0, snap=True)
     for key, name in (

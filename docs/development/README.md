@@ -1,6 +1,6 @@
 # ECHO HEIST development hub
 
-Current state, **2026-10-25**: **P01/P02/P03 complete; P04 IN_PROGRESS**. Khalid's independent presentation is verified on `work/khalid-p04`; SR algorithms/runtime and connected visual acceptance remain pending. Main is still the P03 baseline. P05 has an early crouch subset and the other later gates remain open. See the [completed/remaining list](tracking/STATUS.md).
+Current state, **2026-10-30**: **P01/P02/P03 complete; P04 IN_PROGRESS**. Khalid's independent presentation is verified on `work/khalid-p04`; SR algorithms/runtime and connected visual acceptance remain pending. Main is still the P03 baseline. P05 has early crouch plus independently implemented [prop/tool/audio presentation](tracking/handoffs/khalid/day_03/P05.md); its lifecycle acceptance and later gates remain open. See the [completed/remaining list](tracking/STATUS.md).
 
 Latest work-branch result: [P04 presentation handoff](tracking/handoffs/khalid/day_02/phase04/P04.md), [typed integration port](architecture/integration/autonomy/PRESENTATION.md), [actual verification](quality/reports/phase04/khalid/VERIFICATION.md), [draft PR #2](https://github.com/khalid999devs/Echo_Heist/pull/2): 207 tests/full checks, unchanged Human replays, native Human wins/capture, 34 distinctly labeled synthetic UI states, native Mac app/ZIP and three-platform CI. Suhita retrieves this branch before implementing her gateway. These presentation checks do not prove autonomous AI.
 

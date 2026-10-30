@@ -2,7 +2,7 @@
 
 Identity: **Khalid**. The owner explicitly changed the remaining split on **2026-10-22**: lead complex visual graphics, scene design, animation, camera, UI/audio presentation, rendering performance and desktop delivery. Suhita now leads most gameplay logic, including core systems previously authored by you. The [remaining workload](../../planning/WORKLOAD.md) now estimates 43 points for you and 48 for Suhita after P03 to offset completed foundation/refinement work; equal lifetime effort is a target, not a measured fact.
 
-Read [START_HERE](../START_HERE.md), [Status](../../tracking/STATUS.md), [claims](../../tracking/HANDOFFS.md), [code rules](../CODE_RULES.md), the assigned phase and its source/contracts. P01/P02/P03 are DONE; **P04 is the earliest open phase**. P05 has only an early crouch subset. Preview scenes do not complete their future behavior gates.
+Read [START_HERE](../START_HERE.md), [Status](../../tracking/STATUS.md), [claims](../../tracking/HANDOFFS.md), [code rules](../CODE_RULES.md), the assigned phase and its source/contracts. P01/P02/P03 are DONE; **P04 is the earliest open phase**. P05 has early crouch and an independently verified presentation implementation; its connected gate remains open. Preview scenes do not complete their future behavior gates.
 
 ## Actual baseline
 
@@ -25,6 +25,8 @@ The existing game already has cinematic title/loading/airlocks, room art and mat
 | [P08](../../planning/phases/delivery/PHASE_08.md) | P08-KR1 5; KR2 4 | Primary builds/Mac QA, technical handoff, final traceability, demonstration/media/credits | You |
 
 ## Start next
+
+2026-10-30: the authorized independent P05 presentation is implemented; retrieve the [P05 handoff](../../tracking/handoffs/khalid/day_03/P05.md) and [actual evidence](../../quality/reports/phase05/khalid/VERIFICATION.md). Its narrow scene-hook claim is released for integration. Next connected work is visual acceptance against Suhita's P04 runtime, then P05 lifecycle state/placements. Do not count the component fixture as gameplay or close those gates.
 
 User override, 2026-10-25: proceed with independent P05-KR1/KR2 presentation on `work/khalid-p05-visuals` while Suhita owns P04 logic. Order: props/animation, tool feedback, spatial sound/reduced flash, then scoped performance. Preserve the P04 branch and Suhita's controller/deployment/startup connection. Claim only narrow event/draw/audio consumer hooks; no SR world lifecycle or scoring changes. Full P04/P05 gates still require combined behavior. This supersedes the wait-only instruction below for this explicitly authorized subset.
 

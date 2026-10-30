@@ -1,6 +1,6 @@
 # Contract targets and implemented foundation
 
-Current implemented consumer baseline is [P03 fingerprint 9, guard telemetry and fair perception](../tracking/handoffs/khalid/day_02/phase03/P03.md). The [physical fixture contract](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md) still governs exact bounds/posture/stairs; its schema-7 hashes are historical. The full-game designs below are targets unless verified; old numerical examples do not override current configs/approved changes. Remaining ownership follows [Workload](../planning/WORKLOAD.md): Suhita logic, Khalid graphics/scenes, with explicit shared-contract handoffs.
+Main's completed consumer baseline is [P03 fingerprint 9, guard telemetry and fair perception](../tracking/handoffs/khalid/day_02/phase03/P03.md). The [physical fixture contract](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md) still governs exact bounds/posture/stairs; its schema-7 hashes are historical. The full-game designs below are targets unless verified; old numerical examples do not override current configs/approved changes. Remaining ownership follows [Workload](../planning/WORKLOAD.md): Suhita logic, Khalid graphics/scenes, with explicit shared-contract handoffs.
 
 Blueprint basis: pp. 5-17. P01 established immutable DTOs; Khalid's [P02 handoff](../tracking/handoffs/khalid/day_01/P02.md) now records continuous motion, mission/capture/tools and input/presentation extensions. Use that exact implemented contract when integrating. The table below remains a full-game target; sensing/scoring and later systems are not inferred as complete.
 
@@ -65,7 +65,7 @@ Reject duplicate/missing objective anchors, invalid patrol coordinates, unknown 
 | Capture telegraph | Approximately 0.4 s, represented as ticks |
 | Echo | Three charges, previous 2.5 s path replayed backward |
 | EMP | One charge, approximately 2.5 tiles radius / 3 s disable |
-| Melee | One adjacent reachable target / 1.5 s stun / 2 s recovery immunity |
+| Melee | Two charges per attempt / 4 s recovery / one adjacent reachable target / 1.5 s stun / 2 s guard recovery immunity ([approved override](../planning/balance/MELEE.md)) |
 | Tracker sighting TTL | Approximately 5 s, refreshed only by fresh evidence |
 | Core interaction | Approximately 0.8 s continuous valid interaction |
 | Sound radii in tiles | Walk 0-1; sprint 3; canister 4; glass 6; melee 6; EMP 5 |
@@ -82,3 +82,7 @@ The [stealth runtime contract](integration/STEALTH_SLICE.md) extends these targe
 ## P03 defender logic (2026-10-22, Suhita)
 
 The [guard registry/evidence/geometry contract](integration/defenders/GUARD_CONTRACT.md) adds `GuardRole` assignments from the validated level registry, evidence provenance on every guard goal, Tracker A* and last-seen search, witnessed versus unseen under-desk hiding, sight-gated capture, `Observation.geometry_revision` with `GEOMETRY_REVISED`, `HIDE_WITNESSED`, and replay headers/logs. Fingerprint schema is **8**. Interceptor minimax, NEXUS and P05 object lifecycles remain open.
+
+## Applied limited-melee contract — 2026-10-30
+
+The [user-approved balance](../planning/balance/MELEE.md) is implemented in runtime `68d0c69`; [handoff](../tracking/handoffs/khalid/day_03/MELEE.md). Inventory appends `melee_charges` (initially 2); own status appends `melee_cooldown_remaining`; Simulation owns `melee_ready_at` and the 120-tick recovery rule. Valid resisted strikes spend stock and make noise; rejected actions do neither. Melee TOOL_USED includes actual `remaining` and `ready_at_tick`. Replay/fingerprint schema **10** supersedes schema 9 for this branch. Existing observation fields/positional arguments and acoustic/visual fairness remain intact. Full Companion runtime acceptance remains P04/SR work.

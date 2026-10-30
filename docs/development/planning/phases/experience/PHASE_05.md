@@ -33,6 +33,10 @@ Use stable event/object IDs and deterministic interaction priority. Glass breaks
 
 Khalid's authorized KR1/KR2 presentation is implemented on `work/khalid-p05-visuals`, runtime `59fffba`: prop/effect consumers, truthful existing tool feedback, listener-filtered audio/reduced effects, 216 tests, unchanged Human replays and native review. [Handoff](../../../tracking/handoffs/khalid/day_03/P05.md), [verification](../../../quality/reports/phase05/khalid/VERIFICATION.md). The default environment view remains empty until SR2 provides real committed lifecycle state and placements. Both KR connected acceptance and the shared gate remain pending P04/SR1/SR2; the labeled fixture does not close them.
 
+## Applied user-requested melee subset — 2026-10-30
+
+Khalid directly implemented the approved two-charge/four-second melee update, including actual stock/timer/validation, truthful HUD and legitimate existing clang/investigation behavior. [Rules](../../balance/MELEE.md), [handoff](../../../tracking/handoffs/khalid/day_03/MELEE.md), [verification](../../../quality/reports/phase05/khalid/MELEE.md). Runtime `68d0c69` uses fingerprint 10; 226 tests pass. This is an explicitly authorized narrow subset of SR1, not completion of Suhita's SR1 or the phase. Preserve it while finishing remaining tools, P04 autonomy and SR2 lifecycles.
+
 ## Gate and evidence
 
 - All tools work in both modes, with shared stock/range/collision rules; T05 and capture-boundary regressions pass.

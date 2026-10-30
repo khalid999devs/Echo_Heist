@@ -26,6 +26,8 @@ The existing game already has cinematic title/loading/airlocks, room art and mat
 
 ## Start next
 
+2026-10-30 user follow-up: “okay apply them for me” authorizes the narrow SR1 melee budget/recovery subset in addition to KR1 feedback. It is implemented at `68d0c69` with fingerprint 10 and [this handoff](../../tracking/handoffs/khalid/day_03/MELEE.md). Remaining SR algorithms/lifecycles are still Suhita's. This exception does not transfer the entire SR1 slice.
+
 2026-10-30: the authorized independent P05 presentation is implemented; retrieve the [P05 handoff](../../tracking/handoffs/khalid/day_03/P05.md) and [actual evidence](../../quality/reports/phase05/khalid/VERIFICATION.md). Its narrow scene-hook claim is released for integration. Next connected work is visual acceptance against Suhita's P04 runtime, then P05 lifecycle state/placements. Do not count the component fixture as gameplay or close those gates.
 
 User override, 2026-10-25: proceed with independent P05-KR1/KR2 presentation on `work/khalid-p05-visuals` while Suhita owns P04 logic. Order: props/animation, tool feedback, spatial sound/reduced flash, then scoped performance. Preserve the P04 branch and Suhita's controller/deployment/startup connection. Claim only narrow event/draw/audio consumer hooks; no SR world lifecycle or scoring changes. Full P04/P05 gates still require combined behavior. This supersedes the wait-only instruction below for this explicitly authorized subset.

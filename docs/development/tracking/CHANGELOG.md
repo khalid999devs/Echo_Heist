@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-10-30 - Applied emergency-melee budget
+
+- User approved two stun charges per attempt and four-second Simulation recovery. Valid resisted strikes consume stock/recovery and emit the existing six-tile clang; rejected requests consume nothing and make no gameplay noise. Existing legitimate investigation/roughly five-second original-location memory is preserved, with unchanged scoring.
+- Implemented actual inventory/timer/HUD, exact commit-tick validation, new rejection feedback and schema-10 replay. Ten new regression cases bring full checks to 226 passing tests; native practice HUD/pause/retry and normal Human wins/capture pass. [Rules](../planning/balance/MELEE.md), [handoff](handoffs/khalid/day_03/MELEE.md), [verification](../quality/reports/phase05/khalid/MELEE.md).
+- This directly authorized subset does not complete Suhita's remaining P04/P05 slices.
+
 ## 2026-10-25 - P04 presentation and runtime handoff
 
 - Implemented Khalid's independent KR1/KR2 presentation on `work/khalid-p04`: immutable gateway/telemetry contracts, active-actor camera/robot stairs, spectator input, measured-data F2 tabs, confirmed protocol reset, policy/deploy and review/retry flow, plus explicit once-per-announcement audio. No gameplay/scoring/map/asset changes; Human fingerprint 9 and all five route replay hashes remain unchanged.

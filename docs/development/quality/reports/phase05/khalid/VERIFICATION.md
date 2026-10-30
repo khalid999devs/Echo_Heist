@@ -4,6 +4,8 @@
 
 Independent prop/tool/audio presentation is implemented. Real door/glass/canister/locker lifecycle and P04 autonomous behavior are not provided by the diagnostic fixture. Shared P04/P05 gates remain open.
 
+Latest runtime/package and rules are in the [applied melee follow-up](MELEE.md), source `68d0c69`, fingerprint 10. The original presentation-only source `59fffba` and figures below are preserved as historical evidence.
+
 ## Actual checks
 
 All commands used `uv run --locked --cache-dir .cache/uv`. Native commands used Cocoa and initialized normal audio; they did not substitute SDL dummy drivers.

@@ -1,5 +1,7 @@
 # Feature backlog and owner-slice mapping
 
+2026-10-31: [independent P06/P07/P08 preparation](handoffs/khalid/day_03/P06.md) supplies typed result/profile/preferences consumers, actual session controls/accessibility and draft delivery material. EH-023/EH-033 are in progress, with SR rules/IO and combined acceptance still open. No shared EH feature is completed by this subset.
+
 Status vocabulary: TODO / IN_PROGRESS / BLOCKED / DONE. P01 and P02 are complete; EH-001 through EH-008 include the accepted P02 map/Human/mission work. Items spanning later phases remain IN_PROGRESS. P01-P08 replace the retired M0-M5 labels. See the [phase index](../planning/phases/README.md) and [workload table](../planning/WORKLOAD.md).
 
 EH IDs are stable feature anchors, not exclusive single-person tasks. The revised **Pxx-KRx/Pxx-SRx** slices own remaining P03-P08 implementation (2026-10-22); original P01/P02 IDs and historical credit remain unchanged. Where several slices contribute, the EH item becomes DONE only after all required contributions and feature acceptance pass. Phase completion is recorded separately in [Status](STATUS.md).
@@ -42,17 +44,17 @@ The [revised ownership/transfer table](../planning/WORKLOAD.md) supersedes origi
 | EH-018 | P04-P06 | P04-SR3, P04-KR2, P06-SR2, P06-SR3, P06-KR2 | Protocol persistence, announcement and full reset/deployment wiring | EH-017 | R14, R21 | KR confirmed reset/review/retry UI ready; actual one-protocol persistence/baseline reset and later P06 semantics remain open | IN_PROGRESS |
 | EH-022 | P04 | P04-SR1, P04-KR1 | Bounded belief-only MCTS and real alternative metrics | EH-015, EH-016 | R15 | KR visit/reward consumers preserve unknown values; actual four-stage legality/belief/determinism proof pending SR | IN_PROGRESS |
 | EH-020 | P05 | P05-SR2, P05-KR2 | Stateful glass/canister/doors/hiding and audio-event coupling | EH-007, EH-009 | R09, R27 | Presentation contract/consumers verified on work/khalid-p05-visuals; SR2 once-only lifecycle/geometry and connected cue gate pending | IN_PROGRESS |
-| EH-023 | P06 | P06-SR2, P06-SR3, P06-KR2 | Validated Workshop/presets/profiles/seed/reset deployment | EH-004, EH-015, EH-022 | R16, R21 | Save/recovery, legal settings and meaningful policy-sensitive choices | TODO |
-| EH-033 | P06 | P06-SR1, P06-KR1 | Approved scoring/encounters/pace and result breakdown | EH-008, EH-009 | R22 | Approved examples/boundaries, one chase counted once, every rank reachable | TODO |
+| EH-023 | P06 | P06-SR2, P06-SR3, P06-KR2 | Validated Workshop/presets/profiles/seed/reset deployment | EH-004, EH-015, EH-022 | R16, R21 | Save/recovery, legal settings and meaningful policy-sensitive choices | IN_PROGRESS |
+| EH-033 | P06 | P06-SR1, P06-KR1 | Approved scoring/encounters/pace and result breakdown | EH-008, EH-009 | R22 | Approved examples/boundaries, one chase counted once, every rank reachable | IN_PROGRESS |
 | EH-024 | P06-P07 | P04-KR1, P06-KR1, P06-KR2, P07-SR2, P07-KR1 | Live ticker/Lab View/guide/results explanations | EH-012, EH-016, EH-021, EH-023, EH-033 | R17-R18, R22 | Real metrics and complete flow by P06; accuracy/usability audited P07 | IN_PROGRESS |
 | EH-025 | P05-P07 | P05-KR2, P06-KR2, P06-KR3, P06-SR3, P07-KR1, P07-KR2, P07-SR2 | Minimum art/audio/narrative/ending and accessibility/settings | EH-020, EH-023 | R19, R27 | All baseline functions connected P06 and verified P07; provenance recorded | IN_PROGRESS |
-| EH-026 | P07 | P07-KR1, P07-KR2, P07-SR1, P07-SR2 | T01-T08, fairness/determinism/softlock and UX integration | EH-018, EH-019, EH-024, EH-025 | R01-R23 | Combined candidate has no known blocking gameplay/fairness/save defect | TODO |
-| EH-027 | P07-P08 | P07-SR1, P07-SR2, P07-KR2, P08-SR2 | 24-scenario/four-policy comparison, pruning, performance/balance | EH-026 | R23 | Full denominator, repeatable metadata, failure analysis and measured metrics | TODO |
+| EH-026 | P07 | P07-KR1, P07-KR2, P07-SR1, P07-SR2 | T01-T08, fairness/determinism/softlock and UX integration | EH-018, EH-019, EH-024, EH-025 | R01-R23 | Combined candidate has no known blocking gameplay/fairness/save defect | IN_PROGRESS |
+| EH-027 | P07-P08 | P07-SR1, P07-SR2, P07-KR2, P08-SR2 | 24-scenario/four-policy comparison, pruning, performance/balance | EH-026 | R23 | Full denominator, repeatable metadata, failure analysis and measured metrics | IN_PROGRESS |
 | EH-028 | P08 | P08-KR1, P08-SR1 | Primary native draft archives/manifests and gameplay QA | EH-005, EH-026 | R24-R25 | Both archive hashes and separate actual native-test status | TODO |
-| EH-030 | P08 | P08-KR2, P08-SR2 | Complete functional/source handoff, comparison, credits and demo materials | EH-025, EH-027, EH-028 | R26 | Exact candidate instructions, evidence, demonstration and open release checks | TODO |
+| EH-030 | P08 | P08-KR2, P08-SR2 | Complete functional/source handoff, comparison, credits and demo materials | EH-025, EH-027, EH-028 | R26 | Exact candidate instructions, evidence, demonstration and open release checks | IN_PROGRESS |
 | EH-029 | Outside P01-P08 | Optional owner assigned later | Optional Linux native archive and distro validation | EH-028 | R25 | Independent clean-machine report, or explicit omission | TODO |
 | EH-031 | After full release gate | Khalid + Suhita, actual publishing context required | Public source/downloads, public-link verification and academic submission | EH-028, EH-030 | R25-R26 | Full release matrix/licenses, live free downloads/source/video and submission evidence | TODO |
-| EH-032 | After complete draft/release | Owner assigned to actual issue | Measured accuracy/balance/polish and validated patches | EH-030 | R24-R26 | Reproduced issue, proportionate checks and versioned fix | TODO |
+| EH-032 | After complete draft/release | Owner assigned to actual issue | Measured accuracy/balance/polish and validated patches | EH-030 | R24-R26 | Reproduced issue, proportionate checks and versioned fix | IN_PROGRESS |
 
 ## Dependency interpretation and completion
 

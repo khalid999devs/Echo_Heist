@@ -40,6 +40,15 @@ def draw_vision(
         actor = actors[view.actor_id]
         if actor.position is None or actor.disabled or actor.stunned:
             continue
+        centre = camera.to_screen(
+            (actor.position[0] * size / UNIT, actor.position[1] * size / UNIT)
+        )
+        radius = max(view.sight_range_tiles * size, DEFENDER_SIZE[1] + 16)
+        # Conservative bounds include the whole cone and identification meter.
+        # Off-screen rays cannot contribute pixels; visible rays remain current.
+        extent = pygame.Rect(centre[0] - radius, centre[1] - radius, radius * 2 + 1, radius * 2 + 1)
+        if not extent.colliderect(canvas.get_rect()):
+            continue
         color = theme.WARNING if view.state == GuardState.PATROL else STATE_COLORS[view.state]
         points = [
             camera.to_screen((p[0] * size / UNIT, p[1] * size / UNIT))

@@ -337,7 +337,7 @@
     {
       "path": "world/interactions/door.wav",
       "author": "ECHO HEIST project",
-      "license": "MIT",
+      "license": "Project-authored; license pending",
       "source": "scripts/authoring/interaction_audio.py",
       "created": "2026-10-25",
       "sha256": "cae390cf122f0bb97080650a91970026c5b30fdfa3d23ea6eb030b041346407e",
@@ -348,7 +348,7 @@
     {
       "path": "world/interactions/glass.wav",
       "author": "ECHO HEIST project",
-      "license": "MIT",
+      "license": "Project-authored; license pending",
       "source": "scripts/authoring/interaction_audio.py",
       "created": "2026-10-25",
       "sha256": "03a6918f860275b9d2ed30410b278eb0320e8170612f6870ccc0e5d7f472f504",
@@ -359,7 +359,7 @@
     {
       "path": "world/interactions/canister.wav",
       "author": "ECHO HEIST project",
-      "license": "MIT",
+      "license": "Project-authored; license pending",
       "source": "scripts/authoring/interaction_audio.py",
       "created": "2026-10-25",
       "sha256": "6a280b6f72f6686054b2390c9be093866ffc5da2c8609d85f078f6cb5e011154",
@@ -370,7 +370,7 @@
     {
       "path": "world/interactions/locker.wav",
       "author": "ECHO HEIST project",
-      "license": "MIT",
+      "license": "Project-authored; license pending",
       "source": "scripts/authoring/interaction_audio.py",
       "created": "2026-10-25",
       "sha256": "1e40a389866005b3813d1701ddd32b29b0a7ce01e486d5e4f9268f5c50b10dff",

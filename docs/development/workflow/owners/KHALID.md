@@ -26,6 +26,10 @@ The existing game already has cinematic title/loading/airlocks, room art and mat
 
 ## Start next
 
+Independent P06/P07/P08 preparation is now handed off in [P06](../../tracking/handoffs/khalid/day_03/P06.md). Retrieve its real tests/screens/performance/build evidence before further work. Next connected action is still acceptance against Suhita's actual P04/P05 backend, followed by P06 scores/policies/persistence. Do not reimplement the ready consumers or close full phases on fixtures.
+
+User override, 2026-10-31: “okay now continue doing each” authorizes independent P06 result/profile/settings/input/accessibility consumers, current-build P07 usability/performance checks and P08 delivery preparation while Suhita is unavailable. Work on `work/khalid-p06-ui` from `f50b08a`. Backend score/encounters, policy/profile/history/settings persistence and missing AI/environment lifecycles remain SR-owned. This supersedes gate waiting for this subset only; no shared phase is completed by previews or current-build tests.
+
 2026-10-30 user follow-up: “okay apply them for me” authorizes the narrow SR1 melee budget/recovery subset in addition to KR1 feedback. It is implemented at `68d0c69` with fingerprint 10 and [this handoff](../../tracking/handoffs/khalid/day_03/MELEE.md). Remaining SR algorithms/lifecycles are still Suhita's. This exception does not transfer the entire SR1 slice.
 
 2026-10-30: the authorized independent P05 presentation is implemented; retrieve the [P05 handoff](../../tracking/handoffs/khalid/day_03/P05.md) and [actual evidence](../../quality/reports/phase05/khalid/VERIFICATION.md). Its narrow scene-hook claim is released for integration. Next connected work is visual acceptance against Suhita's P04 runtime, then P05 lifecycle state/placements. Do not count the component fixture as gameplay or close those gates.

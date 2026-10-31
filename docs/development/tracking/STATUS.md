@@ -1,6 +1,8 @@
 # Current development status
 
-Updated **2026-10-30, Asia/Dhaka**. **P01, P02 and P03 are DONE. P04 is IN_PROGRESS.** Khalid's presentation is implemented/independently verified on `work/khalid-p04`; actual SR runtime and connected KR acceptance remain pending. P05 has early crouch and implemented independent presentation; its connected lifecycle gate and P06-P08 remain open. The original four-development-day target is not a demonstrated full V1 delivery.
+Latest independent work: [P06 consumer handoff](handoffs/khalid/day_03/P06.md) on `work/khalid-p06-ui`. Result/profile/history ports and screens, same/new seed, working session remaps/captions/high contrast, current-build P07 review and [P08 draft media/install/credits](../release/draft/README.md) are prepared. Actual scores, persistence, autonomous AI/environment integration and final primary delivery remain open. Main is unchanged; fingerprint **10** applies on the stacked P05/P06 branches.
+
+Updated **2026-10-31, Asia/Dhaka**. **P01, P02 and P03 are DONE. P04 is IN_PROGRESS.** Khalid's presentation is implemented/independently verified on `work/khalid-p04`; actual SR runtime and connected KR acceptance remain pending. P05 has early crouch and implemented independent presentation; its connected lifecycle gate and P06-P08 remain open. The original four-development-day target is not a demonstrated full V1 delivery.
 
 Latest applied balance: [limited-melee handoff](handoffs/khalid/day_03/MELEE.md), runtime **68d0c69**, fingerprint **10**: two charges, four-second recovery, real HUD and preserved hearing fairness. **226 tests**, five exact schema-10 replays and native Human wins/capture pass. This user-authorized SR1 subset leaves the rest of P04/P05 open. The earlier schema-9 replay/source records below remain historical.
 
@@ -25,7 +27,7 @@ Current combined runtime **11cee9b** preserves Suhita's P03 logic and Khalid's K
 | Builds / platforms | Clean runtime Mac app/fresh ZIP each pass 9/9 native Cocoa checks with audio; current Windows x64/macOS arm64 build+dummy-smoke and Linux headless CI pass. Physical Windows retest of the combined build remains NOT_RUN |
 | Performance scope | Native source loop render/audio/present p95 8.76 ms excluding simulation; 12-restart traced audit bounded in this run (1.048 MiB retained Python growth). It includes presentation outliers; full performance acceptance remains P07 |
 
-Current consumer schema is **fingerprint 9**. Retrieve the [guard contract](../architecture/integration/defenders/GUARD_CONTRACT.md) for original evidence tiles and retained actual fuzzy traces. Preserve the [physical fixture/input/startup contract](handoffs/khalid/presentation/CINEMATIC_STARTUP.md); its schema-7 hashes are historical. Scoring is unchanged and still awaits P06 implementation.
+Main/P03 uses **fingerprint 9**; the stacked P05/P06 branch uses **fingerprint 10** from the approved limited melee. Retrieve the [guard contract](../architecture/integration/defenders/GUARD_CONTRACT.md) for original evidence tiles and retained actual fuzzy traces. Preserve the [physical fixture/input/startup contract](handoffs/khalid/presentation/CINEMATIC_STARTUP.md); its schema-7 hashes are historical. Scoring is unchanged and still awaits P06 implementation.
 
 ## Remaining phase gates
 
@@ -34,9 +36,9 @@ Current consumer schema is **fingerprint 9**. Retrieve the [guard contract](../a
 | P01 / P02 / P03 | DONE | Maintain regressions and recorded contracts |
 | P04 | IN_PROGRESS, KR independent implementation ready | SR Companion FSM/utility/A*/MCTS, Interceptor minimax/alpha-beta, NEXUS/persistence/reset, real gateway wiring and combined actual-data KR visual acceptance |
 | P05 | IN_PROGRESS, independent presentation ready; connected acceptance pending | Complete tool/capture edge cases, doors/glass/canisters/full locker/object hiding and scene/audio lifecycle integration |
-| P06 | TODO | Editable saved policies/profiles, approved scores/encounters/history, seed/reset/retry, full settings/accessibility and connected scenes |
-| P07 | TODO | Whole-game both-mode fairness/replay/scenario/performance/usability evidence and blocker fixes |
-| P08 | TODO | Complete comparison/feature audit, final primary packages, physical platform QA, source/credits/demo and functional-draft handoff |
+| P06 | IN_PROGRESS, independent KR consumers ready | Editable saved policies/profiles, approved scores/encounters/history, seed/reset/retry, full settings/accessibility and connected scenes |
+| P07 | IN_PROGRESS, current-build review only | Whole-game both-mode fairness/replay/scenario/performance/usability evidence and blocker fixes |
+| P08 | IN_PROGRESS, independent delivery preparation only | Complete comparison/feature audit, final primary packages, physical platform QA, source/credits/demo and functional-draft handoff |
 
 Suhita's next queue: **P04-SR1/SR2/SR3** on `work/suhita-p04`; normally merge `origin/work/khalid-p04` into that work branch to retrieve the tested port/screens before connecting them. Khalid's next P04 action is actual-data visual acceptance once her backend is published; his independent implementation is handed off and shared-file implementation claims are released for her narrow connection. The later 2026-10-25 user override authorized Khalid's independent P05 presentation only; that [handoff](handoffs/khalid/day_03/P05.md) is now ready. Suhita still finishes P04 before P05 lifecycle work. After P03, estimated remaining work was 43 Khalid / 48 Suhita points; hours are not measured. [Owner-aware startup](../workflow/START_HERE.md), [Windows guide and prompt](../workflow/setup/WINDOWS_SUHITA.md).
 

@@ -1,5 +1,7 @@
 # Start or resume developer work
 
+2026-10-31 independent follow-up: [P06 UI/settings and delivery-preparation handoff](../tracking/handoffs/khalid/day_03/P06.md) on `work/khalid-p06-ui`, stacked on P05. Read its typed experience port before SR scoring/profile/history/preferences wiring. Session remaps/captions/contrast work; persistence/scoring and shared P04–P08 gates remain pending.
+
 Ownership updated **2026-10-22**: Khalid leads complex graphics/scenes; Suhita leads most gameplay logic. Read the [revised workload](../planning/WORKLOAD.md). **KR/SR** are the active remaining-work slice IDs; original P03-P08 assignments in dated handoffs are historical. P01/P02/P03 are complete; P04 is IN_PROGRESS. Khalid's [P04 presentation handoff](../tracking/handoffs/khalid/day_02/phase04/P04.md) is on `work/khalid-p04`, separate from main. Its real-runtime acceptance awaits Suhita's SR implementation. P05 has early crouch plus [independent presentation](../tracking/handoffs/khalid/day_03/P05.md) on `work/khalid-p05-visuals`; connected P05 acceptance and P06-P08 remain open. Do not repeat completed work or count synthetic presentation checks as finished AI behavior.
 
 Latest P05 branch follow-up: [applied limited melee](../tracking/handoffs/khalid/day_03/MELEE.md), runtime `68d0c69`, **fingerprint 10**, actual two-charge stock/four-second recovery, 226 tests. This directly authorized SR1 subset is implemented; Suhita preserves it while retaining other P04/P05 logic. Main/P03 and the older P04 handoff still use schema 9.

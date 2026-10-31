@@ -1,8 +1,10 @@
 # V1 desktop release plan
 
-Authority: PDF p. 19 and explicit user priorities. P01 foundation build [passes native Apple Silicon smoke](../quality/reports/phase01/VERIFICATION.md). No hosted repository, full-game release, itch.io upload or public-download QA has been performed. The final release matrix below stays NOT_RUN until the complete candidate is tested.
+Authority: PDF p. 19 and explicit user priorities. P01 foundation build [passes native Apple Silicon smoke](../quality/reports/phase01/VERIFICATION.md). The GitHub repository and hosted development builds now exist; see current handoffs. No full-game release, itch.io upload or public-download QA has been performed. The final release matrix below stays NOT_RUN until the complete candidate is tested.
 
 Active schedule: complete playable initial draft after P08 within four development days. Khalid owns all P01 setup/first native smoke work and P08 build/manifests; Suhita owns P08 Windows gameplay/audio QA and the comparison report; Khalid owns Mac QA, complex visual fixes and demonstration/media materials, with both checking the complete candidate under revised KR/SR slices. Public release can happen on Day 4 if all gates pass; these eight phases do not imply unperformed QA has passed.
+
+Independent 2026-10-31 [draft page/install/demo/credits material](draft/README.md) is ready for later candidate preparation. Original-source licensing remains undecided; no public release is performed here.
 
 ## Target matrix
 

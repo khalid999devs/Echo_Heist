@@ -1,6 +1,6 @@
 """One heist run: feeds HumanInput into Simulation at fixed ticks and draws the result."""
 
-from collections import deque
+from collections import Counter, deque
 from collections.abc import Sequence
 from enum import StrEnum
 from math import hypot
@@ -11,16 +11,19 @@ from echo_heist.core.contracts.autonomy.model import AutonomyTelemetry, ControlM
 from echo_heist.core.contracts.autonomy.runtime import AutonomousRun, MissionRuntime
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind, GameEvent
-from echo_heist.core.contracts.results import MissionEnd
-from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE
+from echo_heist.core.contracts.results import MissionEnd, RunResult
+from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, Tile
 from echo_heist.core.simulation.engine import Simulation
 from echo_heist.infrastructure.resources import load_sensor_rules
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import build_security_registry
+from echo_heist.ui.input.configuration import key_label, movement_hint
 from echo_heist.ui.input.human import HumanInput, UiCommand
+from echo_heist.ui.presenters.captions import CaptionStream
 from echo_heist.ui.presenters.interactions import InteractionPresentation
 from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
+from echo_heist.ui.render.accessibility.cues import backplates, caption
 from echo_heist.ui.render.actors.model import position_at
 from echo_heist.ui.render.autonomy.panel import AUTONOMY_TABS, draw_telemetry
 from echo_heist.ui.render.autonomy.world import draw_route
@@ -32,6 +35,7 @@ from echo_heist.ui.render.environment.furnishings.catalogue import (
 from echo_heist.ui.render.environment.overview import draw_overview
 from echo_heist.ui.render.environment.stairwell import Stairwell
 from echo_heist.ui.render.hud import draw_hud, panel
+from echo_heist.ui.render.layout.minimap import MinimapLayer
 from echo_heist.ui.render.layout.viewport import interface_canvas
 from echo_heist.ui.render.motifs import ActorMotion
 from echo_heist.ui.render.security.lab import GUARD_TABS, draw_lab
@@ -100,6 +104,10 @@ class HeistSession:
             self.observer_id, rules.simulation_hz, emp_radius_units=rules.emp_radius_units
         )
         self.input = HumanInput(self.observer_id)
+        self.minimap = MinimapLayer()
+        self.captions = CaptionStream(rules.simulation_hz)
+        self.subtitles = True
+        self.high_contrast = False
         self.autonomy_panel = self.autonomous
         self.autonomy_tab = 0 if self.autonomous else 1
         self.telemetry = run.telemetry() if run else AutonomyTelemetry()
@@ -120,6 +128,9 @@ class HeistSession:
             for actor in self.simulation.presentation_snapshot().actors
         }
         self.actor_motion: dict[str, ActorMotion] = {}
+        self.terminal_result: RunResult | None = None
+        self.tool_counts: Counter[str] = Counter()
+        self._tool_ids: set[str] = set()
         self.interaction_tick = 0.0
         self.cue_pulses: list[CuePulse] = []
         self.lab_selected = 0
@@ -304,7 +315,8 @@ class HeistSession:
     def _pause_action(self, index: int) -> HeistRequest | None:
         if self.confirm_abort:
             if index == 0:
-                self.simulation.step(abort=True)
+                result = self.simulation.step(abort=True)
+                self.terminal_result = result.terminal
                 self.paused = self.confirm_abort = False
             else:
                 self.confirm_abort = False
@@ -336,6 +348,7 @@ class HeistSession:
                 result = self.simulation.step(
                     () if self.autonomous else (self.input.action_for(observation),)
                 )
+                self.terminal_result = result.terminal or self.terminal_result
                 self._record_motion()
                 self._record_events(result.events)
                 self._record_telemetry()
@@ -393,11 +406,21 @@ class HeistSession:
             self._last_positions[actor.actor_id] = current
 
     def _record_events(self, events: tuple[GameEvent, ...]) -> None:
+        for event in events:
+            if (
+                event.kind == EventKind.TOOL_USED
+                and event.actor_id == self.observer_id
+                and event.event_id not in self._tool_ids
+            ):
+                self._tool_ids.add(event.event_id)
+                self.tool_counts[str(dict(event.details).get("tool", ""))] += 1
         self.audio_events.extend(events)
         snapshot = self.simulation.presentation_snapshot()
+        observation = self.simulation.observe(self.observer_id)
+        self.captions.observe(observation, events, snapshot.environment.cues)
         self.interactions.observe(
             snapshot,
-            self.simulation.observe(self.observer_id),
+            observation,
             events,
         )
         actors = {actor.actor_id: actor for actor in snapshot.actors}
@@ -456,15 +479,15 @@ class HeistSession:
                 self.notice = "NEXUS / " + nexus.announcement
                 self.notice_until_ms = self.clock_ms + 3500
 
-    def zone_label(self) -> str:
-        observation = self.simulation.observe(self.observer_id)
-        room = self.level.room_at(observation.own_status.tile)
+    def zone_label(self, tile: Tile | None = None) -> str:
+        tile = self.simulation.observe(self.observer_id).own_status.tile if tile is None else tile
+        room = self.level.room_at(tile)
         if room is not None:
             label = room.label
         else:
-            zone = self.level.zone_at(observation.own_status.tile)
+            zone = self.level.zone_at(tile)
             label = zone.label if zone is not None else "Corridor"
-        deck = self.level.deck_at(observation.own_status.tile)
+        deck = self.level.deck_at(tile)
         return f"{'01' if deck.deck_id == 'ground' else '02'} / {label}" if deck else label
 
     def draw(self, canvas: pygame.Surface) -> None:
@@ -523,16 +546,20 @@ class HeistSession:
             fade = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
             fade.fill((3, 10, 18, round(170 * (1 - age / 240))))
             canvas.blit(fade, (0, 0))
+        observation = self.simulation.observe(self.observer_id)
         view = build_objective_view(
-            self.simulation.observe(self.observer_id),
+            observation,
             ticks_per_second=self.simulation.ticks_per_second,
+            interact_key=key_label(self.input.bindings, "interact"),
         )
-        operative_tile = self.simulation.observe(self.observer_id).own_status.tile
+        operative_tile = observation.own_status.tile
         if snapshot.mission_end is None:
+            if self.high_contrast:
+                backplates(canvas)
             draw_hud(
                 canvas,
                 view,
-                self.zone_label(),
+                self.zone_label(operative_tile),
                 self.fonts,
                 level=self.level,
                 operative_tile=operative_tile,
@@ -545,12 +572,20 @@ class HeistSession:
                     actor.actor_id for actor in snapshot.actors if actor.disabled or actor.stunned
                 ),
                 sprint_duration_ticks=self.rules.sprint_duration_ticks,
-                crouched=self.simulation.observe(self.observer_id).own_status.crouched,
-                concealed=self.simulation.observe(self.observer_id).own_status.concealed,
+                crouched=observation.own_status.crouched,
+                concealed=observation.own_status.concealed,
                 sprint_recharge_ticks=self.rules.sprint_recharge_ticks,
                 ticks_per_second=self.rules.simulation_hz,
                 teaching_view=self.lab_note or self.autonomy_panel,
+                minimap=self.minimap,
+                world_map=snapshot.world_map,
                 autonomous=self.autonomous,
+                tool_keys=tuple(
+                    key_label(self.input.bindings, name) for name in ("echo", "emp", "melee")
+                ),
+                sprint_key=key_label(self.input.bindings, "sprint"),
+                crouch_key=key_label(self.input.bindings, "crouch"),
+                control_hint=movement_hint(self.input.bindings),
                 capture=next(
                     (
                         capture
@@ -560,6 +595,8 @@ class HeistSession:
                     None,
                 ),
             )
+        if self.subtitles and not (self.paused or self.summary):
+            caption(canvas, self.fonts, self.captions.at(observation))
         if self.autonomy_panel:
             draw_telemetry(
                 interface_canvas(canvas),

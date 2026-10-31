@@ -33,7 +33,7 @@ def report() -> RunReport:
     return RunReport(
         "fixture:1",
         "vault-five-zone",
-        RunResult("HUMAN", 1042, RunOutcome.WIN, 3600, 100, "S", 0, 50, 40, 10, 1, 5400),
+        RunResult("HUMAN", 1042, RunOutcome.WIN, 3600, 100, "S", 0, 50, 40, 10, 1, 27000),
         30,
         ToolUsage(1, 2, 1),
         (Achievement.GHOST,),

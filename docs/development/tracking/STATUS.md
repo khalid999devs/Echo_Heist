@@ -27,7 +27,7 @@ Current combined runtime **11cee9b** preserves Suhita's P03 logic and Khalid's K
 | Builds / platforms | Clean runtime Mac app/fresh ZIP each pass 9/9 native Cocoa checks with audio; current Windows x64/macOS arm64 build+dummy-smoke and Linux headless CI pass. Physical Windows retest of the combined build remains NOT_RUN |
 | Performance scope | Native source loop render/audio/present p95 8.76 ms excluding simulation; 12-restart traced audit bounded in this run (1.048 MiB retained Python growth). It includes presentation outliers; full performance acceptance remains P07 |
 
-Current consumer schema is **fingerprint 9**. Retrieve the [guard contract](../architecture/integration/defenders/GUARD_CONTRACT.md) for original evidence tiles and retained actual fuzzy traces. Preserve the [physical fixture/input/startup contract](handoffs/khalid/presentation/CINEMATIC_STARTUP.md); its schema-7 hashes are historical. Scoring is unchanged and still awaits P06 implementation.
+Main/P03 uses **fingerprint 9**; the stacked P05/P06 branch uses **fingerprint 10** from the approved limited melee. Retrieve the [guard contract](../architecture/integration/defenders/GUARD_CONTRACT.md) for original evidence tiles and retained actual fuzzy traces. Preserve the [physical fixture/input/startup contract](handoffs/khalid/presentation/CINEMATIC_STARTUP.md); its schema-7 hashes are historical. Scoring is unchanged and still awaits P06 implementation.
 
 ## Remaining phase gates
 

@@ -16,7 +16,12 @@ RESULT_MENU = pygame.Rect(660, 648, 552, 48)
 RESULT_STORY = pygame.Rect(660, 532, 552, 42)
 RESULT_DETAILS = pygame.Rect(660, 480, 264, 40)
 RESULT_NEW_SEED = pygame.Rect(940, 480, 272, 40)
-REPORT_CONTROLS = (pygame.Rect(80, 610, 300, 46), pygame.Rect(900, 610, 300, 46))
+REPORT_CONTROLS = (
+    pygame.Rect(80, 610, 300, 46),
+    pygame.Rect(900, 610, 300, 46),
+    pygame.Rect(410, 610, 220, 46),
+    pygame.Rect(650, 610, 220, 46),
+)
 ACHIEVEMENTS = {
     Achievement.GHOST: "GHOST",
     Achievement.AI_MASTER: "AI MASTER",
@@ -140,6 +145,11 @@ class ReportInspector:
                 self.index = 0 if self.history else -1
             elif activate == 1:
                 self.open = False
+                return
+            elif activate == 2:
+                self.index = max(-1, self.index - 1)
+            elif activate == 3:
+                self.index = min(len(self.history) - 1, self.index + 1)
 
     def draw(self, canvas: pygame.Surface, fonts: Fonts) -> None:
         panel(canvas, pygame.Rect(44, 60, 1192, 628), fill=(3, 13, 21, 252))
@@ -182,6 +192,11 @@ class ReportInspector:
         for i, row in enumerate(lines(fonts.small, explanatory, 1070, 2)):
             canvas.blit(fonts.small.render(row, True, theme.MUTED), (80, 432 + i * 28))
         label(canvas, fonts, fit(fonts.micro, self.state.notice, 1070), (80, 526))
-        label(canvas, fonts, "ARROWS  Browse saved reports     ESC  Close", (80, 565))
+        position = f"{self.index + 1} / {len(self.history)}" if self.index >= 0 else "Current"
+        label(canvas, fonts, "ARROWS Browse    ESC Close    " + position, (80, 565))
         button(canvas, REPORT_CONTROLS[0], "H  SAVED REPORTS", fonts)
         button(canvas, REPORT_CONTROLS[1], "BACK", fonts, True)
+        button(canvas, REPORT_CONTROLS[2], "PREVIOUS", fonts, enabled=self.index >= 0)
+        button(
+            canvas, REPORT_CONTROLS[3], "NEXT", fonts, enabled=self.index < len(self.history) - 1
+        )

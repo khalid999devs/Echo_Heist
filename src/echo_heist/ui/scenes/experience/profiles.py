@@ -106,6 +106,8 @@ class ProfilePanel:
             if action == 3:
                 self.open = False
             elif action is not None:
+                if action != 2:
+                    self.confirm_delete = False
                 try:
                     chosen = self.profiles[self.selected] if self.profiles else None
                     if self.gateway is None:

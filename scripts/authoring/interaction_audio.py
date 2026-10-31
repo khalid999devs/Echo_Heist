@@ -55,7 +55,7 @@ def main() -> None:
             {
                 "path": relative,
                 "author": "ECHO HEIST project",
-                "license": "MIT",
+                "license": "Project-authored; license pending",
                 "source": "scripts/authoring/interaction_audio.py",
                 "created": "2026-10-25",
                 "sha256": sha256(path.read_bytes()).hexdigest(),

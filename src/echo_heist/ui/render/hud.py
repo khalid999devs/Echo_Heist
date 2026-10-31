@@ -173,7 +173,7 @@ def draw_hud(
     _label(
         canvas,
         fonts.micro,
-        label,
+        fit(fonts.micro, label, 140),
         theme.MUTED if recharge else theme.ACCENT,
         (boost.x + 10, boost.y + 7),
     )

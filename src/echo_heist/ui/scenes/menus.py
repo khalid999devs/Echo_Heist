@@ -265,7 +265,7 @@ def _briefing(
     for index, (label, description) in enumerate(steps):
         y = 323 + index * 67
         _text(canvas, fonts.micro, label, theme.ACCENT, (64, y))
-        _text(canvas, fonts.small, description, theme.TEXT, (64, y + 23))
+        _text(canvas, fonts.small, fit(fonts.small, description, 480), theme.TEXT, (64, y + 23))
     pygame.draw.line(canvas, theme.BORDER, (64, 527), (544, 527))
     if protocols is not None and protocols.active is not None:
         active = protocols.active

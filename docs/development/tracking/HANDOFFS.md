@@ -1,12 +1,15 @@
 # Work claims and runnable handoffs
 
+2026-10-31 consolidation: [PRs #2/#3/#4 merged into main](handoffs/khalid/day_03/MAIN.md) with original commits preserved. All Khalid presentation, melee and experience consumers are in main; their former branches are retired after ancestry checks. Existing branch names/counts below are historical provenance. Suhita starts/resumes P04-SR1/SR2/SR3 from current main (fingerprint 10 / latest 246 tests). No shared P04–P08 gate is completed by these merges.
+
+
 P01 and P02 are complete. The [P01 handoff](handoffs/khalid/day_01/P01.md), [P02 integration handoff](handoffs/khalid/day_01/P02_INTEGRATION.md) and [phase specs](../planning/phases/README.md) define the accepted baseline and next owner slices. [Backlog](BACKLOG.md) maps shared feature anchors.
 
 Suhita's original Windows x64 setup and branch workflow remain documented in [Windows setup](../workflow/setup/WINDOWS_SUHITA.md). Her `a98548a` source commit was accepted into the user-directed P02 integration review; she did not publish a separate P02 handoff or Windows interactive QA result on that branch.
 
 ## Current ownership and next handoff
 
-Updated 2026-10-30: [revised workload and transfer map](../planning/WORKLOAD.md). Khalid leads complex graphics/scenes; Suhita leads most gameplay logic. Future P03-P08 work uses **KR/SR** IDs; historical K/S IDs and authorship below remain preserved. P03 is complete. Khalid's [P04 presentation implementation](handoffs/khalid/day_02/phase04/P04.md) is handed off on its work branch; actual-data acceptance awaits Suhita's P04-SR1/SR2/SR3 backend. Main remains the P03 baseline.
+Updated 2026-10-31: [revised workload and transfer map](../planning/WORKLOAD.md). Khalid leads complex graphics/scenes; Suhita leads most gameplay logic. Future P03-P08 work uses **KR/SR** IDs; historical K/S IDs and authorship below remain preserved. P03 is complete. Khalid's [P04 presentation implementation](handoffs/khalid/day_02/phase04/P04.md) is handed off on its work branch; actual-data acceptance awaits Suhita's P04-SR1/SR2/SR3 backend. That was the pre-consolidation baseline; current main now includes all three presentation PRs.
 
 P03-P05 integration is led by Suhita with Khalid's visual acceptance; P06-P08 by Khalid with Suhita's behavior/platform evidence. The [Windows setup and full prompt](../workflow/setup/WINDOWS_SUHITA.md) target P04 and retrieve Khalid's port/screens before the real gateway connection.
 
@@ -14,6 +17,7 @@ P03-P05 integration is led by Suhita with Khalid's visual acceptance; P06-P08 by
 
 | Developer | Phase / slice | Branch or working-diff reference | Files currently claimed | State |
 | --- | --- | --- | --- | --- |
+| Khalid | User-directed PR consolidation / clean main / Suhita Windows prompt, 2026-10-31 | main; merge heads 8f8e012 / e248978 / 89457be | None; [main handoff](handoffs/khalid/day_03/MAIN.md). Ready shared scene hooks remain available for Suhita's narrow claim | DONE for repository consolidation: all three PRs merged, original commits preserved, only fully merged branches removed, current-main startup/prompt and 246-test checks PASS. P04–P08 functionality gates remain open |
 | Khalid | User-authorized independent P06-KR1/KR2/KR3, current-build P07 review and P08 delivery preparation, 2026-10-31 | work/khalid-p06-ui from f50b08a | None; [independent P06/current-build review handoff](handoffs/khalid/day_03/P06.md). Flow/Heist consumer claims released for narrow SR connection; preserve UI/input contracts | Independent subset implemented and verified; result/profile/settings consumers, session controls/accessibility, current-build review and draft delivery material. Actual scores/persistence/lifecycles/AI and full P04-P08 gates remain open |
 | Khalid | User-approved limited melee subset of P05-SR1 plus KR1 HUD | work/khalid-p05-visuals; runtime 68d0c69 | None; narrow implementation claim released. [Approved rules](../planning/balance/MELEE.md), [handoff](handoffs/khalid/day_03/MELEE.md), [verification](../quality/reports/phase05/khalid/MELEE.md) | DONE for this subset: two charges/four-second recovery, actual stock/timer/HUD and legitimate clang consequence; fingerprint 10, 226 tests, exact new replays, native Human wins/capture, Mac app/fresh ZIP 9/9 and all three runtime CI jobs PASS. Other P04/P05 slices remain open |
 | Khalid | P05-KR1/KR2 independent presentation, authorized ahead of P04 integration on 2026-10-25 | work/khalid-p05-visuals; contracts 27d476f, visuals fc43e65, runtime 59fffba | None; narrow event/draw/audio hooks released for integration. [Handoff](handoffs/khalid/day_03/P05.md), [verification](../quality/reports/phase05/khalid/VERIFICATION.md) | Independent implementation verified: 216 tests, unchanged Human replays, native Human wins/capture, 16 prop/tool views and bounded restart profiling. Connected P04/P05 acceptance awaits Suhita's runtime/lifecycle; main unchanged |

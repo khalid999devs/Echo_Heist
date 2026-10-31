@@ -1,5 +1,8 @@
 # P04 - Autonomous Companion, Interceptor and NEXUS
 
+2026-10-31: PRs #2/#3/#4 are merged into main, including all existing P04/P05/P06 consumers and fingerprint 10. Start from main; older branch instructions below are dated provenance. The actual P04 SR algorithms and connected acceptance remain unfinished; this merge does not close the phase.
+
+
 Day 2, second block. Integrator: **Suhita**. Original remaining estimate: Khalid 7, Suhita 18. Status: IN_PROGRESS. Prerequisite: P03; tool-action legality from P02. Feature anchors: EH-015, EH-016, EH-017, EH-018, EH-022. Source: PDF pp. 10-14, 16-18.
 
 2026-10-25: Khalid's KR1/KR2 presentation and typed runtime port are implemented/independently verified on `work/khalid-p04`; [handoff](../../../tracking/handoffs/khalid/day_02/phase04/P04.md). Main remains the P03 baseline. No SR runtime was published at this checkpoint, so KR live-data acceptance and the combined phase gate remain open. Preserve the port/screens when connecting SR1/SR2/SR3; synthetic layout QA proves no autonomous algorithm.

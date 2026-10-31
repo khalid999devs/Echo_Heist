@@ -1,39 +1,38 @@
-# Suhita: Windows setup and P04 handoff
+# Suhita: Windows setup and current-main handoff
 
-Updated **2026-10-25**. Repository: [khalid999devs/Echo_Heist](https://github.com/khalid999devs/Echo_Heist). Use native Windows x64 / PowerShell for desktop QA. **P01-P03 are complete; P04-SR1/SR2/SR3 are next.** You lead logic and Khalid leads complex visuals. Read the [owner guide](../owners/SUHITA.md), [P03 combined handoff](../../tracking/handoffs/khalid/day_02/phase03/P03.md), [P04 specification](../../planning/phases/intelligence/PHASE_04.md) and Khalid's new [P04 presentation handoff](../../tracking/handoffs/khalid/day_02/phase04/P04.md) on `work/khalid-p04`.
+Updated **2026-10-31**. [Repository](https://github.com/khalid999devs/Echo_Heist), native Windows x64 / PowerShell. PRs #2/#3/#4 are merged into **main**; the former Khalid branches are retired. Main includes the P04/P05/P06 presentation, approved limited melee and current-build delivery preparation. **246 tests / fingerprint 10** is the latest verified baseline; fetch and record the actual current commit. Read the [consolidation handoff](../../tracking/handoffs/khalid/day_03/MAIN.md) and [owner guide](../owners/SUHITA.md). **P01–P03 are complete; P04-SR1/SR2/SR3 is your next assignment.**
 
-## Inspect and create the checkout
+## Get the checkout safely
 
-Check Git and uv; install only missing tools through their official installers. Existing project WinGet path:
+Inspect installed Git/uv and install only missing tools. Existing project WinGet paths:
 
 ```powershell
 winget install --id Git.Git --exact --source winget
 winget install --id astral-sh.uv --exact --source winget
 ```
 
-[Git for Windows](https://git-scm.com/install/windows), [uv installation](https://docs.astral.sh/uv/getting-started/installation/). Reopen the terminal if PATH needs refreshing. Do not change system-wide PowerShell execution policy.
-
-Clone if absent:
+Reopen the terminal if PATH needs refresh; do not change system-wide PowerShell execution policy. Clone if absent:
 
 ```powershell
 git clone https://github.com/khalid999devs/Echo_Heist.git
 Set-Location Echo_Heist
 ```
 
-For an existing checkout inspect status, remotes and local commits first. Preserve local changes; never reset/overwrite them. On a clean checkout for this new assignment:
+For an existing checkout, inspect status/remotes/local branches and unpushed commits before changing it. Preserve uncommitted/untracked files and unmerged work; no hard reset, clean or force push. On a clean checkout with no unique main commits:
 
 ```powershell
 git status --short --branch
-git fetch origin --prune
-git switch -c work/suhita-p04 origin/main
-git merge --no-ff origin/work/khalid-p04
+git fetch --prune origin
+git switch main
+git pull --ff-only origin main
+git switch -c work/suhita-p04
 ```
 
-If P04 already exists, inspect/resume it and merge current main and Khalid's presentation branch normally as needed. Inspect its handoff/claims before resolving overlaps; never force/reset away local work. Main is still the P03 baseline, so fetching main alone does not retrieve the new port/screens. A separate worktree is appropriate when unrelated edits must be preserved. P02/P03 branches are historical; do not redo their completed work. Verify main contains the schema-9 P03 handoff before dependent implementation. Use Suhita's own Git identity/account; ask her name/email once only if missing. Public clone access does not prove push access.
+If a meaningful `work/suhita-p04` already exists, preserve/resume it and merge `origin/main` normally rather than recreating it. Use a separate worktree if unrelated edits prevent switching safely. Only delete old local work branches after proving their tips are ancestors of current main and they contain no work to preserve. Your Windows checkout cannot be remotely cleaned from Khalid's Mac. Old handoff branch names are provenance; do not merge deleted `work/khalid-*` branches. Use Suhita's own Git identity/account; ask once if name/email is missing. Public clone does not prove push access.
 
-## Verify the locked source baseline
+## Verify the locked environment
 
-Run sequentially and inspect exit codes before dependent commands; PowerShell may otherwise continue after failure.
+Run sequentially, inspecting failures before dependent commands. Keep the lock; use an isolated user-data folder:
 
 ```powershell
 uv python install 3.13
@@ -44,61 +43,73 @@ uv run --locked python scripts/experiments/p03_evidence.py --output output/windo
 uv run --locked echo-heist --data-dir .local/suhita-p04
 ```
 
-Recorded baselines: **195 tests on main / 207 on Khalid's P04 presentation branch**, structure/Ruff/format/strict types PASS, Python 3.13.16, fingerprint **9**; record your actual fetched commit/version/count. Keep the dependency lock. Suhita's earlier Windows laptop had a 30-second smoke timeout with 35-46-second resource loading; record a recurrence honestly. Hosted Windows checks/build/frozen dummy smoke pass; that does not prove your physical display/audio or packaged playthrough.
+Recorded source baseline: 246 tests, structure/Ruff/format/strict mypy PASS, fingerprint 10, Python 3.13.16; record your own fetched version/count/results. Hosted Windows build/frozen dummy smoke passes but does not prove physical display/audio. Your earlier laptop showed 35–46-second resource loading against a 30-second smoke timeout; distinguish slow startup from crash and report a recurrence honestly.
 
-Desktop: cinematic loading → Chapter → Play / Human / Launch → pressure-door entrance → actual two-floor mission. WASD/arrows move; C crouches/creeps; Shift uses 3-second sprint / 4-second recharge; E stairs/hold Core; Q Echo; F EMP; Space stun; Tab paused map; Esc pause. F3 opens real defender teaching data; 1-4 or tabs select guards. Inspect both routes, core/lockdown/extraction, capture/interrupt/retry, witnessed/unseen cover, pointer alignment and audio/window/fullscreen. New Workshop controls are ready, but Companion deployment stays unavailable until your real gateway advertises it. With that gateway, F2 shows the actual Companion/NEXUS/Interceptor records; 1-3 or tabs select them. No separate sitting action exists.
-
-Use an isolated profile; do not copy Mac environments/apps to Windows. A muted run can isolate audio failure but cannot prove audio works.
+Human smoke: cinematic loading → Chapter → Human → Launch → entry airlock → real two-floor mission. WASD/arrows move; C crouches; Shift sprints 3 s then recharges 4 s; E stairs/hold Core; Q Echo; F EMP; Space two-charge emergency stun; Tab paused map; Escape pause. Inspect controls remapping/captions/high contrast, both routes, Core/lockdown/extraction, capture/retry, pointer/fullscreen and audio. Current remaps/caption/contrast are session-only until the P06 persistence port connects; existing volumes/display settings persist. F3 shows real defender traces. Companion and saved scores/profiles/history remain unavailable until actual services connect. No separate sitting action exists.
 
 ## Implement P04 only
 
-Retrieve AGENTS, START_HERE, your owner guide, development hub, current Status/claims, Workload, P04, code rules, architecture/guard contracts, approved scoring and blueprint pp. 10-14, 16-18. Retrieve the schema-9 P03 handoff plus historical physical fixture/stair/posture contracts.
+Follow AGENTS → START_HERE → SUHITA owner context. Read development hub, Status/claims, Workload, P04 specification, code rules, architecture/guard contracts, approved scoring/melee and blueprint pp. 10–14, 16–18. Read P04/P05/MELEE/P06 handoffs already in main and the autonomy/environment/experience presentation contracts. These define ready consumers and later work, not completed AI/persistence.
 
-Claim **P04-SR1/SR2/SR3**. Implement Companion FSM/utility/observed-risk A*/real bounded belief-only MCTS; Interceptor minimax/alpha-beta and physical movement; evidence-limited NEXUS, versioned protocols/reset and functional first-launch deployment. Use `core/contracts/autonomy/` and the [integration port](../../architecture/integration/autonomy/PRESENTATION.md): implement `AutonomyGateway`, connect `GameFlow(..., autonomy_gateway=gateway)` in startup composition, and return actual runtime actor IDs/metrics/reset results. Do not import `tests.fixtures.autonomy` into production; it is synthetic visual QA only. Preserve the verified Sentinel/Tracker, geometry, hiding, Human mode, input/audio and cinematic flow. No hidden-state cheats, recorded path pretending to be AI, scene redesign or P05 lifecycle work.
+Claim P04-SR1/SR2/SR3 and exact shared composition files. Implement genuine Companion FSM/utility/observed-risk A*/bounded belief-only MCTS; Interceptor minimax/alpha-beta with physical post travel; evidence-limited NEXUS, versioned protocols/reset and first-launch deployment. Implement `AutonomyGateway` and supply `GameFlow(..., autonomy_gateway=gateway)` in startup composition with real actor IDs and metrics. `tests.fixtures.autonomy` is synthetic QA, never production AI. Preserve Human play, geometry/stairs/posture, applied melee/sprint, scenes/input/audio and P06 ports. No scene redesign or automatic P05/P06 implementation.
 
-## Packaging and handoff
+Prove actual autonomous win/capture, real MCTS stages/visits/rewards, alpha-beta correctness/pruning, legitimate evidence/coverage and deterministic memory reset. Preserve Human regressions. Record expected behavior versus actual failures and pending connected visual acceptance.
 
-When code/resource/entry changes require a native package check:
+## Native package and handoff
+
+When entry/runtime changes need packaging verification:
 
 ```powershell
 uv run --locked --all-extras python scripts/packaging/build.py
 uv run --locked --all-extras python scripts/packaging/smoke.py dist/EchoHeist/EchoHeist.exe --output-dir output/windows-p04/native-smoke
 ```
 
-Inspect actual smoke results; nine checks currently exist. Native audio/display requires no mute/dummy-video. Open the executable with its support files and inspect gameplay; never ship the EXE alone. Record actual platform/hardware/commit/commands/hash/results under `docs/development/quality/reports/phase04/windows/` when produced. Large artifacts stay in ignored output/dist; unavailable hardware/builds remain NOT_RUN.
-
-Record `docs/development/tracking/handoffs/suhita/day_02/P04.md` with APIs/files, real autonomous win/failure/search evidence, tests, visual dependencies and exact inspection steps. Commit naturally with your own identity and push `work/suhita-p04` when access permits. Keep main for integration; no force push. Stop after P04 SR slices. KR1/KR2 and combined acceptance are required before closing P04; no automatic P05 work, scoring-rule change, spawned agent or external teammate message.
+Use native display/audio for physical evidence, not mute/dummy. Retain the executable's complete support folder. Record actual Windows hardware/OS/commit/commands/archive hash/results under `docs/development/quality/reports/phase04/windows/`; large output stays ignored. Write `docs/development/tracking/handoffs/suhita/day_02/P04.md` with actual APIs/events, algorithm/run evidence and exact visual review steps. Use short natural commits with your identity and no assistant attribution; push `work/suhita-p04`, open a reviewable PR against main when permitted, then **stop at P04-SR1/SR2/SR3**. Khalid's real-data visual acceptance and the combined gate still apply. No self-merge, automatic P05 work, scoring-rule change, sub-agents or external teammate messages.
 
 ## Starting prompt
 
 ```text
-I'm Suhita, on Windows x64.
-Clone https://github.com/khalid999devs/Echo_Heist.git or safely reuse my checkout,
-preserving local changes. Fetch current main and verify it contains the P03
-schema-9 combined handoff. Retrieve and normally merge origin/work/khalid-p04
-into my work branch to use Khalid's new port/screens; preserve any local work.
+I'm Suhita, working on Windows x64.
+
+Clone https://github.com/khalid999devs/Echo_Heist.git or safely reuse my checkout.
+Inspect and preserve local changes and unpushed/unmerged work. Fetch/prune, switch
+cleanly to main and pull --ff-only; then create work/suhita-p04. If that branch
+already contains work, preserve/resume it and merge origin/main instead. Never
+hard-reset, clean or delete unmerged work. Use my Git identity.
 
 Read AGENTS.md, docs/development/workflow/START_HERE.md,
 docs/development/workflow/owners/SUHITA.md and
 docs/development/workflow/setup/WINDOWS_SUHITA.md.
-Follow their context sequence for Status/claims, blueprint, Workload, P04,
-P03 handoff/guard contracts, code rules and approved scoring.
-Read docs/development/tracking/handoffs/khalid/day_02/phase04/P04.md and
-docs/development/architecture/integration/autonomy/PRESENTATION.md.
+Follow their context sequence for the blueprint, hub, Status/HANDOFFS, WORKLOAD,
+P04 specification, code rules, architecture/data contracts and approved scoring/melee.
+Read docs/development/tracking/handoffs/khalid/day_03/MAIN.md and P06.md,
+day_03/P05.md and MELEE.md, day_02/phase04/P04.md, plus the autonomy,
+environment and experience PRESENTATION.md contracts under
+docs/development/architecture/integration/.
 
-Set up and verify the locked Windows environment. Create/resume work/suhita-p04,
-check claims, then implement only P04-SR1/SR2/SR3: real Companion FSM/utility/A*/
-belief-only MCTS, Interceptor minimax/alpha-beta, evidence-limited NEXUS,
-protocol persistence/reset and functional deployment. Preserve existing Human
-play, Sentinel/Tracker, visuals, geometry, stairs, posture and audio/input.
-Implement AutonomyGateway and connect it at GameFlow; expose actual immutable
-metrics. Claim narrow composition wiring, preserve Khalid's UI and do not use
-the scripted QA fixture as a controller or algorithm evidence.
+Main already includes merged PRs #2/#3/#4: the Human game, polished scenes/audio,
+Companion/NEXUS/Lab and prop/tool presentation, limited melee, result/profile
+interfaces, seed/retry and session controls/accessibility. Baseline is 246 tests,
+fingerprint 10. Retired Khalid branches are unnecessary. These merges do not
+implement the missing AI, environment lifecycles, score engine or persistence.
 
-Prove real autonomous win/capture and algorithm execution, run meaningful
-checks, record actual Windows results and a runnable handoff, then guide me
-through inspecting it. Use my Git identity and short natural commits without
-assistant attribution; push my branch when access permits. Keep main for
-integration. Stop at my P04 slices; do not start P05, change scoring rules,
-spawn agents or send external teammate messages.
+Verify the locked Windows environment and actual launch/audio. Check claims, then
+claim and complete only P04-SR1/SR2/SR3: genuine Companion FSM/utility/A*/belief-only
+MCTS; Interceptor minimax/alpha-beta and physical travel; evidence-limited NEXUS,
+versioned protocols/reset and functional first-launch deployment. Implement
+AutonomyGateway and wire it to the existing GameFlow/startup. Preserve Khalid's
+visuals, experience ports, Human behavior and approved sprint/melee rules. No
+hidden-state cheats, replayed Human paths, fake metrics or production QA fixtures.
+
+Keep files <=1000 lines, <=6 direct files/directory, with necessary tests under
+root tests/. Verify actual autonomous win/capture, algorithm traces, fairness,
+reset/retry and Human regressions; run appropriate checks and native Windows
+build/smoke. Record actual results and a runnable P04 handoff, guide my visible
+inspection, make short natural commits without assistant attribution, push my
+branch and open a reviewable PR to main when access permits.
+
+Later work is P05 environment/tool completion, P06 scoring/policy/persistence,
+then P07/P08 evidence and Windows acceptance. Stop after my P04 SR slices; leave
+shared visual acceptance open. Do not start later phases, self-merge, redesign
+scenes, change scoring rules, spawn agents or message teammates externally.
 ```

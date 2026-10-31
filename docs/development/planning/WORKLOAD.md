@@ -1,5 +1,8 @@
 # Khalid and Suhita: remaining workload and delivery
 
+2026-10-31 consolidation: PRs #2/#3/#4 are merged into main with original history. Former Khalid branches are retired after ancestry checks. Suhita starts/resumes work/suhita-p04 from current main, which already contains all presentation ports. Full P04–P08 gates and the KR/SR ownership split remain unchanged; see the [main handoff](../tracking/handoffs/khalid/day_03/MAIN.md).
+
+
 2026-10-31 authorized advancement: Khalid completed independent P06 presentation consumers, current-build P07 review and P08 preparation on `work/khalid-p06-ui`; see [handoff](../tracking/handoffs/khalid/day_03/P06.md). This advances his existing KR work without transferring SR AI/scoring/persistence/lifecycle responsibilities. Connected acceptance/final delivery are still pending; no invented hours or remaining-point reductions are recorded.
 
 Revised **2026-10-22**, explicitly requested by Khalid. This replaces the original future-work allocation: **Khalid leads complex visual graphics and scenes; Suhita leads most gameplay logic.** P01/P02 credit, completed commits and verified refinements remain historical facts. The eight phases, required V1 scope and approved scoring are unchanged.

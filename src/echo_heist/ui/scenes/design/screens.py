@@ -4,10 +4,13 @@ import pygame
 
 from echo_heist.level.model import LevelData
 from echo_heist.ui.render import theme
+from echo_heist.ui.render.autonomy.protocols import RESET_BUTTONS, draw_reset
 from echo_heist.ui.render.environment.furnishings.catalogue import FurnitureVisual, draw_preview
 from echo_heist.ui.render.hud import panel
+from echo_heist.ui.render.layout.text import fit
 from echo_heist.ui.render.surfaces.cinematic import draw_scene
 from echo_heist.ui.render.theme import Fonts
+from echo_heist.ui.scenes.companion.deployment import DeploymentPanel
 from echo_heist.ui.scenes.design.model import PRESETS, WorkshopDraft
 from echo_heist.ui.scenes.design.workshop import WORKSHOP_CONTROLS, draw_workshop, portrait
 from echo_heist.ui.scenes.navigation.controls import button, hit
@@ -33,9 +36,9 @@ GUIDE_COPY = (
             "BFS routes around obstacles; fuzzy urgency shapes its response.",
         ),
         (
-            "TRACKER + INTERCEPTOR / PLANNED",
-            "Tracker is designed for pursuit; Interceptor controls exits.",
-            "Their specialized controllers are not connected in this build.",
+            "TRACKER / ACTIVE",
+            "A* pursues actual sightings, then searches the last known area.",
+            "Reports retain their original time; hidden routes stay unknown.",
         ),
     ),
     (
@@ -76,7 +79,10 @@ EPILOGUE_CONTROLS = (pygame.Rect(720, 570, 470, 52),)
 
 
 class SceneDesigns:
-    def __init__(self) -> None:
+    def __init__(self, deployment: DeploymentPanel | None = None) -> None:
+        self.deployment = deployment or DeploymentPanel()
+        self.reset_confirmation = False
+        self.reset_selected = 1
         self.draft = WorkshopDraft()
         self.robot = portrait()
         self.guide_tab = 0
@@ -85,11 +91,16 @@ class SceneDesigns:
         self.notice = ""
         self.lab_pan = [0, 0]
         self.drag_point: tuple[int, int] | None = None
+        self.workshop_robot = pygame.transform.smoothscale(
+            self.robot, self.robot.get_rect().fit(pygame.Rect(0, 0, 158, 174)).size
+        )
         self.small_robot = pygame.transform.smoothscale(
             self.robot, self.robot.get_rect().fit(pygame.Rect(0, 0, 116, 146)).size
         )
 
     def controls(self, scene: str) -> tuple[pygame.Rect, ...]:
+        if scene == "WORKSHOP" and self.reset_confirmation:
+            return RESET_BUTTONS
         return {
             "WORKSHOP": WORKSHOP_CONTROLS,
             "GUIDE": GUIDE_CONTROLS,
@@ -98,6 +109,9 @@ class SceneDesigns:
         }[scene]
 
     def handle(self, scene: str, events: list[pygame.event.Event]) -> str | None:
+        if scene == "WORKSHOP" and self.reset_confirmation:
+            self._reset_events(events)
+            return None
         rects = self.controls(scene)
         for event in events:
             activate = False
@@ -150,9 +164,16 @@ class SceneDesigns:
                 elif i == 7:
                     return "LAB"
                 elif i == 8:
-                    self.notice = (
-                        "AI deployment will connect after the companion controller is ready."
-                    )
+                    if self.deployment.can_deploy:
+                        return "DEPLOY"
+                    self.notice = self.deployment.available.reason
+                elif i == 10:
+                    if self.deployment.can_reset:
+                        self.reset_confirmation = True
+                        self.reset_selected = 1
+                        self.notice = ""
+                    else:
+                        self.notice = "NEXUS memory is not available to reset."
                 else:
                     return "MODE"
             elif scene == "GUIDE":
@@ -168,6 +189,34 @@ class SceneDesigns:
             else:
                 return "TITLE"
         return None
+
+    def _reset_events(self, events: list[pygame.event.Event]) -> None:
+        for event in events:
+            activate = False
+            if event.type == pygame.KEYDOWN and not getattr(event, "repeat", False):
+                if event.key == pygame.K_ESCAPE:
+                    self.reset_confirmation = False
+                    return
+                if event.key in (
+                    pygame.K_LEFT,
+                    pygame.K_RIGHT,
+                    pygame.K_UP,
+                    pygame.K_DOWN,
+                    pygame.K_TAB,
+                ):
+                    self.reset_selected = 1 - self.reset_selected
+                elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_SPACE):
+                    activate = True
+            elif event.type in (pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN):
+                selected = hit(RESET_BUTTONS, event.pos)
+                if selected is not None:
+                    self.reset_selected = selected
+                    activate = event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
+            if activate:
+                if self.reset_selected == 1 or self.deployment.reset():
+                    self.reset_confirmation = False
+                self.notice = self.deployment.notice
+                return
 
     def draw(
         self,
@@ -210,18 +259,34 @@ class SceneDesigns:
                 canvas.blit(fonts.small.render(line, True, theme.MUTED), (720, 356 + i * 32))
             button(canvas, EPILOGUE_CONTROLS[0], "RETURN TO MENU", fonts, True)
             return
-        title = {"WORKSHOP": "AI WORKSHOP", "GUIDE": "FIELD GUIDE", "LAB": "COMPANION VIEW"}[scene]
+        title = {"WORKSHOP": "AI WORKSHOP", "GUIDE": "FIELD GUIDE", "LAB": "FACILITY VIEW"}[scene]
         canvas.blit(
             fonts.micro.render("ECHO HEIST / RESEARCH SITE A1", True, theme.ACCENT), (44, 35)
         )
         canvas.blit(fonts.title.render(title, True, theme.TEXT), (40, 68))
         if scene != "GUIDE":
-            badge = "DESIGN PREVIEW / AI DEPLOYMENT NOT CONNECTED"
+            badge = (
+                "CHOOSE A POLICY" if scene == "WORKSHOP" else "FACILITY PREVIEW / NO ACTIVE MISSION"
+            )
             canvas.blit(fonts.micro.render(badge, True, theme.WARNING), (44, 137))
         if scene == "WORKSHOP":
-            draw_workshop(canvas, fonts, self.robot, self.draft, self.selected)
-            if self.notice:
-                canvas.blit(fonts.micro.render(self.notice, True, theme.WARNING), (420, 664))
+            draw_workshop(
+                canvas,
+                fonts,
+                self.workshop_robot,
+                self.draft,
+                self.selected,
+                self.deployment,
+                clock_ms=clock_ms,
+                reduced_motion=reduced_motion,
+            )
+            if self.notice and not self.reset_confirmation:
+                canvas.blit(
+                    fonts.micro.render(fit(fonts.micro, self.notice, 770), True, theme.WARNING),
+                    (420, 664),
+                )
+            if self.reset_confirmation:
+                draw_reset(canvas, fonts, self.reset_selected, self.notice)
         elif scene == "GUIDE":
             for i, label in enumerate(GUIDE_TABS):
                 button(
@@ -272,15 +337,15 @@ class SceneDesigns:
         for i, line in enumerate(
             (
                 "ECHO / " + preset,
-                "Awaiting AI controller",
+                "No mission deployed.",
                 "",
-                "State / Not running",
-                "Route / Not calculated",
-                "Decisions / No live data",
+                "Inspect the facility before deployment.",
+                "Live decisions appear in F2 during play.",
+                "Pause or inspect without taking control.",
             )
         ):
             canvas.blit(
-                fonts.small.render(line, True, theme.ACCENT if i == 0 else theme.MUTED),
+                fonts.micro.render(line, True, theme.ACCENT if i == 0 else theme.MUTED),
                 (866, 366 + i * 34),
             )
         for i, label in enumerate(("01 / SERVICE", "02 / RESEARCH", "BACK TO WORKSHOP")):

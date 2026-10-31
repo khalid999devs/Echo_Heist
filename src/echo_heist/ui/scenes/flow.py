@@ -6,6 +6,9 @@ from enum import StrEnum
 
 import pygame
 
+from echo_heist.core.contracts.autonomy.model import ControlMode
+from echo_heist.core.contracts.autonomy.policy import DeploymentRequest
+from echo_heist.core.contracts.autonomy.runtime import AutonomyGateway, DeploymentUnavailable
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.results import RunOutcome
 from echo_heist.core.contracts.security.model import GuardState
@@ -15,6 +18,7 @@ from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.ui.audio.feedback import UiFeedback
 from echo_heist.ui.audio.model import AudioFrame
+from echo_heist.ui.render.autonomy.panel import AUTONOMY_TABS
 from echo_heist.ui.render.environment.furnishings.catalogue import prepare_furniture
 from echo_heist.ui.render.layout.viewport import interface_canvas, interface_events
 from echo_heist.ui.render.security.lab import GUARD_TABS
@@ -22,6 +26,7 @@ from echo_heist.ui.render.surfaces.cinematic import draw_scene
 from echo_heist.ui.render.surfaces.glass import edge_veil
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import WorldArt, build_map_surface
+from echo_heist.ui.scenes.companion.deployment import DeploymentPanel, restore_selection, selection
 from echo_heist.ui.scenes.design.screens import SceneDesigns
 from echo_heist.ui.scenes.heist import HeistRequest, HeistSession
 from echo_heist.ui.scenes.menus import (
@@ -75,6 +80,7 @@ class GameFlow:
         settings: Settings | None = None,
         security_enabled: bool = True,
         loading: Callable[[float, str], None] | None = None,
+        autonomy_gateway: AutonomyGateway | None = None,
     ) -> None:
         def prepared(fraction: float, label: str) -> None:
             if loading is not None:
@@ -108,7 +114,9 @@ class GameFlow:
         self.ambient_ms = 0
         self.settings_return = Scene.TITLE
         self.dragging_slider: int | None = None
-        self.designs = SceneDesigns()
+        self.deployment = DeploymentPanel(autonomy_gateway)
+        self.last_deployment: DeploymentRequest | None = None
+        self.designs = SceneDesigns(self.deployment)
         self.ui_feedback = UiFeedback()
         self.airlock = AirlockTransition()
         prepared(1.0, "Facility ready")
@@ -129,16 +137,31 @@ class GameFlow:
                 return (MAP_CLOSE,)
             if self.session.paused:
                 return ABORT_BUTTONS if self.session.confirm_abort else PAUSE_BUTTONS
+            if not self.session.panels_interactive:
+                return ()
             if self.session.lab_note:
                 return GUARD_TABS
+            if self.session.autonomy_panel:
+                return AUTONOMY_TABS
         return ()
 
-    def _start_run(self) -> None:
-        self.hovered_result = None
-        self.session = HeistSession(
+    def _start_run(self, request: DeploymentRequest | None = None) -> bool:
+        request = request or DeploymentRequest(
+            ControlMode.HUMAN,
+            self.seed,
+            self.level.static_map.map_id,
+            selection(self.designs.draft),
+        )
+        self.deployment.refresh()
+        try:
+            run = self.deployment.deploy(request, self.level, self.rules)
+        except DeploymentUnavailable as error:
+            self.notice = self.designs.notice = str(error)
+            return False
+        session = HeistSession(
             self.level,
             self.rules,
-            seed=self.seed,
+            seed=request.seed,
             fonts=self.fonts,
             view_size=self.view_size,
             map_surface=self.map_surface,
@@ -146,10 +169,27 @@ class GameFlow:
             furnishings=self.furnishings,
             reduced_flashing=self.settings.reduced_flashing,
             security_enabled=self.security_enabled,
+            run=run,
         )
+        self.hovered_result = None
+        self.session = session
+        self.last_deployment = request
         self.runs_started += 1
         self.scene = Scene.HEIST
         self.airlock.start("ENTRY")
+        return True
+
+    def _retry_run(self) -> None:
+        request = self.last_deployment
+        if request and request.mode == ControlMode.COMPANION:
+            restore_selection(self.designs.draft, request.policy)
+            self.mode_choice = 1
+            self._go(Scene.WORKSHOP)
+        elif self.deployment.protocols_for(ControlMode.HUMAN) is not None:
+            self.mode_choice = 0
+            self._go(Scene.MODE)
+        else:
+            self._start_run(request)
 
     def resize(self, view_size: tuple[int, int]) -> None:
         self.view_size = view_size
@@ -166,6 +206,9 @@ class GameFlow:
         self.dragging_slider = None
         self.designs.selected = 0
         self.designs.notice = ""
+        self.designs.reset_confirmation = False
+        if scene in (Scene.WORKSHOP, Scene.MODE):
+            self.deployment.refresh()
 
     def frame(self, events: Sequence[pygame.event.Event], elapsed_ms: int) -> None:
         events = interface_events(events, self.view_size)
@@ -193,7 +236,16 @@ class GameFlow:
                 self.running = False
                 return
             target = self.designs.handle(self.scene.value, list(events))
-            if target is not None:
+            if target == "DEPLOY":
+                self._start_run(
+                    DeploymentRequest(
+                        ControlMode.COMPANION,
+                        self.seed,
+                        self.level.static_map.map_id,
+                        selection(self.designs.draft),
+                    )
+                )
+            elif target is not None:
                 self._go(Scene(target))
             return
         if self.scene == Scene.SETTINGS:
@@ -206,7 +258,7 @@ class GameFlow:
                 self.running = False
                 return
             if request == HeistRequest.RETRY:
-                self._start_run()
+                self._retry_run()
                 return
             if request == HeistRequest.SETTINGS:
                 self.settings_return = Scene.HEIST
@@ -257,7 +309,7 @@ class GameFlow:
                     ):
                         self._go(Scene.EPILOGUE)
                     elif RESULT_RETRY.collidepoint(event.pos):
-                        self._start_run()
+                        self._retry_run()
                     elif RESULT_MENU.collidepoint(event.pos):
                         self._go(Scene.TITLE)
                     return
@@ -295,8 +347,13 @@ class GameFlow:
                 self._go(Scene.TITLE)
             elif key in CONFIRM_KEYS:
                 if self.selected == 2:
-                    self._start_run()
+                    if self.mode_choice == 1:
+                        self._go(Scene.WORKSHOP)
+                    else:
+                        self._start_run()
                 elif self.selected == 1:
+                    if self.deployment.can_deploy:
+                        self.mode_choice = 1
                     self._go(Scene.WORKSHOP)
                 elif MODE_ITEMS[self.selected].enabled:
                     self.mode_choice = self.selected
@@ -305,7 +362,7 @@ class GameFlow:
                     self.notice = "Companion mode is coming later. Human mode remains selected."
         elif self.scene == Scene.RESULTS:
             if key == pygame.K_r:
-                self._start_run()
+                self._retry_run()
             elif key in (pygame.K_RETURN, pygame.K_KP_ENTER) or key == pygame.K_ESCAPE:
                 self._go(Scene.TITLE)
             elif (
@@ -421,6 +478,10 @@ class GameFlow:
                 reduced_motion=self.settings.reduced_flashing,
                 mode_choice=self.mode_choice,
                 report_available=end is not None,
+                companion_available=self.deployment.can_deploy,
+                protocols=self.deployment.protocols_for(
+                    ControlMode.COMPANION if self.mode_choice else ControlMode.HUMAN
+                ),
                 paint_background=False,
             )
         elif self.scene == Scene.SETTINGS:
@@ -441,6 +502,7 @@ class GameFlow:
                 ticks_per_second=self.rules.simulation_hz,
                 hovered=self.hovered_result,
                 clock_ms=self.ambient_ms,
+                autonomous=self.session.autonomous if self.session else False,
             )
         self.airlock.draw(canvas, reduced_motion=self.settings.reduced_flashing)
 
@@ -450,7 +512,7 @@ class GameFlow:
             self.session.audio_events.clear()
         snapshot = self.session.simulation.presentation_snapshot() if self.session else None
         observation = (
-            self.session.simulation.observe(self.level.operative_id) if self.session else None
+            self.session.simulation.observe(self.session.observer_id) if self.session else None
         )
         room = self.level.room_at(observation.own_status.tile) if observation else None
         return AudioFrame(
@@ -467,7 +529,8 @@ class GameFlow:
             if snapshot
             else False,
             events=events,
-            listener_id=self.level.operative_id,
+            listener_id=self.session.observer_id if self.session else self.level.operative_id,
+            nexus_serial=self.session.announcement_serial if self.session else 0,
             ui_feedback_serial=self.ui_feedback.serial,
             ui_feedback_cue=self.ui_feedback.cue,
             explicit_ui_feedback=True,

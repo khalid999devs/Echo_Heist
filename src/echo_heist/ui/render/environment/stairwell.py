@@ -27,6 +27,7 @@ class Stairwell:
         clock_ms: int,
         *,
         reduced_motion: bool,
+        autonomous: bool = False,
     ) -> None:
         if travel is not None:
             self.active, self.finished_at = travel, clock_ms
@@ -50,11 +51,14 @@ class Stairwell:
             rect.y + round(rect.h * (0.76 - 0.47 * p)),
         )
         index = 1 + (clock_ms // 140) % 2 if not reduced_motion else 0
-        frame = frames[index if ascending else 8 + index]
+        frame = frames[index if ascending or len(frames) < 16 else 8 + index]
         bob = round(2 * abs(sin(clock_ms / 100))) if not reduced_motion else 0
         canvas.blit(frame, frame.get_rect(midbottom=(point[0], point[1] - bob)))
         panel(canvas, pygame.Rect(298, 515, 684, 50), fill=(4, 17, 25, 240))
         label = "ASCENDING / RESEARCH" if ascending else "DESCENDING / SERVICE"
         canvas.blit(fonts.small.render(label, True, TEXT), (318, 524))
-        canvas.blit(fonts.micro.render("Move to cancel", True, MUTED), (826, 526))
+        canvas.blit(
+            fonts.micro.render("AI traversal" if autonomous else "Move to cancel", True, MUTED),
+            (826, 526),
+        )
         pygame.draw.rect(canvas, ACCENT, (318, 554, round(644 * progress), 3))

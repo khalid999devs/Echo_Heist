@@ -193,6 +193,12 @@ class AudioDirector:
             self.seen.clear()
             self.seen_order.clear()
             self.footstep_index = 0
+        if frame.nexus_serial and (
+            previous is None
+            or frame.run_id != previous.run_id
+            or frame.nexus_serial != previous.nexus_serial
+        ):
+            self.play("discovery", 0.22)
         if frame.transition_serial and (
             previous is None or frame.transition_serial != previous.transition_serial
         ):

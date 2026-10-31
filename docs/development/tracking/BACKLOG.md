@@ -36,11 +36,11 @@ The [revised ownership/transfer table](../planning/WORKLOAD.md) supersedes origi
 | EH-013 | P03-P07 | P03-SR3, P07-SR1, P07-SR2 | Replay headers/events and fixed-seed experiment harness | EH-003, EH-009 | R20-R21, R23 | Replay reproducibility first (P03 header/log/verification done), executable comparison harness by P07 | IN_PROGRESS |
 | EH-014 | P03 | P03-SR2, P03-SR3, P03-KR2 | Tracker A*, last-seen memory and dynamic geometry invalidation | EH-009, EH-010 | R11 | Tracker A*, T04, optimal small-fixture paths, first-tick revisions, search/expiry and both-deck review pass | DONE |
 | EH-021 | P03 | P03-SR2, P03-KR1, P03-SR3 | Fuzzy suspicion and real rule/urgency diagnostics | EH-010 | R10 | Real Sugeno inputs/memberships/weights/urgency from stored evaluation; native EMP urgency 0.95 with ID 0/18 | DONE |
-| EH-015 | P04 | P04-SR1, P04-SR3, P04-KR1, P04-KR2 | Companion FSM/utility/observed-risk A* and visible AI mode | EH-008, EH-009, EH-014 | R02, R15 | Autonomous representative win/fail without a recording | TODO |
-| EH-016 | P04 | P04-SR2, P04-KR1 | Interceptor minimax/alpha-beta, travel and metrics | EH-006, EH-009, EH-014 | R12 | T06, pruned/unpruned values and legal physical movement | TODO |
-| EH-017 | P04 | P04-SR2, P04-KR2 | NEXUS evidence-based dispatch/coverage and alerts | EH-010, EH-014, EH-016 | R13 | Evidence-limited tasking and mandatory lockdown coordination | TODO |
-| EH-018 | P04-P06 | P04-SR3, P04-KR2, P06-SR2, P06-SR3, P06-KR2 | Protocol persistence, announcement and full reset/deployment wiring | EH-017 | R14, R21 | One justified announced protocol; reset reproduces baseline | TODO |
-| EH-022 | P04 | P04-SR1, P04-KR1 | Bounded belief-only MCTS and real alternative metrics | EH-015, EH-016 | R15 | Four stages/legality/determinism; early tool-action subset from P02 available | TODO |
+| EH-015 | P04 | P04-SR1, P04-SR3, P04-KR1, P04-KR2 | Companion FSM/utility/observed-risk A* and visible AI mode | EH-008, EH-009, EH-014 | R02, R15 | KR active-actor/deployment presentation ready on work branch; real SR autonomous win/fail without recording and connected acceptance pending | IN_PROGRESS |
+| EH-016 | P04 | P04-SR2, P04-KR1 | Interceptor minimax/alpha-beta, travel and metrics | EH-006, EH-009, EH-014 | R12 | KR measured-data panel/port ready; T06, pruned/unpruned values and actual physical travel still pending SR | IN_PROGRESS |
+| EH-017 | P04 | P04-SR2, P04-KR2 | NEXUS evidence-based dispatch/coverage and alerts | EH-010, EH-014, EH-016 | R13 | KR task/alert/protocol consumers ready; real evidence-limited tasking/coverage and mandatory lockdown coordination pending SR | IN_PROGRESS |
+| EH-018 | P04-P06 | P04-SR3, P04-KR2, P06-SR2, P06-SR3, P06-KR2 | Protocol persistence, announcement and full reset/deployment wiring | EH-017 | R14, R21 | KR confirmed reset/review/retry UI ready; actual one-protocol persistence/baseline reset and later P06 semantics remain open | IN_PROGRESS |
+| EH-022 | P04 | P04-SR1, P04-KR1 | Bounded belief-only MCTS and real alternative metrics | EH-015, EH-016 | R15 | KR visit/reward consumers preserve unknown values; actual four-stage legality/belief/determinism proof pending SR | IN_PROGRESS |
 | EH-020 | P05 | P05-SR2, P05-KR2 | Stateful glass/canister/doors/hiding and audio-event coupling | EH-007, EH-009 | R09, R27 | Once-only interactions, geometry/cache revisions and actual cue mapping | TODO |
 | EH-023 | P06 | P06-SR2, P06-SR3, P06-KR2 | Validated Workshop/presets/profiles/seed/reset deployment | EH-004, EH-015, EH-022 | R16, R21 | Save/recovery, legal settings and meaningful policy-sensitive choices | TODO |
 | EH-033 | P06 | P06-SR1, P06-KR1 | Approved scoring/encounters/pace and result breakdown | EH-008, EH-009 | R22 | Approved examples/boundaries, one chase counted once, every rank reachable | TODO |
@@ -55,6 +55,8 @@ The [revised ownership/transfer table](../planning/WORKLOAD.md) supersedes origi
 | EH-032 | After complete draft/release | Owner assigned to actual issue | Measured accuracy/balance/polish and validated patches | EH-030 | R24-R26 | Reproduced issue, proportionate checks and versioned fix | TODO |
 
 ## Dependency interpretation and completion
+
+2026-10-25 [P04 KR handoff](handoffs/khalid/day_02/phase04/P04.md): independent presentation/typed ports verified on `work/khalid-p04`, main unchanged. Synthetic UI fixtures do not satisfy any algorithm/actual-runtime acceptance above. Shared EH items and KR live-data acceptance remain open until SR implementation and the combined gate pass.
 
 Phase gates and slice dependencies are authoritative for incremental work. A feature spanning phases stays IN_PROGRESS while its later slices remain; consumers can use an explicitly handed-off verified subset (for example P02 tool legality) without falsely closing the whole feature. This avoids a cycle where P04 MCTS waits for P05 effects or P07 waits for its own audited guide.
 

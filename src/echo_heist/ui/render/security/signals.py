@@ -45,9 +45,11 @@ def draw_badges(
     snapshot: PresentationSnapshot,
     camera: Camera,
     fonts: Fonts,
+    *,
+    observer_id: str | None = None,
 ) -> None:
     actors = {actor.actor_id: actor for actor in snapshot.actors}
-    own = actors[level.operative_id]
+    own = actors[observer_id or level.operative_id]
     deck = level.deck_at(own.tile)
     size = snapshot.world_map.tile_size_px
     for guard in snapshot.guards:
@@ -77,8 +79,12 @@ def draw_cues(
     camera: Camera,
     pulses: tuple[CuePulse, ...],
     clock_ms: int,
+    *,
+    observer_id: str | None = None,
 ) -> None:
-    own = next(actor for actor in snapshot.actors if actor.actor_id == level.operative_id)
+    own = next(
+        actor for actor in snapshot.actors if actor.actor_id == (observer_id or level.operative_id)
+    )
     deck = level.deck_at(own.tile)
     size = snapshot.world_map.tile_size_px
     for cue in pulses:
@@ -105,9 +111,13 @@ def draw_debug_path(
     camera: Camera,
     guard: GuardView,
     fonts: Fonts,
+    *,
+    observer_id: str | None = None,
 ) -> None:
     """Privileged teaching view only; never a source for controller decisions."""
-    own = next(actor for actor in snapshot.actors if actor.actor_id == level.operative_id)
+    own = next(
+        actor for actor in snapshot.actors if actor.actor_id == (observer_id or level.operative_id)
+    )
     deck = level.deck_at(own.tile)
     size = snapshot.world_map.tile_size_px
     actor = next(actor for actor in snapshot.actors if actor.actor_id == guard.actor_id)

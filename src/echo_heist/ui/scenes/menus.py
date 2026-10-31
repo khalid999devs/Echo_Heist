@@ -7,10 +7,12 @@ from math import sin
 import pygame
 
 from echo_heist import __version__
+from echo_heist.core.contracts.autonomy.model import ProtocolState
 from echo_heist.core.contracts.results import MissionEnd, RunOutcome
 from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.hud import panel
+from echo_heist.ui.render.layout.text import fit, lines
 from echo_heist.ui.render.surfaces.cinematic import BACKDROP_PAD, draw_scene
 from echo_heist.ui.render.theme import Fonts
 
@@ -226,7 +228,13 @@ def _route_diagram(canvas: pygame.Surface, fonts: Fonts) -> None:
 
 
 def _briefing(
-    canvas: pygame.Surface, fonts: Fonts, selected: int, mode_choice: int, clock_ms: int
+    canvas: pygame.Surface,
+    fonts: Fonts,
+    selected: int,
+    mode_choice: int,
+    clock_ms: int,
+    companion_available: bool = False,
+    protocols: ProtocolState | None = None,
 ) -> None:
     panel(canvas, pygame.Rect(44, 184, 520, 440), fill=(5, 18, 28, 227), border=theme.BORDER)
     _text(canvas, fonts.micro, "CHAPTER 01", theme.ACCENT, (64, 204))
@@ -241,20 +249,26 @@ def _briefing(
         _text(canvas, fonts.micro, label, theme.ACCENT, (64, y))
         _text(canvas, fonts.small, description, theme.TEXT, (64, y + 23))
     pygame.draw.line(canvas, theme.BORDER, (64, 527), (544, 527))
-    _text(
-        canvas,
-        fonts.micro,
-        "WASD  Move    SHIFT  Sprint burst    E  Stairs / Core",
-        theme.MUTED,
-        (64, 546),
-    )
-    _text(
-        canvas,
-        fonts.micro,
-        "Q  Echo    F  EMP    SPACE  Stun    TAB  Map",
-        theme.MUTED,
-        (64, 578),
-    )
+    if protocols is not None and protocols.active is not None:
+        active = protocols.active
+        _text(
+            canvas,
+            fonts.micro,
+            fit(fonts.micro, "NEXUS / " + active.label, 480),
+            theme.WARNING,
+            (64, 544),
+        )
+        for index, line in enumerate(lines(fonts.micro, active.reason, 480, 2)):
+            _text(canvas, fonts.micro, line, theme.MUTED, (64, 568 + index * 20))
+    else:
+        _text(
+            canvas,
+            fonts.micro,
+            "WASD Move  C Crouch  SHIFT Sprint  E Stairs / Core",
+            theme.MUTED,
+            (64, 546),
+        )
+        _text(canvas, fonts.micro, "Q Echo   F EMP   SPACE Stun   TAB Map", theme.MUTED, (64, 578))
     panel(canvas, pygame.Rect(600, 184, 616, 440), fill=(5, 18, 28, 219), border=theme.BORDER)
     _text(canvas, fonts.micro, "PLAY MODE", theme.MUTED, (620, 204))
     for index, item in enumerate(MODE_ITEMS[:2]):
@@ -270,7 +284,11 @@ def _briefing(
         _text(
             canvas,
             fonts.micro,
-            "DIRECT CONTROL" if index == 0 else "WORKSHOP PREVIEW",
+            "DIRECT CONTROL"
+            if index == 0
+            else "AI CONTROL"
+            if companion_available
+            else "PREPARATION",
             border,
             (rect.x + 16, rect.y + 49),
         )
@@ -282,7 +300,7 @@ def _briefing(
     _button(
         canvas,
         LAUNCH_BUTTON,
-        "LAUNCH MISSION",
+        "CONFIGURE COMPANION" if mode_choice else "LAUNCH MISSION",
         fonts,
         selected=selected == 2,
         enabled=MODE_ITEMS[mode_choice].enabled,
@@ -305,6 +323,8 @@ def draw_menu(
     reduced_motion: bool = False,
     mode_choice: int = 0,
     report_available: bool = False,
+    companion_available: bool = False,
+    protocols: ProtocolState | None = None,
     paint_background: bool = True,
 ) -> None:
     briefing = scene == "MODE"
@@ -353,7 +373,7 @@ def draw_menu(
             (44, 674),
         )
     else:
-        _briefing(canvas, fonts, selected, mode_choice, clock_ms)
+        _briefing(canvas, fonts, selected, mode_choice, clock_ms, companion_available, protocols)
         if notice:
             panel(canvas, pygame.Rect(600, 640, 616, 32), fill=(5, 18, 28, 240))
             _text(canvas, fonts.micro, notice, theme.WARNING, (612, 647))
@@ -375,6 +395,7 @@ def draw_results(
     ticks_per_second: int,
     hovered: str | None = None,
     clock_ms: int = 0,
+    autonomous: bool = False,
 ) -> None:
     """Report only committed mission facts; final score/rank is a P06 rule."""
     seconds = end.elapsed_ticks // max(1, ticks_per_second)
@@ -421,7 +442,13 @@ def draw_results(
             clock_ms=clock_ms,
         )
     panel(canvas, RESULT_RETRY, fill=(5, 42 + glow, 56 + glow, 185), border=theme.ACCENT)
-    _text(canvas, fonts.small, "R  RETRY MISSION", theme.ACCENT, (678, 605))
+    _text(
+        canvas,
+        fonts.small,
+        "R  REVIEW & RETRY" if autonomous else "R  RETRY MISSION",
+        theme.ACCENT,
+        (678, 605),
+    )
     panel(
         canvas,
         RESULT_MENU,

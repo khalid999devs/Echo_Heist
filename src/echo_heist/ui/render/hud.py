@@ -10,6 +10,7 @@ from echo_heist.core.contracts.world import MissionPhase, Tile
 from echo_heist.level.model import LevelData
 from echo_heist.ui.presenters.objective import ObjectiveView
 from echo_heist.ui.render import theme
+from echo_heist.ui.render.layout.text import fit
 from echo_heist.ui.render.surfaces.glass import panel as panel
 from echo_heist.ui.render.theme import Color, Fonts
 
@@ -165,6 +166,7 @@ def draw_hud(
     crouched: bool = False,
     concealed: bool = False,
     teaching_view: bool = False,
+    autonomous: bool = False,
     capture: CaptureView | None = None,
 ) -> None:
     _objective(
@@ -211,6 +213,8 @@ def draw_hud(
         else view.sprint_ticks_remaining / max(1, sprint_duration_ticks)
     )
     label = f"READY IN  {recharge / max(1, ticks_per_second):.1f}s" if recharge else "SHIFT  Sprint"
+    if autonomous and not recharge:
+        label = "AI / SPRINT"
     if crouched:
         label = "UNDER DESK" if concealed else "C  Crouched"
     _label(
@@ -238,7 +242,7 @@ def draw_hud(
         rect = pygame.Rect(left, canvas.get_height() - 94, 110, 74)
         color = theme.DISABLED if count == "0" else theme.ACCENT
         panel(canvas, rect, fill=(5, 15, 25, 175), border=theme.BORDER)
-        _label(canvas, fonts.micro, key, color, (left + 10, rect.y + 9))
+        _label(canvas, fonts.micro, "AI" if autonomous else key, color, (left + 10, rect.y + 9))
         _label(canvas, fonts.small, name, theme.TEXT, (left + 10, rect.y + 29))
         _label(canvas, fonts.micro, count, color, (left + 10, rect.y + 53))
     if notice:
@@ -246,7 +250,22 @@ def draw_hud(
         banner = pygame.Rect(0, canvas.get_height() - 194, width, 36)
         banner.centerx = canvas.get_width() // 2
         panel(canvas, banner, border=theme.WARNING)
-        _label(canvas, fonts.small, notice, theme.TEXT, (banner.x + 15, banner.y + 8))
+        _label(
+            canvas,
+            fonts.small,
+            fit(fonts.small, notice, width - 30),
+            theme.TEXT,
+            (banner.x + 15, banner.y + 8),
+        )
+    elif autonomous:
+        hint = "AI CONTROL   /   F2 Decisions   F3 Guards   TAB Map   ESC Pause"
+        _label(
+            canvas,
+            fonts.micro,
+            hint,
+            theme.MUTED,
+            (canvas.get_width() // 2 - fonts.micro.size(hint)[0] // 2, canvas.get_height() - 35),
+        )
     elif clock_ms < 7_000 and not teaching_view:
         hint = "WASD  Move    C  Crouch    SHIFT  Sprint    ESC  Pause"
         _label(

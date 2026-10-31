@@ -183,3 +183,32 @@ def test_music_transition_ramps_across_frames_without_blocking_fadeout(
         assert pygame.mixer.music.get_volume() == 0
     finally:
         pygame.mixer.quit()
+
+
+def test_nexus_announcement_sounds_once_per_serial_and_attempt(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("SDL_AUDIODRIVER", "dummy")
+    pygame.mixer.init()
+    try:
+        audio = AudioDirector(enabled=True)
+        frame = AudioFrame(
+            "HEIST",
+            "0",
+            1,
+            phase=MissionPhase.INFILTRATE,
+            explicit_ui_feedback=True,
+            nexus_serial=0,
+        )
+        audio.update(frame, 0)
+        count = audio.cues_played
+        announced = replace(frame, nexus_serial=1)
+        audio.update(announced, 17)
+        assert audio.cues_played == count + 1
+        for _ in range(5):
+            audio.update(announced, 17)
+        assert audio.cues_played == count + 1
+        audio.update(replace(announced, run_id=2), 17)
+        assert audio.cues_played == count + 2
+    finally:
+        pygame.mixer.quit()

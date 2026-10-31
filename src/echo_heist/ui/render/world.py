@@ -441,10 +441,13 @@ def draw_world(
     reduced_motion: bool = False,
     furnishings: tuple[FurnitureVisual, ...] = (),
     fraction: float = 1.0,
+    observer_id: str | None = None,
 ) -> None:
     size = level.static_map.tile_size_px
     canvas.fill(theme.BACKGROUND)
-    operative = next(actor for actor in snapshot.actors if actor.actor_id == level.operative_id)
+    operative = next(
+        actor for actor in snapshot.actors if actor.actor_id == (observer_id or level.operative_id)
+    )
     deck = level.deck_at(operative.tile)
     original_clip = canvas.get_clip()
     if deck is not None:
@@ -584,7 +587,7 @@ def draw_world(
             ring = pygame.Rect(0, 0, 38, 38)
             ring.center = point
             pygame.draw.arc(canvas, theme.WARNING, ring, pi / 2, pi / 2 + 2 * pi * progress, 4)
-    draw_badges(canvas, level, snapshot, camera, fonts)
+    draw_badges(canvas, level, snapshot, camera, fonts, observer_id=observer_id)
     if snapshot.phase == MissionPhase.LOCKDOWN:
         cycle = 0.55 if reduced_motion else (1 + sin(clock_ms / 440)) / 2
         canvas.fill(

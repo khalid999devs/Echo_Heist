@@ -68,3 +68,29 @@ def test_provider_error_duplicate_history_and_terminal_fallback_are_honest() -> 
     state.gateway = None
     state.capture(request(), report().result)
     assert state.report and state.report.result == report().result
+
+
+def test_mouse_history_navigation_is_read_only_and_can_return_to_current_attempt() -> None:
+    import pygame
+
+    from echo_heist.ui.scenes.experience.report import REPORT_CONTROLS, ReportInspector
+
+    gateway = MemoryGateway()
+    state = ReportState(gateway)
+    state.capture(request())
+    inspector = ReportInspector(state)
+    inspector.open = True
+
+    def click(index: int) -> pygame.event.Event:
+        return pygame.event.Event(
+            pygame.MOUSEBUTTONDOWN, button=1, pos=REPORT_CONTROLS[index].center
+        )
+
+    inspector.handle([click(0)])
+    assert inspector.index == 0
+    inspector.handle([click(2)])
+    assert inspector.index == -1 and state.report == report()
+    inspector.handle([click(3)])
+    assert inspector.index == 0
+    inspector.handle([click(1)])
+    assert not inspector.open and gateway.calls == ["report", "history"]

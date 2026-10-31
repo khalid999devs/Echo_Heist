@@ -1,0 +1,584 @@
+{
+  "date": "2026-10-30",
+  "owner": "Khalid",
+  "phase": "P05-KR1/KR2 independent presentation",
+  "status": "Independent implementation verified; connected lifecycle acceptance pending P04/SR1/SR2",
+  "branch": "work/khalid-p05-visuals",
+  "runtime_commit": "59fffbacb9fad24be8f21369fe9e5e2f37a94626",
+  "contracts_commit": "27d476f",
+  "visual_commit": "fc43e65",
+  "base_p04": "1d24b4b",
+  "draft_pr": "https://github.com/khalid999devs/Echo_Heist/pull/3",
+  "base_main": "65df8b50d6647c416d25f28cb74893f0fb773358",
+  "fingerprint_schema": 9,
+  "map_scoring_simulation_rules_unchanged": true,
+  "checks": {
+    "structure": "PASS",
+    "ruff": "PASS",
+    "format_files": 285,
+    "mypy_source_files": 136,
+    "pytest_passed": 216,
+    "pytest_seconds": 28.23
+  },
+  "ci": {
+    "conclusion": "success",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "headless-checks"
+      },
+      {
+        "conclusion": "success",
+        "name": "macos-arm64"
+      },
+      {
+        "conclusion": "success",
+        "name": "windows-x64"
+      }
+    ],
+    "source": "59fffbacb9fad24be8f21369fe9e5e2f37a94626",
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/41041860894"
+  },
+  "replays": [
+    {
+      "name": "upper-tools",
+      "outcome": "WIN",
+      "ticks": 1514,
+      "event_chain_hash": "e26af4a1c097494b1f3ed984eb8861902be7d0d994fd841e9e42252d97ee3bc7",
+      "final_fingerprint": "fde84330aed7135a0ab16d2510a6d976ef1e49f5d534d490c7f815c0354e6a92",
+      "replay_matched": true
+    },
+    {
+      "name": "lower-tools",
+      "outcome": "WIN",
+      "ticks": 1581,
+      "event_chain_hash": "fa1aa3f98762972f0fac8186433be63cde5434612ffa7322e5d5fa5f6bc7b512",
+      "final_fingerprint": "a1c74c268c3ab04f78bc6a4171748bea04372a40233355913a12a90a6b6333e1",
+      "replay_matched": true
+    },
+    {
+      "name": "cross-tools",
+      "outcome": "WIN",
+      "ticks": 1603,
+      "event_chain_hash": "5361dd314c85f5407ddef7e81cfe203cbf3e2ff3fccb8f76a7376eb9b32986c7",
+      "final_fingerprint": "27ec817ae615701268c30e39506b29a283513bd43308ffa5e22df68522cf3aa5",
+      "replay_matched": true
+    },
+    {
+      "name": "upper-no-tools",
+      "outcome": "CAPTURED",
+      "ticks": 1174,
+      "event_chain_hash": "17bfabc682c06e25660eaa24e2effa8bdfdc814d56136d63ff0ea9dcd45eb212",
+      "final_fingerprint": "7bc4fe9eab947b84e169ca231d94ed071030aeadb1e38e547c539fe3041d3770",
+      "replay_matched": true
+    },
+    {
+      "name": "lower-no-tools",
+      "outcome": "CAPTURED",
+      "ticks": 349,
+      "event_chain_hash": "6061ff5d4bb2e92adca992edec013e2e63531345b224cc9168712c161a82ce7e",
+      "final_fingerprint": "588bc57315565f22f90b8055f6cfbd75f9f537dd14a394ece68dbfdd4b6ae22b",
+      "replay_matched": true
+    }
+  ],
+  "human_replays_match_saved_p04": true,
+  "native_human": {
+    "driver": "cocoa",
+    "outcomes": {
+      "upper": {
+        "outcome": "WIN",
+        "ticks": 1483
+      },
+      "lower": {
+        "outcome": "WIN",
+        "ticks": 1604
+      },
+      "careless": {
+        "outcome": "CAPTURED",
+        "ticks": 694
+      }
+    },
+    "decks": [
+      "ground",
+      "upper"
+    ],
+    "layouts": [
+      {
+        "actual": [
+          1366,
+          768
+        ],
+        "logical": [
+          1281,
+          720
+        ],
+        "fullscreen": false,
+        "guard_clicks": 4
+      },
+      {
+        "actual": [
+          1440,
+          820
+        ],
+        "logical": [
+          1280,
+          729
+        ],
+        "fullscreen": false,
+        "guard_clicks": 4
+      },
+      {
+        "actual": [
+          1470,
+          923
+        ],
+        "logical": [
+          1280,
+          804
+        ],
+        "fullscreen": true,
+        "guard_clicks": 4
+      }
+    ],
+    "unseen_hiding": "PASS",
+    "diagnostics_read_only": "PASS",
+    "frames": 4010,
+    "render_audio_present_ms": {
+      "median": 7.88,
+      "p95": 8.66,
+      "max": 526.1
+    },
+    "scope": "Accelerated native Human input, default four-guard security. Timing excludes simulation; room cameras are diagnostic only."
+  },
+  "presentation_fixture": {
+    "kind": "scripted presentation fixture, NOT environment behavior proof",
+    "driver": "cocoa",
+    "audio_ready": true,
+    "shots": [
+      "props-000.png",
+      "props-030.png",
+      "props-060.png",
+      "props-070.png",
+      "props-090.png",
+      "props-110.png",
+      "props-170.png",
+      "props-180.png",
+      "world-deck-1.png",
+      "world-deck-2.png",
+      "vertical-closed.png",
+      "vertical-open.png",
+      "human-echo.png",
+      "human-emp.png",
+      "human-emp-empty.png",
+      "human-melee-out-of-range.png"
+    ],
+    "frames": 240,
+    "render_ms_median": 8.32,
+    "render_ms_p95": 8.947,
+    "effects_max": 32,
+    "fixture_simulation_unchanged": true,
+    "human_tool_capture_ticks": 4,
+    "audio": {
+      "music_track": "sector",
+      "audio_assets_loaded": 33,
+      "audio_cues_played": 10,
+      "lockdown_alarm_active": false,
+      "room_ambience_active": true
+    }
+  },
+  "fixture_capture_hashes": {
+    "human-echo.png": "421ee29592c815f91089758a1c06336a25fba20de0cc5b123fb39b710677fa2f",
+    "human-emp-empty.png": "150dafe0b866269c4f209d4c8601600c473900e1ed2d1ac25188caa534208e6b",
+    "human-emp.png": "0db42cf40170022acf5f38f224364fee7b3f8a244ca04f773f5b249d9aec0230",
+    "human-melee-out-of-range.png": "ae55125aa51cb95bf27213ff239365d3ad1b5143d139cfd23bdc4e14b26c249a",
+    "props-000.png": "3a1bfba89a487e0765fe4df6fa7241d04928c417e1499f1e9e81b5d53e325b62",
+    "props-030.png": "465078ec737a50bb15b5051120a3ba153cf3a6f5f600190aa0bf9dbf7c382a4e",
+    "props-060.png": "f1ff1c4e92a8468f148f676b1be1603cd47eb6031128bff76a99ec1e09214530",
+    "props-070.png": "4bbc6e6a16900f9bdf0921ad993294297db09d18aa8a5488568a6acb38ba8bc0",
+    "props-090.png": "ecd13fabf67efcc2b741d04b95f51abcd90b9dc9adfecdd24ca18291d6bc7e6e",
+    "props-110.png": "97cf23a429b21fbc0524688367cd6d17041eecee0da0e4ff5aa5ebe86403ffae",
+    "props-170.png": "dfc3c80df75b9d4163e50bd08dc21eaa823b4520398b2b5f738690d8f13981ab",
+    "props-180.png": "3117afcc60234bc43728f8ef065975b55eae37a858c63985d969eb4cf047661e",
+    "vertical-closed.png": "c7e7fa6a214087b46a4ada492ea911fc8895b0cc98cffd40698a4b1b0c38c8fb",
+    "vertical-open.png": "0125e82343ebaf93314fe9980d0160c01aa1711dd6439eaa277959655015ced9",
+    "world-deck-1.png": "7903773e1efc111347351c7694c5b7b73e4fd961e8a0b8558c39e0f4f4657e23",
+    "world-deck-2.png": "fa3926cbba8dc331550ece7e04a51e77ee22425652c9525616a12d4c9151a9f5"
+  },
+  "performance_baseline": {
+    "video_driver": "cocoa",
+    "audio_ready": true,
+    "cycles": 12,
+    "frames": 3600,
+    "measured_frames_after_warmup": 3000,
+    "sizes": [
+      [
+        1280,
+        720
+      ],
+      [
+        1440,
+        900
+      ]
+    ],
+    "security_enabled": true,
+    "teaching_view": false,
+    "frame_ms": {
+      "update": {
+        "median": 1.641,
+        "p95": 2.175,
+        "max": 33.192
+      },
+      "draw": {
+        "median": 6.246,
+        "p95": 19.392,
+        "max": 21.096
+      },
+      "present": {
+        "median": 0.996,
+        "p95": 10.414,
+        "max": 16.239
+      },
+      "total": {
+        "median": 16.517,
+        "p95": 22.318,
+        "max": 53.942
+      }
+    },
+    "memory": [
+      {
+        "cycle": 1,
+        "rss_mb": 463.94,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 2,
+        "rss_mb": 487.64,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 3,
+        "rss_mb": 486.19,
+        "python_mb": 0.586
+      },
+      {
+        "cycle": 4,
+        "rss_mb": 491.52,
+        "python_mb": 0.657
+      },
+      {
+        "cycle": 5,
+        "rss_mb": 488.59,
+        "python_mb": 0.718
+      },
+      {
+        "cycle": 6,
+        "rss_mb": 498.53,
+        "python_mb": 0.771
+      },
+      {
+        "cycle": 7,
+        "rss_mb": 497.11,
+        "python_mb": 0.823
+      },
+      {
+        "cycle": 8,
+        "rss_mb": 501.73,
+        "python_mb": 0.874
+      },
+      {
+        "cycle": 9,
+        "rss_mb": 489.19,
+        "python_mb": 0.918
+      },
+      {
+        "cycle": 10,
+        "rss_mb": 428.84,
+        "python_mb": 0.96
+      },
+      {
+        "cycle": 11,
+        "rss_mb": 426.88,
+        "python_mb": 1.002
+      },
+      {
+        "cycle": 12,
+        "rss_mb": 431.7,
+        "python_mb": 1.045
+      }
+    ],
+    "last_six_rss_span_mb": 74.85,
+    "python_growth_after_warmup_mb": 1.045,
+    "rss_change_from_warmup_mb": -55.94,
+    "bounded_in_this_run": true,
+    "scope": "Native macOS uncapped CPU/presentation workload, 61.2 seconds of simulated play; 12 restarts and alternating resizes, 2 warmup cycles. Python tracing adds overhead. RSS includes OS compression and compositor buffers; bounded means final six samples stay within 64 MB of warmup and Python growth below 4 MB (including telemetry). A bounded short run is not proof against every long-session memory leak."
+  },
+  "performance_final": {
+    "video_driver": "cocoa",
+    "audio_ready": true,
+    "cycles": 12,
+    "frames": 3600,
+    "measured_frames_after_warmup": 3000,
+    "sizes": [
+      [
+        1280,
+        720
+      ],
+      [
+        1440,
+        900
+      ]
+    ],
+    "security_enabled": true,
+    "teaching_view": false,
+    "frame_ms": {
+      "update": {
+        "median": 1.77,
+        "p95": 2.305,
+        "max": 15.89
+      },
+      "draw": {
+        "median": 6.499,
+        "p95": 19.643,
+        "max": 28.338
+      },
+      "present": {
+        "median": 1.065,
+        "p95": 2.984,
+        "max": 8.476
+      },
+      "total": {
+        "median": 9.479,
+        "p95": 22.674,
+        "max": 33.736
+      }
+    },
+    "memory": [
+      {
+        "cycle": 1,
+        "rss_mb": 459.19,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 2,
+        "rss_mb": 486.17,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 3,
+        "rss_mb": 480.52,
+        "python_mb": 0.595
+      },
+      {
+        "cycle": 4,
+        "rss_mb": 485.33,
+        "python_mb": 0.668
+      },
+      {
+        "cycle": 5,
+        "rss_mb": 345.7,
+        "python_mb": 0.73
+      },
+      {
+        "cycle": 6,
+        "rss_mb": 385.08,
+        "python_mb": 0.784
+      },
+      {
+        "cycle": 7,
+        "rss_mb": 384.14,
+        "python_mb": 0.836
+      },
+      {
+        "cycle": 8,
+        "rss_mb": 389.64,
+        "python_mb": 0.887
+      },
+      {
+        "cycle": 9,
+        "rss_mb": 388.52,
+        "python_mb": 0.93
+      },
+      {
+        "cycle": 10,
+        "rss_mb": 394.09,
+        "python_mb": 0.972
+      },
+      {
+        "cycle": 11,
+        "rss_mb": 392.62,
+        "python_mb": 1.014
+      },
+      {
+        "cycle": 12,
+        "rss_mb": 386.73,
+        "python_mb": 1.056
+      }
+    ],
+    "last_six_rss_span_mb": 9.95,
+    "python_growth_after_warmup_mb": 1.056,
+    "rss_change_from_warmup_mb": -99.44,
+    "bounded_in_this_run": true,
+    "scope": "Native macOS uncapped CPU/presentation workload, 61.2 seconds of simulated play; 12 restarts and alternating resizes, 2 warmup cycles. Python tracing adds overhead. RSS includes OS compression and compositor buffers; bounded means final six samples stay within 64 MB of warmup and Python growth below 4 MB (including telemetry). A bounded short run is not proof against every long-session memory leak."
+  },
+  "build_manifest": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 112442571,
+    "archive_sha256": "48e8d5a0a5e1c7bf6179ddd7c72b4a8d78ba5c059fbb30179d29d16dfa6c499a",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "59fffbacb9fad24be8f21369fe9e5e2f37a94626",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "native_app": {
+    "checks": {
+      "frames_rendered": true,
+      "frozen_desktop": true,
+      "frozen_headless": true,
+      "resources_loaded": true,
+      "same_event_hash": true,
+      "same_state_hash": true,
+      "settings_saved": true,
+      "startup_completed": true,
+      "surface_saved": true
+    },
+    "passed": true,
+    "scope": "native display smoke",
+    "video_driver": "cocoa",
+    "audio": "ready",
+    "audio_assets_loaded": 33,
+    "startup": {
+      "cancelled": false,
+      "completed": true,
+      "elapsed_ms": 2213.64,
+      "first_logo_paint_ms": 234.04,
+      "frame_gap_ms": {
+        "max": 24.02,
+        "median": 17.27,
+        "p95": 22.49
+      },
+      "frames": 116,
+      "resource_load_ms": 1615.68,
+      "skip_requested": false,
+      "sound_cues": 3
+    },
+    "runtime": {
+      "architecture": "arm64",
+      "frozen": true,
+      "python": "3.13.16"
+    }
+  },
+  "native_zip": {
+    "checks": {
+      "frames_rendered": true,
+      "frozen_desktop": true,
+      "frozen_headless": true,
+      "resources_loaded": true,
+      "same_event_hash": true,
+      "same_state_hash": true,
+      "settings_saved": true,
+      "startup_completed": true,
+      "surface_saved": true
+    },
+    "passed": true,
+    "scope": "native display smoke",
+    "video_driver": "cocoa",
+    "audio": "ready",
+    "audio_assets_loaded": 33,
+    "startup": {
+      "cancelled": false,
+      "completed": true,
+      "elapsed_ms": 2142.25,
+      "first_logo_paint_ms": 138.95,
+      "frame_gap_ms": {
+        "max": 34.4,
+        "median": 17.16,
+        "p95": 23.14
+      },
+      "frames": 112,
+      "resource_load_ms": 1548.5,
+      "skip_requested": false,
+      "sound_cues": 3
+    },
+    "runtime": {
+      "architecture": "arm64",
+      "frozen": true,
+      "python": "3.13.16"
+    }
+  },
+  "audio_assets": [
+    {
+      "path": "world/interactions/door.wav",
+      "author": "ECHO HEIST project",
+      "license": "MIT",
+      "source": "scripts/authoring/interaction_audio.py",
+      "created": "2026-10-25",
+      "sha256": "cae390cf122f0bb97080650a91970026c5b30fdfa3d23ea6eb030b041346407e",
+      "bytes": 61784,
+      "modified": false,
+      "notes": "Original procedural synthesis; no external samples."
+    },
+    {
+      "path": "world/interactions/glass.wav",
+      "author": "ECHO HEIST project",
+      "license": "MIT",
+      "source": "scripts/authoring/interaction_audio.py",
+      "created": "2026-10-25",
+      "sha256": "03a6918f860275b9d2ed30410b278eb0320e8170612f6870ccc0e5d7f472f504",
+      "bytes": 70604,
+      "modified": false,
+      "notes": "Original procedural synthesis; no external samples."
+    },
+    {
+      "path": "world/interactions/canister.wav",
+      "author": "ECHO HEIST project",
+      "license": "MIT",
+      "source": "scripts/authoring/interaction_audio.py",
+      "created": "2026-10-25",
+      "sha256": "6a280b6f72f6686054b2390c9be093866ffc5da2c8609d85f078f6cb5e011154",
+      "bytes": 57374,
+      "modified": false,
+      "notes": "Original procedural synthesis; no external samples."
+    },
+    {
+      "path": "world/interactions/locker.wav",
+      "author": "ECHO HEIST project",
+      "license": "MIT",
+      "source": "scripts/authoring/interaction_audio.py",
+      "created": "2026-10-25",
+      "sha256": "1e40a389866005b3813d1701ddd32b29b0a7ce01e486d5e4f9268f5c50b10dff",
+      "bytes": 39734,
+      "modified": false,
+      "notes": "Original procedural synthesis; no external samples."
+    }
+  ],
+  "platform_limits": {
+    "windows_x64": "Hosted source/build/frozen dummy-video smoke PASS; physical interactive gameplay/audio NOT_RUN",
+    "linux_x64": "Hosted source/headless checks PASS; native desktop packaging/gameplay NOT_RUN",
+    "macos_arm64": "Local native Human play, app and fresh ZIP verified; clean-machine/notarization release gates remain open",
+    "environment_lifecycle": "NOT_IMPLEMENTED by this slice; labeled fixture is presentation-only",
+    "complete_game_memory_acceptance": "P07 pending; short bounded profiles are not proof against every leak"
+  },
+  "hosted_artifacts": [
+    {
+      "digest": "sha256:91899f3ef97fd3ab6631e3742795de966beca26caa3dc4f5c473b1dd9c4798a9",
+      "id": 12971015973,
+      "name": "foundation-macos-arm64",
+      "size_in_bytes": 111768074
+    },
+    {
+      "digest": "sha256:adccb0e9ab0e5fbb90a2484bae2381c0ee5f7e4a95c627a0a9818897a98b3749",
+      "id": 12969639444,
+      "name": "foundation-windows-x64",
+      "size_in_bytes": 111983323
+    }
+  ],
+  "windows_local_mirror": "Optional slow download stopped; hosted artifact linked, no local archive verification claimed"
+}

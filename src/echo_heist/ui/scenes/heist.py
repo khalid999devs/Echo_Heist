@@ -18,6 +18,7 @@ from echo_heist.infrastructure.resources import load_sensor_rules
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import build_security_registry
 from echo_heist.ui.input.human import HumanInput, UiCommand
+from echo_heist.ui.presenters.interactions import InteractionPresentation
 from echo_heist.ui.presenters.objective import build_objective_view
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.actors.model import position_at
@@ -37,7 +38,6 @@ from echo_heist.ui.render.security.lab import GUARD_TABS, draw_lab
 from echo_heist.ui.render.security.signals import CuePulse, draw_cues, draw_debug_path
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import (
-    VisualPulse,
     WorldArt,
     build_map_surface,
     draw_world,
@@ -96,6 +96,9 @@ class HeistSession:
                 security=security,
             )
         )
+        self.interactions = InteractionPresentation(
+            self.observer_id, rules.simulation_hz, emp_radius_units=rules.emp_radius_units
+        )
         self.input = HumanInput(self.observer_id)
         self.autonomy_panel = self.autonomous
         self.autonomy_tab = 0 if self.autonomous else 1
@@ -117,7 +120,7 @@ class HeistSession:
             for actor in self.simulation.presentation_snapshot().actors
         }
         self.actor_motion: dict[str, ActorMotion] = {}
-        self.pulses: list[VisualPulse] = []
+        self.interaction_tick = 0.0
         self.cue_pulses: list[CuePulse] = []
         self.lab_selected = 0
         self.audio_events: deque[GameEvent] = deque(maxlen=512)
@@ -320,7 +323,6 @@ class HeistSession:
     def update(self, elapsed_ms: int) -> None:
         if not self.paused and not self.summary and self.mission_end is None:
             self.clock_ms += elapsed_ms
-            self.pulses = [pulse for pulse in self.pulses if self.clock_ms - pulse.started_ms < 650]
             self.cue_pulses = [
                 cue for cue in self.cue_pulses if self.clock_ms - cue.started_ms < 900
             ]
@@ -342,6 +344,10 @@ class HeistSession:
                 if result.mission_end is not None:
                     self.accumulator = 0
                     break
+            self.interaction_tick = max(
+                self.interaction_tick,
+                self.simulation.presentation_snapshot().tick + self.accumulator / 1000,
+            )
         self._follow(elapsed_ms / 1000)
 
     def _record_motion(self) -> None:
@@ -388,8 +394,14 @@ class HeistSession:
 
     def _record_events(self, events: tuple[GameEvent, ...]) -> None:
         self.audio_events.extend(events)
-        actors = {actor.actor_id: actor for actor in self.simulation.presentation_snapshot().actors}
-        guards = {guard.actor_id: guard for guard in self.simulation.presentation_snapshot().guards}
+        snapshot = self.simulation.presentation_snapshot()
+        self.interactions.observe(
+            snapshot,
+            self.simulation.observe(self.observer_id),
+            events,
+        )
+        actors = {actor.actor_id: actor for actor in snapshot.actors}
+        guards = {guard.actor_id: guard for guard in snapshot.guards}
         for event in events:
             if event.kind == EventKind.STAIR_USED and event.actor_id == self.observer_id:
                 self.notice = ""
@@ -398,6 +410,7 @@ class HeistSession:
                 self.notice_until_ms = self.clock_ms + 4200
             elif (
                 event.kind == EventKind.ACTION_REJECTED
+                and event.actor_id == self.observer_id
                 and dict(event.details).get("reason") == "low_headroom"
             ):
                 self.notice = "LOW CLEARANCE / CROUCH OUT FIRST"
@@ -424,26 +437,11 @@ class HeistSession:
                         CuePulse(guard.evidence_tile, guard.evidence_kind, self.clock_ms)
                     )
                     self.cue_pulses = self.cue_pulses[-16:]
-            elif event.kind == EventKind.ACTION_REJECTED:
-                reason = dict(event.details).get("reason")
-                self.notice = {
-                    "echo_empty": "NO ECHO CHARGES LEFT",
-                    "emp_empty": "NO EMP CHARGES LEFT",
-                    "no_reachable_guard": "MELEE NEEDS A NEARBY GUARD",
-                    "stair_landing_occupied": "STAIRS BLOCKED  /  WAIT FOR THE LANDING",
-                }.get(str(reason), self.notice)
-                self.notice_until_ms = self.clock_ms + 1400
-            elif event.kind == EventKind.TOOL_USED:
-                tool = dict(event.details).get("tool")
-                self.notice = {
-                    "ECHO": "ECHO DECOY DEPLOYED",
-                    "EMP": "EMP DISCHARGED",
-                    "MELEE": "MELEE CONTACT",
-                }.get(str(tool), "TOOL USED")
-                self.notice_until_ms = self.clock_ms + 1600
-                actor = actors.get(event.actor_id)
-                if actor is not None and actor.position is not None and tool in ("ECHO", "EMP"):
-                    self.pulses.append(VisualPulse(actor.position, str(tool), self.clock_ms))
+            elif event.kind in (EventKind.ACTION_REJECTED, EventKind.TOOL_USED):
+                feedback = self.interactions.feedback
+                if event.actor_id == self.observer_id and feedback and feedback.tick == event.tick:
+                    self.notice = feedback.message
+                    self.notice_until_ms = self.clock_ms + 1600
 
     def _record_telemetry(self) -> None:
         if self.run is None:
@@ -482,7 +480,9 @@ class HeistSession:
             pulse,
             actor_motion=self.actor_motion,
             clock_ms=self.clock_ms,
-            pulses=tuple(self.pulses),
+            effects=tuple(self.interactions.effects),
+            effect_tick=self.interaction_tick,
+            ticks_per_second=self.rules.simulation_hz,
             art=self.art,
             reduced_motion=self.reduced_flashing,
             furnishings=self.furnishings,
@@ -539,6 +539,7 @@ class HeistSession:
                 phase=snapshot.phase,
                 clock_ms=self.clock_ms,
                 notice=self.notice if self.clock_ms < self.notice_until_ms else "",
+                feedback=self.interactions.feedback_at(snapshot.tick),
                 guards=snapshot.guards,
                 unavailable_guards=frozenset(
                     actor.actor_id for actor in snapshot.actors if actor.disabled or actor.stunned

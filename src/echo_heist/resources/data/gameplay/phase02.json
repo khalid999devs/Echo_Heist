@@ -29,5 +29,6 @@
   "crouch_speed_percent": 55,
   "crouch_footstep_interval_ticks": 24,
   "sprint_footstep_interval_ticks": 7,
-  "chase_guard_speed_percent": 115
+  "chase_guard_speed_percent": 115,
+  "melee_cooldown_ticks": 120
 }

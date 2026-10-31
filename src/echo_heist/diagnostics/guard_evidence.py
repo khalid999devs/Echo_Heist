@@ -80,7 +80,11 @@ class RouteDriver:
             ):
                 self.tools_used["EMP"] += 1
                 return Action(self.actor_id, ActionKind.EMP, tick)
-            if self._threat(observation, position, self.rules.melee_range_units):
+            if (
+                own.inventory.melee_charges > 0
+                and own.melee_cooldown_remaining <= 1
+                and self._threat(observation, position, self.rules.melee_range_units)
+            ):
                 self.tools_used["MELEE"] += 1
                 return Action(self.actor_id, ActionKind.MELEE, tick)
         stair = next(

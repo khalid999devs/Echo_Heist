@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-10-30 - Applied emergency-melee budget
+
+- User approved two stun charges per attempt and four-second Simulation recovery. Valid resisted strikes consume stock/recovery and emit the existing six-tile clang; rejected requests consume nothing and make no gameplay noise. Existing legitimate investigation/roughly five-second original-location memory is preserved, with unchanged scoring.
+- Implemented actual inventory/timer/HUD, exact commit-tick validation, new rejection feedback and schema-10 replay. Ten new regression cases bring full checks to 226 passing tests; native practice HUD/pause/retry and normal Human wins/capture pass. [Rules](../planning/balance/MELEE.md), [handoff](handoffs/khalid/day_03/MELEE.md), [verification](../quality/reports/phase05/khalid/MELEE.md).
+- This directly authorized subset does not complete Suhita's remaining P04/P05 slices.
+
 ## 2026-10-25 - P04 presentation and runtime handoff
 
 - Implemented Khalid's independent KR1/KR2 presentation on `work/khalid-p04`: immutable gateway/telemetry contracts, active-actor camera/robot stairs, spectator input, measured-data F2 tabs, confirmed protocol reset, policy/deploy and review/retry flow, plus explicit once-per-announcement audio. No gameplay/scoring/map/asset changes; Human fingerprint 9 and all five route replay hashes remain unchanged.
@@ -177,3 +183,9 @@ Future entries should record task IDs, resulting behavior, actual checks with ou
 ## 2026-10-21 — Cinematic UI, licensed audio and first live stealth cluster
 
 Khalid followed the owner's new brief and grouped screenshot inspirations, replaced the title with the approved perspective cinematic, blended shared UI surfaces, integrated CC0 context music/event sounds and real Settings, then began the first P03 subset. One Sentinel now uses immutable filtered sensors, actual BFS/fuzzy/FSM behavior, identification, investigation/chase/search/return and expiring evidence. Physical Entry/Service furniture, compact HUD, sensor cones and real F3 telemetry are connected. 89 behavior cases and native playthrough/screens pass; see the [review](../quality/reports/phase02/presentation/REVIEW.md). Remaining shared P03/P04-P08 functionality stays open, including the owner-deferred P05 environment mechanics.
+
+## 2026-10-30 - Independent P05 presentation
+
+- Completed the authorized prop/tool/audio consumers on `work/khalid-p05-visuals`: immutable environment snapshots, depth/deck-aware door/glass/canister/locker art, paused/bounded effects, truthful stock/rejection/resisted-melee feedback and hearing-filtered stereo. Four original synthesized sounds have exact provenance; existing map, scoring and actual Human replays are preserved.
+- Full checks/216 tests, native Human wins/capture, 16 component/tool views, short restart/memory profiling, clean Mac app/fresh ZIP 9/9 with audio and all three runtime CI jobs pass. [Handoff](handoffs/khalid/day_03/P05.md), [verification](../quality/reports/phase05/khalid/VERIFICATION.md), [draft PR #3](https://github.com/khalid999devs/Echo_Heist/pull/3).
+- P04/SR and connected P05 lifecycle/placement gates remain open. The presentation fixture is explicitly labeled; main and the existing P04 branch are unchanged.

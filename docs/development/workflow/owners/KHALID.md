@@ -2,7 +2,7 @@
 
 Identity: **Khalid**. The owner explicitly changed the remaining split on **2026-10-22**: lead complex visual graphics, scene design, animation, camera, UI/audio presentation, rendering performance and desktop delivery. Suhita now leads most gameplay logic, including core systems previously authored by you. The [remaining workload](../../planning/WORKLOAD.md) now estimates 43 points for you and 48 for Suhita after P03 to offset completed foundation/refinement work; equal lifetime effort is a target, not a measured fact.
 
-Read [START_HERE](../START_HERE.md), [Status](../../tracking/STATUS.md), [claims](../../tracking/HANDOFFS.md), [code rules](../CODE_RULES.md), the assigned phase and its source/contracts. P01/P02/P03 are DONE; **P04 is the earliest open phase**. P05 has only an early crouch subset. Preview scenes do not complete their future behavior gates.
+Read [START_HERE](../START_HERE.md), [Status](../../tracking/STATUS.md), [claims](../../tracking/HANDOFFS.md), [code rules](../CODE_RULES.md), the assigned phase and its source/contracts. P01/P02/P03 are DONE; **P04 is the earliest open phase**. P05 has early crouch and an independently verified presentation implementation; its connected gate remains open. Preview scenes do not complete their future behavior gates.
 
 ## Actual baseline
 
@@ -25,6 +25,12 @@ The existing game already has cinematic title/loading/airlocks, room art and mat
 | [P08](../../planning/phases/delivery/PHASE_08.md) | P08-KR1 5; KR2 4 | Primary builds/Mac QA, technical handoff, final traceability, demonstration/media/credits | You |
 
 ## Start next
+
+2026-10-30 user follow-up: “okay apply them for me” authorizes the narrow SR1 melee budget/recovery subset in addition to KR1 feedback. It is implemented at `68d0c69` with fingerprint 10 and [this handoff](../../tracking/handoffs/khalid/day_03/MELEE.md). Remaining SR algorithms/lifecycles are still Suhita's. This exception does not transfer the entire SR1 slice.
+
+2026-10-30: the authorized independent P05 presentation is implemented; retrieve the [P05 handoff](../../tracking/handoffs/khalid/day_03/P05.md) and [actual evidence](../../quality/reports/phase05/khalid/VERIFICATION.md). Its narrow scene-hook claim is released for integration. Next connected work is visual acceptance against Suhita's P04 runtime, then P05 lifecycle state/placements. Do not count the component fixture as gameplay or close those gates.
+
+User override, 2026-10-25: proceed with independent P05-KR1/KR2 presentation on `work/khalid-p05-visuals` while Suhita owns P04 logic. Order: props/animation, tool feedback, spatial sound/reduced flash, then scoped performance. Preserve the P04 branch and Suhita's controller/deployment/startup connection. Claim only narrow event/draw/audio consumer hooks; no SR world lifecycle or scoring changes. Full P04/P05 gates still require combined behavior. This supersedes the wait-only instruction below for this explicitly authorized subset.
 
 Current queue: **P04-KR1/KR2** presentation is implemented and independently verified on `work/khalid-p04`; read its [runnable handoff](../../tracking/handoffs/khalid/day_02/phase04/P04.md) and [typed runtime port](../../architecture/integration/autonomy/PRESENTATION.md). No SR backend was published at the 2026-10-25 handoff. Next action is visual acceptance against Suhita's actual runtime after she connects it. Do not rebuild the screens, implement her AI, close P04 on synthetic data or advance to P05 before the shared gate. The `heist.py`/`flow.py` implementation claim is released for her narrow adapter/composition connection; preserve the new graphics and input contracts.
 

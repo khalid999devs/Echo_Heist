@@ -529,6 +529,11 @@ class GameFlow:
             if snapshot
             else False,
             events=events,
+            environment_cues=self.session.interactions.take_audio() if self.session else (),
+            heard_events=observation.heard_events if observation else (),
+            listener_position=observation.own_status.position if observation else None,
+            tick=snapshot.tick if snapshot else 0,
+            hz=self.session.rules.simulation_hz if self.session else 30,
             listener_id=self.session.observer_id if self.session else self.level.operative_id,
             nexus_serial=self.session.announcement_serial if self.session else 0,
             ui_feedback_serial=self.ui_feedback.serial,

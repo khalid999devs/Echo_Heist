@@ -30,6 +30,7 @@ class ActorState:
     disabled_until: int = 0
     stunned_until: int = 0
     melee_immune_until: int = 0
+    melee_ready_at: int = 0
     path: list[Position] = field(default_factory=list)
     next_footstep_tick: int = 0
     traversed_tiles: tuple[Tile, ...] = ()

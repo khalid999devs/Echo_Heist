@@ -56,7 +56,7 @@ def test_shipped_audio_context_deduplication_pause_and_mix(monkeypatch: pytest.M
     pygame.mixer.init()
     try:
         audio = AudioDirector(enabled=True)
-        assert audio.report()["audio_assets_loaded"] == 29
+        assert audio.report()["audio_assets_loaded"] == 33
         assert all(sound.get_length() > 0 for sound in audio.sounds.values())
         frame = AudioFrame("TITLE", "0", 0)
         audio.update(frame, 0)

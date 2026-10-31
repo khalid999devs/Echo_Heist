@@ -6,11 +6,13 @@ from math import cos, pi, sin
 
 import pygame
 
+from echo_heist.core.contracts.environment.presentation import PropKind, PropView
 from echo_heist.core.contracts.observations import EntityView
 from echo_heist.core.contracts.results import PresentationSnapshot
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, ActorKind, MissionPhase
 from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.level.model import LevelData
+from echo_heist.ui.presenters.interactions import Effect
 from echo_heist.ui.render import motifs, theme
 from echo_heist.ui.render.actors.model import (
     COMPANION_SIZE,
@@ -35,20 +37,14 @@ from echo_heist.ui.render.environment.furnishings.catalogue import FurnitureVisu
 from echo_heist.ui.render.environment.furnishings.story import paint_room_story
 from echo_heist.ui.render.environment.interiors import draw_details, draw_room_trim, room_floors
 from echo_heist.ui.render.environment.lighting import bake_lighting, draw_equipment
+from echo_heist.ui.render.interactions.effects import draw_effects
+from echo_heist.ui.render.interactions.props import depth as prop_depth
+from echo_heist.ui.render.interactions.props import draw_prop
 from echo_heist.ui.render.security.signals import draw_badges
 from echo_heist.ui.render.surfaces.formats import opaque_surface
 from echo_heist.ui.render.surfaces.glass import alert_frame
 from echo_heist.ui.render.surfaces.vision import draw_vision
 from echo_heist.ui.render.theme import Fonts
-
-
-@dataclass(frozen=True, slots=True)
-class VisualPulse:
-    """Short lived, purely visual response to a committed game event."""
-
-    position: tuple[int, int]
-    kind: str
-    started_ms: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -436,12 +432,14 @@ def draw_world(
     *,
     actor_motion: dict[str, motifs.ActorMotion] | None = None,
     clock_ms: int = 0,
-    pulses: tuple[VisualPulse, ...] = (),
     art: WorldArt | None = None,
     reduced_motion: bool = False,
     furnishings: tuple[FurnitureVisual, ...] = (),
     fraction: float = 1.0,
     observer_id: str | None = None,
+    effects: tuple[Effect, ...] = (),
+    effect_tick: float = 0,
+    ticks_per_second: int = 30,
 ) -> None:
     size = level.static_map.tile_size_px
     canvas.fill(theme.BACKGROUND)
@@ -460,7 +458,7 @@ def draw_world(
     else:
         canvas.blit(map_surface, camera.to_screen((0, 0)))
     draw_equipment(canvas, level, camera, 0 if reduced_motion else clock_ms, deck)
-    layers: list[tuple[float, str, FurnitureVisual | EntityView]] = []
+    layers: list[tuple[float, str, FurnitureVisual | EntityView | PropView]] = []
     for item in furnishings:
         screen_rect = pygame.Rect(camera.to_screen(item.render_rect.topleft), item.render_rect.size)
         if (deck is not None and not deck.contains(item.tile)) or not screen_rect.colliderect(
@@ -474,6 +472,20 @@ def draw_world(
                 (feet[0] - item.shadow.pivot[0], feet[1] - item.shadow.pivot[1]),
             )
         layers.append((item.depth, item.object_id, item))
+    visible_props = []
+    for prop in snapshot.environment.props:
+        tile = (
+            prop.position[0] // POSITION_UNITS_PER_TILE,
+            prop.position[1] // POSITION_UNITS_PER_TILE,
+        )
+        if deck is None or deck.contains(tile):
+            visible_props.append(prop)
+            layers.append((prop_depth(prop, size, fraction), prop.object_id, prop))
+    locker_cover = {
+        prop.occupant_id: prop.occupant_cover
+        for prop in visible_props
+        if prop.kind == PropKind.LOCKER and prop.occupant_id is not None
+    }
     draw_vision(canvas, snapshot.world_map, snapshot, camera)
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
     _anchor(
@@ -509,17 +521,6 @@ def draw_world(
             theta = clock_ms / 400 + index * 2 * pi / 3
             trace = (round(point[0] + 19 * cos(theta)), round(point[1] + 19 * sin(theta)))
             pygame.draw.circle(canvas, theme.ACCENT, trace, 2)
-    for visual in pulses:
-        age = clock_ms - visual.started_ms
-        if not 0 <= age < 650:
-            continue
-        point = camera.to_screen(to_pixels(visual.position, size))
-        radius = 8 + age // (7 if visual.kind == "EMP" else 12)
-        color = theme.ACCENT if visual.kind == "ECHO" else theme.WARNING
-        alpha = max(0, 170 - age // 4)
-        pulse_surface = pygame.Surface((radius * 2 + 8, radius * 2 + 8), pygame.SRCALPHA)
-        pygame.draw.circle(pulse_surface, (*color, alpha), (radius + 4, radius + 4), radius, 3)
-        canvas.blit(pulse_surface, (point[0] - radius - 4, point[1] - radius - 4))
     for entity in snapshot.actors:
         if entity.position is None or (deck is not None and not deck.contains(entity.tile)):
             continue
@@ -532,7 +533,13 @@ def draw_world(
         if isinstance(layer_item, FurnitureVisual):
             draw_instrument(canvas, layer_item, camera, 0 if reduced_motion else clock_ms)
             continue
+        if isinstance(layer_item, PropView):
+            draw_prop(canvas, layer_item, camera, size, fraction, art.props[46] if art else None)
+            continue
         entity = layer_item
+        cover = locker_cover.get(entity.actor_id, 0.0) if entity.concealed else 0.0
+        if cover >= 1:
+            continue
         assert entity.position is not None
         motion = (actor_motion or {}).get(entity.actor_id, motifs.ActorMotion())
         render_position = position_at(entity.position, motion, fraction)
@@ -542,7 +549,7 @@ def draw_world(
                 render_position[1] * size / POSITION_UNITS_PER_TILE,
             )
         )
-        if entity.concealed:
+        if entity.concealed and entity.actor_id not in locker_cover:
             # Match the shallow ground-depth projection of the desk opening.
             # Blend from zero at its front edge, preserving smooth entry/exit;
             # this is an art socket, not a different authoritative position.
@@ -580,6 +587,7 @@ def draw_world(
             if art is not None and entity.kind == ActorKind.OPERATIVE
             else (),
             fraction=fraction,
+            cover=cover,
         )
         capture = captures.get(entity.actor_id)
         if capture is not None:
@@ -587,6 +595,25 @@ def draw_world(
             ring = pygame.Rect(0, 0, 38, 38)
             ring.center = point
             pygame.draw.arc(canvas, theme.WARNING, ring, pi / 2, pi / 2 + 2 * pi * progress, 4)
+    draw_effects(
+        canvas,
+        tuple(
+            effect
+            for effect in effects
+            if deck is None
+            or deck.contains(
+                (
+                    effect.position[0] // POSITION_UNITS_PER_TILE,
+                    effect.position[1] // POSITION_UNITS_PER_TILE,
+                )
+            )
+        ),
+        camera,
+        size,
+        effect_tick,
+        ticks_per_second,
+        reduced_motion=reduced_motion,
+    )
     draw_badges(canvas, level, snapshot, camera, fonts, observer_id=observer_id)
     if snapshot.phase == MissionPhase.LOCKDOWN:
         cycle = 0.55 if reduced_motion else (1 + sin(clock_ms / 440)) / 2

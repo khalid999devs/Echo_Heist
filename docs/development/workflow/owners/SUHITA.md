@@ -4,6 +4,9 @@ Identity: **Suhita**, Windows x64. You lead most gameplay logic; Khalid leads co
 
 **P01/P02/P03 are complete. Your next queue is P04-SR1/SR2/SR3.** Do not redo Tracker, guard registry or P03. Preserve your original commits and [P03 handoff](../../tracking/handoffs/suhita/day_02/P03.md), then retrieve the superseding [combined schema-9 handoff](../../tracking/handoffs/khalid/day_02/phase03/P03.md) and [actual acceptance](../../quality/reports/phase03/integration/VERIFICATION.md). Main must contain this integration before dependent work begins. Use the [Windows setup and prompt](../setup/WINDOWS_SUHITA.md).
 
+
+2026-10-30 P05 follow-up: Khalid directly implemented the [approved limited-melee subset](../../tracking/handoffs/khalid/day_03/MELEE.md), runtime `68d0c69` on `work/khalid-p05-visuals`: two charges, four-second recovery and HUD, fingerprint **10**. Preserve these fields/rules when later merging that P05 branch; do not reintroduce unlimited melee. Your P04 queue and remaining SR1/SR2 ownership stay unchanged. Main/P03 and the P04 presentation baseline below still use schema 9.
+
 ## Retrieve the current baseline
 
 Read [START_HERE](../START_HERE.md), Status/claims, [P04](../../planning/phases/intelligence/PHASE_04.md), source PDF pp. 10-14 and 16-18, code rules, architecture/data contracts and approved scoring. Read the [guard contract](../../architecture/integration/defenders/GUARD_CONTRACT.md) and the earlier [physical fixture handoff](../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md) for geometry/input/startup details.

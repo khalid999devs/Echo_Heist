@@ -11,6 +11,7 @@ from echo_heist.core.contracts.results import RunOutcome
 from echo_heist.core.contracts.world import MissionPhase
 from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.ui.audio.model import AudioFrame
+from echo_heist.ui.audio.spatial import environment_sound, stereo
 
 MUSIC = ("title", "sector", "pulse", "urgent", "transmission")
 MUSIC_GAINS = {"title": 0.40, "sector": 0.34, "pulse": 0.38, "urgent": 0.40, "transmission": 0.34}
@@ -32,6 +33,7 @@ CUES = {
         for name in ("stair-start", "stair-arrive", "core", "ready", "unavailable", "discovery")
     },
     **{name: f"ui/{name}.ogg" for name in ("adjust", "back", "toggle")},
+    **{name: f"world/interactions/{name}.wav" for name in ("door", "glass", "canister", "locker")},
     "ventilation": "ambience/ventilation.ogg",
 }
 
@@ -76,12 +78,16 @@ def event_cue(event: GameEvent) -> tuple[str, float, bool] | None:
     if event.kind == EventKind.ACTION_REJECTED and details.get("reason") in (
         "echo_empty",
         "emp_empty",
+        "melee_empty",
+        "melee_cooldown",
         "no_reachable_guard",
         "stair_landing_occupied",
         "low_headroom",
     ):
         return "unavailable", 0.15, False
     if event.kind == EventKind.TOOL_USED:
+        if details.get("tool") == "MELEE" and details.get("affected") is False:
+            return "unavailable", 0.2, False
         cue = str(details.get("tool", "")).lower()
         return (cue, 0.65, False) if cue in ("echo", "emp", "melee") else None
     if event.kind == EventKind.LOCKDOWN_STARTED:
@@ -128,6 +134,7 @@ class AudioDirector:
         self.seen: set[str] = set()
         self.seen_order: deque[str] = deque()
         self.channel_gains: dict[int, float] = {}
+        self.channel_pans: dict[int, float] = {}
         self.cues_played = 0
         self.footstep_index = 0
         self.clock_ms = 0
@@ -138,7 +145,9 @@ class AudioDirector:
         self.music_volume = max(0.0, min(1.0, music))
         self.sfx_volume = max(0.0, min(1.0, sfx))
 
-    def play(self, cue: str, gain: float, *, critical: bool = False, ui: bool = False) -> None:
+    def play(
+        self, cue: str, gain: float, *, critical: bool = False, ui: bool = False, pan: float = 0.0
+    ) -> None:
         if not self.enabled:
             return
         channel_id = (
@@ -154,15 +163,36 @@ class AudioDirector:
             return
         channel = pygame.mixer.Channel(channel_id)
         self.channel_gains[channel_id] = gain
-        channel.set_volume(gain * self.sfx_volume)
+        self.channel_pans[channel_id] = max(-1, min(1, pan))
+        self._mix_channel(channel_id, gain)
         channel.play(self.sounds[cue])
+        self._mix_channel(channel_id, gain)
         self.cues_played += 1
+
+    def _mix_channel(self, index: int, gain: float) -> None:
+        channel = pygame.mixer.Channel(index)
+        volume = gain * self.sfx_volume
+        pan = self.channel_pans.get(index, 0.0)
+        if pan and volume:
+            channel.set_volume(*stereo(volume, pan))
+        else:
+            # Mono gain preserves ordinary UI/critical channel volume reporting;
+            # zero also silences the channel irrespective of prior stereo state.
+            channel.set_volume(volume)
 
     def update(self, frame: AudioFrame, elapsed_ms: int) -> None:
         if not self.enabled:
             self.last_frame = frame
             return
         previous = self.last_frame
+        if previous is not None and (
+            frame.run_id != previous.run_id
+            or (previous.scene == "HEIST" and frame.scene != "HEIST")
+        ):
+            for index in range(4, 12):
+                pygame.mixer.Channel(index).stop()
+                self.channel_gains.pop(index, None)
+                self.channel_pans.pop(index, None)
         self.clock_ms += max(0, elapsed_ms)
         alarm = pygame.mixer.Channel(2)
         lockdown = frame.scene == "HEIST" and frame.phase == MissionPhase.LOCKDOWN
@@ -263,6 +293,17 @@ class AudioDirector:
                     name = f"{name.split('-')[0]}-{self.footstep_index % 3}"
                     self.footstep_index += 1
                 self.play(name, cue[1], critical=cue[2])
+        for environment_cue in frame.environment_cues:
+            identity = "environment:" + environment_cue.event_id
+            if identity in self.seen:
+                continue
+            if len(self.seen_order) >= 4096:
+                self.seen.discard(self.seen_order.popleft())
+            self.seen.add(identity)
+            self.seen_order.append(identity)
+            sound = environment_sound(environment_cue, frame)
+            if sound is not None:
+                self.play(sound[0], sound[1], pan=sound[2])
         desired = music_for(frame)
         if desired != self.target_music:
             self.target_music = desired
@@ -285,7 +326,7 @@ class AudioDirector:
         pygame.mixer.music.set_volume(self.music_volume * gain * duck * fade)
         for index, gain in self.channel_gains.items():
             channel = pygame.mixer.Channel(index)
-            channel.set_volume(gain * self.sfx_volume)
+            self._mix_channel(index, gain)
             if index and frame.paused:
                 channel.pause()
             else:

@@ -39,6 +39,7 @@ class GameRules:
     crouch_footstep_interval_ticks: int = 24
     sprint_footstep_interval_ticks: int = 7
     chase_guard_speed_percent: int = 115
+    melee_cooldown_ticks: int = 120
 
     def __post_init__(self) -> None:
         for field in fields(self):

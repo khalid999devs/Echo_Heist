@@ -1,0 +1,430 @@
+{
+  "date": "2026-10-31",
+  "branch": "work/khalid-p06-ui",
+  "base": "f50b08a",
+  "ui_commit": "e94dd7c",
+  "ui_credit_followup": "029f9b9",
+  "render_optimization": "caf235a",
+  "scope": "Independent P06 consumers/session controls, current-build P07 review and P08 draft preparation; full combined gates open",
+  "fingerprint_schema": 10,
+  "checks": {
+    "checkpoint_tests": 243,
+    "checkpoint_seconds": 105.72,
+    "source_modules": 150,
+    "final": "PENDING"
+  },
+  "native_ui": {
+    "video_driver": "cocoa",
+    "audio_ready": true,
+    "shots": [
+      "01-title",
+      "02-briefing",
+      "03-seed",
+      "04-general-settings",
+      "05-controls",
+      "06-key-capture",
+      "07-remapped",
+      "08-accessibility",
+      "09-session-save-notice",
+      "10-accessible-hud",
+      "11-actual-aborted-unscored",
+      "12-actual-report-unavailable",
+      "13-history-unavailable",
+      "14-workshop",
+      "15-profiles-unavailable",
+      "16-fixture-profiles",
+      "17-fixture-profile-loaded",
+      "18-fixture-delete-confirm",
+      "19-fixture-storage-failure",
+      "20-fixture-score-details",
+      "21-fixture-history",
+      "22-fixture-rank-s",
+      "23-fixture-rank-a",
+      "24-fixture-failure",
+      "25-settings-1366x768",
+      "26-controls-1366x768",
+      "25-settings-1440x900",
+      "26-controls-1440x900",
+      "25-settings-1920x1080",
+      "26-controls-1920x1080",
+      "25-settings-1024x768",
+      "26-controls-1024x768"
+    ],
+    "checks": [
+      "Actual Human input, pause/settings freeze, remapping, captions/contrast controls, confirmed abort, default unscored report and unavailable storage.",
+      "Test-only profile save/load/delete confirmation and provider error; fixed S/A/F report examples and history inspection. No backend evidence.",
+      "Visible pointer targets at 1366x768, 1440x900, 1920x1080, 1024x768."
+    ],
+    "scope": "Human/default and labeled UI fixtures; no finished P06/backend gate claim."
+  },
+  "native_human": {
+    "driver": "cocoa",
+    "outcomes": {
+      "upper": {
+        "outcome": "WIN",
+        "ticks": 1483
+      },
+      "lower": {
+        "outcome": "WIN",
+        "ticks": 1604
+      },
+      "careless": {
+        "outcome": "CAPTURED",
+        "ticks": 694
+      }
+    },
+    "decks": [
+      "ground",
+      "upper"
+    ],
+    "states": [
+      "guard-core/PATROL",
+      "guard-research/CHASE",
+      "guard-research/INVESTIGATE",
+      "guard-research/PATROL",
+      "guard-research/RETURN",
+      "guard-research/SEARCH",
+      "guard-research/SPOTTED",
+      "guard-security/INVESTIGATE",
+      "guard-security/PATROL",
+      "guard-security/RETURN",
+      "guard-security/SEARCH",
+      "guard-security/SPOTTED",
+      "guard-service/CHASE",
+      "guard-service/INVESTIGATE",
+      "guard-service/PATROL",
+      "guard-service/RETURN",
+      "guard-service/SEARCH",
+      "guard-service/SPOTTED"
+    ],
+    "traces": {
+      "fuzzy/actual-emp": {
+        "evaluated_tick": 472,
+        "cue_tick": 472,
+        "cue_tile": [
+          22,
+          20
+        ],
+        "distance_tiles": 3,
+        "salience": 1.0,
+        "visibility": 0.0,
+        "memberships": [
+          [
+            "near",
+            0.25
+          ],
+          [
+            "far",
+            0.0
+          ],
+          [
+            "loud",
+            1.0
+          ],
+          [
+            "notable",
+            0.0
+          ],
+          [
+            "partial",
+            0.0
+          ],
+          [
+            "quiet",
+            0.0
+          ]
+        ],
+        "activations": [
+          0.25,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "outputs": [
+          0.95,
+          0.8,
+          0.45,
+          0.1,
+          0.6
+        ],
+        "urgency": 0.95
+      }
+    },
+    "capture_frames": {
+      "guard-service": 13,
+      "guard-research": 1
+    },
+    "screens": [
+      "capture/result",
+      "capture/wind-up",
+      "fuzzy/actual-emp",
+      "guards/guard-core-patrol",
+      "guards/guard-core-patrol-lab",
+      "guards/guard-research-chase",
+      "guards/guard-research-chase-lab",
+      "guards/guard-research-search",
+      "guards/guard-research-search-lab",
+      "guards/guard-research-spotted",
+      "guards/guard-research-spotted-lab",
+      "guards/guard-security-investigate",
+      "guards/guard-security-investigate-lab",
+      "guards/guard-security-patrol",
+      "guards/guard-security-patrol-lab",
+      "guards/guard-security-spotted",
+      "guards/guard-security-spotted-lab",
+      "guards/guard-service-chase",
+      "guards/guard-service-chase-lab",
+      "guards/guard-service-patrol",
+      "guards/guard-service-patrol-lab",
+      "guards/guard-service-spotted",
+      "guards/guard-service-spotted-lab",
+      "hiding/unseen-under-desk",
+      "layouts/1366x768-guard-1",
+      "layouts/1366x768-guard-2",
+      "layouts/1366x768-guard-3",
+      "layouts/1366x768-guard-4",
+      "layouts/1440x820-guard-1",
+      "layouts/1440x820-guard-2",
+      "layouts/1440x820-guard-3",
+      "layouts/1440x820-guard-4",
+      "layouts/1470x923-guard-1",
+      "layouts/1470x923-guard-2",
+      "layouts/1470x923-guard-3",
+      "layouts/1470x923-guard-4",
+      "routes/lower-lockdown",
+      "routes/lower-win",
+      "routes/upper-lockdown",
+      "routes/upper-win"
+    ],
+    "layouts": [
+      {
+        "actual": [
+          1366,
+          768
+        ],
+        "logical": [
+          1281,
+          720
+        ],
+        "fullscreen": false,
+        "guard_clicks": 4
+      },
+      {
+        "actual": [
+          1440,
+          820
+        ],
+        "logical": [
+          1280,
+          729
+        ],
+        "fullscreen": false,
+        "guard_clicks": 4
+      },
+      {
+        "actual": [
+          1470,
+          923
+        ],
+        "logical": [
+          1280,
+          804
+        ],
+        "fullscreen": true,
+        "guard_clicks": 4
+      }
+    ],
+    "unseen_hiding": "PASS",
+    "diagnostics_read_only": "PASS",
+    "frames": 4010,
+    "render_audio_present_ms": {
+      "median": 10.04,
+      "p95": 13.73,
+      "max": 765.75
+    },
+    "scope": "Accelerated native Human input, default four-guard security. Timing excludes simulation; room cameras are diagnostic only."
+  },
+  "replay_header": {
+    "fingerprint_schema": 10,
+    "game_version": "0.1.0a1",
+    "map_hash": "967e2c0597e6584b887db9616efde7ae4e4b416e1b1d38d5d79763256ad3f697",
+    "map_id": "vault-five-zone",
+    "mode": "HUMAN",
+    "registry_revision": "29b5e21f3afa0e7ff65714617d96cc78401a8d09bcaa8a5ccd531e80d2b7e27b",
+    "replay_schema": 1,
+    "rules_hash": "3f3ca42ccd1a881f2487707cf57b2a5d85778412ddae6ce5027a795dc5fa791e",
+    "seed": 1042,
+    "sensor_hash": "4594f530d051eb37885f50d3ab547330f510faa0ecf8c7115ba408a84dfd0546",
+    "simulation_hz": 30
+  },
+  "replays": [
+    {
+      "event_chain_hash": "e2a4b1b00ff3e6f70f1c5ec07490bf66a0dc5989d9bcac3486b282f4b1eb5e9e",
+      "final_fingerprint": "15af548c689226ae3c60bbcc43d35342326ea6d27ed5863f0a9c136a8b518ed3",
+      "name": "upper-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "ticks": 1513
+    },
+    {
+      "event_chain_hash": "e6314f3ca0df1a76b2091eb9f93a34dd2b8c9dcb9003f2f0a8c7fcaa34e15904",
+      "final_fingerprint": "6a16cddbac13672ad1c8cf273de48a103a2d5475d6921611267575e022be37e8",
+      "name": "lower-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "ticks": 1581
+    },
+    {
+      "event_chain_hash": "5361dd314c85f5407ddef7e81cfe203cbf3e2ff3fccb8f76a7376eb9b32986c7",
+      "final_fingerprint": "84da84e0ccbe05b54a8c21a40ef050faec4be47f667de0c21bc0e82755379371",
+      "name": "cross-tools",
+      "outcome": "WIN",
+      "replay_matched": true,
+      "ticks": 1603
+    },
+    {
+      "event_chain_hash": "17bfabc682c06e25660eaa24e2effa8bdfdc814d56136d63ff0ea9dcd45eb212",
+      "final_fingerprint": "08d308126f944deba90db03b9439f6b3d2b92be7fc5dd961a84e459707227ac2",
+      "name": "upper-no-tools",
+      "outcome": "CAPTURED",
+      "replay_matched": true,
+      "ticks": 1174
+    },
+    {
+      "event_chain_hash": "6061ff5d4bb2e92adca992edec013e2e63531345b224cc9168712c161a82ce7e",
+      "final_fingerprint": "65cf5d727758f5dfc3be931ad62b275a278d86d1ba530af8d6c6f071042872ed",
+      "name": "lower-no-tools",
+      "outcome": "CAPTURED",
+      "replay_matched": true,
+      "ticks": 349
+    }
+  ],
+  "all_hashes_match_melee": true,
+  "performance_first": {
+    "cycles": 12,
+    "frames": 3600,
+    "measured_frames_after_warmup": 3000,
+    "frame_ms": {
+      "update": {
+        "median": 4.595,
+        "p95": 6.286,
+        "max": 10.684
+      },
+      "draw": {
+        "median": 17.318,
+        "p95": 51.341,
+        "max": 59.662
+      },
+      "present": {
+        "median": 1.76,
+        "p95": 2.4,
+        "max": 1115.59
+      },
+      "total": {
+        "median": 23.089,
+        "p95": 59.317,
+        "max": 1132.924
+      }
+    },
+    "last_six_rss_span_mb": 108.15,
+    "python_growth_after_warmup_mb": 1.057,
+    "rss_change_from_warmup_mb": -75.19,
+    "bounded_in_this_run": true
+  },
+  "performance_isolated_before_optimization": {
+    "cycles": 12,
+    "frames": 3600,
+    "measured_frames_after_warmup": 3000,
+    "frame_ms": {
+      "update": {
+        "median": 4.182,
+        "p95": 6.246,
+        "max": 122.727
+      },
+      "draw": {
+        "median": 16.952,
+        "p95": 51.534,
+        "max": 59.87
+      },
+      "present": {
+        "median": 1.727,
+        "p95": 2.249,
+        "max": 7.131
+      },
+      "total": {
+        "median": 22.758,
+        "p95": 59.393,
+        "max": 141.163
+      }
+    },
+    "last_six_rss_span_mb": 11.81,
+    "python_growth_after_warmup_mb": 1.056,
+    "rss_change_from_warmup_mb": -141.39,
+    "bounded_in_this_run": true
+  },
+  "performance_final": "PENDING: final off-screen cone culling measurement",
+  "native_build": "PENDING",
+  "ci": "PENDING",
+  "screenshots_sha256": {
+    "native/01-title.png": "b7183798ade834b0a68ad0fd9176264224cb711b67cb600af283c992ba69cac7",
+    "native/02-briefing.png": "392c5914012ec5adc3c1d56e6774d03b53443d8db0139b074c605732855ec863",
+    "native/03-seed.png": "de09c8433a43eeea15c86b7ceb3b6046554ac6022676fe7dac95de45a8f367fb",
+    "native/04-general-settings.png": "b608546bb0120f33b0df87116bd41a5933ace28e0e8c4dac03cb502d66013b09",
+    "native/05-controls.png": "9fb4e401f13d04e546ff3b391e0d14cfd8190b7ee7b5fd2543f3e2b2a5729092",
+    "native/06-key-capture.png": "fee0e006d62ee2ae80d1782966cddac446493a86abab90b5cbf040b71fea0470",
+    "native/07-remapped.png": "35fcdc83a7dea0be5f811f7ee03137f2b612e17b6075c0577faa14c1553fc92b",
+    "native/08-accessibility.png": "aa98bbb50f4f02e755c45ec59be275d102b7b0002c936fa3cb8bc98d5302b74e",
+    "native/09-session-save-notice.png": "d5b394de0d0b23116ff9ee8679031e79ce38a6591a08c6f37ad7f6ff4373ccea",
+    "native/10-accessible-hud.png": "97b2696574cacdd4fc8d871d2400b1a217bdaee70db5af212bf724bf2e47679e",
+    "native/11-actual-aborted-unscored.png": "be1c436772244004997b14d5d5ffdf2fca621686bd77658d8eed2a16722cc196",
+    "native/12-actual-report-unavailable.png": "05df31b897af2a1c4468c27132e146b7a411c8e1d8ecbb2567485e806e6bb6c9",
+    "native/13-history-unavailable.png": "60d4ac2c444a2c273a8535c79f24da6ef71d63ad838dc7910ba3d37a6cd381ee",
+    "native/14-workshop.png": "1d17b8bb77ced0da678322e2e9a4a3e363b4d164039762dfbdfe67a8f1cf9a88",
+    "native/15-profiles-unavailable.png": "9a84da264e7b26938b03a1ec437cf0989840e030ddcad0c09c4baf237be1a9e2",
+    "native/16-fixture-profiles.png": "08714e4dce83292409bc6ee3dc434c665e1c57a91e59984139beac9c78f55c40",
+    "native/17-fixture-profile-loaded.png": "5e46c47cba86ed9940218941298b69d5719e067c93e1e2c995791325ad7ceb88",
+    "native/18-fixture-delete-confirm.png": "b3eb31f38be42bd90544bf28dd24e0d8bd802d3adb06225db3a03445790c6b11",
+    "native/19-fixture-storage-failure.png": "0a21bc4b1b60b7e63bdf4fc04794083a4469c1b71f73398cda46f388ab6384ba",
+    "native/20-fixture-score-details.png": "5cb458c9d7af5d065d2d263d5d6ff33237637f7855fde515ff4566d28c94a658",
+    "native/21-fixture-history.png": "0f02276bfd62df44f314b965b514cac43e02bff0aa579a24d6e34508438a5bf1",
+    "native/22-fixture-rank-s.png": "7cb02506eb07182ff55a5d00e08bad775f1e229653f4bcf54db447e77bbebe56",
+    "native/23-fixture-rank-a.png": "ae31b79ab78917872ee22ec85466ba4214f2b7fa5f5d0b78e3b78e83ba64a8f9",
+    "native/24-fixture-failure.png": "288b5ad57fe98668bf107ba3587d0f54dd6c69195fc2239b24712a4bbabd8b57",
+    "native/25-settings-1024x768.png": "4fa194818eb3060fe6c95e68ea9ef10300f07046d6582029e2c77eb7d403bb0a",
+    "native/25-settings-1366x768.png": "7179985efe6132a1f61442fd7134cac1f7c81a68d229465f8e0dbc504a9b53ef",
+    "native/25-settings-1440x900.png": "d020b256dced92ec673bcaeb3737055545efb36d9f1aad9c5e8f110b2552af05",
+    "native/25-settings-1920x1080.png": "31bcbc4ec2b3ae875e4e6fbb956b4a53e30e95f2124aa6fd44e5b3d5bcf613fa",
+    "native/26-controls-1024x768.png": "148edfd177b3031defb46a49587bbf1e01cc77854302df32c5be48b79cca2fdf",
+    "native/26-controls-1366x768.png": "a287e1a7561fc39edb1700037e1e4b439d93ba6974274fc51cdb674f31ff135e",
+    "native/26-controls-1440x900.png": "28e32176a1c10615c081483f263f98bd5b657736f040258817dcceef3ebcac01",
+    "native/26-controls-1920x1080.png": "c485bd678989aaa7d7b9b070a33fc6a7bec02bdae20508c7e3f9987c488fdec0"
+  },
+  "performance_minimap_observation_optimization": {
+    "frame_ms": {
+      "update": {
+        "median": 4.718,
+        "p95": 7.003,
+        "max": 249.142
+      },
+      "draw": {
+        "median": 13.377,
+        "p95": 46.948,
+        "max": 73.115
+      },
+      "present": {
+        "median": 1.978,
+        "p95": 3.187,
+        "max": 33.648
+      },
+      "total": {
+        "median": 19.963,
+        "p95": 55.625,
+        "max": 291.953
+      }
+    },
+    "last_six_rss_span_mb": 11.66,
+    "python_growth_after_warmup_mb": 1.059,
+    "bounded_in_this_run": true
+  }
+}

@@ -25,7 +25,9 @@ class ObjectiveView:
     melee_cooldown_remaining: int = 0
 
 
-def build_objective_view(observation: Observation, *, ticks_per_second: int) -> ObjectiveView:
+def build_objective_view(
+    observation: Observation, *, ticks_per_second: int, interact_key: str = "E"
+) -> ObjectiveView:
     if ticks_per_second <= 0:
         raise ValueError("Tick rate must be positive")
     objective = {
@@ -47,7 +49,7 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
             "LeaveHide": "Leave cover",
             "Canister": "Push canister",
         }.get(hint.kind, "Interact")
-        interaction = ("Hold E  " if hint.required_ticks > 1 else "E  ") + label
+        interaction = (("Hold " if hint.required_ticks > 1 else "") + interact_key + "  ") + label
         if hint.required_ticks > 1:
             interaction_progress = hint.progress_ticks, hint.required_ticks
     inventory = observation.own_status.inventory

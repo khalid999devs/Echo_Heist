@@ -170,6 +170,10 @@ def draw_hud(
     autonomous: bool = False,
     capture: CaptureView | None = None,
     feedback: Feedback | None = None,
+    tool_keys: tuple[str, ...] = ("Q", "F", "SPACE"),
+    sprint_key: str = "SHIFT",
+    crouch_key: str = "C",
+    control_hint: str = "WASD Move  C Crouch  SHIFT Sprint",
 ) -> None:
     _objective(
         canvas, view, zone_label, level, operative_tile, phase, fonts, capture, ticks_per_second
@@ -214,11 +218,15 @@ def draw_hud(
         if recharge
         else view.sprint_ticks_remaining / max(1, sprint_duration_ticks)
     )
-    label = f"READY IN  {recharge / max(1, ticks_per_second):.1f}s" if recharge else "SHIFT  Sprint"
+    label = (
+        f"READY IN  {recharge / max(1, ticks_per_second):.1f}s"
+        if recharge
+        else f"{sprint_key} Sprint"
+    )
     if autonomous and not recharge:
         label = "AI / SPRINT"
     if crouched:
-        label = "UNDER DESK" if concealed else "C  Crouched"
+        label = "UNDER DESK" if concealed else f"{crouch_key} Crouched"
     _label(
         canvas,
         fonts.micro,
@@ -235,9 +243,9 @@ def draw_hud(
     )
     for index, (key, name, count) in enumerate(
         (
-            ("Q", "ECHO", str(view.echo_charges)),
-            ("F", "EMP", str(view.emp_charges)),
-            ("SPACE", "STUN", str(view.melee_charges)),
+            (tool_keys[0], "ECHO", str(view.echo_charges)),
+            (tool_keys[1], "EMP", str(view.emp_charges)),
+            (tool_keys[2], "STUN", str(view.melee_charges)),
         )
     ):
         left = canvas.get_width() - 372 + index * 118
@@ -265,7 +273,13 @@ def draw_hud(
             seconds = ceil(view.melee_cooldown_remaining * 10 / ticks_per_second) / 10
             count = f"{view.melee_charges} / {seconds:.1f}s"
             color = theme.MUTED
-        _label(canvas, fonts.micro, "AI" if autonomous else key, color, (left + 10, rect.y + 9))
+        _label(
+            canvas,
+            fonts.micro,
+            "AI" if autonomous else fit(fonts.micro, key, 90),
+            color,
+            (left + 10, rect.y + 9),
+        )
         _label(canvas, fonts.small, name, theme.TEXT, (left + 10, rect.y + 29))
         _label(
             canvas,
@@ -296,7 +310,7 @@ def draw_hud(
             (canvas.get_width() // 2 - fonts.micro.size(hint)[0] // 2, canvas.get_height() - 35),
         )
     elif clock_ms < 7_000 and not teaching_view:
-        hint = "WASD  Move    C  Crouch    SHIFT  Sprint    ESC  Pause"
+        hint = control_hint + "    ESC Pause"
         _label(
             canvas,
             fonts.micro,

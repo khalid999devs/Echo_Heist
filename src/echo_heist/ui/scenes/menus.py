@@ -8,13 +8,24 @@ import pygame
 
 from echo_heist import __version__
 from echo_heist.core.contracts.autonomy.model import ProtocolState
-from echo_heist.core.contracts.results import MissionEnd, RunOutcome
 from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.hud import panel
 from echo_heist.ui.render.layout.text import fit, lines
 from echo_heist.ui.render.surfaces.cinematic import BACKDROP_PAD, draw_scene
 from echo_heist.ui.render.theme import Fonts
+from echo_heist.ui.scenes.experience.report import (
+    RESULT_MENU as RESULT_MENU,
+)
+from echo_heist.ui.scenes.experience.report import (
+    RESULT_RETRY as RESULT_RETRY,
+)
+from echo_heist.ui.scenes.experience.report import (
+    RESULT_STORY as RESULT_STORY,
+)
+from echo_heist.ui.scenes.experience.report import (
+    draw_results as draw_results,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -53,9 +64,6 @@ MODE_BUTTONS = (
     LAUNCH_BUTTON,
     BACK_BUTTON,
 )
-RESULT_RETRY = pygame.Rect(660, 590, 552, 48)
-RESULT_MENU = pygame.Rect(660, 648, 552, 48)
-RESULT_STORY = pygame.Rect(660, 532, 552, 42)
 
 
 def load_backdrop(
@@ -107,6 +115,11 @@ def _frame(
     *,
     briefing: bool,
     paint_background: bool = True,
+    control_hints: tuple[str, str, str] = (
+        "E",
+        "W/A/S/D Move  C Crouch  SHIFT Sprint",
+        "Q Echo  F EMP  SPACE Stun",
+    ),
 ) -> None:
     if paint_background:
         draw_scene(canvas, backdrop, clock_ms, reduced_motion=reduced_motion)
@@ -235,13 +248,18 @@ def _briefing(
     clock_ms: int,
     companion_available: bool = False,
     protocols: ProtocolState | None = None,
+    control_hints: tuple[str, str, str] = (
+        "E",
+        "W/A/S/D Move  C Crouch  SHIFT Sprint",
+        "Q Echo  F EMP  SPACE Stun",
+    ),
 ) -> None:
     panel(canvas, pygame.Rect(44, 184, 520, 440), fill=(5, 18, 28, 227), border=theme.BORDER)
     _text(canvas, fonts.micro, "CHAPTER 01", theme.ACCENT, (64, 204))
     _text(canvas, fonts.heading, "The Core Rebellion", theme.TEXT, (62, 229))
     steps = (
         ("01  INFILTRATE", "Take either stairway to the upper floor."),
-        ("02  RECOVER", "Hold E beside the experimental Core."),
+        ("02  RECOVER", f"Hold {control_hints[0]} beside the experimental Core."),
         ("03  EXTRACT", "Escape lockdown. Return downstairs."),
     )
     for index, (label, description) in enumerate(steps):
@@ -264,11 +282,17 @@ def _briefing(
         _text(
             canvas,
             fonts.micro,
-            "WASD Move  C Crouch  SHIFT Sprint  E Stairs / Core",
+            fit(fonts.micro, control_hints[1], 480),
             theme.MUTED,
             (64, 546),
         )
-        _text(canvas, fonts.micro, "Q Echo   F EMP   SPACE Stun   TAB Map", theme.MUTED, (64, 578))
+        _text(
+            canvas,
+            fonts.micro,
+            fit(fonts.micro, control_hints[2] + "  TAB Map", 480),
+            theme.MUTED,
+            (64, 578),
+        )
     panel(canvas, pygame.Rect(600, 184, 616, 440), fill=(5, 18, 28, 219), border=theme.BORDER)
     _text(canvas, fonts.micro, "PLAY MODE", theme.MUTED, (620, 204))
     for index, item in enumerate(MODE_ITEMS[:2]):
@@ -326,6 +350,11 @@ def draw_menu(
     companion_available: bool = False,
     protocols: ProtocolState | None = None,
     paint_background: bool = True,
+    control_hints: tuple[str, str, str] = (
+        "E",
+        "W/A/S/D Move  C Crouch  SHIFT Sprint",
+        "Q Echo  F EMP  SPACE Stun",
+    ),
 ) -> None:
     briefing = scene == "MODE"
     _frame(
@@ -373,7 +402,16 @@ def draw_menu(
             (44, 674),
         )
     else:
-        _briefing(canvas, fonts, selected, mode_choice, clock_ms, companion_available, protocols)
+        _briefing(
+            canvas,
+            fonts,
+            selected,
+            mode_choice,
+            clock_ms,
+            companion_available,
+            protocols,
+            control_hints,
+        )
         if notice:
             panel(canvas, pygame.Rect(600, 640, 616, 32), fill=(5, 18, 28, 240))
             _text(canvas, fonts.micro, notice, theme.WARNING, (612, 647))
@@ -385,75 +423,3 @@ def draw_menu(
             theme.MUTED,
             (600, 680),
         )
-
-
-def draw_results(
-    canvas: pygame.Surface,
-    end: MissionEnd,
-    fonts: Fonts,
-    *,
-    ticks_per_second: int,
-    hovered: str | None = None,
-    clock_ms: int = 0,
-    autonomous: bool = False,
-) -> None:
-    """Report only committed mission facts; final score/rank is a P06 rule."""
-    seconds = end.elapsed_ticks // max(1, ticks_per_second)
-    color = {
-        RunOutcome.WIN: theme.ACCENT,
-        RunOutcome.CAPTURED: theme.DANGER,
-        RunOutcome.ABORTED: theme.WARNING,
-    }[end.outcome]
-    _text(canvas, fonts.micro, "CHAPTER 01  /  MISSION REPORT", color, (660, 115))
-    pygame.draw.line(canvas, color, (660, 148), (1212, 148), 2)
-    headline = {
-        RunOutcome.WIN: ("CORE", "EXTRACTED"),
-        RunOutcome.CAPTURED: ("OPERATIVE", "CAPTURED"),
-        RunOutcome.ABORTED: ("MISSION", "ABORTED"),
-    }[end.outcome]
-    _text(canvas, fonts.title, headline[0], theme.TEXT, (655, 185))
-    _text(canvas, fonts.title, headline[1], color, (655, 246))
-    pygame.draw.line(canvas, theme.BORDER, (660, 359), (1212, 359), 1)
-    _text(canvas, fonts.micro, "MISSION TIME", theme.MUTED, (662, 383))
-    _text(canvas, fonts.stat, f"{seconds // 60:02d}:{seconds % 60:02d}", theme.TEXT, (658, 410))
-    objective = "RECOVERED" if end.outcome == RunOutcome.WIN else "NOT EXTRACTED"
-    _text(canvas, fonts.micro, "CORE STATUS", theme.MUTED, (960, 383))
-    _text(canvas, fonts.body, objective, color, (958, 424))
-    _text(
-        canvas,
-        fonts.small,
-        "The core is safe. You made it out."
-        if end.outcome == RunOutcome.WIN
-        else "Break line of sight. Choose another route."
-        if end.outcome == RunOutcome.CAPTURED
-        else "Ready when you are.",
-        theme.MUTED,
-        (662, 492),
-    )
-    glow = round(8 * (1 + sin(clock_ms / 280))) if hovered == "RETRY" else 0
-    if end.outcome == RunOutcome.WIN:
-        _button(
-            canvas,
-            RESULT_STORY,
-            "C  ENCRYPTED TRANSMISSION",
-            fonts,
-            selected=hovered == "STORY",
-            enabled=True,
-            clock_ms=clock_ms,
-        )
-    panel(canvas, RESULT_RETRY, fill=(5, 42 + glow, 56 + glow, 185), border=theme.ACCENT)
-    _text(
-        canvas,
-        fonts.small,
-        "R  REVIEW & RETRY" if autonomous else "R  RETRY MISSION",
-        theme.ACCENT,
-        (678, 605),
-    )
-    panel(
-        canvas,
-        RESULT_MENU,
-        fill=(6, 34, 45, 230) if hovered == "MENU" else theme.PANEL,
-        border=theme.ACCENT if hovered == "MENU" else theme.BORDER,
-    )
-    _text(canvas, fonts.small, "ENTER  MAIN MENU", theme.TEXT, (678, 663))
-    _text(canvas, fonts.micro, "ESC MENU", theme.MUTED, (1127, 666))

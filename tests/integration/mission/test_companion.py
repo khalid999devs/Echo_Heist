@@ -23,7 +23,7 @@ from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import SecurityRegistry, build_security_registry
 
-WIN_SEED, CAPTURE_SEED = 6, 1  # Balanced outcomes on this map/rules revision
+WIN_SEED, CAPTURE_SEED = 6, 4  # Balanced outcomes on this map/rules (two-charge melee)
 
 
 @pytest.fixture(scope="module")
@@ -65,7 +65,15 @@ def play(run: AutonomousMission, limit: int = 9_000) -> tuple[list[CompanionTrac
 
 
 @pytest.mark.parametrize(
-    ("seed", "outcome"), [(WIN_SEED, RunOutcome.WIN), (CAPTURE_SEED, RunOutcome.CAPTURED)]
+    ("seed", "outcome"),
+    [
+        (WIN_SEED, RunOutcome.WIN),
+        (CAPTURE_SEED, RunOutcome.CAPTURED),
+        # Formerly stalled: a gate-holding Interceptor (default seed) and a
+        # grab/escape alternation (34). Both must now be decided by real play.
+        (1042, RunOutcome.WIN),
+        (34, RunOutcome.WIN),
+    ],
 )
 def test_companion_genuinely_wins_or_is_captured_without_recordings(
     level: LevelData,

@@ -16,7 +16,12 @@ from random import Random
 from echo_heist.ai.companion import tactics
 from echo_heist.ai.companion.belief import Beliefs
 from echo_heist.ai.companion.briefing import MissionBriefing, PolicyWeights, policy_weights
-from echo_heist.ai.companion.utility import Override, active_guards, emergency
+from echo_heist.ai.companion.utility import (
+    Override,
+    active_guards,
+    emergency,
+    melee_available,
+)
 from echo_heist.ai.navigation.astar import astar
 from echo_heist.ai.navigation.grid import distances_from
 from echo_heist.ai.navigation.routes import ZoneRoute, zone_routes
@@ -40,13 +45,14 @@ CLEAR_TICKS = 60
 BREADCRUMBS = 150
 FLEE = "FLEE"
 BODY_COST = 60
-BLOCK_TILES = 4
 JAM_TICKS = 90
 FLEE_LIMIT_TICKS = 180
 JAM_COST = 400
 ALERT_TICKS = 150
 STALL_TICKS = 600
 FLEE_TICKS = 75
+BLOCK_TILES = 4
+ABANDON_TICKS = 180
 
 
 @dataclass(frozen=True, slots=True)
@@ -98,10 +104,14 @@ class CompanionController:
         self.last_tick = -1
         self.last_watched = -10_000
         self.jammed: dict[Tile, int] = {}
+        # Routes given up by ALTERNATE stay excluded briefly, so the choice commits.
+        self.abandoned: dict[tuple[str, ...], int] = {}
         self.flee_started = -1
         self.progress_tick = 0
         self.previous: Position | None = None
         self.still_ticks = 0
+        self.tile_ticks = 0  # ticks spent on the current tile (survives body jitter)
+        self.last_tile: Tile | None = None
         self.crumbs: deque[Tile] = deque(maxlen=BREADCRUMBS)
         self.melee_ready_at: dict[str, int] = {}
         self.echo_ready_at = 0
@@ -145,6 +155,9 @@ class CompanionController:
         carrying = own.inventory.core_held
         remaining = self.legs[0].route.nodes[self.progress :] if self.legs else ()
         legs = self._legs_from(own.tile, self._goal(observation), observation)
+        tick = observation.tick
+        open_legs = tuple(leg for leg in legs if self.abandoned.get(leg.route.nodes, -1) < tick)
+        legs = open_legs or legs
         # Keep the branch being followed first so ADVANCE means "continue".
         legs = tuple(sorted(legs, key=lambda leg: leg.route.nodes != remaining))
         self.legs, self.progress = legs, 0
@@ -170,6 +183,8 @@ class CompanionController:
             carrying=carrying,
             echo=own.inventory.echo_charges,
             emp=own.inventory.emp_charges,
+            melee=own.inventory.melee_charges,
+            melee_wait=own.melee_cooldown_remaining / self.rules.simulation_hz,
             seconds=0.0,
             # Recently seen in a cone: the defenders are alerted and converging.
             detections=tactics.ALERT_DETECTIONS
@@ -196,7 +211,7 @@ class CompanionController:
             {gid: brief.kind for gid, brief in guards.items()},
             hide_zones,
             own.inventory.emp_charges > 0 and within(self.rules.emp_radius_units * 8 // 10),
-            within(self.rules.melee_range_units),
+            melee_available(observation) and within(self.rules.melee_range_units),
             len(self.crumbs) > 8,
             not self.beliefs.visible
             and any(observation.tick - seen.tick <= 150 for seen in self.beliefs.sightings.values())
@@ -205,6 +220,7 @@ class CompanionController:
             {gid: self.beliefs.prior(brief) for gid, brief in guards.items()},
             self._branch_threatened(observation, legs),
             observation.tick - self.progress_tick >= STALL_TICKS,
+            melee_recovery=self.rules.melee_cooldown_ticks / self.rules.simulation_hz,
         )
         result: MctsResult[str] = search(
             model, iterations=ITERATIONS, max_depth=MAX_DEPTH, rng=self.rng
@@ -223,6 +239,7 @@ class CompanionController:
             + f" after {self.trigger}"
         )
         if choice == tactics.ALTERNATE and len(legs) > 1:
+            self.abandoned[legs[0].route.nodes] = observation.tick + ABANDON_TICKS
             self.legs = (*legs[1:], legs[0])
             self.directive = Directive(tactics.ADVANCE)
         elif choice == tactics.WAIT:
@@ -387,6 +404,12 @@ class CompanionController:
             self.path_goal = None
         return Action(self.actor_id, ActionKind.MOVE, tick, direction, sprint=sprint)
 
+    def _avoid(self, guard: Position, tick: int) -> None:
+        tile = (guard[0] // UNIT, guard[1] // UNIT)
+        for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)):
+            self.jammed[(tile[0] + dx, tile[1] + dy)] = tick + JAM_TICKS
+        self.path_goal = None
+
     def _escape(self, observation: Observation, away: Position) -> Action:
         own = observation.own_status
         position = own.position or tile_center(own.tile)
@@ -401,8 +424,9 @@ class CompanionController:
         if not options:
             return Action(self.actor_id, ActionKind.WAIT, observation.tick)
         options.sort()
-        direction = options[0][1]
-        del position
+        # A rejected step (a body or an exact fixture edge) rotates to the next option.
+        choice = (self.still_ticks // 3) % len(options) if self.previous == position else 0
+        direction = options[choice][1]
         return Action(
             self.actor_id, ActionKind.MOVE, observation.tick, direction, sprint=not own.crouched
         )
@@ -518,12 +542,28 @@ class CompanionController:
         if own.stair_ticks_remaining or phase in ("WIN", "CAPTURED"):
             return Action(self.actor_id, ActionKind.WAIT, tick)
         self.still_ticks = self.still_ticks + 1 if self.previous == position else 0
+        self.tile_ticks = self.tile_ticks + 1 if self.last_tile == own.tile else 0
+        self.last_tile = own.tile
         watched = self.beliefs.watched_by(observation, own.tile)
         if watched is not None:
             self.last_watched = tick
         override = emergency(
-            observation, self.rules, self.weights.emergency, self.melee_ready_at, watched
+            observation,
+            self.rules,
+            self.weights.emergency,
+            self.melee_ready_at,
+            watched,
         )
+        if override is not None and override.kind == "ESCAPE" and override.away_from:
+            grabbed = own.capture_ticks_remaining is not None
+            if grabbed or self.tile_ticks >= STUCK_TICKS:
+                # Remember where this guard stands so the route stops leading back
+                # into its reach (otherwise grab/escape can alternate forever).
+                self._avoid(override.away_from, tick)
+            if not grabbed and self.tile_ticks >= STUCK_TICKS:
+                # Backing off gains nothing and the guard is not grabbing (e.g. it
+                # holds a gate): let the strategy pick another way out.
+                self.pending, override = "escape blocked", None
         action = self._override(observation, override) if override else None
         self.utility = (override.kind, override.reason) if override and action else ("", "")
         if action is None:
@@ -541,7 +581,8 @@ class CompanionController:
                 else "inability to progress"
                 if tick - self.progress_tick == STALL_TICKS
                 else "being stuck"
-                if self.still_ticks >= STUCK_TICKS and self.directive.action == tactics.ADVANCE
+                if (self.still_ticks >= STUCK_TICKS or self.tile_ticks >= 2 * STUCK_TICKS)
+                and self.directive.action == tactics.ADVANCE
                 else "finishing a hold"
                 if self.directive.until_tick and tick >= self.directive.until_tick
                 else ""
@@ -579,18 +620,14 @@ class CompanionController:
         if override.kind == "ESCAPE" and override.away_from is not None:
             return self._escape(observation, override.away_from)
         if override.kind == "REACT" and self.directive.action != FLEE:
-            # Seen in a cone: break line of sight now. Sentinels are slower than
-            # a walking intruder, so moving away beats freezing or hiding in view.
-            if (
-                self.weights.preferred == "ECHO"
-                and own.inventory.echo_charges > 0
-                and tick >= self.echo_ready_at
-            ):
-                self.directive = Directive(FLEE, tick + FLEE_TICKS)
-                return Action(self.actor_id, ActionKind.ECHO, tick)
+            if self.weights.sprint:
+                # Non-cautious policies press on: a patrol is slower than a moving
+                # intruder, while turning back hands it time and the dead-end entry
+                # (measured on the packaged map). Grabs are still handled above.
+                return None
             watcher = self.beliefs.watched_by(observation, own.tile)
             ahead = self._route_goal(observation)
-            # Only turn back when the watcher stands close ahead on the way.
+            # Only a watcher standing close ahead on the way blocks the route.
             blocked = (
                 watcher is not None
                 and abs(watcher.tile[0] - own.tile[0]) + abs(watcher.tile[1] - own.tile[1])
@@ -598,6 +635,14 @@ class CompanionController:
                 and abs(watcher.tile[0] - ahead[0]) + abs(watcher.tile[1] - ahead[1])
                 < abs(own.tile[0] - ahead[0]) + abs(own.tile[1] - ahead[1])
             )
+            # Cautious policy: break line of sight, backing off if the watcher blocks.
+            if (
+                self.weights.preferred == "ECHO"
+                and own.inventory.echo_charges > 0
+                and tick >= self.echo_ready_at
+            ):
+                self.directive = Directive(FLEE, tick + FLEE_TICKS)
+                return Action(self.actor_id, ActionKind.ECHO, tick)
             self.directive = Directive(
                 FLEE, tick + FLEE_TICKS, self._safe_crumb(tick, far=True) if blocked else None
             )
@@ -622,7 +667,7 @@ class CompanionController:
             }
             if stock.get(kind, 1) > 0 and kind != ActionKind.MELEE:
                 return Action(self.actor_id, kind, tick)
-            if kind == ActionKind.MELEE:
+            if kind == ActionKind.MELEE and melee_available(observation):
                 target = min(
                     active_guards(observation),
                     key=lambda e: abs(e.tile[0] - own.tile[0]) + abs(e.tile[1] - own.tile[1]),
@@ -653,7 +698,9 @@ class CompanionController:
         if directive.action == FLEE:
             if self.flee_started < 0:
                 self.flee_started = tick
-            if self.still_ticks >= STUCK_TICKS // 2 and directive.goal is None:
+            if (
+                self.still_ticks >= STUCK_TICKS // 2 or self.tile_ticks >= STUCK_TICKS
+            ) and directive.goal is None:
                 # The way forward stays jammed: turn back along remembered tiles.
                 self.directive = directive = Directive(
                     FLEE, directive.until_tick, self._safe_crumb(tick, far=True)
@@ -688,7 +735,11 @@ class CompanionController:
             return False
         if self.directive.action in (FLEE, tactics.RETREAT):
             return True  # breaking contact outweighs the louder footsteps
-        return self.weights.sprint_always or (self.weights.sprint and own.inventory.core_held)
+        # Transit between briefed patrol sectors is fastest at the timed sprint;
+        # Simulation still enforces its three-second burst and recharge.
+        return self.weights.sprint_always or (
+            self.weights.sprint and (own.inventory.core_held or self.state == "INFILTRATE")
+        )
 
     # --------------------------------------------------------------- telemetry
     def _record(self, observation: Observation) -> None:

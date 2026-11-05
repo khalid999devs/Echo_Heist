@@ -202,7 +202,7 @@ def main() -> int:
         for preset in PRESETS
         for seed in range(args.seeds)
     ]
-    repeat = companion_run(level, rules, sensors, registry, "BALANCED", 6)
+    repeat = companion_run(level, rules, sensors, registry, "BALANCED", 0)
     summary = {}
     for preset in PRESETS:
         rows = [row for row in runs if row["preset"] == preset]
@@ -227,8 +227,8 @@ def main() -> int:
     deterministic = {
         "runs": runs,
         "summary": summary,
-        "repeat_balanced_seed_6_matches": repeat["fingerprint"]
-        == next(r["fingerprint"] for r in runs if r["preset"] == "BALANCED" and r["seed"] == 6),
+        "repeat_balanced_seed_0_matches": repeat["fingerprint"]
+        == next(r["fingerprint"] for r in runs if r["preset"] == "BALANCED" and r["seed"] == 0),
         "interceptor_parity": interceptor_parity(level, rules, registry),
         "protocol_reset": reset_check(level, rules, sensors),
         "human_routes": routes,

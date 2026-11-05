@@ -23,7 +23,7 @@ uv run --locked echo-heist --headless --seed 1042
 uv run --locked python scripts/checks/run.py
 ```
 
-The desktop entry opens a Chapter 01 card. Play Chapter opens the briefing, where you choose a mode and use Launch Mission. Select with mouse or arrows/Enter; Back returns without starting a run. In the mission, move with WASD/arrows, sprint with Shift, hold E near the Core, and return to the original Exit after lockdown. Q deploys Echo, F uses EMP, Space melees, Tab opens the paused facility map, and Escape pauses. Pause offers resume, same-seed retry and confirmed abort. Companion remains visibly unavailable until Phase 4.
+The desktop entry opens a Chapter 01 card. Play Chapter opens the briefing, where you choose a mode and use Launch Mission. Select with mouse or arrows/Enter; Back returns without starting a run. In the mission, move with WASD/arrows, sprint with Shift, hold E near the Core, and return to the original Exit after lockdown. Q deploys Echo, F uses EMP, Space uses one of two loud emergency stuns (four-second recovery), Tab opens the paused facility map, and Escape pauses. Pause offers resume, same-seed retry and confirmed abort. Companion remains visibly unavailable until Phase 4.
 
 The game fills the resized/fullscreen window, expands the visible world proportionally and keeps menu controls inside a centered safe area. Pointer input uses that same mapping. `--mute` skips audio initialization; unavailable audio devices fall back silently. `--headless` repeats the small seeded foundation diagnostic without importing pygame.
 

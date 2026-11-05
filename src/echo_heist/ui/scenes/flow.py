@@ -2,7 +2,9 @@
 
 from collections import Counter
 from collections.abc import Callable, Sequence
+from dataclasses import replace
 from enum import StrEnum
+from uuid import uuid4
 
 import pygame
 
@@ -10,6 +12,8 @@ from echo_heist.core.contracts.autonomy.model import ControlMode
 from echo_heist.core.contracts.autonomy.policy import DeploymentRequest
 from echo_heist.core.contracts.autonomy.runtime import AutonomyGateway, DeploymentUnavailable
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.experience.model import ResultRequest, ToolUsage
+from echo_heist.core.contracts.experience.ports import ExperienceGateway
 from echo_heist.core.contracts.results import RunOutcome
 from echo_heist.core.contracts.security.model import GuardState
 from echo_heist.infrastructure.persistence.settings import Settings
@@ -18,6 +22,8 @@ from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.ui.audio.feedback import UiFeedback
 from echo_heist.ui.audio.model import AudioFrame
+from echo_heist.ui.input.configuration import bindings_for, key_label, movement_hint
+from echo_heist.ui.presenters.reporting import ReportState
 from echo_heist.ui.render.autonomy.panel import AUTONOMY_TABS
 from echo_heist.ui.render.environment.furnishings.catalogue import prepare_furniture
 from echo_heist.ui.render.layout.viewport import interface_canvas, interface_events
@@ -28,6 +34,10 @@ from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.render.world import WorldArt, build_map_surface
 from echo_heist.ui.scenes.companion.deployment import DeploymentPanel, restore_selection, selection
 from echo_heist.ui.scenes.design.screens import SceneDesigns
+from echo_heist.ui.scenes.experience.preferences import PreferencesPanel
+from echo_heist.ui.scenes.experience.profiles import PROFILE_BUTTON, ProfilePanel
+from echo_heist.ui.scenes.experience.report import RESULT_DETAILS, RESULT_NEW_SEED, ReportInspector
+from echo_heist.ui.scenes.experience.seed import SEED_ACTIONS, SEED_BUTTON, SeedDialog
 from echo_heist.ui.scenes.heist import HeistRequest, HeistSession
 from echo_heist.ui.scenes.menus import (
     CHAPTER_CARD,
@@ -45,7 +55,6 @@ from echo_heist.ui.scenes.menus import (
     move_selection,
 )
 from echo_heist.ui.scenes.navigation.controls import ABORT_BUTTONS, MAP_CLOSE, PAUSE_BUTTONS
-from echo_heist.ui.scenes.settings import OPTION_RECTS, adjust, click, draw_settings
 from echo_heist.ui.scenes.transitions.airlock import AirlockTransition
 
 DEFAULT_MAP_ID = "vault-five-zone"
@@ -81,6 +90,7 @@ class GameFlow:
         security_enabled: bool = True,
         loading: Callable[[float, str], None] | None = None,
         autonomy_gateway: AutonomyGateway | None = None,
+        experience_gateway: ExperienceGateway | None = None,
     ) -> None:
         def prepared(fraction: float, label: str) -> None:
             if loading is not None:
@@ -119,19 +129,35 @@ class GameFlow:
         self.designs = SceneDesigns(self.deployment)
         self.ui_feedback = UiFeedback()
         self.airlock = AirlockTransition()
+        self.app_nonce = uuid4().hex[:12]
+        self.reports = ReportState(experience_gateway)
+        self.inspector = ReportInspector(self.reports)
+        self.profiles = ProfilePanel(experience_gateway)
+        self.preferences = PreferencesPanel(experience_gateway)
+        self.seed_dialog = SeedDialog()
         prepared(1.0, "Facility ready")
 
     def _feedback_rects(self) -> tuple[pygame.Rect, ...]:
+        if self.seed_dialog.open:
+            return SEED_ACTIONS
+        if self.profiles.open:
+            return self.profiles.controls()
+        if self.inspector.open:
+            return self.inspector.controls()
         if self.scene == Scene.TITLE:
             return (CHAPTER_CARD, *TITLE_BUTTONS[1:])
         if self.scene == Scene.MODE:
-            return MODE_BUTTONS
+            return (*MODE_BUTTONS, SEED_BUTTON)
         if self.scene == Scene.SETTINGS:
-            return OPTION_RECTS
+            return self.preferences.controls()
         if self.scene == Scene.RESULTS:
-            return (RESULT_RETRY, RESULT_MENU, RESULT_STORY)
+            return (RESULT_RETRY, RESULT_MENU, RESULT_STORY, RESULT_DETAILS, RESULT_NEW_SEED)
         if self.scene in (Scene.WORKSHOP, Scene.LAB, Scene.GUIDE, Scene.EPILOGUE):
-            return self.designs.controls(self.scene.value)
+            return (
+                (*self.designs.controls(self.scene.value), PROFILE_BUTTON, SEED_BUTTON)
+                if self.scene == Scene.WORKSHOP
+                else self.designs.controls(self.scene.value)
+            )
         if self.session is not None:
             if self.session.summary:
                 return (MAP_CLOSE,)
@@ -171,6 +197,10 @@ class GameFlow:
             security_enabled=self.security_enabled,
             run=run,
         )
+        session.input.bindings = bindings_for(self.preferences.preferences)
+        session.subtitles = self.preferences.preferences.subtitles
+        session.high_contrast = self.preferences.preferences.high_contrast
+        self.inspector.open = self.profiles.open = self.seed_dialog.open = False
         self.hovered_result = None
         self.session = session
         self.last_deployment = request
@@ -196,6 +226,8 @@ class GameFlow:
         self.backdrop = load_backdrop(view_size)
         self.extraction_backdrop = load_backdrop(view_size, "assets/scenes/extraction-dawn.png")
         self.dragging_slider = None
+        self.preferences.dragging = None
+        self.preferences.capturing = None
         if self.session is not None:
             self.session.resize(view_size)
 
@@ -207,6 +239,9 @@ class GameFlow:
         self.designs.selected = 0
         self.designs.notice = ""
         self.designs.reset_confirmation = False
+        self.inspector.open = self.profiles.open = self.seed_dialog.open = False
+        if scene == Scene.SETTINGS:
+            self.preferences.reset_page()
         if scene in (Scene.WORKSHOP, Scene.MODE):
             self.deployment.refresh()
 
@@ -231,6 +266,44 @@ class GameFlow:
                 return
             else:
                 self.airlock.advance(elapsed_ms)
+        if any(event.type == pygame.QUIT for event in events):
+            self.running = False
+            return
+        if self.seed_dialog.open:
+            chosen = self.seed_dialog.handle(list(events))
+            if chosen is not None:
+                self.seed = chosen
+                if self.scene == Scene.RESULTS and self.last_deployment:
+                    self.last_deployment = replace(self.last_deployment, seed=chosen)
+                    self._retry_run()
+            return
+        if self.inspector.open:
+            self.inspector.handle(list(events))
+            return
+        if self.profiles.open:
+            policy = self.profiles.handle(list(events), selection(self.designs.draft))
+            if policy is not None:
+                restore_selection(self.designs.draft, policy)
+            return
+        if self.scene in (Scene.MODE, Scene.WORKSHOP):
+            for event in events:
+                if (event.type == pygame.KEYDOWN and event.key == pygame.K_n) or (
+                    event.type == pygame.MOUSEBUTTONDOWN
+                    and event.button == 1
+                    and SEED_BUTTON.collidepoint(event.pos)
+                ):
+                    self.seed_dialog.show(self.seed)
+                    return
+                if self.scene == Scene.WORKSHOP and (
+                    (event.type == pygame.KEYDOWN and event.key == pygame.K_p)
+                    or (
+                        event.type == pygame.MOUSEBUTTONDOWN
+                        and event.button == 1
+                        and PROFILE_BUTTON.collidepoint(event.pos)
+                    )
+                ):
+                    self.profiles.show()
+                    return
         if self.scene in (Scene.WORKSHOP, Scene.LAB, Scene.GUIDE, Scene.EPILOGUE):
             if any(event.type == pygame.QUIT for event in events):
                 self.running = False
@@ -253,6 +326,12 @@ class GameFlow:
             return
         if self.scene == Scene.HEIST and self.session is not None:
             self.session.reduced_flashing = self.settings.reduced_flashing
+            bindings = bindings_for(self.preferences.preferences)
+            if self.session.input.bindings != bindings:
+                self.session.input.clear()
+                self.session.input.bindings = bindings
+            self.session.subtitles = self.preferences.preferences.subtitles
+            self.session.high_contrast = self.preferences.preferences.high_contrast
             request = self.session.handle(events)
             if request == HeistRequest.QUIT:
                 self.running = False
@@ -267,6 +346,20 @@ class GameFlow:
             self.session.update(elapsed_ms)
             end = self.session.mission_end
             if end is not None:
+                result_request = ResultRequest(
+                    f"{self.app_nonce}:{self.runs_started}",
+                    self.level.static_map.map_id,
+                    self.last_deployment.seed if self.last_deployment else self.seed,
+                    self.session.control_mode,
+                    end,
+                    self.rules.simulation_hz,
+                    ToolUsage(
+                        self.session.tool_counts["ECHO"],
+                        self.session.tool_counts["EMP"],
+                        self.session.tool_counts["MELEE"],
+                    ),
+                )
+                self.reports.capture(result_request, self.session.terminal_result)
                 self.outcomes[end.outcome.value] += 1
                 self.scene = Scene.RESULTS
                 self.hovered_result = None
@@ -280,7 +373,12 @@ class GameFlow:
             initial_scene = self.scene
             if event.type == pygame.KEYDOWN and not getattr(event, "repeat", False):
                 self._key(event.key)
-                if not self.running or self.scene == Scene.HEIST:
+                if (
+                    not self.running
+                    or self.scene == Scene.HEIST
+                    or self.seed_dialog.open
+                    or self.inspector.open
+                ):
                     return
             elif event.type == pygame.MOUSEMOTION and self.scene in (Scene.TITLE, Scene.MODE):
                 hovered = menu_hit(self.scene.value, event.pos)
@@ -288,7 +386,11 @@ class GameFlow:
                     self.selected = hovered
             elif event.type == pygame.MOUSEMOTION and self.scene == Scene.RESULTS:
                 self.hovered_result = (
-                    "STORY"
+                    "DETAILS"
+                    if RESULT_DETAILS.collidepoint(event.pos)
+                    else "NEW_SEED"
+                    if RESULT_NEW_SEED.collidepoint(event.pos)
+                    else "STORY"
                     if RESULT_STORY.collidepoint(event.pos)
                     and self.session
                     and self.session.mission_end
@@ -301,6 +403,12 @@ class GameFlow:
                 )
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.scene == Scene.RESULTS:
+                    if RESULT_DETAILS.collidepoint(event.pos):
+                        self.inspector.open = True
+                        return
+                    if RESULT_NEW_SEED.collidepoint(event.pos):
+                        self.seed_dialog.show((self.seed + 1) % 2**31)
+                        return
                     if (
                         RESULT_STORY.collidepoint(event.pos)
                         and self.session
@@ -361,7 +469,11 @@ class GameFlow:
                 else:
                     self.notice = "Companion mode is coming later. Human mode remains selected."
         elif self.scene == Scene.RESULTS:
-            if key == pygame.K_r:
+            if key == pygame.K_d:
+                self.inspector.open = True
+            elif key == pygame.K_n:
+                self.seed_dialog.show((self.seed + 1) % 2**31)
+            elif key == pygame.K_r:
                 self._retry_run()
             elif key in (pygame.K_RETURN, pygame.K_KP_ENTER) or key == pygame.K_ESCAPE:
                 self._go(Scene.TITLE)
@@ -374,50 +486,15 @@ class GameFlow:
                 self._go(Scene.EPILOGUE)
 
     def _settings_events(self, events: Sequence[pygame.event.Event]) -> None:
-        for event in events:
-            if event.type == pygame.QUIT:
-                self.running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE or (
-                    event.key in CONFIRM_KEYS and self.selected == 4
-                ):
-                    self._go(self.settings_return)
-                    return
-                if event.key in (pygame.K_UP, pygame.K_DOWN):
-                    self.selected = (
-                        self.selected + (1 if event.key == pygame.K_DOWN else -1)
-                    ) % len(OPTION_RECTS)
-                elif event.key in (pygame.K_LEFT, pygame.K_RIGHT):
-                    self.settings = adjust(
-                        self.settings, self.selected, 1 if event.key == pygame.K_RIGHT else -1
-                    )
-                elif event.key in CONFIRM_KEYS and self.selected in (2, 3):
-                    self.settings = adjust(self.settings, self.selected, 1)
-            elif (
-                event.type == pygame.MOUSEBUTTONUP and event.button == 1
-            ) or event.type == pygame.WINDOWFOCUSLOST:
-                self.dragging_slider = None
-            elif event.type in (pygame.MOUSEMOTION, pygame.MOUSEBUTTONDOWN):
-                if event.type == pygame.MOUSEMOTION and self.dragging_slider is not None:
-                    self.settings = click(self.settings, self.dragging_slider, event.pos)
-                    continue
-                hit = next(
-                    (
-                        index
-                        for index, rect in enumerate(OPTION_RECTS)
-                        if rect.collidepoint(event.pos)
-                    ),
-                    None,
-                )
-                if hit is not None:
-                    self.selected = hit
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        if hit == 4:
-                            self._go(self.settings_return)
-                            return
-                        if hit in (0, 1):
-                            self.dragging_slider = hit
-                        self.settings = click(self.settings, hit, event.pos)
+        if any(event.type == pygame.QUIT for event in events):
+            self.running = False
+            return
+        self.preferences.selected = self.selected
+        self.settings, close = self.preferences.handle(list(events), self.settings)
+        self.selected = self.preferences.selected
+        self.dragging_slider = self.preferences.dragging
+        if close:
+            self._go(self.settings_return)
 
     def draw(self, canvas: pygame.Surface) -> None:
         if self.scene == Scene.HEIST and self.session is not None:
@@ -477,6 +554,14 @@ class GameFlow:
                 clock_ms=self.ambient_ms,
                 reduced_motion=self.settings.reduced_flashing,
                 mode_choice=self.mode_choice,
+                control_hints=(
+                    key_label(bindings_for(self.preferences.preferences), "interact"),
+                    movement_hint(bindings_for(self.preferences.preferences)),
+                    "  ".join(
+                        f"{key_label(bindings_for(self.preferences.preferences), a)} {name}"
+                        for a, name in (("echo", "Echo"), ("emp", "EMP"), ("melee", "Stun"))
+                    ),
+                ),
                 report_available=end is not None,
                 companion_available=self.deployment.can_deploy,
                 protocols=self.deployment.protocols_for(
@@ -485,14 +570,8 @@ class GameFlow:
                 paint_background=False,
             )
         elif self.scene == Scene.SETTINGS:
-            draw_settings(
-                content,
-                self.fonts,
-                self.backdrop,
-                self.settings,
-                self.selected,
-                self.ambient_ms,
-                paint_background=False,
+            self.preferences.draw(
+                content, self.fonts, self.backdrop, self.settings, self.ambient_ms
             )
         elif self.scene == Scene.RESULTS and end is not None:
             draw_results(
@@ -503,7 +582,21 @@ class GameFlow:
                 hovered=self.hovered_result,
                 clock_ms=self.ambient_ms,
                 autonomous=self.session.autonomous if self.session else False,
+                request=self.reports.request,
+                report=self.reports.report,
             )
+        if self.scene in (Scene.MODE, Scene.WORKSHOP):
+            from echo_heist.ui.scenes.navigation.controls import button
+
+            button(content, SEED_BUTTON, f"N  SEED {self.seed}", self.fonts)
+            if self.scene == Scene.WORKSHOP:
+                button(content, PROFILE_BUTTON, "P  SAVED POLICIES", self.fonts)
+        if self.inspector.open:
+            self.inspector.draw(content, self.fonts)
+        if self.profiles.open:
+            self.profiles.draw(content, self.fonts)
+        if self.seed_dialog.open:
+            self.seed_dialog.draw(content, self.fonts)
         self.airlock.draw(canvas, reduced_motion=self.settings.reduced_flashing)
 
     def audio_frame(self) -> AudioFrame:
@@ -529,6 +622,11 @@ class GameFlow:
             if snapshot
             else False,
             events=events,
+            environment_cues=self.session.interactions.take_audio() if self.session else (),
+            heard_events=observation.heard_events if observation else (),
+            listener_position=observation.own_status.position if observation else None,
+            tick=snapshot.tick if snapshot else 0,
+            hz=self.session.rules.simulation_hz if self.session else 30,
             listener_id=self.session.observer_id if self.session else self.level.operative_id,
             nexus_serial=self.session.announcement_serial if self.session else 0,
             ui_feedback_serial=self.ui_feedback.serial,

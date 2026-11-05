@@ -1,6 +1,8 @@
 # P08 - Complete functional V1 draft and desktop delivery
 
-Day 4, second block. Integrator: **Khalid**. Remaining effort: Khalid 9, Suhita 5. Status: TODO. Prerequisite: P07. Feature anchors: completion of EH-027, EH-028 and EH-030. Source: PDF pp. 18-19 plus the user's complete-draft requirement.
+2026-10-31 user-authorized independent work is recorded in the [P06/current-build review handoff](../../../tracking/handoffs/khalid/day_03/P06.md). Ready consumers and delivery preparation do not close this phase's combined runtime/platform gate.
+
+Day 4, second block. Integrator: **Khalid**. Remaining effort: Khalid 9, Suhita 5. Status: IN_PROGRESS (independent Khalid subset only). Prerequisite: P07. Feature anchors: completion of EH-027, EH-028 and EH-030. Source: PDF pp. 18-19 plus the user's complete-draft requirement.
 
 Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.
 

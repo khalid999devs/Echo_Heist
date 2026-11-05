@@ -130,7 +130,12 @@ class HumanDriver:
                 for actor in observation.visible_entities
             ):
                 desired.add(pygame.K_f)
-        elif self.use_tools and pygame.K_SPACE not in self.held:
+        elif (
+            self.use_tools
+            and pygame.K_SPACE not in self.held
+            and observation.own_status.inventory.melee_charges > 0
+            and observation.own_status.melee_cooldown_remaining <= 1
+        ):
             if any(
                 actor.position is not None
                 and not actor.disabled

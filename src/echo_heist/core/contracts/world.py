@@ -61,6 +61,7 @@ class Inventory:
     echo_charges: int = 3
     emp_charges: int = 1
     core_held: bool = False
+    melee_charges: int = 2
 
 
 @dataclass(frozen=True, slots=True)

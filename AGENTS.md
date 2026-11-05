@@ -4,7 +4,7 @@ Read [START_HERE](docs/development/workflow/START_HERE.md) before implementing. 
 
 ## Required project rules
 
-- The source PDF in `docs/idea` governs gameplay, with explicit user overrides: four development days, eight phases, named ownership, and approved scoring. Read the development hub and assigned phase for context.
+- The source PDF in `docs/idea` governs gameplay, with explicit user overrides: four development days, eight phases, named ownership, approved scoring, and [approved limited melee](docs/development/planning/balance/MELEE.md). Read the development hub and assigned phase for context.
 - Phase 1 belongs entirely to Khalid. Do not claim it for Suhita or start dependent implementation before its foundation handoff is ready.
 - Preserve all required functionality through Phase 8. Simple presentation is acceptable for the initial draft; missing mechanics, fake AI, hidden-state cheats and untested platform claims are not.
 - Follow [CODE_RULES](docs/development/workflow/CODE_RULES.md): at most **1,000 lines per authored file**, at most **six maintained direct files per directory**, including package initializers and dotfiles. Group by responsibility before exceeding either limit. These are limits, not target sizes.

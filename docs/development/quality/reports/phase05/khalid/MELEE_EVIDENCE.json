@@ -1,0 +1,379 @@
+{
+  "date": "2026-10-30",
+  "owner": "Khalid",
+  "scope": "User-approved limited melee subset; other P04/P05 behavior remains pending",
+  "branch": "work/khalid-p05-visuals",
+  "runtime_commit": "68d0c69bc6833a73262653602cd075fe8314b86a",
+  "previous_presentation_runtime": "59fffba",
+  "fingerprint_schema": 10,
+  "rules": {
+    "initial_charges": 2,
+    "refill": false,
+    "recovery_ticks": 120,
+    "simulation_hz": 30,
+    "stun_ticks": 45,
+    "guard_immunity_ticks": 60,
+    "noise_radius_tiles": 6,
+    "heard_memory_ticks": 150,
+    "resisted_consumes": true,
+    "invalid_consumes": false,
+    "score_rules_changed": false
+  },
+  "checks": {
+    "structure": "PASS",
+    "ruff": "PASS",
+    "format_files": 291,
+    "mypy_source_modules": 136,
+    "tests_passed": 226,
+    "test_seconds": 28.14,
+    "focused_checks": 20,
+    "focused_seconds": 0.46
+  },
+  "native_hud": {
+    "kind": "Native practice layout, real melee/movement/capture; guard AI disabled",
+    "video_driver": "cocoa",
+    "audio_ready": true,
+    "shots": [
+      "ready-two",
+      "one-charge-recovery",
+      "cooldown-rejected",
+      "paused-recovery",
+      "recovered-one",
+      "second-strike-empty",
+      "empty-rejected",
+      "retry-restored-two"
+    ],
+    "states": [
+      {
+        "name": "ready-two",
+        "tick": 0,
+        "charges": 2,
+        "cooldown": 0,
+        "notice": ""
+      },
+      {
+        "name": "one-charge-recovery",
+        "tick": 1,
+        "charges": 1,
+        "cooldown": 120,
+        "notice": "GUARD STUNNED"
+      },
+      {
+        "name": "cooldown-rejected",
+        "tick": 2,
+        "charges": 1,
+        "cooldown": 119,
+        "notice": "STUN RECOVERING / KEEP MOVING"
+      },
+      {
+        "name": "paused-recovery",
+        "tick": 2,
+        "charges": 1,
+        "cooldown": 119,
+        "notice": "STUN RECOVERING / KEEP MOVING"
+      },
+      {
+        "name": "recovered-one",
+        "tick": 121,
+        "charges": 1,
+        "cooldown": 0,
+        "notice": "STUN RECOVERING / KEEP MOVING"
+      },
+      {
+        "name": "second-strike-empty",
+        "tick": 137,
+        "charges": 0,
+        "cooldown": 120,
+        "notice": "GRAB ESCAPED"
+      },
+      {
+        "name": "empty-rejected",
+        "tick": 138,
+        "charges": 0,
+        "cooldown": 119,
+        "notice": "NO STUN CHARGES LEFT"
+      },
+      {
+        "name": "retry-restored-two",
+        "tick": 0,
+        "charges": 2,
+        "cooldown": 0,
+        "notice": ""
+      }
+    ],
+    "audio": {
+      "music_track": "sector",
+      "audio_assets_loaded": 33,
+      "audio_cues_played": 13,
+      "lockdown_alarm_active": false,
+      "room_ambience_active": true
+    },
+    "paused_clock": "PASS",
+    "retry": "PASS"
+  },
+  "native_hud_hashes": {
+    "cooldown-rejected.png": "c034eda90faf1f5f7ee885eedbfa75af7d757950ccc581ec5ffb4b66d0511b18",
+    "empty-rejected.png": "4e734123bd5a04ccad25c22d56c6e8f035278817cffc082d15f92d5eedf09899",
+    "one-charge-recovery.png": "cdaa93997162d3adacb00cbe78618e00aea0767f4b2027a5b99abbfba5a4b420",
+    "paused-recovery.png": "b8e8730eb9107b8aafdabb760d62120d884d53f04ab3846cdf6daaa3c0a9ad57",
+    "ready-two.png": "6011693d40889d7cc21811bad8e58ddfe50c3b2a31c8f5eac3bc900e9fd2fd13",
+    "recovered-one.png": "4f10c44ad4ff15ff3f4539af0d7487b069462ace517ba0ab2ef2bf5a51bf67d8",
+    "retry-restored-two.png": "6011693d40889d7cc21811bad8e58ddfe50c3b2a31c8f5eac3bc900e9fd2fd13",
+    "second-strike-empty.png": "7583ff8981784016eb3d2ad1477be948e30d1c3bc8140663885e889978815c54"
+  },
+  "replays": [
+    {
+      "name": "upper-tools",
+      "outcome": "WIN",
+      "ticks": 1513,
+      "tools": {
+        "EMP": 1,
+        "MELEE": 1
+      },
+      "event_chain_hash": "e2a4b1b00ff3e6f70f1c5ec07490bf66a0dc5989d9bcac3486b282f4b1eb5e9e",
+      "final_fingerprint": "15af548c689226ae3c60bbcc43d35342326ea6d27ed5863f0a9c136a8b518ed3",
+      "replay_matched": true
+    },
+    {
+      "name": "lower-tools",
+      "outcome": "WIN",
+      "ticks": 1581,
+      "tools": {
+        "EMP": 1,
+        "MELEE": 1
+      },
+      "event_chain_hash": "e6314f3ca0df1a76b2091eb9f93a34dd2b8c9dcb9003f2f0a8c7fcaa34e15904",
+      "final_fingerprint": "6a16cddbac13672ad1c8cf273de48a103a2d5475d6921611267575e022be37e8",
+      "replay_matched": true
+    },
+    {
+      "name": "cross-tools",
+      "outcome": "WIN",
+      "ticks": 1603,
+      "tools": {
+        "EMP": 1
+      },
+      "event_chain_hash": "5361dd314c85f5407ddef7e81cfe203cbf3e2ff3fccb8f76a7376eb9b32986c7",
+      "final_fingerprint": "84da84e0ccbe05b54a8c21a40ef050faec4be47f667de0c21bc0e82755379371",
+      "replay_matched": true
+    },
+    {
+      "name": "upper-no-tools",
+      "outcome": "CAPTURED",
+      "ticks": 1174,
+      "tools": {},
+      "event_chain_hash": "17bfabc682c06e25660eaa24e2effa8bdfdc814d56136d63ff0ea9dcd45eb212",
+      "final_fingerprint": "08d308126f944deba90db03b9439f6b3d2b92be7fc5dd961a84e459707227ac2",
+      "replay_matched": true
+    },
+    {
+      "name": "lower-no-tools",
+      "outcome": "CAPTURED",
+      "ticks": 349,
+      "tools": {},
+      "event_chain_hash": "6061ff5d4bb2e92adca992edec013e2e63531345b224cc9168712c161a82ce7e",
+      "final_fingerprint": "65cf5d727758f5dfc3be931ad62b275a278d86d1ba530af8d6c6f071042872ed",
+      "replay_matched": true
+    }
+  ],
+  "old_schema9_hash_comparison": "Not applicable: new resource/timer/rules schema and legal action choices change hashes; current schema-10 logs replay exactly",
+  "native_human": {
+    "driver": "cocoa",
+    "outcomes": {
+      "upper": {
+        "outcome": "WIN",
+        "ticks": 1483
+      },
+      "lower": {
+        "outcome": "WIN",
+        "ticks": 1604
+      },
+      "careless": {
+        "outcome": "CAPTURED",
+        "ticks": 694
+      }
+    },
+    "decks": [
+      "ground",
+      "upper"
+    ],
+    "layouts": [
+      {
+        "actual": [
+          1366,
+          768
+        ],
+        "logical": [
+          1281,
+          720
+        ],
+        "fullscreen": false,
+        "guard_clicks": 4
+      },
+      {
+        "actual": [
+          1440,
+          820
+        ],
+        "logical": [
+          1280,
+          729
+        ],
+        "fullscreen": false,
+        "guard_clicks": 4
+      },
+      {
+        "actual": [
+          1470,
+          923
+        ],
+        "logical": [
+          1280,
+          804
+        ],
+        "fullscreen": true,
+        "guard_clicks": 4
+      }
+    ],
+    "unseen_hiding": "PASS",
+    "diagnostics_read_only": "PASS",
+    "frames": 4010
+  },
+  "build_manifest": {
+    "architecture": "arm64",
+    "archive": "echo-heist-0.1.0a1-macos-arm64.zip",
+    "archive_bytes": 112443582,
+    "archive_sha256": "d046610d18de1b81c2fd6514a05dd5c1d652624aa3bc52c27250d628c7058fbc",
+    "host_os": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "native_smoke": "NOT_RUN; run scripts/packaging/smoke.py against the artifact",
+    "pyinstaller": "6.22.3",
+    "python": "3.13.16",
+    "signing": "ad-hoc; not notarized",
+    "source_commit": "68d0c69bc6833a73262653602cd075fe8314b86a",
+    "stage": "Human stealth vertical slice; full V1 remains in development",
+    "target": "macos-arm64",
+    "version": "0.1.0a1",
+    "working_tree_dirty": false
+  },
+  "native_app": {
+    "checks": {
+      "frames_rendered": true,
+      "frozen_desktop": true,
+      "frozen_headless": true,
+      "resources_loaded": true,
+      "same_event_hash": true,
+      "same_state_hash": true,
+      "settings_saved": true,
+      "startup_completed": true,
+      "surface_saved": true
+    },
+    "passed": true,
+    "scope": "native display smoke",
+    "video_driver": "cocoa",
+    "audio": "ready",
+    "audio_assets_loaded": 33,
+    "runtime": {
+      "architecture": "arm64",
+      "frozen": true,
+      "python": "3.13.16"
+    },
+    "startup": {
+      "cancelled": false,
+      "completed": true,
+      "elapsed_ms": 2430.98,
+      "first_logo_paint_ms": 146.04,
+      "frame_gap_ms": {
+        "max": 83.46,
+        "median": 17.18,
+        "p95": 23.32
+      },
+      "frames": 122,
+      "resource_load_ms": 1837.59,
+      "skip_requested": false,
+      "sound_cues": 3
+    }
+  },
+  "native_zip": {
+    "checks": {
+      "frames_rendered": true,
+      "frozen_desktop": true,
+      "frozen_headless": true,
+      "resources_loaded": true,
+      "same_event_hash": true,
+      "same_state_hash": true,
+      "settings_saved": true,
+      "startup_completed": true,
+      "surface_saved": true
+    },
+    "passed": true,
+    "scope": "native display smoke",
+    "video_driver": "cocoa",
+    "audio": "ready",
+    "audio_assets_loaded": 33,
+    "runtime": {
+      "architecture": "arm64",
+      "frozen": true,
+      "python": "3.13.16"
+    },
+    "startup": {
+      "cancelled": false,
+      "completed": true,
+      "elapsed_ms": 2288.78,
+      "first_logo_paint_ms": 148.69,
+      "frame_gap_ms": {
+        "max": 142.8,
+        "median": 17.11,
+        "p95": 23.27
+      },
+      "frames": 114,
+      "resource_load_ms": 1705.94,
+      "skip_requested": false,
+      "sound_cues": 3
+    }
+  },
+  "ci": {
+    "conclusion": "success",
+    "jobs": [
+      {
+        "conclusion": "success",
+        "name": "macos-arm64",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "windows-x64",
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "headless-checks",
+        "status": "completed"
+      }
+    ],
+    "source": "68d0c69bc6833a73262653602cd075fe8314b86a",
+    "status": "completed",
+    "url": "https://github.com/khalid999devs/Echo_Heist/actions/runs/41048163778"
+  },
+  "hosted_artifacts": [
+    {
+      "digest": "sha256:137791a0b9a26eb0ca994e1a47eae87882c42322a7c343af48b1923f33c0b895",
+      "id": 12973975606,
+      "name": "foundation-windows-x64",
+      "size_in_bytes": 111983288
+    },
+    {
+      "digest": "sha256:1fd438f191698c68033f38523068de5eba7662c522b040a7d2c7a6995a42e791",
+      "id": 12973925766,
+      "name": "foundation-macos-arm64",
+      "size_in_bytes": 111769671
+    }
+  ],
+  "remaining": {
+    "P04_autonomous_runtime": "Suhita / pending",
+    "P05_other_SR1_and_SR2": "Suhita / pending",
+    "physical_Windows_gameplay_audio": "NOT_RUN; hosted native build and frozen dummy smoke PASS",
+    "Linux_desktop_release": "NOT_RUN; hosted source/headless PASS",
+    "Mac_release": "Ad-hoc signed; clean-machine/notarization/P08 gates pending"
+  }
+}

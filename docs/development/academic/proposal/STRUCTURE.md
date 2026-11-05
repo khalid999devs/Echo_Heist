@@ -1,5 +1,7 @@
 # ECHO HEIST: focused AI lab proposal
 
+**2026-10-25:** the live three-minute class presentation now uses the 15-slide [class deck](CLASS_DECK.md). This 17-slide edition is kept for reference only.
+
 Revised for Khalid and Suhita, **2026-10-22**. The latest direction is **at least 15 and at most 20 slides total**, with academic AI theory/implementation as the main subject. This draft has **17 slides total, no appendix**. It supersedes the earlier 16- and 22-slide drafts.
 
 Deliverable: `output/proposal-deck/final/ECHO_HEIST_AI_Proposal_Blue_Edition.pptx`. Transfer pack: `output/proposal-deck/final/ECHO_HEIST_Proposal_Blue_Handoff.zip`. This task never overwrites the original Downloads presentation.

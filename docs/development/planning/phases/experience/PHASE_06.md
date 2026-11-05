@@ -1,6 +1,8 @@
 # P06 - Workshop, approved scoring and complete game flow
 
-Day 3, second block. Integrator: **Khalid**. Remaining effort: Khalid 9, Suhita 9. Status: TODO. Prerequisite: P05. Feature anchors: EH-023, EH-024, EH-033 and remaining scene/settings/narrative EH-025. Source: PDF pp. 2, 5, 14-18 plus user-approved scoring.
+2026-10-31 user-authorized independent work is recorded in the [P06/current-build review handoff](../../../tracking/handoffs/khalid/day_03/P06.md). Ready consumers and delivery preparation do not close this phase's combined runtime/platform gate.
+
+Day 3, second block. Integrator: **Khalid**. Remaining effort: Khalid 9, Suhita 9. Status: IN_PROGRESS (independent Khalid subset only). Prerequisite: P05. Feature anchors: EH-023, EH-024, EH-033 and remaining scene/settings/narrative EH-025. Source: PDF pp. 2, 5, 14-18 plus user-approved scoring.
 
 Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.
 

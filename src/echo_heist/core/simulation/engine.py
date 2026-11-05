@@ -443,7 +443,7 @@ class Simulation:
             return "environment_system_not_connected"
         if action.kind == ActionKind.INTERACT:
             return interaction_reason(self._world, self._map, self._rules, self._mission, action)
-        return tool_reason(self._world, self._map, self._rules, action)
+        return tool_reason(self._world, self._map, self._rules, action, at_tick=self.tick + 1)
 
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""

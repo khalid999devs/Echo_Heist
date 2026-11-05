@@ -333,6 +333,50 @@
       "sha256": "d5862627e6d0c424fc157eaffaa5421bae4f0bb177e7628d520bfb6a45aa9676",
       "bytes": 817770,
       "modified": false
+    },
+    {
+      "path": "world/interactions/door.wav",
+      "author": "ECHO HEIST project",
+      "license": "Project-authored; license pending",
+      "source": "scripts/authoring/interaction_audio.py",
+      "created": "2026-10-25",
+      "sha256": "cae390cf122f0bb97080650a91970026c5b30fdfa3d23ea6eb030b041346407e",
+      "bytes": 61784,
+      "modified": false,
+      "notes": "Original procedural synthesis; no external samples."
+    },
+    {
+      "path": "world/interactions/glass.wav",
+      "author": "ECHO HEIST project",
+      "license": "Project-authored; license pending",
+      "source": "scripts/authoring/interaction_audio.py",
+      "created": "2026-10-25",
+      "sha256": "03a6918f860275b9d2ed30410b278eb0320e8170612f6870ccc0e5d7f472f504",
+      "bytes": 70604,
+      "modified": false,
+      "notes": "Original procedural synthesis; no external samples."
+    },
+    {
+      "path": "world/interactions/canister.wav",
+      "author": "ECHO HEIST project",
+      "license": "Project-authored; license pending",
+      "source": "scripts/authoring/interaction_audio.py",
+      "created": "2026-10-25",
+      "sha256": "6a280b6f72f6686054b2390c9be093866ffc5da2c8609d85f078f6cb5e011154",
+      "bytes": 57374,
+      "modified": false,
+      "notes": "Original procedural synthesis; no external samples."
+    },
+    {
+      "path": "world/interactions/locker.wav",
+      "author": "ECHO HEIST project",
+      "license": "Project-authored; license pending",
+      "source": "scripts/authoring/interaction_audio.py",
+      "created": "2026-10-25",
+      "sha256": "1e40a389866005b3813d1701ddd32b29b0a7ce01e486d5e4f9268f5c50b10dff",
+      "bytes": 39734,
+      "modified": false,
+      "notes": "Original procedural synthesis; no external samples."
     }
   ]
 }

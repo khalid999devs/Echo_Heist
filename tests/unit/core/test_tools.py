@@ -46,6 +46,8 @@ def test_emp_cancels_all_grabs_on_completion_tick_and_never_recharges(rules: Gam
 
 
 def test_melee_targets_one_guard_then_recovery_immunity_is_noisy(rules: GameRules) -> None:
+    # Isolate guard immunity from the separately tested default four-second recovery.
+    rules = replace(rules, melee_cooldown_ticks=1)
     sim = contact(rules)
     first = sim.step((Action("operative", ActionKind.MELEE, 0),))
     stunned = [event.actor_id for event in first.events if event.kind == EventKind.GUARD_STUNNED]

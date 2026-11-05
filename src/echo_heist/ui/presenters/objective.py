@@ -21,9 +21,13 @@ class ObjectiveView:
     core_held: bool = False
     sprint_ticks_remaining: int = 0
     sprint_recharge_remaining: int = 0
+    melee_charges: int = 0
+    melee_cooldown_remaining: int = 0
 
 
-def build_objective_view(observation: Observation, *, ticks_per_second: int) -> ObjectiveView:
+def build_objective_view(
+    observation: Observation, *, ticks_per_second: int, interact_key: str = "E"
+) -> ObjectiveView:
     if ticks_per_second <= 0:
         raise ValueError("Tick rate must be positive")
     objective = {
@@ -37,8 +41,16 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
     interaction_progress = None
     if observation.interactions:
         hint = observation.interactions[0]
-        interaction = "E  Use stairs" if hint.kind == "Stair" else "Hold E  Recover core"
-        if hint.kind != "Stair":
+        label = {
+            "Stair": "Use stairs",
+            "Core": "Recover core",
+            "Door": "Use door",
+            "HideSpot": "Enter cover",
+            "LeaveHide": "Leave cover",
+            "Canister": "Push canister",
+        }.get(hint.kind, "Interact")
+        interaction = (("Hold " if hint.required_ticks > 1 else "") + interact_key + "  ") + label
+        if hint.required_ticks > 1:
             interaction_progress = hint.progress_ticks, hint.required_ticks
     inventory = observation.own_status.inventory
     seconds = observation.tick // ticks_per_second
@@ -47,6 +59,7 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
         objective,
         interaction,
         f"Echo {inventory.echo_charges} | EMP {inventory.emp_charges} | "
+        f"Stun {inventory.melee_charges} | "
         f"Core {'YES' if inventory.core_held else 'NO'}",
         f"{seconds // 60:02d}:{seconds % 60:02d}",
         "CAPTURE WIND-UP - Escape, EMP or melee" if remaining is not None else "",
@@ -56,6 +69,8 @@ def build_objective_view(observation: Observation, *, ticks_per_second: int) -> 
         inventory.core_held,
         observation.own_status.sprint_ticks_remaining,
         observation.own_status.sprint_recharge_remaining,
+        inventory.melee_charges,
+        observation.own_status.melee_cooldown_remaining,
     )
 
 

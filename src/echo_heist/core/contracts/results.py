@@ -1,8 +1,9 @@
 """Committed step/results and a separate read-only presentation boundary."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 
+from echo_heist.core.contracts.environment.presentation import EnvironmentView
 from echo_heist.core.contracts.events import GameEvent
 from echo_heist.core.contracts.observations import EntityView, Observation
 from echo_heist.core.contracts.security.model import GuardView
@@ -101,3 +102,4 @@ class PresentationSnapshot:
     mission_end: MissionEnd | None = None
     guards: tuple[GuardView, ...] = ()
     stairs: tuple[StairView, ...] = ()
+    environment: EnvironmentView = field(default_factory=EnvironmentView)

@@ -3,7 +3,8 @@
 These run every tick before the strategic plan and only consider guards the
 Companion currently sees. Scarce tools are reserved for real capture threats:
 EMP when trapped or grabbed, melee only against an adjacent guard that is not
-already stunned or still inside its post-stun immunity window.
+already stunned or still inside its post-stun immunity window, and only while
+the Companion's own observed melee stock and recovery allow a strike.
 """
 
 from dataclasses import dataclass
@@ -27,6 +28,13 @@ class Override:
 
 def _distance2(first: Position, second: Position) -> int:
     return (first[0] - second[0]) ** 2 + (first[1] - second[1]) ** 2
+
+
+def melee_available(observation: Observation) -> bool:
+    """Own stock/recovery from the immutable observation. A request commits on
+    the next tick, so one remaining recovery tick is already legal."""
+    own = observation.own_status
+    return own.inventory.melee_charges > 0 and own.melee_cooldown_remaining <= 1
 
 
 def active_guards(observation: Observation) -> tuple[EntityView, ...]:
@@ -58,12 +66,14 @@ def emergency(
         key=lambda item: (item[0], item[1]),
     )
     emp = own.inventory.emp_charges > 0
+    strike = melee_available(observation)
     if own.capture_ticks_remaining is not None:
         # A grab is felt even when the grabbing guard is out of view (e.g. in cover).
         remaining = own.capture_ticks_remaining
         nearest = guards[0] if guards else None
         can_melee = (
-            nearest is not None
+            strike
+            and nearest is not None
             and nearest[0] <= rules.melee_range_units**2
             and (observation.tick >= melee_ready_at.get(nearest[1], 0))
         )
@@ -79,8 +89,10 @@ def emergency(
         return None
     nearest_d2, nearest_id, nearest_view = guards[0]
     nearest_position = nearest_view.position or tile_center(nearest_view.tile)
-    can_melee = nearest_d2 <= rules.melee_range_units**2 and observation.tick >= melee_ready_at.get(
-        nearest_id, 0
+    can_melee = (
+        strike
+        and nearest_d2 <= rules.melee_range_units**2
+        and observation.tick >= melee_ready_at.get(nearest_id, 0)
     )
     in_emp = nearest_d2 <= (rules.emp_radius_units * 8 // 10) ** 2
     close = nearest_d2 <= (rules.capture_range_units * 3 // 2) ** 2

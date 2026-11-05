@@ -93,6 +93,8 @@ class TacticalState:
     hidden: bool
     zone: str
     depth: int = 0
+    melee: int = 0  # own melee charges (observed stock at the root)
+    melee_wait: float = 0.0  # seconds of own melee recovery left
     advanced: int = 0  # net route segments gained toward the current objective
     survival: float = 1.0  # probability of not having been grabbed on this trajectory
 
@@ -134,6 +136,7 @@ class CompanionModel:
     priors: dict[str, dict[str, float]]  # briefed home-sector prior per guard
     reroute_ready: bool  # observed danger on the current branch justifies a switch
     committed: bool = False  # no progress for long: holds are excluded at the root
+    melee_recovery: float = 4.0  # rules' melee recovery, in seconds of simulation time
 
     def _legs(self, state: TacticalState) -> tuple[Leg, ...]:
         return self.homeward if state.carrying else self.outbound
@@ -162,7 +165,8 @@ class CompanionModel:
             legal.append(ECHO)
         if state.emp > 0 and (self.emp_ready if root else threat):
             legal.append(EMP)
-        if root and self.melee_ready:
+        strike = state.melee > 0 and state.melee_wait <= 0
+        if strike and (self.melee_ready if root else threat):
             legal.append(MELEE)
         if root and self.committed:
             legal = [action for action in legal if action not in (WAIT, HIDE, RETREAT)]
@@ -220,7 +224,11 @@ class CompanionModel:
         return replace(state, guards=tuple(moved), distracted=max(0, state.distracted - 1))
 
     def step(self, state: TacticalState, action: str, rng: Random) -> TacticalState:
-        return replace(self._transition(state, action, rng), depth=state.depth + 1)
+        after = self._transition(state, action, rng)
+        # Recovery runs on elapsed abstract simulation time, like the real timer.
+        elapsed = after.seconds - state.seconds
+        wait = max(0.0, after.melee_wait - (0.0 if action == MELEE else elapsed))
+        return replace(after, depth=state.depth + 1, melee_wait=wait)
 
     def _transition(self, state: TacticalState, action: str, rng: Random) -> TacticalState:
         legs_now = self._legs(state)
@@ -285,6 +293,8 @@ class CompanionModel:
                 state,
                 guards=calm,
                 emp=state.emp - (action == EMP),
+                melee=state.melee - (action == MELEE),
+                melee_wait=self.melee_recovery if action == MELEE else state.melee_wait,
                 gadgets=state.gadgets + 1,
                 seconds=state.seconds + 1,
             )
@@ -321,14 +331,17 @@ class CompanionModel:
             zones.extend(legs_now[state.leg % len(legs_now)].zones[state.progress :])
         if not state.carrying and self.homeward:
             zones.extend(self.homeward[0].zones[1:])
-        care = 1.0
         cost = 0.0
-        for zone in zones:
+        for index, zone in enumerate(zones):
+            # Same exposure as an actual crossing: the current sector is traversed,
+            # every later one is also entered through its gate (ARRIVAL). A cheaper
+            # leaf estimate would make postponing a crossing look safer than it is.
+            factor = 1.0 if index == 0 else 1.0 + ARRIVAL
             for guard_id, prior in self.priors.items():
                 chance = (
                     prior.get(zone, 0.0)
                     * EXPOSURE.get(self.kinds.get(guard_id, ActorKind.SENTINEL), 0.25)
-                    * care
+                    * factor
                 )
                 cost += chance * (
                     self.weights.detection_penalty + 0.45 * self.weights.capture_penalty

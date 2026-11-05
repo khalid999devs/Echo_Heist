@@ -448,7 +448,7 @@ class Simulation:
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 10,
+            "schema_version": 11,
             "seed": self._seed,
             "rules": asdict(self._rules),
             "pending_geometry": {

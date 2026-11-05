@@ -1,6 +1,6 @@
 # P04 runtime, defender and protocol contract (SR side)
 
-2026-10-25, Suhita, `work/suhita-p04` (merged `origin/work/khalid-p04` at `1d24b4b`). This is the logic side of the [presentation port](PRESENTATION.md). It accepts Khalid's immutable `core/contracts/autonomy/` records unchanged and adds only the internal records below. Nothing here changes the Human controls, geometry, stairs, crouch, sprint or audio contracts.
+2026-10-25, Suhita, `work/suhita-p04`; **updated 2026-11-05** after merging current main (`1136788`, PRs #2/#3/#4) with Khalid's presentation, limited melee and experience consumers unchanged. This is the logic side of the [presentation port](PRESENTATION.md). It accepts Khalid's immutable `core/contracts/autonomy/` records unchanged and adds only the internal records below. Nothing here changes the Human controls, geometry, stairs, crouch, sprint or audio contracts.
 
 ## Agreed external interface (unchanged from KR)
 
@@ -31,9 +31,13 @@
 
 `infrastructure/persistence/protocols.py` stores schema-1 `nexus-memory.json` beside settings in the user data directory. Missing → baseline; corrupt → quarantined copy and baseline; future schema → refused without overwrite. Reset clears every adaptation input (evidence totals, attempts, active protocol) and bumps the revision. At most one protocol is selected between attempts, announced through `ProtocolState.active` before deployment, applied unchanged for that attempt, and its evidence is recorded once when the attempt ends.
 
+## Companion tools under the approved melee rule
+
+The Companion never plans a strike Simulation would reject. Utility overrides and the MCTS root require its own `Inventory.melee_charges > 0` and `OwnStatus.melee_cooldown_remaining <= 1` (a request commits next tick). `TacticalState` carries `melee` charges and `melee_wait` seconds: a rollout strike spends one charge and starts the rules' recovery (`melee_cooldown_ticks / simulation_hz`), and every transition advances recovery by its elapsed abstract seconds. Target immunity is still tracked per guard from the Companion's own actions. Simulation validation stays authoritative.
+
 ## Fingerprint and replay
 
-NEXUS memory is part of `WorldState`, so the canonical fingerprint schema becomes **10**. Replacing the sensing-only POST with the Interceptor changes recorded defender traces; P03 hashes are historical. The replay header records the director/protocol configuration through the registry revision and fingerprint.
+NEXUS memory is part of `WorldState`. Main's schema 10 already covered the two-charge melee payload; adding the P04 NEXUS memory, route graph and director makes the merged canonical fingerprint schema **11** (`engine.fingerprint`, `replay.FINGERPRINT_SCHEMA`). Replacing the sensing-only POST with the Interceptor changes recorded defender traces; P03 hashes are historical. The replay header records the director/protocol configuration through the registry revision and fingerprint.
 
 ## Shared-file claims
 

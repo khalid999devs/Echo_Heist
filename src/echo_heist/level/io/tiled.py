@@ -53,6 +53,9 @@ OBJECT_KINDS = {
             "FloorDetail",
             "Deck",
             "Stair",
+            "Door",
+            "Glass",
+            "Canister",
         }
     ),
 }
@@ -423,6 +426,9 @@ def build_level(raw: RawMap) -> LevelData:
         "Chokepoint",
         "Furniture",
         "Stair",
+        "Door",
+        "Glass",
+        "Canister",
     )
     stairs = {obj.object_id: obj for obj in of("Stair")}
     links = []
@@ -467,7 +473,12 @@ def build_level(raw: RawMap) -> LevelData:
         tuple(chokepoints),
         tuple(
             Marker(obj.object_id, obj.kind, obj.tile)
-            for obj in of("Cover") + of("HideSpot") + of("UnderDesk")
+            for obj in of("Cover")
+            + of("HideSpot")
+            + of("UnderDesk")
+            + of("Door")
+            + of("Glass")
+            + of("Canister")
         ),
         raw.layers["floor"],
         raw.layers["glass"],

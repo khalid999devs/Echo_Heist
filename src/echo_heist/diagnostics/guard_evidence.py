@@ -11,6 +11,7 @@ from dataclasses import dataclass, field, replace
 from echo_heist.ai.navigation.grid import bfs
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.environment.model import EnvironmentSpec
 from echo_heist.core.contracts.events import EventKind
 from echo_heist.core.contracts.observations import Observation
 from echo_heist.core.contracts.security.model import SensorRules
@@ -147,7 +148,12 @@ class ScenarioResult:
 
 
 def build_simulation(
-    level: LevelData, rules: GameRules, sensors: SensorRules, registry: SecurityRegistry, seed: int
+    level: LevelData,
+    rules: GameRules,
+    sensors: SensorRules,
+    registry: SecurityRegistry,
+    seed: int,
+    environment: EnvironmentSpec | None = None,
 ) -> Simulation:
     return Simulation(
         level.static_map,
@@ -156,6 +162,7 @@ def build_simulation(
         mission=level.mission(),
         seed=seed,
         security=registry.spec(sensors),
+        environment=environment,
     )
 
 
@@ -171,8 +178,9 @@ def run_route(
     limit: int = 9_000,
     use_tools: bool = True,
     sprint: bool = True,
+    environment: EnvironmentSpec | None = None,
 ) -> ScenarioResult:
-    simulation = build_simulation(level, rules, sensors, registry, seed)
+    simulation = build_simulation(level, rules, sensors, registry, seed, environment)
     header = build_header(
         level.static_map, rules, sensors, registry_revision=registry.revision, seed=seed
     )

@@ -4,6 +4,7 @@ from collections import deque
 from collections.abc import Iterable
 
 from echo_heist.core.contracts.world import Tile
+from echo_heist.level.environment import PROP_KINDS, prop_spec
 from echo_heist.level.model import ZONE_IDS, LevelData
 
 MIN_GUARD_SPAWN_DISTANCE = 3
@@ -107,12 +108,41 @@ def _anchors(level: LevelData) -> list[str]:
             for dx, dy in NEIGHBORS
         ):
             problems.append(f"hide spot {marker.marker_id!r} has no adjacent vision blocker")
+    problems.extend(_props(level))
     known = {zone.zone_id for zone in level.zones}
     for point in level.chokepoints:
         if not world_map.can_walk(point.tile):
             problems.append(f"chokepoint {point.point_id!r} at {point.tile} is not walkable")
         if point.zones[0] == point.zones[1] or not set(point.zones) <= known:
             problems.append(f"chokepoint {point.point_id!r} must link two distinct known zones")
+    return problems
+
+
+def _props(level: LevelData) -> list[str]:
+    """Interactive props stay off stairs/anchors/patrol routes and never share tiles."""
+    world_map = level.static_map
+    problems: list[str] = []
+    reserved = {link.tile for link in world_map.stairs} | {
+        obj.tile for obj in world_map.objects if obj.kind in ("Spawn", "Exit", "Core")
+    }
+    patrolled = {tile for route in level.routes for tile in route.tiles()}
+    used: set[Tile] = set()
+    for obj in world_map.objects:
+        if obj.kind not in PROP_KINDS:
+            continue
+        try:
+            spec = prop_spec(world_map, obj)
+        except ValueError as error:
+            problems.append(str(error))
+            continue
+        tiles = set(spec.tiles)
+        if tiles & reserved or tiles & used:
+            problems.append(f"{obj.kind} {obj.object_id!r} overlaps a stair, anchor or prop")
+        if obj.kind == "Glass" and tiles & patrolled:
+            problems.append(f"glass {obj.object_id!r} may not block a patrol route")
+        if obj.kind == "Glass" and any(not world_map.can_walk(tile) for tile in tiles):
+            problems.append(f"glass {obj.object_id!r} must stand on open floor")
+        used |= tiles
     return problems
 
 

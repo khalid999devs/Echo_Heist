@@ -9,7 +9,7 @@
   "height": 40,
   "tilewidth": 96,
   "tileheight": 96,
-  "nextobjectid": 183,
+  "nextobjectid": 191,
   "nextlayerid": 9,
   "properties": [{"name": "schema", "type": "string", "value": "echo-heist-map/1"}, {"name": "map_id", "type": "string", "value": "vault-five-zone"}],
   "tilesets": [{"firstgid": 1, "name": "facility-geometry", "tilewidth": 96, "tileheight": 96, "tilecount": 4, "columns": 4}],
@@ -421,7 +421,15 @@
         {"id": 179, "name": "cover-4", "type": "Cover", "x": 4176, "y": 2736, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": [{"name": "collision_left", "type": "int", "value": 31}, {"name": "collision_top", "type": "int", "value": 0}, {"name": "collision_right", "type": "int", "value": 979}, {"name": "collision_bottom", "type": "int", "value": 979}, {"name": "collision_tile_x", "type": "int", "value": 44}, {"name": "collision_tile_y", "type": "int", "value": 28}]},
         {"id": 180, "name": "hide-4", "type": "HideSpot", "x": 4272, "y": 2832, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": []},
         {"id": 181, "name": "cover-5", "type": "Cover", "x": 5040, "y": 2256, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": [{"name": "collision_left", "type": "int", "value": 31}, {"name": "collision_top", "type": "int", "value": 489}, {"name": "collision_right", "type": "int", "value": 979}, {"name": "collision_bottom", "type": "int", "value": 979}, {"name": "collision_tile_x", "type": "int", "value": 53}, {"name": "collision_tile_y", "type": "int", "value": 23}]},
-        {"id": 182, "name": "hide-5", "type": "HideSpot", "x": 4848, "y": 2352, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": []}
+        {"id": 182, "name": "hide-5", "type": "HideSpot", "x": 4848, "y": 2352, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": []},
+        {"id": 183, "name": "door-cross-link", "type": "Door", "x": 3696, "y": 1776, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": []},
+        {"id": 184, "name": "door-core-north", "type": "Door", "x": 4848, "y": 1296, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": [{"name": "span", "type": "int", "value": 2}]},
+        {"id": 185, "name": "door-core-south", "type": "Door", "x": 4848, "y": 2832, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": [{"name": "span", "type": "int", "value": 2}]},
+        {"id": 186, "name": "glass-research-rack", "type": "Glass", "x": 3600, "y": 2352, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": [{"name": "horizontal", "type": "bool", "value": true}]},
+        {"id": 187, "name": "glass-research-cell", "type": "Glass", "x": 3216, "y": 2832, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": [{"name": "horizontal", "type": "bool", "value": true}]},
+        {"id": 188, "name": "canister-service-1", "type": "Canister", "x": 1680, "y": 2640, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": []},
+        {"id": 189, "name": "canister-service-2", "type": "Canister", "x": 2352, "y": 1296, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": []},
+        {"id": 190, "name": "canister-research", "type": "Canister", "x": 3504, "y": 2160, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": []}
       ]
     }
   ]

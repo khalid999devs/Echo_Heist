@@ -1,6 +1,6 @@
 # P05 - Complete tools, interactive environment and feedback
 
-Day 3, first block. Integrator: **Suhita**. Remaining effort: Khalid 9, Suhita 10. Status: IN_PROGRESS (early crouch and independent presentation implemented; connected lifecycle acceptance pending). Prerequisite for the full phase: P04. Feature anchors: completion of EH-019, EH-020 and environment part of EH-025. Source: PDF pp. 4-8, 15, 17, 19.
+Day 3, first block. Integrator: **Suhita**. Remaining effort: Khalid 9, Suhita 10. Status: IN_PROGRESS (early crouch, independent presentation and the SR1/SR2 runtime on `work/suhita-p05` implemented; connected acceptance pending). Prerequisite for the full phase: P04. Feature anchors: completion of EH-019, EH-020 and environment part of EH-025. Source: PDF pp. 4-8, 15, 17, 19.
 
 Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.
 
@@ -36,6 +36,10 @@ Khalid's authorized KR1/KR2 presentation is implemented on `work/khalid-p05-visu
 ## Applied user-requested melee subset — 2026-10-30
 
 Khalid directly implemented the approved two-charge/four-second melee update, including actual stock/timer/validation, truthful HUD and legitimate existing clang/investigation behavior. [Rules](../../balance/MELEE.md), [handoff](../../../tracking/handoffs/khalid/day_03/MELEE.md), [verification](../../../quality/reports/phase05/khalid/MELEE.md). Runtime `68d0c69` uses fingerprint 10; 226 tests pass. This is an explicitly authorized narrow subset of SR1, not completion of Suhita's SR1 or the phase. Preserve it while finishing remaining tools, P04 autonomy and SR2 lifecycles.
+
+## Actual SR checkpoint — 2026-11-09
+
+At the user's request, Suhita implemented P05-SR1/SR2 on `work/suhita-p05` (runtime `10fca5d`, built on the P04 branch): Simulation-owned doors, breakable glass, rolling canisters and HideSpot lockers placed in the facility; one geometry revision per change for collision/sight/reach; routable closed doors that open when pushed; once-only glass/impact sounds linked to real cues; populated `PresentationSnapshot.environment`; symmetric melee reach from cover and both-mode T05/stale/locker/door tool cases. Fingerprint 12; 300 tests and all checks pass in the locked environment on her computer's Linux shell. [Handoff](../../../tracking/handoffs/suhita/day_03/P05.md), [verification](../../../quality/reports/phase05/suhita/VERIFICATION.md), [runtime contract](../../../architecture/integration/environment/RUNTIME.md). Physical Windows play, push/CI and Khalid's connected KR acceptance remain; the phase gate stays open.
 
 ## Gate and evidence
 

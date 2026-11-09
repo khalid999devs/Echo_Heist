@@ -16,7 +16,7 @@ from echo_heist.core.contracts.autonomy.runtime import (
     RuntimeAvailability,
 )
 from echo_heist.core.contracts.config.gameplay import GameRules
-from echo_heist.core.contracts.world import ActorKind
+from echo_heist.core.contracts.world import ActorKind, StaticMap
 from echo_heist.level.model import LevelData
 from echo_heist.ui.scenes.design.model import WorkshopDraft
 
@@ -41,6 +41,22 @@ def restore_selection(draft: WorkshopDraft, policy: PolicySelection) -> None:
 
     draft.preset = next(
         (i for i, values in enumerate(PRESET_VALUES) if tuple(draft.choices) == values), -1
+    )
+
+
+def same_facility(physical: StaticMap, authored: StaticMap) -> bool:
+    """The runtime plays the authored map: same identity, stairs and objects.
+
+    Its physical geometry may add committed prop state (intact glass, closed
+    doors) on top of the authored walls, but never removes an authored wall.
+    """
+    return (
+        physical.map_id == authored.map_id
+        and (physical.width, physical.height) == (authored.width, authored.height)
+        and physical.stairs == authored.stairs
+        and physical.objects == authored.objects
+        and authored.blocked_tiles <= physical.blocked_tiles
+        and authored.opaque_tiles <= physical.opaque_tiles
     )
 
 
@@ -107,7 +123,7 @@ class DeploymentPanel:
             or actor.kind != expected
             or run.runtime.tick != 0
             or run.runtime.ticks_per_second != rules.simulation_hz
-            or snapshot.world_map != level.static_map
+            or not same_facility(snapshot.world_map, level.static_map)
         ):
             raise DeploymentUnavailable("Runtime does not match this mission, mode or rules.")
         return run

@@ -33,7 +33,16 @@ from echo_heist.core.contracts.world import (
 type Planner = Callable[[StaticMap, Tile, Tile], PathResult]
 
 INTRUDERS = (ActorKind.OPERATIVE, ActorKind.COMPANION)
-SALIENCE = {"CROUCH": 0.15, "FOOTSTEP": 0.25, "SPRINT": 0.75, "EMP": 1.0, "MELEE": 1.0}
+SALIENCE = {
+    "CROUCH": 0.15,
+    "FOOTSTEP": 0.25,
+    "DOOR": 0.4,
+    "SPRINT": 0.75,
+    "METAL": 0.85,
+    "EMP": 1.0,
+    "MELEE": 1.0,
+    "GLASS": 1.0,
+}
 MOTION = "UNIDENTIFIED_MOTION"
 HIDE_ENTRY = "HIDE_ENTRY"
 DISPATCH = "DISPATCH"

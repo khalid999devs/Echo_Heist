@@ -48,6 +48,7 @@ def build_objective_view(
             "HideSpot": "Enter cover",
             "LeaveHide": "Leave cover",
             "Canister": "Push canister",
+            "Glass": "Break glass",
         }.get(hint.kind, "Interact")
         interaction = (("Hold " if hint.required_ticks > 1 else "") + interact_key + "  ") + label
         if hint.required_ticks > 1:

@@ -17,6 +17,9 @@ REJECTIONS = {
     "no_reachable_guard": ("MELEE", "NO GUARD IN REACH"),
     "stair_landing_occupied": ("", "STAIRS BLOCKED / WAIT FOR THE LANDING"),
     "low_headroom": ("", "LOW CLEARANCE / CROUCH OUT FIRST"),
+    "door_obstructed": ("", "DOORWAY BLOCKED / CLEAR IT FIRST"),
+    "hide_spot_occupied": ("", "LOCKER OCCUPIED"),
+    "hide_spot_blocked": ("", "LOCKER BLOCKED"),
 }
 
 

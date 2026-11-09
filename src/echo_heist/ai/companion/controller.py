@@ -433,6 +433,19 @@ class CompanionController:
 
     def _hide(self, observation: Observation) -> Action | None:
         own = observation.own_status
+        locker = next((h for h in observation.interactions if h.kind == "HideSpot"), None)
+        threatened = (
+            observation.tick
+            - max((s.tick for s in self.beliefs.sightings.values()), default=-10_000)
+            <= CLEAR_TICKS
+        )
+        if locker is not None and not own.concealed and not self.beliefs.visible and threatened:
+            # An authored locker offered right here is the same legal hiding
+            # action the Human has; entering in view of a guard would only be
+            # inspected, so it is used out of sight. Simulation decides success.
+            return Action(
+                self.actor_id, ActionKind.HIDE, observation.tick, target_id=locker.target_id
+            )
         tile = self.directive.goal
         if tile is None:
             return None

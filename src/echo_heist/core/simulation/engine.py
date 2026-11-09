@@ -11,6 +11,7 @@ from echo_heist.ai.navigation.grid import bfs
 from echo_heist.core.abilities.tools import advance_echoes, tool_reason, use_tool
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.environment.model import EnvironmentSpec
 from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.observations import Observation
 from echo_heist.core.contracts.results import (
@@ -26,7 +27,17 @@ from echo_heist.core.contracts.security.model import (
     InterceptPlan,
     SecuritySpec,
 )
-from echo_heist.core.contracts.world import ActorKind, ActorSpawn, Scalar, StaticMap, tile_center
+from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
+from echo_heist.core.contracts.world import (
+    ActorKind,
+    ActorSpawn,
+    Position,
+    Scalar,
+    StaticMap,
+    tile_center,
+)
+from echo_heist.core.environment import lifecycle as props
+from echo_heist.core.perception.sensors import line_of_sight
 from echo_heist.core.simulation import views
 from echo_heist.core.simulation.systems import security as guard_security
 from echo_heist.core.simulation.systems.capture import update_captures
@@ -34,6 +45,7 @@ from echo_heist.core.simulation.systems.mission import (
     check_extraction,
     end_mission,
     interaction_reason,
+    interaction_target,
     mission_object,
     update_theft,
 )
@@ -79,6 +91,7 @@ def _map_payload(world_map: StaticMap) -> dict[str, object]:
         ],
         "objects": [asdict(obj) for obj in world_map.objects],
         "stairs": [asdict(link) for link in world_map.stairs],
+        "door_tiles": sorted(world_map.door_tiles),
     }
 
 
@@ -92,9 +105,23 @@ class Simulation:
         mission: MissionSpec | None = None,
         seed: int = 1042,
         security: SecuritySpec | None = None,
+        environment: EnvironmentSpec | None = None,
     ) -> None:
         if not spawns:
             raise ValueError("At least one actor is required")
+        self._base_map, self._environment = world_map, environment
+        prop_state = props.initial_state(environment) if environment is not None else None
+        if environment is not None and prop_state is not None:
+            stair_tiles = {link.tile for link in world_map.stairs}
+            for prop in environment.props:
+                if any(
+                    not world_map.can_walk(tile)
+                    or tile in stair_tiles
+                    or tile in world_map.crouch_tiles
+                    for tile in prop.tiles
+                ):
+                    raise ValueError(f"Prop {prop.object_id!r} must stand on open, non-stair floor")
+            world_map = props.effective_map(world_map, prop_state)
         if len({spawn.actor_id for spawn in spawns}) != len(spawns) or len(
             {spawn.tile for spawn in spawns}
         ) != len(spawns):
@@ -119,6 +146,15 @@ class Simulation:
                 for spawn in sorted(spawns, key=lambda value: value.actor_id)
             }
         )
+        if prop_state is not None:
+            self._world.environment = prop_state
+        if mission is not None and environment is not None:
+            anchors = {
+                mission_object(world_map, object_id).tile
+                for object_id in (mission.core_object_id, mission.exit_object_id)
+            }
+            if any(tile in anchors for prop in environment.props for tile in prop.tiles):
+                raise ValueError("A prop may not cover the Core or Exit anchor")
         if mission is not None:
             actor = self._world.actors.get(mission.operative_id)
             if actor is None or actor.kind not in (ActorKind.OPERATIVE, ActorKind.COMPANION):
@@ -194,7 +230,7 @@ class Simulation:
         map identity, never moves an actor and refuses a map in which any actor's
         current physical body would no longer fit.
         """
-        current = self._map
+        current = self._base_map
         if (
             world_map.map_id != current.map_id
             or (world_map.width, world_map.height) != (current.width, current.height)
@@ -202,14 +238,16 @@ class Simulation:
             or not reason
         ):
             raise ValueError("A geometry revision must keep map identity, size and stairs")
+        physical = props.effective_map(world_map, self._world.environment)
         if any(
             not body_fits(
-                world_map, actor.position, self._rules.actor_radius_units, crouched=actor.crouched
+                physical, actor.position, self._rules.actor_radius_units, crouched=actor.crouched
             )
             for actor in self._world.actors.values()
         ):
             raise ValueError("A geometry revision cannot enclose an actor's body")
-        self._pending_geometry = (world_map, reason)
+        self._base_map = world_map
+        self._pending_geometry = (physical, reason)
 
     def nexus_status(self) -> NexusStatus | None:
         """Privileged NEXUS display/persistence data; never given to a controller."""
@@ -235,6 +273,17 @@ class Simulation:
 
     def presentation_snapshot(self) -> PresentationSnapshot:
         return views.presentation(self._world, self._map, self._rules, self._security)
+
+    def _cue_visible(self, position: Position, actor_id: str) -> bool:
+        """Whether the mission intruder actually saw a prop cue (own cues always)."""
+        observer_id = self._mission.operative_id if self._mission else None
+        if observer_id is None or actor_id == observer_id:
+            return True
+        observer = self._world.actors[observer_id]
+        reach = (self._security.rules.sight_range_tiles if self._security else 8) * UNIT
+        return (observer.position[0] - position[0]) ** 2 + (
+            observer.position[1] - position[1]
+        ) ** 2 <= reach**2 and line_of_sight(self._map, observer.position, position)
 
     def step(self, actions: Iterable[Action] = (), *, abort: bool = False) -> StepResult:
         if self._world.mission_end is not None:
@@ -296,6 +345,7 @@ class Simulation:
             )
             self._world.next_event_id += 1
 
+        t = props.Tick(self._world, self._map, self._rules, emit, self._cue_visible)
         if abort:
             operative = (
                 self._mission.operative_id if self._mission else next(iter(self._world.actors))
@@ -329,6 +379,16 @@ class Simulation:
         for action in accepted:
             if action.kind == ActionKind.MOVE:
                 cancel_stair(self._world, action.actor_id, emit)
+                actor = self._world.actors[action.actor_id]
+                if actor.hidden_in is not None:
+                    props.leave_locker(t, action.actor_id)  # "exit by E or move"
+                sprint = (
+                    action.sprint
+                    and not actor.crouched
+                    and actor.sprint_ready_at == 0
+                    and actor.sprint_ticks_remaining > 0
+                )
+                props.push(t, action.actor_id, action.direction, sprint)
                 move_actor(self._world, self._map, self._rules, action, emit)
             elif action.kind == ActionKind.WAIT:
                 emit(EventKind.ACTION_ACCEPTED, action.actor_id)
@@ -350,21 +410,34 @@ class Simulation:
                     self._world, self._map, self._rules, self._mission, action
                 )
                 if reason is None:
-                    stairs = stair_hints(self._world, self._map, action.actor_id)
-                    if stairs and (
-                        action.target_id is None or action.target_id == stairs[0].target_id
-                    ):
+                    hint = interaction_target(
+                        self._world, self._map, self._rules, self._mission, action
+                    )
+                    if hint.kind == "Stair":
                         use_stair(
                             self._world,
                             self._map,
                             self._rules,
                             action.actor_id,
-                            stairs[0].target_id,
+                            hint.target_id,
                             emit,
                         )
-                    else:
+                    elif hint.kind == "Core":
                         interactions.append(action)
-                else:
+                    else:
+                        reason = props.interact(t, action.actor_id, hint.target_id)
+                if reason is not None:
+                    emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
+            elif action.kind == ActionKind.HIDE:
+                spot = self._hide_spot(action)
+                reason = (
+                    "no_hide_spot"
+                    if spot is None
+                    else props.enter_locker(
+                        t, action.actor_id, self._world.environment.lockers[spot]
+                    )
+                )
+                if reason is not None:
                     emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
             elif action.kind in TOOL_ACTIONS:
                 reason = tool_reason(self._world, self._map, self._rules, action)
@@ -373,6 +446,18 @@ class Simulation:
                     use_tool(self._world, self._map, self._rules, action, emit)
                 else:
                     emit(EventKind.ACTION_REJECTED, action.actor_id, (("reason", reason),))
+        for action in accepted:
+            if action.kind == ActionKind.MOVE:
+                props.bump(t, action.actor_id)
+        props.advance(t)
+        if self._world.environment.geometry_reasons:
+            reasons = ";".join(self._world.environment.geometry_reasons)
+            self._world.environment.geometry_reasons.clear()
+            # Applied at the start of the next tick, like every geometry change.
+            self._pending_geometry = (
+                props.effective_map(self._base_map, self._world.environment),
+                reasons,
+            )
         update_theft(self._world, self._rules, self._mission, tuple(interactions), emit)
         advance_stairs(self._world, self._map, self._rules, emit)
         if self._security is not None:
@@ -411,7 +496,7 @@ class Simulation:
         if action.target_tile is not None:
             return "unsupported_target_tile"
         if (
-            action.kind not in (ActionKind.INTERACT, ActionKind.MELEE)
+            action.kind not in (ActionKind.INTERACT, ActionKind.MELEE, ActionKind.HIDE)
             and action.target_id is not None
         ):
             return "unexpected_target_id"
@@ -434,21 +519,37 @@ class Simulation:
         ):
             return "intruder_only_action"
         if action.kind == ActionKind.CROUCH:
+            if actor.hidden_in is not None:
+                return "hidden"
             if actor.crouched and not body_fits(
                 self._map, actor.position, self._rules.actor_radius_units
             ):
                 return "low_headroom"
             return None
         if action.kind == ActionKind.HIDE:
-            return "environment_system_not_connected"
+            if actor.hidden_in is not None:
+                return "already_hidden"
+            return None if self._hide_spot(action) is not None else "no_hide_spot"
         if action.kind == ActionKind.INTERACT:
             return interaction_reason(self._world, self._map, self._rules, self._mission, action)
         return tool_reason(self._world, self._map, self._rules, action, at_tick=self.tick + 1)
 
+    def _hide_spot(self, action: Action) -> str | None:
+        """The locker a HIDE action enters: the named one or the closest offered."""
+        hints = props.hints(self._world, self._map, self._rules, action.actor_id)
+        return next(
+            (
+                hint.target_id
+                for _, hint in hints
+                if hint.kind == "HideSpot" and action.target_id in (None, hint.target_id)
+            ),
+            None,
+        )
+
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 11,
+            "schema_version": 12,
             "seed": self._seed,
             "rules": asdict(self._rules),
             "pending_geometry": {
@@ -469,6 +570,8 @@ class Simulation:
             else None,
             "world": asdict(self._world),
             "map": _map_payload(self._map),
+            "base_map": _map_payload(self._base_map),
+            "environment": asdict(self._environment) if self._environment else None,
         }
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False)
         return sha256(canonical.encode()).hexdigest()

@@ -133,6 +133,9 @@ class StaticMap:
     stairs: tuple[StairLink, ...] = ()
     crouch_tiles: frozenset[Tile] = frozenset()
     obstacles: tuple[ObstacleBounds, ...] = ()
+    # Controlled passages: a closed door blocks bodies and sight, but routes may
+    # still plan through it because any actor pushing into it opens it.
+    door_tiles: frozenset[Tile] = frozenset()
     obstacle_index: Mapping[Tile, tuple[ObstacleBounds, ...]] = data_field(
         init=False, repr=False, compare=False
     )
@@ -152,6 +155,10 @@ class StaticMap:
         if not crouch_tiles <= self.blocked_tiles & self.opaque_tiles:
             raise ValueError("Under-desk space must be inside solid, opaque furniture")
         object.__setattr__(self, "crouch_tiles", crouch_tiles)
+        doors = frozenset(immutable_tile(tile) for tile in self.door_tiles)
+        if any(not self.contains(tile) for tile in doors) or doors & crouch_tiles:
+            raise ValueError("Door tiles must be in-bounds passages, not furniture clearance")
+        object.__setattr__(self, "door_tiles", doors)
         object.__setattr__(self, "obstacles", tuple(self.obstacles))
         index: dict[Tile, list[ObstacleBounds]] = {}
         if len({obstacle.object_id for obstacle in self.obstacles}) != len(self.obstacles):
@@ -197,7 +204,9 @@ class StaticMap:
 
     def can_walk(self, tile: Tile, *, crouched: bool = False) -> bool:
         return self.contains(tile) and (
-            tile not in self.blocked_tiles or (crouched and tile in self.crouch_tiles)
+            tile not in self.blocked_tiles
+            or (crouched and tile in self.crouch_tiles)
+            or tile in self.door_tiles
         )
 
     def point_blocked(self, point: Position, *, vision: bool = False) -> bool:

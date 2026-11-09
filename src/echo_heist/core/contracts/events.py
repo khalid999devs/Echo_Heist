@@ -28,6 +28,7 @@ class EventKind(StrEnum):
     POLICY_DECISION = "POLICY_DECISION"
     GEOMETRY_REVISED = "GEOMETRY_REVISED"
     HIDE_WITNESSED = "HIDE_WITNESSED"
+    PROP_CHANGED = "PROP_CHANGED"
 
 
 @dataclass(frozen=True, slots=True)

@@ -1,8 +1,9 @@
-"""Seen versus unseen hiding over the existing posture/under-desk clearance contract.
+"""Seen versus unseen hiding: under-desk clearance and authored lockers.
 
-Concealment is authoritative posture plus authored clearance, never an art or
-render effect. A guard that saw the entry receives a cue naming that cover and
-may inspect it from an adjacent tile; nobody else can see the hidden actor.
+Concealment is authoritative posture plus authored clearance, or occupancy of
+a locker committed by Simulation; never an art or render effect. A guard that
+saw the entry receives a cue naming that cover and may inspect it from an
+adjacent tile; nobody else can see the hidden actor.
 """
 
 from echo_heist.core.contracts.security.model import VisualCue
@@ -11,8 +12,10 @@ from echo_heist.core.contracts.world import StaticMap, Tile
 HIDE_ENTRY = "HIDE_ENTRY"
 
 
-def is_concealed(world_map: StaticMap, tile: Tile, crouched: bool) -> bool:
-    return crouched and tile in world_map.crouch_tiles
+def is_concealed(
+    world_map: StaticMap, tile: Tile, crouched: bool, *, hidden_in: str | None = None
+) -> bool:
+    return hidden_in is not None or (crouched and tile in world_map.crouch_tiles)
 
 
 def witnessed_entry(guard_id: str, cover: Tile, tick: int) -> VisualCue:

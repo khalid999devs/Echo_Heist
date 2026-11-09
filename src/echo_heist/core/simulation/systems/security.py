@@ -182,7 +182,7 @@ def _sees(
     rules = spec.rules
     actor, target = world.actors[viewer], world.actors[other]
     if viewer in world.guard_memories:
-        if is_concealed(world_map, target.tile, target.crouched):
+        if is_concealed(world_map, target.tile, target.crouched, hidden_in=target.hidden_in):
             return inspection_reveals(
                 actor.tile,
                 target.tile,
@@ -226,7 +226,9 @@ def _witness(
                     actor is not None
                     and actor.kind in INTRUDERS
                     and not entity.concealed
-                    and is_concealed(world_map, actor.tile, actor.crouched)
+                    and is_concealed(
+                        world_map, actor.tile, actor.crouched, hidden_in=actor.hidden_in
+                    )
                 ):
                     cue = witnessed_entry(guard_id, actor.tile, world.tick)
                     cues.append(cue)
@@ -282,7 +284,9 @@ def refresh(
                     world.tick < other.stunned_until,
                     other.facing,
                     crouched=other.crouched,
-                    concealed=is_concealed(world_map, other.tile, other.crouched),
+                    concealed=is_concealed(
+                        world_map, other.tile, other.crouched, hidden_in=other.hidden_in
+                    ),
                 )
             )
         world.visible_entities[actor_id] = tuple(visible)

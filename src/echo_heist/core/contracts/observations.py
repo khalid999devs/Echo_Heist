@@ -51,6 +51,8 @@ class OwnStatus:
     stair_ticks_remaining: int = 0
     crouched: bool = False
     melee_cooldown_remaining: int = 0
+    # Stable ID of the locker this actor is inside (own knowledge only).
+    hidden_in: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "tile", immutable_tile(self.tile))

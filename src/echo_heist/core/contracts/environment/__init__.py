@@ -1,1 +1,1 @@
-"""Immutable presentation contracts for Simulation-owned environment lifecycles."""
+"""Immutable prop/rule inputs and presentation contracts for environment lifecycles."""

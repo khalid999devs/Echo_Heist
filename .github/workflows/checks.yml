@@ -23,7 +23,7 @@ jobs:
           - os: windows-2022
             architecture: x64
             target: windows-x64
-          - os: macos-14
+          - os: macos-15
             architecture: arm64
             target: macos-arm64
     env:

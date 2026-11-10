@@ -1,0 +1,675 @@
+{
+  "base_commit": "87302a9",
+  "date": "2026-11-10",
+  "fingerprint": 12,
+  "asset": {
+    "path": "src/echo_heist/resources/assets/characters/robots/turnarounds.png",
+    "sha256": "355b6f0b5c4a8d03f6d1f72db783a2faff10fa47b20eaefa513bd78f5d25fb27",
+    "origin": "built-in image_gen; existing project robot references; preserved RGBA"
+  },
+  "checks": {
+    "initial_full_suite": 301,
+    "initial_full_seconds": 48.01,
+    "final_presentation": 50,
+    "final_presentation_seconds": 17.21,
+    "ruff": "PASS",
+    "format": "PASS",
+    "structure": "PASS",
+    "mypy_sources": 179,
+    "mypy": "PASS"
+  },
+  "native": {
+    "driver": "cocoa",
+    "frames": 480,
+    "actual_tick": 244,
+    "moving_frame_samples": {
+      "SENTINEL": 297,
+      "TRACKER": 270,
+      "INTERCEPTOR": 346,
+      "COMPANION": 388
+    },
+    "actual_pose_indices": {
+      "SENTINEL": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "TRACKER": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "INTERCEPTOR": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "COMPANION": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "furniture_shadow_styles": {
+      "16,-16,40": 1,
+      "0,3,28": 25,
+      "-6,-14,40": 1,
+      "8,0,40": 1,
+      "-10,4,40": 1,
+      "7,3,40": 2,
+      "-21,9,40": 4,
+      "-7,18,40": 1,
+      "0,14,40": 1,
+      "16,16,40": 2,
+      "0,23,40": 1,
+      "8,-8,40": 1,
+      "-8,-3,40": 2,
+      "19,0,40": 1,
+      "5,-13,40": 1,
+      "6,-15,40": 3,
+      "-8,-8,40": 1,
+      "0,4,32": 7,
+      "21,9,40": 2,
+      "7,18,40": 1,
+      "14,14,40": 1,
+      "8,20,40": 1,
+      "10,-10,40": 2,
+      "16,-7,40": 1,
+      "-15,-15,40": 1,
+      "13,-5,40": 1,
+      "-6,14,40": 1,
+      "23,0,40": 2,
+      "-9,4,40": 1,
+      "-13,5,40": 1,
+      "13,5,40": 1,
+      "-5,-13,40": 2,
+      "-16,16,40": 2,
+      "0,-23,40": 1,
+      "21,-9,40": 1,
+      "-21,-9,40": 1,
+      "-10,-10,40": 1,
+      "-5,-11,40": 1,
+      "-9,21,40": 3,
+      "-19,0,40": 1,
+      "-7,-7,40": 1,
+      "5,11,40": 2,
+      "9,0,40": 1,
+      "-3,-3,40": 1,
+      "-11,11,40": 1,
+      "4,10,40": 1,
+      "-15,-6,40": 1,
+      "7,-16,40": 1,
+      "9,9,40": 1,
+      "-8,8,40": 1,
+      "-9,-21,40": 1,
+      "4,-9,40": 1,
+      "-14,-6,40": 1,
+      "0,-12,40": 1,
+      "6,-6,40": 1,
+      "9,-21,40": 1,
+      "4,-2,40": 1,
+      "9,21,40": 1,
+      "8,-3,40": 1,
+      "3,7,40": 1
+    },
+    "shots": [
+      "real-robots-030",
+      "real-robots-090",
+      "real-robots-150",
+      "real-robots-210",
+      "real-robots-330",
+      "real-robots-470",
+      "room-screening",
+      "room-reception",
+      "room-power",
+      "room-servers",
+      "room-repair",
+      "room-logistics",
+      "room-checkpoint",
+      "room-control",
+      "room-wet-lab",
+      "room-bio-lab",
+      "room-lab-stores",
+      "room-electronics",
+      "room-coolant",
+      "room-reactor"
+    ],
+    "four_camera_draw_ms_p95": 4.277999978512526,
+    "scope": "Production AI/map, real committed movement. Four diagnostic actor cameras and room-only previews are visual QA, not ordinary player visibility or FPS."
+  },
+  "chase": {
+    "driver": "cocoa",
+    "frames": 2400,
+    "actual_tick": 1224,
+    "moving_frame_samples": {
+      "SENTINEL": 1597,
+      "TRACKER": 1581,
+      "INTERCEPTOR": 1383,
+      "COMPANION": 2125
+    },
+    "fast_frame_samples": {
+      "COMPANION": 832,
+      "TRACKER": 310,
+      "INTERCEPTOR": 92,
+      "SENTINEL": 330
+    },
+    "actual_pose_indices": {
+      "SENTINEL": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "TRACKER": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "INTERCEPTOR": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "COMPANION": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    "furniture_shadow_styles": {
+      "16,-16,40": 1,
+      "0,3,28": 25,
+      "-6,-14,40": 1,
+      "8,0,40": 1,
+      "-10,4,40": 1,
+      "7,3,40": 2,
+      "-21,9,40": 4,
+      "-7,18,40": 1,
+      "0,14,40": 1,
+      "16,16,40": 2,
+      "0,23,40": 1,
+      "8,-8,40": 1,
+      "-8,-3,40": 2,
+      "19,0,40": 1,
+      "5,-13,40": 1,
+      "6,-15,40": 3,
+      "-8,-8,40": 1,
+      "0,4,32": 7,
+      "21,9,40": 2,
+      "7,18,40": 1,
+      "14,14,40": 1,
+      "8,20,40": 1,
+      "10,-10,40": 2,
+      "16,-7,40": 1,
+      "-15,-15,40": 1,
+      "13,-5,40": 1,
+      "-6,14,40": 1,
+      "23,0,40": 2,
+      "-9,4,40": 1,
+      "-13,5,40": 1,
+      "13,5,40": 1,
+      "-5,-13,40": 2,
+      "-16,16,40": 2,
+      "0,-23,40": 1,
+      "21,-9,40": 1,
+      "-21,-9,40": 1,
+      "-10,-10,40": 1,
+      "-5,-11,40": 1,
+      "-9,21,40": 3,
+      "-19,0,40": 1,
+      "-7,-7,40": 1,
+      "5,11,40": 2,
+      "9,0,40": 1,
+      "-3,-3,40": 1,
+      "-11,11,40": 1,
+      "4,10,40": 1,
+      "-15,-6,40": 1,
+      "7,-16,40": 1,
+      "9,9,40": 1,
+      "-8,8,40": 1,
+      "-9,-21,40": 1,
+      "4,-9,40": 1,
+      "-14,-6,40": 1,
+      "0,-12,40": 1,
+      "6,-6,40": 1,
+      "9,-21,40": 1,
+      "4,-2,40": 1,
+      "9,21,40": 1,
+      "8,-3,40": 1,
+      "3,7,40": 1
+    },
+    "shots": [
+      "real-robots-030",
+      "real-robots-090",
+      "real-robots-150",
+      "real-robots-210",
+      "real-robots-1200",
+      "real-robots-2390",
+      "room-screening",
+      "room-reception",
+      "room-power",
+      "room-servers",
+      "room-repair",
+      "room-logistics",
+      "room-checkpoint",
+      "room-control",
+      "room-wet-lab",
+      "room-bio-lab",
+      "room-lab-stores",
+      "room-electronics",
+      "room-coolant",
+      "room-reactor"
+    ],
+    "four_camera_draw_ms_p95": 4.2334579629823565,
+    "scope": "Production AI/map, real committed movement. Four diagnostic actor cameras and room-only previews are visual QA, not ordinary player visibility or FPS."
+  },
+  "performance": {
+    "video_driver": "cocoa",
+    "audio_ready": true,
+    "cycles": 12,
+    "frames": 3600,
+    "measured_frames_after_warmup": 2400,
+    "sizes": [
+      [
+        1280,
+        720
+      ],
+      [
+        1440,
+        900
+      ]
+    ],
+    "security_enabled": true,
+    "production_gateway": true,
+    "python_tracing": false,
+    "runs": [
+      {
+        "cycle": 1,
+        "mode": "HUMAN",
+        "tick": 153,
+        "deployment_ms": 20.857,
+        "companion_search": null,
+        "props": 13
+      },
+      {
+        "cycle": 2,
+        "mode": "COMPANION",
+        "tick": 153,
+        "deployment_ms": 20.961,
+        "companion_search": 64,
+        "props": 13
+      },
+      {
+        "cycle": 3,
+        "mode": "HUMAN",
+        "tick": 153,
+        "deployment_ms": 20.526,
+        "companion_search": null,
+        "props": 13
+      },
+      {
+        "cycle": 4,
+        "mode": "COMPANION",
+        "tick": 153,
+        "deployment_ms": 20.922,
+        "companion_search": 64,
+        "props": 13
+      },
+      {
+        "cycle": 5,
+        "mode": "HUMAN",
+        "tick": 153,
+        "deployment_ms": 19.999,
+        "companion_search": null,
+        "props": 13
+      },
+      {
+        "cycle": 6,
+        "mode": "COMPANION",
+        "tick": 153,
+        "deployment_ms": 21.121,
+        "companion_search": 64,
+        "props": 13
+      },
+      {
+        "cycle": 7,
+        "mode": "HUMAN",
+        "tick": 153,
+        "deployment_ms": 20.921,
+        "companion_search": null,
+        "props": 13
+      },
+      {
+        "cycle": 8,
+        "mode": "COMPANION",
+        "tick": 153,
+        "deployment_ms": 20.768,
+        "companion_search": 64,
+        "props": 13
+      },
+      {
+        "cycle": 9,
+        "mode": "HUMAN",
+        "tick": 153,
+        "deployment_ms": 20.068,
+        "companion_search": null,
+        "props": 13
+      },
+      {
+        "cycle": 10,
+        "mode": "COMPANION",
+        "tick": 153,
+        "deployment_ms": 21.278,
+        "companion_search": 64,
+        "props": 13
+      },
+      {
+        "cycle": 11,
+        "mode": "HUMAN",
+        "tick": 153,
+        "deployment_ms": 20.881,
+        "companion_search": null,
+        "props": 13
+      },
+      {
+        "cycle": 12,
+        "mode": "COMPANION",
+        "tick": 153,
+        "deployment_ms": 20.46,
+        "companion_search": 64,
+        "props": 13
+      }
+    ],
+    "mode_frame_ms": {
+      "HUMAN": {
+        "update": {
+          "median": 0.781,
+          "p95": 1.083,
+          "max": 1.725
+        },
+        "draw": {
+          "median": 2.088,
+          "p95": 2.759,
+          "max": 3.834
+        },
+        "present": {
+          "median": 5.559,
+          "p95": 6.619,
+          "max": 7.585
+        },
+        "total": {
+          "median": 8.291,
+          "p95": 9.089,
+          "max": 9.467
+        }
+      },
+      "COMPANION": {
+        "update": {
+          "median": 0.843,
+          "p95": 1.184,
+          "max": 8.084
+        },
+        "draw": {
+          "median": 2.09,
+          "p95": 2.791,
+          "max": 4.225
+        },
+        "present": {
+          "median": 5.463,
+          "p95": 6.643,
+          "max": 6.879
+        },
+        "total": {
+          "median": 8.292,
+          "p95": 9.143,
+          "max": 11.685
+        }
+      }
+    },
+    "teaching_view": false,
+    "frame_ms": {
+      "update": {
+        "median": 0.805,
+        "p95": 1.149,
+        "max": 8.084
+      },
+      "draw": {
+        "median": 2.09,
+        "p95": 2.781,
+        "max": 4.225
+      },
+      "present": {
+        "median": 5.495,
+        "p95": 6.628,
+        "max": 7.585
+      },
+      "total": {
+        "median": 8.291,
+        "p95": 9.124,
+        "max": 11.685
+      }
+    },
+    "memory": [
+      {
+        "cycle": 1,
+        "rss_mb": 504.28,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 2,
+        "rss_mb": 511.62,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 3,
+        "rss_mb": 534.61,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 4,
+        "rss_mb": 547.44,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 5,
+        "rss_mb": 540.81,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 6,
+        "rss_mb": 546.52,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 7,
+        "rss_mb": 550.81,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 8,
+        "rss_mb": 552.11,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 9,
+        "rss_mb": 550.67,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 10,
+        "rss_mb": 551.88,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 11,
+        "rss_mb": 556.44,
+        "python_mb": 0.0
+      },
+      {
+        "cycle": 12,
+        "rss_mb": 558.25,
+        "python_mb": 0.0
+      }
+    ],
+    "last_six_rss_span_mb": 7.58,
+    "python_growth_after_warmup_mb": null,
+    "rss_change_from_warmup_mb": 10.81,
+    "bounded_in_this_run": true,
+    "scope": "Native macOS uncapped CPU/presentation workload, production AI/security/props; restarts and resizes, four warmup cycles (both modes at both sizes). Optional Python tracing adds overhead. Each run starts at seed 1042 with reset protocol memory; no actor state injection. RSS includes OS compression and compositor buffers; bounded means final six samples stay within 64 MB of warmup and Python growth below 4 MB (including telemetry). A bounded short run is not proof against every long-session memory leak.",
+    "complete_mission": {
+      "outcome": "WIN",
+      "tick": 2463,
+      "lockdown_alarm_seen": true,
+      "phase_frame_ms": {
+        "INFILTRATE": {
+          "frames": 1961,
+          "update": {
+            "median": 0.797,
+            "p95": 1.062,
+            "max": 14.464
+          },
+          "draw": {
+            "median": 2.365,
+            "p95": 3.221,
+            "max": 15.683
+          },
+          "present": {
+            "median": 5.492,
+            "p95": 6.657,
+            "max": 502.596
+          },
+          "total": {
+            "median": 8.165,
+            "p95": 9.2,
+            "max": 506.254
+          }
+        },
+        "LOCKDOWN": {
+          "frames": 2869,
+          "update": {
+            "median": 0.842,
+            "p95": 1.607,
+            "max": 8.335
+          },
+          "draw": {
+            "median": 3.303,
+            "p95": 4.534,
+            "max": 7.334
+          },
+          "present": {
+            "median": 4.386,
+            "p95": 5.561,
+            "max": 5.722
+          },
+          "total": {
+            "median": 8.182,
+            "p95": 9.096,
+            "max": 14.102
+          }
+        }
+      },
+      "python_tracing": false
+    }
+  }
+}

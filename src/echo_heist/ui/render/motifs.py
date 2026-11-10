@@ -9,6 +9,7 @@ from echo_heist.core.contracts.world import ActorKind
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.actors.draw import draw_actor
 from echo_heist.ui.render.actors.model import ActorMotion as ActorMotion
+from echo_heist.ui.render.actors.shadows import DEFAULT_SHADOW, ShadowStyle
 
 
 def shade(color: theme.Color, amount: int) -> theme.Color:
@@ -232,6 +233,8 @@ def actor(
     crouch: tuple[pygame.Surface, ...] = (),
     fraction: float = 1.0,
     cover: float = 0.0,
+    robot: bool = False,
+    shadow_style: ShadowStyle = DEFAULT_SHADOW,
 ) -> None:
     """Animate a facing armored silhouette without changing actor location or hitbox."""
     if sprites is not None:
@@ -250,6 +253,8 @@ def actor(
             crouch=crouch,
             fraction=fraction,
             cover=cover,
+            robot=robot,
+            shadow_style=shadow_style,
         )
         return
     x, y = point

@@ -108,9 +108,11 @@ class GameFlow:
         prepared(0.18, "Preparing the facility")
         self.art = WorldArt.load()
         prepared(0.52, "Preparing the facility")
-        self.map_surface = build_map_surface(self.level, self.fonts, self.art)
-        prepared(0.80, "Preparing the facility")
         self.furnishings = prepare_furniture(self.level, self.art.props)
+        prepared(0.68, "Preparing the facility")
+        self.map_surface = build_map_surface(
+            self.level, self.fonts, self.art, furnishings=self.furnishings
+        )
         prepared(0.96, "Preparing the facility")
         self.scene = Scene.TITLE
         self.selected = 0

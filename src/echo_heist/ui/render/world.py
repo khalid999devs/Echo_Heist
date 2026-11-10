@@ -20,6 +20,7 @@ from echo_heist.ui.render.actors.model import (
     OPERATIVE_SIZE,
     position_at,
 )
+from echo_heist.ui.render.actors.robots import load_robots
 from echo_heist.ui.render.camera import Camera
 from echo_heist.ui.render.environment.architecture.materials import material_floor
 from echo_heist.ui.render.environment.architecture.sections import (
@@ -27,6 +28,7 @@ from echo_heist.ui.render.environment.architecture.sections import (
     wall_section,
     wall_skin,
 )
+from echo_heist.ui.render.environment.architecture.services import paint_services
 from echo_heist.ui.render.environment.art import (
     clinical_props,
     laboratory_props,
@@ -35,6 +37,7 @@ from echo_heist.ui.render.environment.art import (
 )
 from echo_heist.ui.render.environment.furnishings.catalogue import FurnitureVisual, draw_instrument
 from echo_heist.ui.render.environment.furnishings.story import paint_room_story
+from echo_heist.ui.render.environment.illumination.model import shadow_at
 from echo_heist.ui.render.environment.interiors import draw_details, draw_room_trim, room_floors
 from echo_heist.ui.render.environment.lighting import bake_lighting, draw_equipment
 from echo_heist.ui.render.interactions.effects import draw_effects
@@ -60,6 +63,9 @@ class WorldArt:
     operative_walk: tuple[pygame.Surface, ...]
     operative_run: tuple[pygame.Surface, ...]
     operative_crouch: tuple[pygame.Surface, ...] = ()
+    robot_idle: tuple[tuple[pygame.Surface, ...], ...] = ()
+    robot_walk: tuple[tuple[pygame.Surface, ...], ...] = ()
+    robot_run: tuple[tuple[pygame.Surface, ...], ...] = ()
 
     @classmethod
     def load(cls) -> "WorldArt":
@@ -103,6 +109,7 @@ class WorldArt:
 
         props = tuple(resident(source) for source in props)
 
+        robot_idle, robot_walk, robot_run = load_robots()
         return cls(
             floor,
             bulkhead,
@@ -133,6 +140,9 @@ class WorldArt:
                 column_edges=(0, 406, 681, 1026, 1323),
             ),
             sprite_grid("assets/characters/operative/crouch.png", 4, 4, (110, 86)),
+            robot_idle,
+            robot_walk,
+            robot_run,
         )
 
 
@@ -245,7 +255,11 @@ def _furniture_rects(level: LevelData) -> tuple[tuple[pygame.Rect, str, int], ..
 
 
 def build_map_surface(
-    level: LevelData, fonts: Fonts, art: WorldArt | None = None
+    level: LevelData,
+    fonts: Fonts,
+    art: WorldArt | None = None,
+    *,
+    furnishings: tuple[FurnitureVisual, ...] = (),
 ) -> pygame.Surface:
     """Prepaint the facility once; visual motifs never affect map collision tags."""
     world_map, size = level.static_map, level.static_map.tile_size_px
@@ -298,6 +312,7 @@ def build_map_surface(
                     _roof_tile(surface, rect, variant, roof_texture)
     _floor_shadows(surface, level)
     paint_mounts(surface, level)
+    paint_services(surface, level, furnishings)
     bake_lighting(surface, level)
     draw_details(surface, level, art.props[11] if art else None)
     paint_room_story(surface, level)
@@ -556,6 +571,13 @@ def draw_world(
             front = (entity.tile[1] + 1) * POSITION_UNITS_PER_TILE
             depth = max(0, min(POSITION_UNITS_PER_TILE, front - render_position[1]))
             point = (point[0], point[1] + round(depth * size * 0.8 / POSITION_UNITS_PER_TILE))
+        robot_role = {
+            ActorKind.SENTINEL: 0,
+            ActorKind.TRACKER: 1,
+            ActorKind.INTERCEPTOR: 2,
+            ActorKind.COMPANION: 3,
+        }.get(entity.kind)
+        robot = art is not None and bool(art.robot_idle) and robot_role is not None
         motifs.actor(
             canvas,
             point,
@@ -566,7 +588,11 @@ def draw_world(
             pulse=pulse,
             motion=(actor_motion or {}).get(entity.actor_id, motifs.ActorMotion()),
             clock_ms=clock_ms,
-            sprites=(
+            robot=robot,
+            shadow_style=shadow_at(level, to_pixels(entity.position, size)),
+            sprites=art.robot_idle[robot_role]
+            if robot and art is not None and robot_role is not None
+            else (
                 art.operative
                 if entity.kind == ActorKind.OPERATIVE
                 else art.companion
@@ -581,8 +607,14 @@ def draw_world(
             else None,
             walk=art.operative_walk
             if art is not None and entity.kind == ActorKind.OPERATIVE
+            else art.robot_walk[robot_role]
+            if robot and art is not None and robot_role is not None
             else (),
-            run=art.operative_run if art is not None and entity.kind == ActorKind.OPERATIVE else (),
+            run=art.operative_run
+            if art is not None and entity.kind == ActorKind.OPERATIVE
+            else art.robot_run[robot_role]
+            if robot and art is not None and robot_role is not None
+            else (),
             crouch=art.operative_crouch
             if art is not None and entity.kind == ActorKind.OPERATIVE
             else (),

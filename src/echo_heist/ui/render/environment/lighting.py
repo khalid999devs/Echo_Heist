@@ -4,6 +4,7 @@ import pygame
 
 from echo_heist.level.model import Deck, LevelData
 from echo_heist.ui.render.camera import Camera
+from echo_heist.ui.render.environment.illumination.model import room_lights
 from echo_heist.ui.render.motifs import light_pool
 
 
@@ -23,29 +24,18 @@ def bake_lighting(surface: pygame.Surface, level: LevelData) -> None:
                         (255, 255, 255, 255),
                         ((x - room.left) * size, (y - room.top) * size, size, size),
                     )
-        clinical = room.style in ("laboratory", "office", "reception")
-        color = {
-            "laboratory": (215, 231, 238),
-            "office": (238, 219, 182),
-            "reception": (225, 231, 222),
-            "storage": (229, 196, 139),
-            "maintenance": (233, 184, 110),
-            "server": (132, 177, 218),
-            "reactor": (99, 193, 220),
-        }.get(room.style, (215, 211, 193))
-        radius = max(95, min(rect.width, rect.height))
-        light_pool(light, (rect.width // 2, rect.height // 2), color, radius)
-        if clinical:
-            light_pool(light, (rect.width // 2, size), color, radius)
-        # Wall-mounted linear luminaires, with a reflected wash rather than a neon grid.
-        for x in (rect.left - 6, rect.right + 2):
-            fixture = pygame.Rect(x, rect.top + size // 3, 4, size // 2)
-            tile = (fixture.centerx // size, fixture.centery // size)
-            if tile in level.floor_tiles or not level.static_map.contains(tile):
-                continue
-            pygame.draw.rect(surface, (13, 30, 38), fixture.inflate(6, 6), border_radius=3)
-            pygame.draw.rect(surface, color, fixture, border_radius=2)
-            light_pool(light, (fixture.centerx - rect.x, fixture.centery - rect.y), color, size * 2)
+        for lamp in room_lights(room, size):
+            x, y = lamp.position
+            light_pool(light, (x - rect.x, y - rect.y), lamp.color, lamp.radius)
+            if not lamp.ceiling:
+                # Visible fixtures and shadow sources share exactly the same positions.
+                horizontal = min(abs(y - rect.top), abs(y - rect.bottom)) < size // 2
+                fixture = pygame.Rect(
+                    0, 0, size // 2 if horizontal else 5, 5 if horizontal else size // 2
+                )
+                fixture.center = lamp.position
+                pygame.draw.rect(surface, (15, 26, 30), fixture.inflate(6, 6), border_radius=3)
+                pygame.draw.rect(surface, lamp.color, fixture, border_radius=2)
         if room.style == "laboratory":
             # Pale wall caps and a second clean edge give the laboratory a physical depth.
             pygame.draw.line(

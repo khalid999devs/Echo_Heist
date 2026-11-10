@@ -4,7 +4,7 @@ import pygame
 
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.actors.model import ActorMotion
-from echo_heist.ui.render.actors.shadows import draw_shadow
+from echo_heist.ui.render.actors.shadows import DEFAULT_SHADOW, ShadowStyle, draw_shadow
 
 
 def draw_actor(
@@ -23,6 +23,8 @@ def draw_actor(
     crouch: tuple[pygame.Surface, ...] = (),
     fraction: float = 1.0,
     cover: float = 0.0,
+    robot: bool = False,
+    shadow_style: ShadowStyle = DEFAULT_SHADOW,
 ) -> None:
     active = motion.moving and not (disabled or stunned)
     dx, dy = motion.direction
@@ -35,20 +37,24 @@ def draw_actor(
         poses = run if motion.sprinting and run else walk
         count = len(poses) // 4
         frame = poses[row * count + int(phase * count) % count]
-        pivot = (frame.get_width() // 2, frame.get_height())
+        pivot = (frame.get_width() // 2, frame.get_height() - (12 if robot else 0))
     else:
         pose = 1 + int(phase * 2) if active else 0
-        frame = sprites[(row * 4 if len(sprites) == 16 else 0) + pose]
+        frame = sprites[row] if robot else sprites[(row * 4 if len(sprites) == 16 else 0) + pose]
         pivot = (frame.get_width() // 2, frame.get_height())
     feet = (point[0], point[1] + 3)
     if not cover:
-        draw_shadow(canvas, frame, feet)
+        draw_shadow(canvas, sprites[row] if robot else frame, feet, style=shadow_style)
     if cover:
         frame = frame.copy()
         frame.set_alpha(round(255 * (1 - max(0, min(1, cover)))))
     # Run passing poses have a short flight phase. Keep the contact shadow on
     # the floor; the low lift never affects collision or the camera anchor.
-    lift = round(2 * (1 - abs(2 * ((phase * 2) % 1) - 1))) if active and motion.sprinting else 0
+    lift = (
+        round(2 * (1 - abs(2 * ((phase * 2) % 1) - 1)))
+        if active and motion.sprinting and not robot
+        else 0
+    )
     canvas.blit(frame, (feet[0] - pivot[0], feet[1] - pivot[1] - lift))
     if carries_core:
         pygame.draw.circle(canvas, theme.WARNING, (point[0] + 19, point[1] - 45), 5, 2)

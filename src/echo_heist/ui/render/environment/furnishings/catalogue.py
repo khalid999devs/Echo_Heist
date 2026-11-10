@@ -9,6 +9,7 @@ from echo_heist.level.model import LevelData
 from echo_heist.ui.render.actors.shadows import GroundShadow, cast_shadow
 from echo_heist.ui.render.camera import Camera
 from echo_heist.ui.render.environment.architecture.materials import room_grade
+from echo_heist.ui.render.environment.illumination.model import shadow_at
 
 APPEARANCE_SOURCES = {
     "centrifuge": 27,
@@ -142,7 +143,9 @@ def prepare_furniture(
         # Wall equipment already has contact shading; a second floor silhouette
         # would make screens and cable panels look detached from their wall.
         shadow = (
-            None if appearance in ("screen", "reagents", "cable-cabinet") else cast_shadow(sprite)
+            None
+            if appearance in ("screen", "reagents", "cable-cabinet")
+            else cast_shadow(sprite, shadow_at(level, rect.center, render_rect.h // 2))
         )
         result.append(
             FurnitureVisual(
@@ -169,7 +172,7 @@ def prepare_furniture(
                 rect,
                 render_rect,
                 sprite,
-                cast_shadow(sprite),
+                cast_shadow(sprite, shadow_at(level, rect.center, render_rect.h // 2)),
                 "cover",
                 (),
             )

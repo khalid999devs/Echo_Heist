@@ -1,5 +1,8 @@
 # Current development status
 
+2026-11-10 visual follow-up: [robot/light/wiring handoff](handoffs/khalid/day_04/ROBOT_LIGHTING.md) records four-direction sixteen-pose robot walk/fast gaits, source-directed room shadows and connected wall/machine services. Current fingerprint stays 12; this is a presentation refinement, not closure of pending scoring/persistence/platform gates.
+
+
 Updated **2026-11-10, Asia/Dhaka**. PRs #2–#6 are merged into **main**, preserving original commits. Latest runtime merge **bf3db94** equals the reviewed P05 tree. Read the [merged runtime handoff](../quality/reports/phase05/review/INTEGRATION.md), [P04 review](../quality/reports/phase04/review/REVIEW.md) and [P05 review](../quality/reports/phase05/review/REVIEW.md). Older branch/count/schema statements in dated reports are historical.
 
 Current baseline: **fingerprint 12 / 301 tests**. Structure/Ruff/format/strict mypy pass. Reviewed heads and merged runtime pass Linux headless and Windows x64/macOS arm64 build/frozen smoke CI. Actual Mac production UI/audio review passes. Hosted artifact storage is full; a successful validation job does not prove an archive was uploaded. Physical Windows full-game review and final delivery remain separate.

@@ -1,5 +1,8 @@
 # Work claims and runnable handoffs
 
+2026-11-10: **PRs #5/#6 merged into main**, runtime bf3db94, fingerprint 12 / 301 tests. Read the [merged runtime handoff](../quality/reports/phase05/review/INTEGRATION.md). Real P04 AI/protocols and P05 lifecycles are now implemented; earlier "not published / unavailable / start P04" notes below are historical. Connected review and remaining gate boundaries are recorded in current Status. Khalid's review/fix/integration claim is **DONE and released**; no files remain claimed by this review.
+
+
 2026-10-31 consolidation: [PRs #2/#3/#4 merged into main](handoffs/khalid/day_03/MAIN.md) with original commits preserved. All Khalid presentation, melee and experience consumers are in main; their former branches are retired after ancestry checks. Existing branch names/counts below are historical provenance. Suhita starts/resumes P04-SR1/SR2/SR3 from current main (fingerprint 10 / latest 246 tests). No shared P04–P08 gate is completed by these merges.
 
 

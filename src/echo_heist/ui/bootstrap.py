@@ -76,7 +76,11 @@ def run_desktop(
         )
         pygame.display.set_icon(mark)
         opened = open_game(
-            screen, settings, mute=mute, minimum_ms=0 if smoke_frames is not None else 2200
+            screen,
+            settings,
+            mute=mute,
+            minimum_ms=0 if smoke_frames is not None else 2200,
+            data_dir=data_dir,
         )
         startup_report = {**opened.report, "first_logo_paint_ms": round(first_paint_ms, 2)}
         audio_state = opened.audio_state

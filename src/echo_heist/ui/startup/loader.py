@@ -2,6 +2,7 @@
 
 from concurrent.futures import Future
 from dataclasses import dataclass
+from pathlib import Path
 from queue import Empty, SimpleQueue
 from threading import Event, Thread
 from time import perf_counter
@@ -43,8 +44,16 @@ class StartupLoader:
     Cancellation joins before pygame.quit, including startup errors.
     """
 
-    def __init__(self, view_size: tuple[int, int], settings: Settings, *, mute: bool) -> None:
+    def __init__(
+        self,
+        view_size: tuple[int, int],
+        settings: Settings,
+        *,
+        mute: bool,
+        data_dir: Path | None = None,
+    ) -> None:
         self.progress = LoadingProgress()
+        self._data_dir = data_dir
         self._view_size = view_size
         self._updates: SimpleQueue[LoadingProgress] = SimpleQueue()
         self._cancel = Event()
@@ -90,10 +99,27 @@ class StartupLoader:
             from echo_heist.ui.scenes.flow import GameFlow
 
             self._publish(0.01, "Preparing the facility")
+            gateway = None
+            level = rules = None
+            if self._data_dir is not None:
+                # P04 composition hook: the real autonomy/NEXUS gateway, prepared
+                # here on the worker before ownership reaches the main loop.
+                from echo_heist.autonomy.gateway import connect_gateway
+                from echo_heist.infrastructure.resources import (
+                    load_game_rules,
+                    load_sensor_rules,
+                )
+                from echo_heist.ui.scenes.flow import load_level
+
+                level, rules = load_level(), load_game_rules()
+                gateway = connect_gateway(level, rules, load_sensor_rules(), self._data_dir)
             flow = GameFlow(
                 view_size,
                 settings=settings,
+                level=level,
+                rules=rules,
                 loading=lambda value, _: self._publish(value * 0.78, "Preparing the facility"),
+                autonomy_gateway=gateway,
             )
             self._publish(0.78, "Connecting audio")
             director = AudioDirector(

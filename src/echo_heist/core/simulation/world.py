@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from echo_heist.core.contracts.events import EventKind, HeardCue, SecurityReport
 from echo_heist.core.contracts.observations import EntityView
 from echo_heist.core.contracts.results import MissionEnd
+from echo_heist.core.contracts.security.director import NexusMemory
 from echo_heist.core.contracts.security.model import GuardMemory, VisualCue
 from echo_heist.core.contracts.world import (
     ActorKind,
@@ -85,3 +86,5 @@ class WorldState:
     # Cover each guard actually saw an intruder enter, keyed by guard ID.
     hide_witnesses: dict[str, tuple[VisualCue, ...]] = field(default_factory=dict)
     geometry_revision: int = 0
+    # NEXUS director memory: only guard-sensed evidence, alarms and its own tasks.
+    nexus: NexusMemory = field(default_factory=NexusMemory)

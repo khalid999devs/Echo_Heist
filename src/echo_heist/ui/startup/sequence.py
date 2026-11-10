@@ -1,6 +1,7 @@
 """Keep OS events and display on the main thread while resources prepare."""
 
 from dataclasses import dataclass
+from pathlib import Path
 from statistics import median
 from time import perf_counter
 
@@ -22,7 +23,12 @@ class OpenedGame:
 
 
 def open_game(
-    screen: pygame.Surface, settings: Settings, *, mute: bool, minimum_ms: int = 2200
+    screen: pygame.Surface,
+    settings: Settings,
+    *,
+    mute: bool,
+    minimum_ms: int = 2200,
+    data_dir: Path | None = None,
 ) -> OpenedGame:
     """Called after the first logo flip; normal smoke runs can skip the logo hold.
 
@@ -32,7 +38,9 @@ def open_game(
     began = perf_counter()
     opening = OpeningScreen(reduced_motion=settings.reduced_flashing)
     opening_audio: OpeningAudio | None = None
-    loader = StartupLoader(logical_size_for(screen.get_size()), settings, mute=mute)
+    loader = StartupLoader(
+        logical_size_for(screen.get_size()), settings, mute=mute, data_dir=data_dir
+    )
     frames = 0
     gaps: list[float] = []
     previous = began

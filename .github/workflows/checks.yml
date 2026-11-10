@@ -23,7 +23,7 @@ jobs:
           - os: windows-2022
             architecture: x64
             target: windows-x64
-          - os: macos-14
+          - os: macos-15
             architecture: arm64
             target: macos-arm64
     env:
@@ -64,13 +64,26 @@ jobs:
           uv run --locked --all-extras python scripts/packaging/smoke.py
           "dist/Echo Heist.app" --mute --dummy-video
       - name: Save native build and smoke evidence
-        if: matrix.target != 'headless-checks'
+        id: artifacts
+        if: >-
+          matrix.target != 'headless-checks' &&
+          (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: foundation-${{ matrix.target }}
+          retention-days: 7
           if-no-files-found: error
           path: |
             dist/*.zip
             dist/*.manifest.json
             output/native-smoke/*.json
             output/native-smoke/desktop.png
+      - name: Report unavailable artifact archive
+        if: steps.artifacts.outcome == 'failure'
+        shell: bash
+        run: |
+          echo "::warning::Artifact upload failed. Check the upload log and storage quota."
+          echo "### Native artifact unavailable" >> "$GITHUB_STEP_SUMMARY"
+          echo "Validation completed, but this job did not publish a downloadable archive." >> "$GITHUB_STEP_SUMMARY"
+          echo "See the upload step for the actual failure. Tests, builds and smoke checks remain mandatory." >> "$GITHUB_STEP_SUMMARY"

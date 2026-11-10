@@ -6,25 +6,38 @@ reported in one pass.
 """
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from hashlib import sha256
 
-from echo_heist.ai.navigation.grid import bfs
+from echo_heist.ai.navigation.grid import bfs, distances_from
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.security.director import (
+    ActiveProtocol,
+    DirectorRules,
+    RouteGraph,
+    RouteNode,
+    ZoneArea,
+)
 from echo_heist.core.contracts.security.model import (
     GuardPatrol,
     GuardRole,
     SecuritySpec,
     SensorRules,
 )
-from echo_heist.core.contracts.world import ActorKind, StaticMap, Tile, tile_center
+from echo_heist.core.contracts.world import (
+    POSITION_UNITS_PER_TILE,
+    ActorKind,
+    StaticMap,
+    Tile,
+    tile_center,
+)
 from echo_heist.core.simulation.systems.motion import body_fits
 from echo_heist.level.model import Chokepoint, LevelData
 
 ROLES = {
     ActorKind.SENTINEL: GuardRole.SENTINEL,
     ActorKind.TRACKER: GuardRole.TRACKER,
-    ActorKind.INTERCEPTOR: GuardRole.POST,  # minimax/alpha-beta controller arrives in P04
+    ActorKind.INTERCEPTOR: GuardRole.INTERCEPTOR,
 }
 
 
@@ -51,14 +64,55 @@ class SecurityRegistry:
     chokepoints: tuple[Chokepoint, ...]
     sound_blocking_tiles: frozenset[Tile]
     revision: str
+    graph: RouteGraph | None = None
+    director: DirectorRules | None = None
 
     def assignment(self, guard_id: str) -> GuardAssignment:
         return next(value for value in self.assignments if value.guard_id == guard_id)
 
-    def spec(self, rules: SensorRules) -> SecuritySpec:
+    def spec(self, rules: SensorRules, protocol: ActiveProtocol | None = None) -> SecuritySpec:
+        """The shipped defender team: guards, route graph and NEXUS with one protocol."""
+        director = replace(self.director, protocol=protocol) if self.director is not None else None
         return SecuritySpec(
-            tuple(value.patrol for value in self.assignments), rules, self.sound_blocking_tiles
+            tuple(value.patrol for value in self.assignments),
+            rules,
+            self.sound_blocking_tiles,
+            self.graph,
+            director,
         )
+
+
+def _ticks_per_tile(rules: GameRules, speed: int) -> int:
+    return -(-POSITION_UNITS_PER_TILE * rules.simulation_hz // speed)
+
+
+def build_route_graph(level: LevelData) -> RouteGraph:
+    """Zones, chokepoints and legal walking distances, from static geometry only."""
+    world_map = level.static_map
+    anchors = {
+        "CORE": next(obj.tile for obj in world_map.objects if obj.object_id == level.core_id),
+        "EXIT": next(obj.tile for obj in world_map.objects if obj.object_id == level.exit_id),
+    }
+    nodes = tuple(
+        RouteNode(point.point_id, point.tile, point.zones)
+        for point in sorted(level.chokepoints, key=lambda value: value.point_id)
+    )
+    distances: list[tuple[str, str, int]] = []
+    for index, node in enumerate(nodes):
+        steps = distances_from(world_map, node.tile)
+        for other in nodes[index + 1 :]:
+            if other.tile in steps:
+                distances.append((node.node_id, other.node_id, steps[other.tile]))
+        for name, tile in anchors.items():
+            if tile in steps:
+                distances.append((node.node_id, name, steps[tile]))
+    return RouteGraph(
+        tuple(ZoneArea(z.zone_id, z.left, z.top, z.width, z.height) for z in level.zones),
+        nodes,
+        anchors["CORE"],
+        anchors["EXIT"],
+        tuple(distances),
+    )
 
 
 def _fits(world_map: StaticMap, tile: Tile, radius: int) -> bool:
@@ -108,8 +162,8 @@ def build_security_registry(level: LevelData, rules: GameRules) -> SecurityRegis
         chokepoints = tuple(
             sorted(point.point_id for point in level.chokepoints if zone_id in point.zones)
         )
-        if role == GuardRole.POST and not chokepoints:
-            problems.append(f"{where} has no chokepoint for its later interception role")
+        if role == GuardRole.INTERCEPTOR and not chokepoints:
+            problems.append(f"{where} has no chokepoint for its interception role")
         if len(points) >= 2:
             assignments.append(
                 GuardAssignment(
@@ -146,9 +200,15 @@ def build_security_registry(level: LevelData, rules: GameRules) -> SecurityRegis
         sort_keys=True,
         separators=(",", ":"),
     )
+    director = DirectorRules(
+        guard_ticks_per_tile=_ticks_per_tile(rules, rules.interceptor_speed_units_per_second),
+        intruder_ticks_per_tile=_ticks_per_tile(rules, rules.walk_speed_units_per_second),
+    )
     return SecurityRegistry(
         tuple(assignments),
         tuple(sorted(level.chokepoints, key=lambda value: value.point_id)),
         level.sound_blocking_tiles,
         sha256(canonical.encode()).hexdigest(),
+        build_route_graph(level),
+        director,
     )

@@ -141,6 +141,9 @@ class ScenarioResult:
     states: dict[str, list[str]]
     tools: dict[str, int]
     log: ReplayLog
+    # Privileged QA data: each Interceptor's searched posts, and final actor tiles.
+    intercept_posts: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    final_tiles: dict[str, Tile] = field(default_factory=dict)
 
 
 def build_simulation(
@@ -181,6 +184,7 @@ def run_route(
     evidence: Counter[str] = Counter()
     expanded: dict[str, int] = {}
     states: dict[str, list[str]] = {}
+    intercepts: dict[str, list[str]] = {}
     end = None
     while simulation.tick < limit:
         observation = simulation.observe(level.operative_id)
@@ -213,11 +217,16 @@ def run_route(
                 trail = states.setdefault(event.actor_id, [])
                 if not trail or trail[-1] != details["state"]:
                     trail.append(str(details["state"]))
+        for guard_id, plan in simulation.intercept_plans():
+            posts = intercepts.setdefault(guard_id, [])
+            if not posts or posts[-1] != plan.post_id:
+                posts.append(plan.post_id)
         if result.mission_end is not None:
             end = result.mission_end
             break
         if not pending:
             break
+    snapshot = simulation.presentation_snapshot()
     return ScenarioResult(
         name,
         end.outcome.value if end else "UNFINISHED",
@@ -230,6 +239,8 @@ def run_route(
         {key: value[:24] for key, value in sorted(states.items())},
         dict(driver.tools_used),
         recorder.log(),
+        {guard_id: tuple(posts) for guard_id, posts in sorted(intercepts.items())},
+        {actor.actor_id: actor.tile for actor in snapshot.actors},
     )
 
 

@@ -62,6 +62,8 @@ class SecurityReport:
     confidence: float
     event_id: str
     expires_at_tick: int
+    # Empty for broadcast radio; a NEXUS DISPATCH names the one guard it tasks.
+    recipient: str = ""
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "tile", immutable_tile(self.tile))

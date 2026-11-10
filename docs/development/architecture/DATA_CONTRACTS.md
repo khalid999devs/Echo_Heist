@@ -86,3 +86,7 @@ The [guard registry/evidence/geometry contract](integration/defenders/GUARD_CONT
 ## Applied limited-melee contract — 2026-10-30
 
 The [user-approved balance](../planning/balance/MELEE.md) is implemented in runtime `68d0c69`; [handoff](../tracking/handoffs/khalid/day_03/MELEE.md). Inventory appends `melee_charges` (initially 2); own status appends `melee_cooldown_remaining`; Simulation owns `melee_ready_at` and the 120-tick recovery rule. Valid resisted strikes spend stock and make noise; rejected actions do neither. Melee TOOL_USED includes actual `remaining` and `ready_at_tick`. Replay/fingerprint schema **10** supersedes schema 9 for this branch. Existing observation fields/positional arguments and acoustic/visual fairness remain intact. Full Companion runtime acceptance remains P04/SR work.
+
+## P04 SR runtime contract — 2026-11-05
+
+The [SR runtime contract](integration/autonomy/RUNTIME.md) implements Khalid's typed `AutonomyGateway` with `NexusGateway`, adds the `INTERCEPTOR` guard role, NEXUS `DISPATCH` reports with original evidence ticks, route graph/director rules in `SecuritySpec`, and versioned protocol memory (`nexus-memory.json`, schema 1). The Companion reads its own `melee_charges` and `melee_cooldown_remaining` before any strike, in utility and in MCTS rollouts. Merging the schema-10 melee payload with the P04 NEXUS memory/route graph/director payload is a genuine change, so the **fingerprint schema is 11**; schema-10 replays/hashes are historical.

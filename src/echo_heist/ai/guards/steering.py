@@ -10,6 +10,7 @@ from dataclasses import dataclass, replace
 from echo_heist.ai.guards.fuzzy import investigate_urgency
 from echo_heist.ai.navigation.grid import PathResult, neighbors
 from echo_heist.core.contracts.actions import Action, ActionKind
+from echo_heist.core.contracts.events import SecurityReport
 from echo_heist.core.contracts.observations import EntityView, Observation
 from echo_heist.core.contracts.security.model import (
     FuzzyTrace,
@@ -35,6 +36,8 @@ INTRUDERS = (ActorKind.OPERATIVE, ActorKind.COMPANION)
 SALIENCE = {"CROUCH": 0.15, "FOOTSTEP": 0.25, "SPRINT": 0.75, "EMP": 1.0, "MELEE": 1.0}
 MOTION = "UNIDENTIFIED_MOTION"
 HIDE_ENTRY = "HIDE_ENTRY"
+DISPATCH = "DISPATCH"
+VERIFY_ECHO_TILES = 4
 
 
 def distance(first: Tile, second: Tile) -> int:
@@ -116,22 +119,40 @@ class Cue:
     tick: int
 
 
-def strongest_cue(observation: Observation) -> Cue | None:
+def strongest_cue(observation: Observation, verify_within: int | None = None) -> Cue | None:
+    """Newest heard origin, else unidentified motion.
+
+    Under NEXUS VERIFY_ECHO a guard only walks to motion it can verify nearby
+    (``verify_within`` tiles); heard sounds and real sightings are unaffected.
+    """
     if observation.heard_events:
         heard = max(observation.heard_events, key=lambda cue: (cue.tick, cue.event_id))
         return Cue(
             heard.tile, SALIENCE.get(heard.kind, 0.5), 0.0, "NOISE", heard.event_id, heard.tick
         )
-    motion = [cue for cue in observation.visual_cues if cue.kind == MOTION]
+    motion = [
+        cue
+        for cue in observation.visual_cues
+        if cue.kind == MOTION
+        and (
+            verify_within is None
+            or distance(observation.own_status.tile, cue.tile) <= verify_within
+        )
+    ]
     if motion:
         seen = motion[-1]
         return Cue(seen.tile, 0.0, 0.5, "MOTION", seen.cue_id, seen.tick)
     return None
 
 
-def investigate(observation: Observation, rules: SensorRules, memory: GuardMemory) -> GuardMemory:
+def investigate(
+    observation: Observation,
+    rules: SensorRules,
+    memory: GuardMemory,
+    verify_within: int | None = None,
+) -> GuardMemory:
     """Turn the strongest cue into a fuzzy-graded investigation with provenance."""
-    cue = strongest_cue(observation)
+    cue = strongest_cue(observation, verify_within)
     if cue is None:
         return memory
     fuzzy = investigate_urgency(
@@ -159,6 +180,41 @@ def investigate(observation: Observation, rules: SensorRules, memory: GuardMemor
             fuzzy.outputs,
             fuzzy.urgency,
         ),
+    )
+
+
+def dispatch_for(observation: Observation, memory: GuardMemory) -> SecurityReport | None:
+    """Newest live NEXUS DISPATCH addressed to this guard, newer than its evidence.
+
+    A dispatch keeps the original evidence tick of what another guard sensed
+    (or the public Core alarm); it is a place to go, never an identity.
+    """
+    orders = [
+        report
+        for report in observation.shared_reports
+        if report.report_kind == DISPATCH
+        and report.recipient == observation.agent_id
+        and observation.tick <= report.expires_at_tick
+        and (report.tick, report.event_id) > (memory.evidence_tick, memory.evidence_id)
+        and report.tick >= memory.last_seen_tick
+    ]
+    return max(orders, key=lambda report: (report.tick, report.event_id)) if orders else None
+
+
+def follow_dispatch(observation: Observation, memory: GuardMemory) -> GuardMemory:
+    order = dispatch_for(observation, memory)
+    if order is None:
+        return memory
+    return replace(
+        memory,
+        state=GuardState.INVESTIGATE,
+        target=order.tile,
+        urgency=order.confidence,
+        search_tiles=(),
+        evidence_kind="REPORT",
+        evidence_id=order.event_id,
+        evidence_tick=order.tick,
+        evidence_tile=order.tile,
     )
 
 

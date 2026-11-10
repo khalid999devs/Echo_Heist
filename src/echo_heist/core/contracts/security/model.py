@@ -5,6 +5,7 @@ from enum import StrEnum
 from typing import Self
 
 from echo_heist.core.contracts.actions import Action
+from echo_heist.core.contracts.security.director import DirectorRules, RouteGraph
 from echo_heist.core.contracts.world import Tile, immutable_tile
 
 
@@ -22,10 +23,16 @@ class GuardRole(StrEnum):
 
     SENTINEL = "SENTINEL"  # BFS patrol, FSM and fuzzy cue urgency
     TRACKER = "TRACKER"  # heuristic A* and last-seen memory
-    POST = "POST"  # sensing-only post until its P04 controller exists
+    POST = "POST"  # sensing-only post (legacy/test fixtures)
+    INTERCEPTOR = "INTERCEPTOR"  # bounded minimax/alpha-beta over the route graph
 
 
-ROLE_ALGORITHMS = {GuardRole.SENTINEL: "BFS", GuardRole.TRACKER: "A*", GuardRole.POST: "NONE"}
+ROLE_ALGORITHMS = {
+    GuardRole.SENTINEL: "BFS",
+    GuardRole.TRACKER: "A*",
+    GuardRole.POST: "NONE",
+    GuardRole.INTERCEPTOR: "ALPHA-BETA",
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,6 +80,9 @@ class SecuritySpec:
     patrols: tuple[GuardPatrol, ...]
     rules: SensorRules
     sound_blocking_tiles: frozenset[Tile] = frozenset()
+    # Public chokepoint graph for interception and the NEXUS director rules.
+    graph: RouteGraph | None = None
+    director: DirectorRules | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "patrols", tuple(self.patrols))
@@ -119,6 +129,25 @@ class FuzzyTrace:
 
 
 @dataclass(frozen=True, slots=True)
+class InterceptPlan:
+    """The Interceptor's last actual alpha-beta search over route hypotheses."""
+
+    evaluated_tick: int
+    evidence_tick: int
+    post_id: str
+    post_tile: Tile
+    depth: int
+    evaluated_leaves: int
+    pruned_branches: int
+    value: float
+    hypotheses: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "post_tile", immutable_tile(self.post_tile))
+        object.__setattr__(self, "hypotheses", tuple(self.hypotheses))
+
+
+@dataclass(frozen=True, slots=True)
 class GuardMemory:
     state: GuardState = GuardState.PATROL
     patrol_index: int = 0
@@ -146,6 +175,7 @@ class GuardMemory:
     path_revision: int = 0
     evidence_tile: Tile | None = None
     fuzzy_trace: FuzzyTrace | None = None
+    intercept: InterceptPlan | None = None
 
     def __post_init__(self) -> None:
         for name in ("last_seen_tile", "target", "path_goal", "search_origin", "evidence_tile"):

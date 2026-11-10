@@ -44,7 +44,7 @@ def upper(
     return run_route("upper", level, rules, sensors, registry, route_steps(level, "upper", "upper"))
 
 
-@pytest.mark.parametrize(("branch", "back"), [("lower", "lower"), ("cross", "upper")])
+@pytest.mark.parametrize(("branch", "back"), [("lower", "upper"), ("cross", "upper")])
 def test_default_security_routes_win_with_real_guard_algorithms(
     level: LevelData,
     rules: GameRules,
@@ -60,6 +60,27 @@ def test_default_security_routes_win_with_real_guard_algorithms(
         assert outcome.events["CORE_TAKEN"] == outcome.events["LOCKDOWN_STARTED"] == 1
         assert outcome.algorithms["BFS"] > 0 and outcome.algorithms["A*"] > 0
         assert outcome.max_expanded["A*"] > 0 and outcome.events["SIGHTING_CONFIRMED"] > 0
+        assert outcome.algorithms["ALPHA-BETA"] > 0
+
+
+def test_blind_return_through_the_predicted_gate_is_intercepted(
+    level: LevelData, rules: GameRules, sensors: SensorRules, registry: SecurityRegistry
+) -> None:
+    """P04: after the lockdown the Interceptor searches the escape branches and
+    physically holds the Research Return gate; walking straight back into it
+    loses, while the alternate corridor (above) still wins. With two melee
+    charges the pursuing Research guard may close the grab at that gate, so the
+    assertion is the Interceptor's searched and physically held post."""
+    result = run_route(
+        "lower", level, rules, sensors, registry, route_steps(level, "lower", "lower")
+    )
+    assert result.outcome == "CAPTURED" and result.events["CORE_TAKEN"] == 1
+    assert result.algorithms["ALPHA-BETA"] > 0
+    assert result.intercept_posts["guard-core"][-1] == "choke-research-core"
+    assert registry.graph is not None
+    gate = registry.graph.node("choke-research-core").tile
+    held, caught = result.final_tiles["guard-core"], result.final_tiles[level.operative_id]
+    assert held == gate and abs(caught[0] - gate[0]) + abs(caught[1] - gate[1]) <= 1
 
 
 def test_careless_route_is_captured_by_a_live_defender(
@@ -89,7 +110,7 @@ def test_recorded_run_replays_exactly_and_detects_changed_inputs(
 ) -> None:
     assert replay_matches(level, rules, sensors, registry, upper)
     log = upper.log
-    assert log.header.fingerprint_schema == 10 and log.header.registry_revision == registry.revision
+    assert log.header.fingerprint_schema == 11 and log.header.registry_revision == registry.revision
     header = build_header(
         level.static_map, rules, sensors, registry_revision=registry.revision, seed=1042
     )

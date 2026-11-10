@@ -1,5 +1,7 @@
 # Suhita's agent guide
 
+**2026-11-05:** P04-SR1/SR2/SR3 are implemented on `work/suhita-p04`, merged with current main ([handoff](../../tracking/handoffs/suhita/day_02/P04.md)). Next: PR review/merge and the combined P04 gate with Khalid's connected acceptance. Do not start P05 before that gate.
+
 Identity: **Suhita**, Windows x64. You lead most gameplay logic; Khalid leads complex graphics/scenes. Revised [workload](../../planning/WORKLOAD.md) and KR/SR slices govern remaining work; historical hours are unknown.
 
 ## Current baseline and next assignment

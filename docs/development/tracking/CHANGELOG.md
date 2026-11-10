@@ -1,10 +1,22 @@
 # Development changelog
 
+## 2026-11-05 - P04 SR merged with main and adapted to limited melee
+
+- `work/suhita-p04` merges current main (PRs #2/#3/#4) normally; Khalid's presentation, limited melee and experience consumers are preserved. Fingerprint schema **11** (schema-10 melee + P04 NEXUS memory/route graph/director).
+- Companion respects its own two melee charges and four-second recovery in utility and MCTS rollouts; consistent MCTS leaf cost; non-cautious policies press on past slower patrols and sprint while infiltrating; escape/route liveness fixes (gate-holding Interceptor, grab/escape alternation, ALTERNATE commitment). Actual results: [verification](../quality/reports/phase04/suhita/VERIFICATION.md).
+- P04 is not complete: Khalid's connected KR acceptance and the combined gate remain.
+
 ## 2026-10-30 - Applied emergency-melee budget
 
 - User approved two stun charges per attempt and four-second Simulation recovery. Valid resisted strikes consume stock/recovery and emit the existing six-tile clang; rejected requests consume nothing and make no gameplay noise. Existing legitimate investigation/roughly five-second original-location memory is preserved, with unchanged scoring.
 - Implemented actual inventory/timer/HUD, exact commit-tick validation, new rejection feedback and schema-10 replay. Ten new regression cases bring full checks to 226 passing tests; native practice HUD/pause/retry and normal Human wins/capture pass. [Rules](../planning/balance/MELEE.md), [handoff](handoffs/khalid/day_03/MELEE.md), [verification](../quality/reports/phase05/khalid/MELEE.md).
 - This directly authorized subset does not complete Suhita's remaining P04/P05 slices.
+
+## 2026-10-25 - P04 SR logic: Companion, Interceptor, NEXUS and protocols
+
+- Suhita's `work/suhita-p04` (on Khalid's presentation branch): Companion mission FSM, utility overrides, observed-risk A* and bounded belief-only MCTS; Interceptor minimax/alpha-beta with physical gate travel; evidence-limited NEXUS dispatch, coverage and lockdown; versioned protocol memory with one announced adaptation and full reset; the real gateway injected at startup.
+- Fingerprint schema 10; registry Core guard role INTERCEPTOR (`ALPHA-BETA`). Blind lower->lower Human return is now intercepted; the alternate corridor still wins.
+- Agent container: 184 non-pygame tests, structure/Ruff/strict types; actual evidence in [verification](../quality/reports/phase04/suhita/VERIFICATION.md). Locked pygame suite, Windows desktop and hosted CI pending Suhita's run/push. P04 not complete.
 
 ## 2026-10-25 - P04 presentation and runtime handoff
 

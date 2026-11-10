@@ -1,5 +1,7 @@
 # Suhita: Windows setup and current-main handoff
 
+**2026-11-05 update:** SR1/SR2/SR3 are on `work/suhita-p04`, merged with current main; fingerprint is now **11**. Resume that branch and use the run/inspect block in the [SR handoff](../../tracking/handoffs/suhita/day_02/P04.md); the steps below remain the general setup reference.
+
 Updated **2026-10-31**. [Repository](https://github.com/khalid999devs/Echo_Heist), native Windows x64 / PowerShell. PRs #2/#3/#4 are merged into **main**; the former Khalid branches are retired. Main includes the P04/P05/P06 presentation, approved limited melee and current-build delivery preparation. **246 tests / fingerprint 10** is the latest verified baseline; fetch and record the actual current commit. Read the [consolidation handoff](../../tracking/handoffs/khalid/day_03/MAIN.md) and [owner guide](../owners/SUHITA.md). **P01–P03 are complete; P04-SR1/SR2/SR3 is your next assignment.**
 
 ## Get the checkout safely

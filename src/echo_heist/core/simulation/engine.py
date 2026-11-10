@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from dataclasses import asdict
 from hashlib import sha256
 
+from echo_heist.ai.director.nexus import initial_memory
 from echo_heist.ai.navigation.grid import bfs
 from echo_heist.core.abilities.tools import advance_echoes, tool_reason, use_tool
 from echo_heist.core.contracts.actions import Action, ActionKind
@@ -18,7 +19,13 @@ from echo_heist.core.contracts.results import (
     RunOutcome,
     StepResult,
 )
-from echo_heist.core.contracts.security.model import GuardMemory, GuardRole, SecuritySpec
+from echo_heist.core.contracts.security.director import NexusStatus
+from echo_heist.core.contracts.security.model import (
+    GuardMemory,
+    GuardRole,
+    InterceptPlan,
+    SecuritySpec,
+)
 from echo_heist.core.contracts.world import ActorKind, ActorSpawn, Scalar, StaticMap, tile_center
 from echo_heist.core.simulation import views
 from echo_heist.core.simulation.systems import security as guard_security
@@ -45,6 +52,7 @@ ROLE_KINDS = {
     GuardRole.SENTINEL: frozenset({ActorKind.SENTINEL}),
     GuardRole.TRACKER: frozenset({ActorKind.TRACKER}),
     GuardRole.POST: GUARD_KINDS,
+    GuardRole.INTERCEPTOR: frozenset({ActorKind.INTERCEPTOR}),
 }
 
 
@@ -160,6 +168,8 @@ class Simulation:
                     else 0,
                 )
                 self._world.guard_memories[patrol.actor_id] = GuardMemory()
+            if security.director is not None:
+                self._world.nexus = initial_memory(security.director)
             guard_security.refresh(self._world, world_map, security, ())
 
     @property
@@ -201,6 +211,28 @@ class Simulation:
             raise ValueError("A geometry revision cannot enclose an actor's body")
         self._pending_geometry = (world_map, reason)
 
+    def nexus_status(self) -> NexusStatus | None:
+        """Privileged NEXUS display/persistence data; never given to a controller."""
+        if self._security is None or self._security.director is None:
+            return None
+        memory = self._world.nexus
+        return NexusStatus(
+            memory.evaluated_tick,
+            memory.dispatches,
+            memory.announcement,
+            memory.announcement_tick,
+            memory.evidence,
+            self._security.director.protocol,
+        )
+
+    def intercept_plans(self) -> tuple[tuple[str, InterceptPlan], ...]:
+        """Each Interceptor's last actual search (privileged display/QA data)."""
+        return tuple(
+            (guard_id, memory.intercept)
+            for guard_id, memory in sorted(self._world.guard_memories.items())
+            if memory.intercept is not None
+        )
+
     def presentation_snapshot(self) -> PresentationSnapshot:
         return views.presentation(self._world, self._map, self._rules, self._security)
 
@@ -216,6 +248,8 @@ class Simulation:
                 # Decisions must see the new map and its current visibility.
                 # Already-heard sounds retain their original provenance.
                 guard_security.refresh(self._world, self._map, self._security, None)
+        if self._security is not None:
+            guard_security.direct(self._world, self._map, self._security)
         choices = (
             guard_security.decisions(
                 self._security,
@@ -414,7 +448,7 @@ class Simulation:
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 10,
+            "schema_version": 11,
             "seed": self._seed,
             "rules": asdict(self._rules),
             "pending_geometry": {
@@ -428,6 +462,8 @@ class Simulation:
                 "patrols": [asdict(patrol) for patrol in self._security.patrols],
                 "rules": asdict(self._security.rules),
                 "sound_blocking_tiles": sorted(self._security.sound_blocking_tiles),
+                "graph": asdict(self._security.graph) if self._security.graph else None,
+                "director": asdict(self._security.director) if self._security.director else None,
             }
             if self._security
             else None,

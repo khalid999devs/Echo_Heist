@@ -831,5 +831,12 @@
     "ruff": "PASS",
     "format": "PASS",
     "mypy": "PASS"
+  },
+  "terminal_backdrop_followup": {
+    "presentation_tests": 50,
+    "seconds": 14.28,
+    "native_journey": "PASS",
+    "lint_types_format": "PASS",
+    "scope": "Draw-only terminal overlay removal after initial full checks/performance; final CI repeats suite"
   }
 }

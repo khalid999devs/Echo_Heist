@@ -516,6 +516,10 @@ class HeistSession:
             fraction=self.render_fraction,
             observer_id=self.observer_id,
         )
+        if snapshot.mission_end is not None:
+            # Results reuse the actual facility as their backdrop. Ended-run
+            # diagnostics, captions and pause controls must not bleed through it.
+            return
         draw_cues(
             canvas,
             self.level,

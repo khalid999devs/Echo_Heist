@@ -1,5 +1,8 @@
 # P05 - Complete tools, interactive environment and feedback
 
+2026-11-10: P04/P05 runtime is merged into main. Khalid's [connected Mac acceptance](../../../tracking/handoffs/khalid/day_04/CONNECTED_REVIEW.md) verifies real doors/glass/tools in addition to merged native canister/locker review. Current-build physical Windows gameplay and combined integration sign-off remain; the old fixture-only checkpoint below is historical.
+
+
 Day 3, first block. Integrator: **Suhita**. Remaining effort: Khalid 9, Suhita 10. Status: IN_PROGRESS (early crouch, independent presentation and the SR1/SR2 runtime on `work/suhita-p05` implemented; connected acceptance pending). Prerequisite for the full phase: P04. Feature anchors: completion of EH-019, EH-020 and environment part of EH-025. Source: PDF pp. 4-8, 15, 17, 19.
 
 Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.

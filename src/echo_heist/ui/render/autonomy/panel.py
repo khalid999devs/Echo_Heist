@@ -49,7 +49,16 @@ def draw_telemetry(
             text("VISITS", 405, theme.MUTED, 299)
             text("MEAN", 405, theme.MUTED, 410)
             maximum = max((item.visits for item in trace.alternatives), default=1)
-            for i, item in enumerate(trace.alternatives[:4]):
+            alternatives = sorted(
+                trace.alternatives,
+                key=lambda item: (
+                    item.action != trace.chosen_action,
+                    -item.visits,
+                    not item.legal,
+                    item.action,
+                ),
+            )
+            for i, item in enumerate(alternatives[:4]):
                 y = 432 + i * 29
                 color = (
                     theme.ACCENT

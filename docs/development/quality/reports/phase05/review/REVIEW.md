@@ -1,0 +1,17 @@
+# PR #6 — P05 environment review
+
+Khalid, 2026-11-10. Reviewed Suhita's `a6ddbee` (P05 on P04) and merged the P04 review fixes into this branch without rewriting her history. No environment, scoring or melee balance rule was changed in this review.
+
+## Verification
+
+- `uv run --locked --cache-dir .cache/uv python scripts/checks/run.py`: **PASS**, **301 tests in 46.32 s**, structure/Ruff/format/strict mypy (**175 source modules**). This includes the actual door/glass geometry/LOS/reach, once-only acoustic cues, capture/EMP/tool edges, witnessed/unseen lockers, fresh-press Human input, real gateway/mission and replay regressions.
+- `python scripts/experiments/p05_evidence.py --output output/pr-review/p05-evidence.json --seeds 4`: **PASS**, deterministic hash **062772779518e25736670732ada894902afc80c97bbc561fe83a855e07862d7e**, exactly matching Suhita's report. Repeated Balanced seed 1 matches. Four seeds × three presets × prop/no-prop: Balanced 4/4 wins in each, Rush 1 win/3 captures, Ghost 3 captures/1 test-runner timeout. The game has no injected timeout. Human upper/upper, lower/upper and cross/upper win; blind lower/lower is captured. The real Human lifecycle emits one metal impact, enters hide-2 and leaves it without ending the run.
+- `python -m tests.fixtures.autonomy.live_capture --output output/pr-review/p05-native`: **Cocoa/audio ready**, production prop-enabled gateway, actual Companion 1042 WIN at **2463**, seed 4 CAPTURED at **1180**. Actual MCTS/NEXUS/Interceptor displays, lockdown, pause and confirmed UI protocol reset work; 14 screenshots inspected against the P04 run.
+- `python -m tests.fixtures.interactions.live_capture --output output/pr-review/p05-human`: **Cocoa/audio ready**, ordinary keyboard Human movement on the packaged map with real security. Canister bump/impact, locker prompt, entry, held-E stability and fresh-press exit verified at tick **845** with 13 committed props. Four native screenshots inspected. No actor/prop position, outcome, sound or telemetry was injected. The locker is near the map's right boundary; the clamped camera correctly leaves it near the screen edge.
+- Source review confirmed real per-run props/geometry and observation-owned concealment, correct cue/noise provenance, and unchanged tool stock/recovery. Existing fixture bodies/scene art are preserved. P04's chosen-action display regression and supported Mac/retained CI-upload fixes are included.
+
+## Remaining boundaries
+
+Fingerprint **12** supersedes P04's schema 11 and old schema-10 hashes. Actual environment rules are covered; a downloaded Windows game has not been physically played on Khalid's Mac. Hosted builds/frozen smoke supplement Suhita's separate Windows report. P06 authoritative scoring/encounters, profile/history/new-preference persistence and complete policy/deployment behavior remain unfinished. Known Ghost/Rush imbalance and rare narrow-corridor body blocking remain P07 hardening; no claim of universal autonomous success or full-game performance is made.
+
+GitHub's macOS 14 runner is retired; CI now uses supported macos-15/arm64 with architecture verification. Historical native CI failures were archive storage quota, not failed tests/builds. Branch/PR validation keeps all substantive gates; optional main/manual archiving has seven-day retention and reports an unavailable upload explicitly. Old archives were not deleted and unavailable hosted downloads are not represented as delivered artifacts.

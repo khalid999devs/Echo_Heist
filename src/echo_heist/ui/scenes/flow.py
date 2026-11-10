@@ -467,7 +467,7 @@ class GameFlow:
                     self.mode_choice = self.selected
                     self.selected, self.notice = 2, ""
                 else:
-                    self.notice = "Companion mode is coming later. Human mode remains selected."
+                    self.notice = "Companion deployment unavailable. Check the Workshop notice."
         elif self.scene == Scene.RESULTS:
             if key == pygame.K_d:
                 self.inspector.open = True

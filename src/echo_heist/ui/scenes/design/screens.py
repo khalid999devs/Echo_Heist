@@ -48,21 +48,21 @@ GUIDE_COPY = (
             "Rush accepts more risk. Edit the design in Workshop.",
         ),
         (
-            "DECISION STACK / PLANNED",
-            "A* plans routes; utility scores goals; MCTS tests choices.",
-            "Emergency search compares nearby escape and tool actions.",
+            "DECISION STACK / ACTIVE",
+            "A* follows known routes; utility handles immediate danger.",
+            "MCTS selects, expands, rolls out and backs up belief-based choices.",
         ),
     ),
     (
         (
-            "THE FACILITY RESPONDS",
-            "Recovering the Core starts lockdown.",
-            "Expect quicker guards, longer searches and warning lights.",
+            "INTERCEPTOR / ACTIVE",
+            "Minimax chooses a reachable post; alpha-beta prunes branches.",
+            "The robot travels there physically using legitimate sightings.",
         ),
         (
-            "COORDINATION / PLANNED",
-            "NEXUS will coordinate guard roles using shared reports.",
-            "Persistent learning and profile storage arrive in later phases.",
+            "COORDINATION / ACTIVE",
+            "NEXUS dispatches from guard reports and preserves coverage.",
+            "One evidence-backed protocol can adapt; reset clears its memory.",
         ),
     ),
 )

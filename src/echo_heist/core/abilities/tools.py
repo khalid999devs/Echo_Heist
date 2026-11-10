@@ -20,7 +20,14 @@ def melee_target(
         if guard.kind in GUARD_KINDS
         and (action.target_id is None or action.target_id == guard.actor_id)
         and distance_squared(actor.position, guard.position) <= rules.melee_range_units**2
-        and clear_reach(world_map, actor.position, guard.position)
+        # Reach is symmetric with capture: an intruder revealed inside desk
+        # clearance can strike the guard that is able to grab it there.
+        and clear_reach(
+            world_map,
+            guard.position,
+            actor.position,
+            allow_solid_end=actor.crouched and actor.tile in world_map.crouch_tiles,
+        )
     ]
     return min(
         targets,

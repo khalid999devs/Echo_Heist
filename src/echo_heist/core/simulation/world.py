@@ -17,6 +17,7 @@ from echo_heist.core.contracts.world import (
     Tile,
     position_tile,
 )
+from echo_heist.core.environment.state import EnvironmentState
 
 type Emit = Callable[[EventKind, str, tuple[tuple[str, Scalar], ...]], None]
 GUARD_KINDS = frozenset({ActorKind.SENTINEL, ActorKind.TRACKER, ActorKind.INTERCEPTOR})
@@ -42,6 +43,8 @@ class ActorState:
     stair_source_id: str | None = None
     stair_arrives_at: int = 0
     crouched: bool = False
+    # Stable ID of the locker this intruder is inside; None when not hidden.
+    hidden_in: str | None = None
 
     @property
     def tile(self) -> Tile:
@@ -88,3 +91,5 @@ class WorldState:
     geometry_revision: int = 0
     # NEXUS director memory: only guard-sensed evidence, alarms and its own tasks.
     nexus: NexusMemory = field(default_factory=NexusMemory)
+    # P05 interactive props: doors, glass, canisters and lockers.
+    environment: EnvironmentState = field(default_factory=EnvironmentState)

@@ -23,6 +23,7 @@ from echo_heist.core.contracts.autonomy.model import (
 )
 from echo_heist.core.contracts.autonomy.policy import DeploymentRequest
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.environment.model import EnvironmentSpec
 from echo_heist.core.contracts.observations import Observation
 from echo_heist.core.contracts.results import MissionEnd, PresentationSnapshot, StepResult
 from echo_heist.core.contracts.security.director import ActiveProtocol, NexusStatus
@@ -75,6 +76,7 @@ class AutonomousMission:
         protocol: ActiveProtocol | None,
         protocol_state: ProtocolState | None,
         on_end: AttemptEnded | None = None,
+        environment: EnvironmentSpec | None = None,
     ) -> None:
         self._mode = ControlMode(request.mode)
         companion = self._mode == ControlMode.COMPANION
@@ -92,6 +94,7 @@ class AutonomousMission:
             mission=replace(level.mission(self._mode.value), operative_id=self._actor_id),
             seed=request.seed,
             security=registry.spec(sensors, protocol),
+            environment=environment,
         )
         self.request, self.protocol = request, protocol
         self.controller = (

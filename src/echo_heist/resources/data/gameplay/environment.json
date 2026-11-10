@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "door_cycle_ticks": 12,
+  "door_noise_radius_tiles": 2,
+  "glass_noise_radius_tiles": 6,
+  "canister_noise_radius_tiles": 4,
+  "canister_step_ticks": 5,
+  "canister_roll_tiles": 4,
+  "locker_cycle_ticks": 9,
+  "cue_ttl_ticks": 60
+}

@@ -1,0 +1,314 @@
+{
+  "companion_prop_changes": {
+    "CANISTER_IMPACT": 1,
+    "ROLLING": 1
+  },
+  "evidence": "p05-suhita",
+  "human_lifecycle": {
+    "canister_rest_tile": [
+      17,
+      28
+    ],
+    "cues": [
+      "647:3342:CANISTER_IMPACT",
+      "810:4188:HIDE_ENTER",
+      "841:4346:HIDE_LEAVE"
+    ],
+    "ended": null,
+    "fingerprint": "bb46b2e507e761f3",
+    "hidden_in": "hide-2",
+    "left_locker": true,
+    "offered_at_locker": [
+      "HideSpot"
+    ],
+    "prop_noises": {
+      "DOOR": 0,
+      "GLASS": 0,
+      "METAL": 1
+    },
+    "tick": 841
+  },
+  "human_routes_with_props": {
+    "cross-upper": "WIN",
+    "lower-lower": "CAPTURED",
+    "lower-upper": "WIN",
+    "upper-upper": "WIN"
+  },
+  "machine": "x86_64",
+  "note": "Compacted from the raw p05_evidence.py output; raw deterministic_hash recorded below. Each companion_runs row: preset, seed, props enabled, outcome, ticks, fingerprint prefix, prop state changes, prop noises.",
+  "props": [
+    {
+      "horizontal": true,
+      "id": "canister-research",
+      "kind": "CANISTER",
+      "tiles": [
+        [
+          36,
+          22
+        ]
+      ]
+    },
+    {
+      "horizontal": true,
+      "id": "canister-service-1",
+      "kind": "CANISTER",
+      "tiles": [
+        [
+          17,
+          27
+        ]
+      ]
+    },
+    {
+      "horizontal": true,
+      "id": "canister-service-2",
+      "kind": "CANISTER",
+      "tiles": [
+        [
+          24,
+          13
+        ]
+      ]
+    },
+    {
+      "horizontal": false,
+      "id": "door-core-north",
+      "kind": "DOOR",
+      "tiles": [
+        [
+          50,
+          13
+        ],
+        [
+          50,
+          14
+        ]
+      ]
+    },
+    {
+      "horizontal": false,
+      "id": "door-core-south",
+      "kind": "DOOR",
+      "tiles": [
+        [
+          50,
+          29
+        ],
+        [
+          50,
+          30
+        ]
+      ]
+    },
+    {
+      "horizontal": true,
+      "id": "door-cross-link",
+      "kind": "DOOR",
+      "tiles": [
+        [
+          38,
+          18
+        ]
+      ]
+    },
+    {
+      "horizontal": true,
+      "id": "glass-research-cell",
+      "kind": "GLASS",
+      "tiles": [
+        [
+          33,
+          29
+        ]
+      ]
+    },
+    {
+      "horizontal": true,
+      "id": "glass-research-rack",
+      "kind": "GLASS",
+      "tiles": [
+        [
+          37,
+          24
+        ]
+      ]
+    },
+    {
+      "horizontal": true,
+      "id": "hide-1",
+      "kind": "LOCKER",
+      "tiles": [
+        [
+          20,
+          18
+        ]
+      ]
+    },
+    {
+      "horizontal": true,
+      "id": "hide-2",
+      "kind": "LOCKER",
+      "tiles": [
+        [
+          29,
+          26
+        ]
+      ]
+    },
+    {
+      "horizontal": true,
+      "id": "hide-3",
+      "kind": "LOCKER",
+      "tiles": [
+        [
+          35,
+          15
+        ]
+      ]
+    },
+    {
+      "horizontal": true,
+      "id": "hide-4",
+      "kind": "LOCKER",
+      "tiles": [
+        [
+          44,
+          29
+        ]
+      ]
+    },
+    {
+      "horizontal": true,
+      "id": "hide-5",
+      "kind": "LOCKER",
+      "tiles": [
+        [
+          50,
+          24
+        ]
+      ]
+    }
+  ],
+  "python": "3.13.17",
+  "raw_deterministic_hash": "46f1db7fa7474132d85814eda110341e25adf58ab488a3d634ed67f7b0393656",
+  "repeat_balanced_seed_1_matches": true,
+  "rules": {
+    "canister_noise_radius_tiles": 4,
+    "canister_roll_tiles": 4,
+    "canister_step_ticks": 5,
+    "cue_ttl_ticks": 60,
+    "door_cycle_ticks": 12,
+    "door_noise_radius_tiles": 2,
+    "glass_noise_radius_tiles": 6,
+    "locker_cycle_ticks": 9,
+    "schema_version": 1
+  },
+  "seconds": 210.0,
+  "seeds4_hash_container_and_device": "062772779518e25736670732ada894902afc80c97bbc561fe83a855e07862d7e",
+  "seeds_per_preset": 12,
+  "source_commit": "10fca5d",
+  "summary": {
+    "BALANCED/no-props": {
+      "CAPTURED": 3,
+      "WIN": 9
+    },
+    "BALANCED/props": {
+      "CAPTURED": 3,
+      "WIN": 9
+    },
+    "GHOST/no-props": {
+      "CAPTURED": 10,
+      "TIMEOUT": 1,
+      "WIN": 1
+    },
+    "GHOST/props": {
+      "CAPTURED": 10,
+      "TIMEOUT": 1,
+      "WIN": 1
+    },
+    "RUSH/no-props": {
+      "CAPTURED": 9,
+      "WIN": 3
+    },
+    "RUSH/props": {
+      "CAPTURED": 9,
+      "WIN": 3
+    }
+  },
+  "system": "Linux",
+  "tick_cap": 9000,
+  "companion_runs": [
+    ["GHOST", 0, true, "CAPTURED", 839, "8669c51954210b15", {}, {}],
+    ["GHOST", 0, false, "CAPTURED", 839, "9002f9fae0d988b5", {}, {}],
+    ["GHOST", 1, true, "CAPTURED", 813, "751e002c7b62ec5c", {}, {}],
+    ["GHOST", 1, false, "CAPTURED", 813, "74197637d2c9a960", {}, {}],
+    ["GHOST", 2, true, "CAPTURED", 813, "51b625855f6be443", {}, {}],
+    ["GHOST", 2, false, "CAPTURED", 813, "75c6bc2440b65052", {}, {}],
+    ["GHOST", 3, true, "TIMEOUT", 9000, "ece391dc738aaf37", {}, {}],
+    ["GHOST", 3, false, "TIMEOUT", 9000, "ad5a7dc10ea4185c", {}, {}],
+    ["GHOST", 4, true, "CAPTURED", 3004, "8414e754c342f7f0", {}, {}],
+    ["GHOST", 4, false, "CAPTURED", 3004, "e0110630e03dc2a0", {}, {}],
+    ["GHOST", 5, true, "CAPTURED", 1875, "307bd6c7f34525e4", {}, {}],
+    ["GHOST", 5, false, "CAPTURED", 1875, "6916035b685fdc8c", {}, {}],
+    ["GHOST", 6, true, "CAPTURED", 813, "8fb7b530f5dee7e3", {}, {}],
+    ["GHOST", 6, false, "CAPTURED", 813, "46f8273c4152905c", {}, {}],
+    ["GHOST", 7, true, "CAPTURED", 839, "64fc0c59f0ff61e6", {}, {}],
+    ["GHOST", 7, false, "CAPTURED", 839, "bb398e1b5ffeaf5e", {}, {}],
+    ["GHOST", 8, true, "CAPTURED", 839, "d34a6b606e05b209", {}, {}],
+    ["GHOST", 8, false, "CAPTURED", 839, "2eccce004ab9f01b", {}, {}],
+    ["GHOST", 9, true, "CAPTURED", 813, "5d85d73900ca4cc5", {}, {}],
+    ["GHOST", 9, false, "CAPTURED", 813, "7c699009aa263126", {}, {}],
+    ["GHOST", 10, true, "CAPTURED", 813, "4019b0457860a5b6", {}, {}],
+    ["GHOST", 10, false, "CAPTURED", 813, "f621c4e568771b8e", {}, {}],
+    ["GHOST", 11, true, "WIN", 4978, "395fd5fbc1ac0317", {}, {}],
+    ["GHOST", 11, false, "WIN", 4978, "fcc840616c6da802", {}, {}],
+    ["BALANCED", 0, true, "WIN", 2025, "8bb529f14d159f0d", {}, {}],
+    ["BALANCED", 0, false, "WIN", 2025, "84de27cf8791e453", {}, {}],
+    ["BALANCED", 1, true, "WIN", 1730, "ca56f3521d9c720f", {}, {}],
+    ["BALANCED", 1, false, "WIN", 1730, "a053a8a9abd50756", {}, {}],
+    ["BALANCED", 2, true, "WIN", 2541, "bee6f8f0706b548e", {}, {}],
+    ["BALANCED", 2, false, "WIN", 2541, "1efe8748d7184b3d", {}, {}],
+    ["BALANCED", 3, true, "WIN", 1980, "376e762b121f76f9", {}, {}],
+    ["BALANCED", 3, false, "WIN", 1980, "8b3db147e705b3dc", {}, {}],
+    ["BALANCED", 4, true, "CAPTURED", 1180, "046917a98eab9af9", {}, {}],
+    ["BALANCED", 4, false, "CAPTURED", 1180, "8a2e6a41f90c74f0", {}, {}],
+    ["BALANCED", 5, true, "WIN", 2704, "fa75e4e73dc3d9c8", {"CANISTER_IMPACT": 1, "ROLLING": 1}, {"METAL": 1}],
+    ["BALANCED", 5, false, "WIN", 2704, "276c48702c374d7a", {}, {}],
+    ["BALANCED", 6, true, "WIN", 2102, "2b98c7d7947d4cdb", {}, {}],
+    ["BALANCED", 6, false, "WIN", 2102, "a5869ec95c4c74d4", {}, {}],
+    ["BALANCED", 7, true, "WIN", 1833, "8ef54d0cba093fd1", {}, {}],
+    ["BALANCED", 7, false, "WIN", 1833, "0ce2032dd968fbde", {}, {}],
+    ["BALANCED", 8, true, "WIN", 3104, "910684fddb54ee5b", {}, {}],
+    ["BALANCED", 8, false, "WIN", 3104, "774d9b08c134b1c0", {}, {}],
+    ["BALANCED", 9, true, "WIN", 2437, "5036cca67a142c90", {}, {}],
+    ["BALANCED", 9, false, "WIN", 2437, "dcf16ab8c156fe3d", {}, {}],
+    ["BALANCED", 10, true, "CAPTURED", 1316, "d964ce590a01ad36", {}, {}],
+    ["BALANCED", 10, false, "CAPTURED", 1316, "d764ff274263e9e0", {}, {}],
+    ["BALANCED", 11, true, "CAPTURED", 1959, "255158faaa845578", {}, {}],
+    ["BALANCED", 11, false, "CAPTURED", 1959, "c6d7d99c1ef515a2", {}, {}],
+    ["RUSH", 0, true, "CAPTURED", 757, "9071782d0ab77525", {}, {}],
+    ["RUSH", 0, false, "CAPTURED", 757, "fb51f24f311796f3", {}, {}],
+    ["RUSH", 1, true, "CAPTURED", 2269, "55dd8184e3d5d375", {}, {}],
+    ["RUSH", 1, false, "CAPTURED", 2269, "0a3960b30706f4b6", {}, {}],
+    ["RUSH", 2, true, "WIN", 1959, "644180a971141e14", {}, {}],
+    ["RUSH", 2, false, "WIN", 1959, "baaf4fc766b6c323", {}, {}],
+    ["RUSH", 3, true, "CAPTURED", 1692, "9ca0ae66799cc300", {}, {}],
+    ["RUSH", 3, false, "CAPTURED", 1692, "e3ba890d5d3ed186", {}, {}],
+    ["RUSH", 4, true, "CAPTURED", 2115, "cae24fc7ab99929a", {}, {}],
+    ["RUSH", 4, false, "CAPTURED", 2115, "d966f870e5044ecf", {}, {}],
+    ["RUSH", 5, true, "CAPTURED", 1775, "ad636b3ec4d40493", {}, {}],
+    ["RUSH", 5, false, "CAPTURED", 1775, "f0f8c3ddbec80f38", {}, {}],
+    ["RUSH", 6, true, "CAPTURED", 1132, "5b38456e5614d4f2", {}, {}],
+    ["RUSH", 6, false, "CAPTURED", 1132, "d348bff4381f6fd7", {}, {}],
+    ["RUSH", 7, true, "CAPTURED", 1597, "36385e20467ef0de", {}, {}],
+    ["RUSH", 7, false, "CAPTURED", 1597, "4c87a014c3220155", {}, {}],
+    ["RUSH", 8, true, "CAPTURED", 1579, "289a39fbbee6f619", {}, {}],
+    ["RUSH", 8, false, "CAPTURED", 1579, "e251c1cb5f7a3a6d", {}, {}],
+    ["RUSH", 9, true, "CAPTURED", 1681, "693fccc36ecf6c1e", {}, {}],
+    ["RUSH", 9, false, "CAPTURED", 1681, "9a0003e862fe9616", {}, {}],
+    ["RUSH", 10, true, "WIN", 1647, "a6eaa3a08febedf3", {}, {}],
+    ["RUSH", 10, false, "WIN", 1647, "94dd602cbff5dcef", {}, {}],
+    ["RUSH", 11, true, "WIN", 2090, "7038f54e158778fa", {}, {}],
+    ["RUSH", 11, false, "WIN", 2090, "34a26a2a2ff4405a", {}, {}]
+  ]
+}

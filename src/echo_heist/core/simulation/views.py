@@ -11,6 +11,8 @@ from echo_heist.core.contracts.results import (
 )
 from echo_heist.core.contracts.security.model import ROLE_ALGORITHMS, GuardView, SecuritySpec
 from echo_heist.core.contracts.world import StaticMap
+from echo_heist.core.environment.view import environment_view
+from echo_heist.core.perception.concealment import is_concealed
 from echo_heist.core.simulation.systems.mission import interaction_hints
 from echo_heist.core.simulation.world import WorldState
 
@@ -36,7 +38,9 @@ def observe(
         own_status=OwnStatus(
             actor.tile,
             actor.inventory,
-            concealed=actor.crouched and actor.tile in world_map.crouch_tiles,
+            concealed=is_concealed(
+                world_map, actor.tile, actor.crouched, hidden_in=actor.hidden_in
+            ),
             position=actor.position,
             interaction_progress_ticks=world.interaction_ticks
             if world.interaction_actor == actor_id
@@ -51,6 +55,7 @@ def observe(
             stair_ticks_remaining=max(0, actor.stair_arrives_at - world.tick),
             crouched=actor.crouched,
             melee_cooldown_remaining=max(0, actor.melee_ready_at - world.tick),
+            hidden_in=actor.hidden_in,
         ),
         visible_entities=world.visible_entities.get(actor_id, ()),
         heard_events=world.heard_cues.get(actor_id, ()),
@@ -77,7 +82,7 @@ def presentation(
                 world.tick < actor.stunned_until,
                 actor.facing,
                 actor.crouched,
-                actor.crouched and actor.tile in world_map.crouch_tiles,
+                is_concealed(world_map, actor.tile, actor.crouched, hidden_in=actor.hidden_in),
             )
             for actor in world.actors.values()
         ),
@@ -140,4 +145,5 @@ def presentation(
             for link in world_map.stairs
             if link.object_id == actor.stair_source_id
         ),
+        environment=environment_view(world.environment, world.tick),
     )

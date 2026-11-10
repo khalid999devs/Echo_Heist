@@ -6,6 +6,7 @@ from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind
 from echo_heist.core.contracts.results import MissionSpec, RunOutcome
 from echo_heist.core.contracts.world import ActorKind, StaticMap
+from echo_heist.core.perception.concealment import is_concealed
 from echo_heist.core.simulation.systems.mission import end_mission
 from echo_heist.core.simulation.systems.motion import clear_reach, distance_squared
 from echo_heist.core.simulation.world import GUARD_KINDS, CaptureState, Emit, WorldState
@@ -37,7 +38,9 @@ def update_captures(
                 and (
                     actor.actor_id in allowed_targets[guard.actor_id]
                     if allowed_targets is not None and guard.actor_id in allowed_targets
-                    else not (actor.crouched and actor.tile in world_map.crouch_tiles)
+                    else not is_concealed(
+                        world_map, actor.tile, actor.crouched, hidden_in=actor.hidden_in
+                    )
                 )
                 and distance_squared(guard.position, actor.position) <= rules.capture_range_units**2
                 and clear_reach(

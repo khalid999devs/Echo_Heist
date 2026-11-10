@@ -6,6 +6,7 @@ from importlib.resources import files
 from pathlib import PurePosixPath
 
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.environment.model import EnvironmentRules
 from echo_heist.core.contracts.security.model import SensorRules
 
 
@@ -15,6 +16,12 @@ def load_game_rules() -> GameRules:
 
 def load_sensor_rules() -> SensorRules:
     return SensorRules.from_payload(json.loads(resource_bytes("data/gameplay/security.json")))
+
+
+def load_environment_rules() -> EnvironmentRules:
+    return EnvironmentRules.from_payload(
+        json.loads(resource_bytes("data/gameplay/environment.json"))
+    )
 
 
 def resource_bytes(relative_path: str) -> bytes:

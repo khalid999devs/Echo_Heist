@@ -110,7 +110,7 @@ def test_recorded_run_replays_exactly_and_detects_changed_inputs(
 ) -> None:
     assert replay_matches(level, rules, sensors, registry, upper)
     log = upper.log
-    assert log.header.fingerprint_schema == 11 and log.header.registry_revision == registry.revision
+    assert log.header.fingerprint_schema == 12 and log.header.registry_revision == registry.revision
     header = build_header(
         level.static_map, rules, sensors, registry_revision=registry.revision, seed=1042
     )

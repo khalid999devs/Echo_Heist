@@ -24,6 +24,8 @@ from echo_heist.infrastructure.persistence.protocols import (
     FutureProtocolVersion,
     ProtocolStore,
 )
+from echo_heist.infrastructure.resources import load_environment_rules
+from echo_heist.level.environment import build_environment
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import build_security_registry
 
@@ -38,6 +40,8 @@ class NexusGateway:
     ) -> None:
         self.level, self.rules, self.sensors, self.store = level, rules, sensors, store
         self.registry = build_security_registry(level, rules)
+        # Doors, glass, canisters and lockers authored in the map (P05-SR2).
+        self.environment = build_environment(level, load_environment_rules())
         graph = self.registry.graph
         homes = {
             value.zone_id
@@ -99,6 +103,7 @@ class NexusGateway:
             protocol=protocol,
             protocol_state=state,
             on_end=self._attempt_ended,
+            environment=self.environment,
         )
 
     def _attempt_ended(self, _end: MissionEnd, status: NexusStatus | None) -> ProtocolState | None:

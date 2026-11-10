@@ -174,30 +174,8 @@ def prepare_furniture(
                 (),
             )
         )
-    for marker in level.markers:
-        if marker.kind != "HideSpot":
-            continue
-        rect = pygame.Rect(marker.tile[0] * size, marker.tile[1] * size, size, size)
-        render_rect = rect.copy()
-        render_rect.h = round(size * 1.55)
-        render_rect.bottom = rect.bottom
-        sprite = pygame.Surface(render_rect.size, pygame.SRCALPHA)
-        fitted = props[46].get_rect().fit(sprite.get_rect().inflate(-4, -4))
-        fitted.midbottom = (render_rect.w // 2, render_rect.h - 2)
-        sprite.blit(pygame.transform.smoothscale(props[46], fitted.size), fitted)
-        sprite.fill((183, 206, 204, 255), special_flags=pygame.BLEND_RGBA_MULT)
-        result.append(
-            FurnitureVisual(
-                marker.marker_id,
-                marker.tile,
-                rect,
-                render_rect,
-                sprite,
-                None,
-                "recess",
-                (),
-            )
-        )
+    # HideSpot cabinets are drawn by the interactive locker prop from committed
+    # P05 state (occupancy/hatch), so no second static cabinet is baked here.
     return tuple(sorted(result, key=lambda item: (item.depth, item.footprint.x, item.object_id)))
 
 

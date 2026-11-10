@@ -93,3 +93,27 @@ def test_held_interact_never_bounces_between_stair_landings(rules: GameRules) ->
     for _ in range(rules.stair_travel_ticks):
         sim.step((adapter.action_for(sim.observe("operative")),))
     assert sim.observe("operative").own_status.tile == (2, 2)
+
+
+def test_held_interact_toggles_a_locker_once_per_fresh_press(rules: GameRules) -> None:
+    from echo_heist.core.contracts.environment.model import EnvironmentSpec, PropSpec
+    from echo_heist.core.contracts.environment.presentation import PropKind
+
+    sim = Simulation(
+        StaticMap("locker", 8, 8),
+        (ActorSpawn("operative", (3, 3)),),
+        rules=rules,
+        environment=EnvironmentSpec((PropSpec("locker", PropKind.LOCKER, ((3, 2),)),)),
+    )
+    adapter = HumanInput("operative")
+    adapter.feed([press(pygame.K_e)])
+    kinds = []
+    for _ in range(20):  # E stays held: enter once, never leave and re-enter
+        action = adapter.action_for(sim.observe("operative"))
+        kinds.append(action.kind)
+        sim.step((action,))
+    assert kinds.count(ActionKind.INTERACT) == 1
+    assert sim.observe("operative").own_status.hidden_in == "locker"
+    adapter.feed([pygame.event.Event(pygame.KEYUP, key=pygame.K_e), press(pygame.K_e)])
+    sim.step((adapter.action_for(sim.observe("operative")),))
+    assert sim.observe("operative").own_status.hidden_in is None

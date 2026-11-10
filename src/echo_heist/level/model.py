@@ -106,7 +106,7 @@ class Chokepoint:
 
 @dataclass(frozen=True, slots=True)
 class Marker:
-    """Cover or HideSpot position; hiding behavior itself arrives with P05."""
+    """Cover, under-desk, HideSpot (locker) or interactive prop (Door/Glass/Canister)."""
 
     marker_id: str
     kind: str

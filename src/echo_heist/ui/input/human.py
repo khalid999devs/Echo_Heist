@@ -120,7 +120,10 @@ class HumanInput:
             kind, sprint = ActionKind.MOVE, held(self.bindings.sprint)
         elif held(self.bindings.interact) and not observation.own_status.stair_ticks_remaining:
             hint = observation.interactions[0] if observation.interactions else None
-            if hint is None or hint.kind != "Stair" or self._interact_armed:
+            # Only a multi-tick interaction (the Core) repeats while E is held;
+            # stairs, doors, lockers, glass and canisters need a fresh press so
+            # a held key cannot toggle a door or locker every tick.
+            if hint is None or hint.required_ticks > 1 or self._interact_armed:
                 kind = ActionKind.INTERACT
                 target = hint.target_id if hint else None
             self._interact_armed = False

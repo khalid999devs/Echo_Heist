@@ -14,7 +14,8 @@ from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.results import MissionEnd, RunResult
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, Tile
 from echo_heist.core.simulation.engine import Simulation
-from echo_heist.infrastructure.resources import load_sensor_rules
+from echo_heist.infrastructure.resources import load_environment_rules, load_sensor_rules
+from echo_heist.level.environment import build_environment
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import build_security_registry
 from echo_heist.ui.input.configuration import key_label, movement_hint
@@ -98,6 +99,9 @@ class HeistSession:
                 mission=level.mission(),
                 seed=seed,
                 security=security,
+                environment=build_environment(level, load_environment_rules())
+                if security_enabled
+                else None,
             )
         )
         self.interactions = InteractionPresentation(

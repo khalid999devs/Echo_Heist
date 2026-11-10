@@ -2,7 +2,9 @@
 
 Updated **2026-11-10**: PRs **#5/#6 are merged into main**, preserving Suhita's original commits, after review fixes and successful CI. Read the [merged runtime handoff](../quality/reports/phase05/review/INTEGRATION.md). Current baseline: **fingerprint 12 / 301 tests**. Old work branches and earlier schema/count/checkout instructions are historical.
 
-**P01/P02/P03 are DONE.** P04/P05 runtime now includes real Companion/MCTS, Interceptor/minimax, NEXUS/protocol persistence/reset and doors/glass/canisters/lockers. Production Companion deployment is available; native actual-data review is recorded. Full P04/P05 gate sign-off remains conservative; remaining P05 native door/glass/ability and physical Windows review must be recorded. Do not rebuild these implemented systems.
+Khalid's [connected Mac review](../tracking/handoffs/khalid/day_04/CONNECTED_REVIEW.md) verifies actual props/tools, current UI and both-mode profiling. P06 connected score/profile/history acceptance still depends on Suhita's services.
+
+**P01/P02/P03 are DONE.** P04/P05 runtime now includes real Companion/MCTS, Interceptor/minimax, NEXUS/protocol persistence/reset and doors/glass/canisters/lockers. Production Companion deployment is available; native actual-data review is recorded. Full P04/P05 gate sign-off remains conservative; Khalid's Mac door/glass/ability acceptance is now recorded; current-build physical Windows review remains. Do not rebuild these implemented systems.
 
 Authoritative scoring/encounters, editable saved policies/profiles, history and additional preferences persistence remain P06 work. P06 consumers already exist; retrieve their [handoff](../tracking/handoffs/khalid/day_03/P06.md). P07 balance/fairness/performance and P08 delivery remain open. A future request to implement the next slice must check current gates and claims first; this PR review does not authorize automatic later-phase implementation.
 

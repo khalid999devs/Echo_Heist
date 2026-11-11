@@ -544,6 +544,10 @@ class Simulation:
             mission_end=self._world.mission_end,
         )
 
+    def detection_encounters(self) -> int:
+        """Team detection encounters so far (privileged analysis data)."""
+        return self._world.encounters.count
+
     def terminal_result(self) -> RunResult | None:
         """The authoritative approved score once the mission has ended."""
         end, mission = self._world.mission_end, self._mission

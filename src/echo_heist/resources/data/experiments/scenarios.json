@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "suite": "vault-five-zone/v1",
+  "map_id": "vault-five-zone",
+  "tick_cap": 9000,
+  "policies": {
+    "GHOST": {"navigation": "SAFEST", "guard_reaction": "HIDE", "emergency": "ESCAPE", "risk": "CAUTIOUS"},
+    "BALANCED": {"navigation": "BALANCED", "guard_reaction": "RETREAT", "emergency": "EMP_IF_TRAPPED", "risk": "BALANCED"},
+    "RUSH": {"navigation": "SHORTEST", "guard_reaction": "CONSIDER_ECHO", "emergency": "MELEE_IF_ADJACENT", "risk": "BOLD"},
+    "CUSTOM": {"navigation": "SAFEST", "guard_reaction": "RETREAT", "emergency": "EMP_IF_TRAPPED", "risk": "BALANCED"}
+  },
+  "scenarios": [
+    {"id": "s01-patrol-early", "category": "patrol-timing", "seed": 201, "hold": 0},
+    {"id": "s02-patrol-3s", "category": "patrol-timing", "seed": 202, "hold": 90},
+    {"id": "s03-patrol-6s", "category": "patrol-timing", "seed": 203, "hold": 180},
+    {"id": "s04-patrol-9s", "category": "patrol-timing", "seed": 204, "hold": 270},
+    {"id": "s05-upper-stairs", "category": "route-upper", "seed": 205, "tile": [26, 11]},
+    {"id": "s06-upper-stairs-late", "category": "route-upper", "seed": 206, "tile": [26, 11], "hold": 120},
+    {"id": "s07-lower-stairs", "category": "route-lower", "seed": 207, "tile": [27, 33]},
+    {"id": "s08-lower-stairs-late", "category": "route-lower", "seed": 208, "tile": [27, 33], "hold": 120},
+    {"id": "s09-cross-link-junction", "category": "junction", "seed": 209, "tile": [38, 16]},
+    {"id": "s10-research-junction", "category": "junction", "seed": 210, "tile": [45, 30]},
+    {"id": "s11-security-cone-edge", "category": "partial-vision", "seed": 211, "tile": [36, 13]},
+    {"id": "s12-security-east", "category": "partial-vision", "seed": 212, "tile": [45, 13]},
+    {"id": "s13-service-lower", "category": "heard-only", "seed": 213, "tile": [24, 24]},
+    {"id": "s14-service-west", "category": "heard-only", "seed": 214, "tile": [19, 26]},
+    {"id": "s15-service-corridor", "category": "stale-sighting", "seed": 215, "tile": [21, 16]},
+    {"id": "s16-service-corridor-late", "category": "stale-sighting", "seed": 216, "tile": [21, 15], "hold": 60},
+    {"id": "s17-security-sentinel-near", "category": "capture-threat", "seed": 217, "tile": [41, 10]},
+    {"id": "s18-research-tracker-near", "category": "capture-threat", "seed": 218, "tile": [36, 30]},
+    {"id": "s19-no-tools", "category": "scarce-tools", "seed": 219, "echo": 0, "emp": 0, "melee": 0},
+    {"id": "s20-one-echo-one-stun", "category": "scarce-tools", "seed": 220, "echo": 1, "emp": 0, "melee": 1},
+    {"id": "s21-core-approach", "category": "core-theft", "seed": 221, "tile": [53, 22]},
+    {"id": "s22-core-approach-late", "category": "core-theft", "seed": 222, "tile": [54, 24], "hold": 60},
+    {"id": "s23-lockdown-core-chamber", "category": "lockdown-return", "seed": 223, "tile": [55, 22], "core_held": true},
+    {"id": "s24-lockdown-north-exit", "category": "lockdown-return", "seed": 224, "tile": [58, 21], "core_held": true}
+  ]
+}

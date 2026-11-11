@@ -56,7 +56,10 @@ def metadata(facility: Facility, suite: Suite) -> dict[str, Any]:
         "suite": suite.suite_id,
         "version": __version__,
         "commit": commit,
-        "uv_lock_sha256": hashlib.sha256(lock.read_bytes()).hexdigest() if lock.exists() else None,
+        # Line endings normalized: a Windows checkout must hash like any other.
+        "uv_lock_sha256": hashlib.sha256(lock.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        if lock.exists()
+        else None,
         "map_hash": map_hash(facility.level.static_map),
         "rules_hash": canonical_hash(asdict(facility.rules)),
         "sensors_hash": canonical_hash(asdict(facility.sensors)),

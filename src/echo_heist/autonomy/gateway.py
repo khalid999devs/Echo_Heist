@@ -7,11 +7,13 @@ from persisted, legitimately observed evidence; it is announced through
 only at construction, on reset and once when an attempt ends; never in drawing.
 """
 
+from dataclasses import replace
 from pathlib import Path
 
 from echo_heist.ai.director import protocols as rules_of
 from echo_heist.ai.director.protocols import ProtocolMemory
-from echo_heist.autonomy.mission import AutonomousMission
+from echo_heist.autonomy.experience import ExperienceService
+from echo_heist.autonomy.mission import AutonomousMission, ResultListener
 from echo_heist.core.contracts.autonomy.model import ControlMode, ProtocolState
 from echo_heist.core.contracts.autonomy.policy import DeploymentRequest
 from echo_heist.core.contracts.autonomy.runtime import DeploymentUnavailable, RuntimeAvailability
@@ -24,7 +26,7 @@ from echo_heist.infrastructure.persistence.protocols import (
     FutureProtocolVersion,
     ProtocolStore,
 )
-from echo_heist.infrastructure.resources import load_environment_rules
+from echo_heist.infrastructure.resources import load_environment_rules, load_scoring_rules
 from echo_heist.level.environment import build_environment
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import build_security_registry
@@ -42,6 +44,9 @@ class NexusGateway:
         self.registry = build_security_registry(level, rules)
         # Doors, glass, canisters and lockers authored in the map (P05-SR2).
         self.environment = build_environment(level, load_environment_rules())
+        self.scoring = load_scoring_rules()
+        # Optional P06 listener that receives each attempt's authoritative score.
+        self.result_listener: ResultListener | None = None
         graph = self.registry.graph
         homes = {
             value.zone_id
@@ -89,6 +94,31 @@ class NexusGateway:
         self.memory = cleared
         return rules_of.state(cleared)
 
+    def set_protocols_enabled(self, enabled: bool) -> ProtocolState:
+        """Turn NEXUS adaptation on or off for later attempts (persisted).
+
+        Disabling clears any selected protocol so the next attempt is the
+        baseline; recorded evidence is kept for when it is enabled again.
+        """
+        if self.problem:
+            raise DeploymentUnavailable(self.problem)
+        if type(enabled) is not bool:
+            raise ValueError("The protocol switch must be a boolean")
+        updated = replace(
+            self.memory,
+            revision=self.memory.revision + 1,
+            enabled=enabled,
+            active=self.memory.active if enabled else None,
+            rationale=self.memory.rationale if enabled else "",
+        )
+        if self.store is not None:
+            try:
+                self.store.save(updated)
+            except OSError as error:
+                raise DeploymentUnavailable(f"NEXUS memory not saved: {error}") from error
+        self.memory = updated
+        return rules_of.state(updated)
+
     def deploy(self, request: DeploymentRequest) -> AutonomousMission:
         if request.map_id != self.level.static_map.map_id:
             raise DeploymentUnavailable(f"Map {request.map_id!r} is not loaded")
@@ -104,6 +134,8 @@ class NexusGateway:
             protocol_state=state,
             on_end=self._attempt_ended,
             environment=self.environment,
+            scoring=self.scoring,
+            on_result=self.result_listener,
         )
 
     def _attempt_ended(self, _end: MissionEnd, status: NexusStatus | None) -> ProtocolState | None:
@@ -126,3 +158,10 @@ def connect_gateway(
     """Composition helper for the desktop startup worker."""
     store = ProtocolStore(data_dir / FILE_NAME) if data_dir is not None else None
     return NexusGateway(level, rules, sensors, store)
+
+
+def connect_experience(gateway: NexusGateway, data_dir: Path | None) -> ExperienceService:
+    """The real P06 experience service, fed by every attempt the gateway deploys."""
+    service = ExperienceService(gateway.level.static_map.map_id, gateway.scoring, data_dir)
+    gateway.result_listener = service.attempt_finished
+    return service

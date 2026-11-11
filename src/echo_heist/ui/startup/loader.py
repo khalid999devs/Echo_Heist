@@ -100,11 +100,12 @@ class StartupLoader:
 
             self._publish(0.01, "Preparing the facility")
             gateway = None
+            experience = None
             level = rules = None
             if self._data_dir is not None:
                 # P04 composition hook: the real autonomy/NEXUS gateway, prepared
                 # here on the worker before ownership reaches the main loop.
-                from echo_heist.autonomy.gateway import connect_gateway
+                from echo_heist.autonomy.gateway import connect_experience, connect_gateway
                 from echo_heist.infrastructure.resources import (
                     load_game_rules,
                     load_sensor_rules,
@@ -113,6 +114,8 @@ class StartupLoader:
 
                 level, rules = load_level(), load_game_rules()
                 gateway = connect_gateway(level, rules, load_sensor_rules(), self._data_dir)
+                # P06: scored reports, run history, profiles and preferences.
+                experience = connect_experience(gateway, self._data_dir)
             flow = GameFlow(
                 view_size,
                 settings=settings,
@@ -120,6 +123,7 @@ class StartupLoader:
                 rules=rules,
                 loading=lambda value, _: self._publish(value * 0.78, "Preparing the facility"),
                 autonomy_gateway=gateway,
+                experience_gateway=experience,
             )
             self._publish(0.78, "Connecting audio")
             director = AudioDirector(

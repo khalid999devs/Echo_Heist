@@ -58,3 +58,19 @@ class DeploymentRequest:
         object.__setattr__(self, "mode", ControlMode(self.mode))
         if type(self.seed) is not int or not self.map_id:
             raise ValueError("Deployment needs an integer seed and map identity")
+
+
+# Documented starting presets (blueprint p. 14); not secret buffs.
+PRESETS: dict[str, PolicySelection] = {
+    "GHOST": PolicySelection(
+        Navigation.SAFEST, GuardReaction.HIDE, Emergency.ESCAPE, Risk.CAUTIOUS
+    ),
+    "BALANCED": PolicySelection(),
+    "RUSH": PolicySelection(
+        Navigation.SHORTEST, GuardReaction.CONSIDER_ECHO, Emergency.MELEE_IF_ADJACENT, Risk.BOLD
+    ),
+}
+
+
+def preset_name(policy: PolicySelection) -> str | None:
+    return next((name for name, value in PRESETS.items() if value == policy), None)

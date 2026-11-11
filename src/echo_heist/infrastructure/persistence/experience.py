@@ -231,7 +231,8 @@ class ProfileStore(JsonStore):
         return next_id, profiles
 
     def load(self) -> tuple[int, tuple[SavedProfile, ...]]:
-        return self.read(self._decode, (1, ()))
+        empty: tuple[int, tuple[SavedProfile, ...]] = (1, ())
+        return self.read(self._decode, empty)
 
     def save(self, next_id: int, profiles: tuple[SavedProfile, ...]) -> None:
         self.write(

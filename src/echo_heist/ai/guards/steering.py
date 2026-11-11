@@ -243,6 +243,58 @@ def evidence_expired(observation: Observation, rules: SensorRules, memory: Guard
     )
 
 
+GUARDS = (ActorKind.SENTINEL, ActorKind.TRACKER, ActorKind.INTERCEPTOR)
+BODY_CLEARANCE = UNIT // 2  # another guard this close ahead blocks the step
+
+
+def give_way(observation: Observation, position: Position, direction: Tile, delta: Tile) -> Tile:
+    """Step around a visible guard body instead of pushing into it forever.
+
+    Two guards each pushing into the other's body on different axes used to
+    deadlock in narrow corridors (P07 softlock). Using only this guard's own
+    observation: if a seen guard is within half a tile ahead, try the other
+    axis toward the waypoint, else sidestep perpendicular away from the
+    blocker. Intruders never count as blockers, so pursuit is unchanged.
+    """
+    if direction == (0, 0):
+        return direction
+
+    def blocked(step: Tile) -> bool:
+        ahead = (
+            position[0] + step[0] * UNIT // 10,
+            position[1] + step[1] * UNIT // 10,
+        )
+        return any(
+            entity.kind in GUARDS
+            and entity.actor_id != observation.agent_id
+            and entity.position is not None
+            and (entity.position[0] - ahead[0]) ** 2 + (entity.position[1] - ahead[1]) ** 2
+            < (entity.position[0] - position[0]) ** 2 + (entity.position[1] - position[1]) ** 2
+            and (entity.position[0] - position[0]) ** 2 + (entity.position[1] - position[1]) ** 2
+            < BODY_CLEARANCE**2
+            for entity in observation.visible_entities
+        )
+
+    if not blocked(direction):
+        return direction
+    world_map = observation.map_static
+    tile = observation.own_status.tile
+    other = (0, sign(delta[1])) if direction[0] else (sign(delta[0]), 0)
+    options = [other] if other != (0, 0) else []
+    if direction[0]:
+        options += [(0, 1), (0, -1)]
+    else:
+        options += [(1, 0), (-1, 0)]
+    for step in options:
+        if (
+            step != (0, 0)
+            and not blocked(step)
+            and world_map.can_walk((tile[0] + step[0], tile[1] + step[1]))
+        ):
+            return step
+    return direction
+
+
 def steer(
     observation: Observation,
     memory: GuardMemory,
@@ -312,6 +364,7 @@ def steer(
     direction = (
         (sign(dx), 0) if abs(dx) > UNIT // 10 else (0, sign(dy)) if abs(dy) > UNIT // 10 else (0, 0)
     )
+    direction = give_way(observation, position, direction, (dx, dy))
     facing = direction if direction != (0, 0) else own.facing
     if memory.state == GuardState.SPOTTED and intruder is not None:
         look = intruder.position or tile_center(intruder.tile)

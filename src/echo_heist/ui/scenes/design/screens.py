@@ -26,7 +26,7 @@ GUIDE_COPY = (
         (
             "LISTEN TO YOUR FOOTSTEPS",
             "Sprint is loud. C toggles a slower, quieter crouch.",
-            "Crouch beneath open desks. Leave the low space before standing.",
+            "E: lockers and doors. Breaking glass or a kicked canister is loud.",
         ),
     ),
     (
@@ -36,9 +36,9 @@ GUIDE_COPY = (
             "BFS routes around obstacles; fuzzy urgency shapes its response.",
         ),
         (
-            "TRACKER / ACTIVE",
-            "A* pursues actual sightings, then searches the last known area.",
-            "Reports retain their original time; hidden routes stay unknown.",
+            "TRACKER AND INTERCEPTOR",
+            "Tracker: A* to actual sightings, then searches that area.",
+            "Interceptor: depth-3 alpha-beta picks which gate to hold.",
         ),
     ),
     (
@@ -48,9 +48,9 @@ GUIDE_COPY = (
             "Rush accepts more risk. Edit the design in Workshop.",
         ),
         (
-            "DECISION STACK / PLANNED",
-            "A* plans routes; utility scores goals; MCTS tests choices.",
-            "Emergency search compares nearby escape and tool actions.",
+            "DECISION STACK",
+            "Utility rules react first when grabbed or seen.",
+            "MCTS runs 64 simulations; A* avoids observed danger.",
         ),
     ),
     (
@@ -60,9 +60,9 @@ GUIDE_COPY = (
             "Expect quicker guards, longer searches and warning lights.",
         ),
         (
-            "COORDINATION / PLANNED",
-            "NEXUS will coordinate guard roles using shared reports.",
-            "Persistent learning and profile storage arrive in later phases.",
+            "NEXUS COORDINATION",
+            "Dispatches guards from heard, seen or reported evidence only.",
+            "May adapt one protocol between attempts; reset in Workshop.",
         ),
     ),
 )

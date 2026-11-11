@@ -1,6 +1,6 @@
 # Approved V1 scoring
 
-Status: approved by the user in chat on 2026-10-18; implementation pending. This replaces the numerical scoring defaults on blueprint p. 18. The original PDF stays unchanged. Further changes to scoring weights, penalties, rank rules or scoring meaning must be proposed in chat and approved before adoption.
+Status: approved by the user in chat on 2026-10-18; implemented on `work/suhita-p06-p08` (2026-11-11, scoring version 1, draft pace reference unchanged; see [runtime](../architecture/integration/experience/RUNTIME.md)). This replaces the numerical scoring defaults on blueprint p. 18. The original PDF stays unchanged. Further changes to scoring weights, penalties, rank rules or scoring meaning must be proposed in chat and approved before adoption.
 
 ## Why change the original defaults
 

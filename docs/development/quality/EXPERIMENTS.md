@@ -1,6 +1,6 @@
 # Reproducible AI and academic evidence
 
-Blueprint basis: pp. 9-14, 18. Status: experiment design only; no results exist.
+Blueprint basis: pp. 9-14, 18. Status: implemented; first full results in [POLICY_COMPARISON](experiments/POLICY_COMPARISON.md) (2026-11-11, 96 runs).
 
 Eight-phase schedule: P03/P04 introduce real telemetry/algorithm evidence; P06 verifies saved policy-sensitive choices; P07 assigns Suhita the behavior/search/replay harness and scenario/metadata fixtures, while Khalid profiles rendering/resources; P08 assigns Suhita the full matrix execution/analysis and Khalid the technical delivery review. Preserve the full denominator under time pressure and report incomplete runs explicitly.
 

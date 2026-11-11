@@ -11,6 +11,8 @@ from echo_heist.ai.navigation.grid import bfs
 from echo_heist.core.abilities.tools import advance_echoes, tool_reason, use_tool
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.config.scenario import IntruderStart
+from echo_heist.core.contracts.config.scoring import ScoringRules
 from echo_heist.core.contracts.environment.model import EnvironmentSpec
 from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.observations import Observation
@@ -18,12 +20,14 @@ from echo_heist.core.contracts.results import (
     MissionSpec,
     PresentationSnapshot,
     RunOutcome,
+    RunResult,
     StepResult,
 )
 from echo_heist.core.contracts.security.director import NexusStatus
 from echo_heist.core.contracts.security.model import (
     GuardMemory,
     GuardRole,
+    GuardState,
     InterceptPlan,
     SecuritySpec,
 )
@@ -31,6 +35,7 @@ from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
 from echo_heist.core.contracts.world import (
     ActorKind,
     ActorSpawn,
+    MissionPhase,
     Position,
     Scalar,
     StaticMap,
@@ -38,6 +43,8 @@ from echo_heist.core.contracts.world import (
 )
 from echo_heist.core.environment import lifecycle as props
 from echo_heist.core.perception.sensors import line_of_sight
+from echo_heist.core.scoring import encounters
+from echo_heist.core.scoring.score import score_run
 from echo_heist.core.simulation import views
 from echo_heist.core.simulation.systems import security as guard_security
 from echo_heist.core.simulation.systems.capture import update_captures
@@ -60,6 +67,14 @@ from echo_heist.core.simulation.systems.traversal import (
 from echo_heist.core.simulation.world import GUARD_KINDS, ActorState, WorldState
 
 TOOL_ACTIONS = frozenset({ActionKind.ECHO, ActionKind.EMP, ActionKind.MELEE})
+DECISIVE = frozenset(
+    {
+        EventKind.CORE_TAKEN,
+        EventKind.LOCKDOWN_STARTED,
+        EventKind.CAPTURE_COMPLETED,
+        EventKind.MISSION_ENDED,
+    }
+)
 ROLE_KINDS = {
     GuardRole.SENTINEL: frozenset({ActorKind.SENTINEL}),
     GuardRole.TRACKER: frozenset({ActorKind.TRACKER}),
@@ -106,10 +121,14 @@ class Simulation:
         seed: int = 1042,
         security: SecuritySpec | None = None,
         environment: EnvironmentSpec | None = None,
+        scoring: ScoringRules | None = None,
+        intruder_start: IntruderStart | None = None,
     ) -> None:
         if not spawns:
             raise ValueError("At least one actor is required")
         self._base_map, self._environment = world_map, environment
+        self._scoring = scoring or ScoringRules()
+        self._start = intruder_start
         prop_state = props.initial_state(environment) if environment is not None else None
         if environment is not None and prop_state is not None:
             stair_tiles = {link.tile for link in world_map.stairs}
@@ -159,6 +178,12 @@ class Simulation:
             actor = self._world.actors.get(mission.operative_id)
             if actor is None or actor.kind not in (ActorKind.OPERATIVE, ActorKind.COMPANION):
                 raise ValueError("Mission operative must identify an intruder actor")
+            if intruder_start is not None:
+                # Experiment start (P07): reduced stock or an already-stolen Core.
+                actor.inventory = intruder_start.inventory()
+                if intruder_start.core_held:
+                    self._world.core_owner = actor.actor_id
+                    self._world.phase = MissionPhase.LOCKDOWN
             if mission.mode not in ("HUMAN", "COMPANION"):
                 raise ValueError("Unsupported mission mode")
             core = mission_object(world_map, mission.core_object_id)
@@ -351,6 +376,7 @@ class Simulation:
                 self._mission.operative_id if self._mission else next(iter(self._world.actors))
             )
             end_mission(self._world, operative, RunOutcome.ABORTED, emit)
+            self._world.decisive_events.extend(events[-1:])
             return self._result(tuple(events))
         if geometry_reason is not None:
             emit(
@@ -360,8 +386,15 @@ class Simulation:
             )
         for actor in self._world.actors.values():
             actor.traversed_tiles = (actor.tile,)
+        confirmed: list[int] = []
         if self._security is not None:
             guard_security.apply_decisions(self._world, self._security, choices, emit)
+            observed_tick = self._world.tick - 1
+            confirmed = [
+                memory.last_seen_tick
+                for memory in self._world.guard_memories.values()
+                if memory.state == GuardState.CHASE and memory.last_seen_tick == observed_tick
+            ]
         advance_echoes(self._world)
         update_sprint(
             self._world,
@@ -472,15 +505,58 @@ class Simulation:
             guard_security.capture_targets(self._world, self._security) if self._security else None,
         )
         check_extraction(self._world, self._map, self._mission, emit)
+        self._score_encounters(events, confirmed)
         remember_paths(self._world, self._rules)
         return self._result(tuple(events))
+
+    def _score_encounters(self, events: list[GameEvent], confirmed: list[int]) -> None:
+        """Team detection encounters from actual confirmations and grabs (SCORING.md)."""
+        world = self._world
+        if self._security is not None:
+            grabs = [world.tick for e in events if e.kind == EventKind.CAPTURE_STARTED]
+            started = encounters.update(
+                world.encounters,
+                world.tick,
+                [*confirmed, *grabs],
+                grab_active=bool(world.captures),
+                ttl_ticks=self._security.rules.memory_ticks,
+            )
+            if started:
+                first = next(
+                    (
+                        e
+                        for e in events
+                        if e.kind in (EventKind.SIGHTING_CONFIRMED, EventKind.CAPTURE_STARTED)
+                    ),
+                    None,
+                )
+                if first is not None:
+                    world.decisive_events.append(first)
+        world.decisive_events.extend(e for e in events if e.kind in DECISIVE)
+        del world.decisive_events[:-24]
 
     def _result(self, events: tuple[GameEvent, ...]) -> StepResult:
         return StepResult(
             self.tick,
             events,
             tuple(self.observe(actor_id) for actor_id in self._world.actors),
+            terminal=self.terminal_result(),
             mission_end=self._world.mission_end,
+        )
+
+    def terminal_result(self) -> RunResult | None:
+        """The authoritative approved score once the mission has ended."""
+        end, mission = self._world.mission_end, self._mission
+        if end is None or mission is None:
+            return None
+        return score_run(
+            mode=mission.mode,
+            seed=self._seed,
+            outcome=end.outcome,
+            elapsed_ticks=end.elapsed_ticks,
+            detection_encounters=self._world.encounters.count,
+            rules=self._scoring,
+            decisive_events=tuple(self._world.decisive_events),
         )
 
     def _rejection_reason(self, action: Action, count: int) -> str | None:
@@ -549,7 +625,7 @@ class Simulation:
     def fingerprint(self) -> str:
         """Privileged hash includes timers, decoy history, rules and mission spec."""
         payload = {
-            "schema_version": 12,
+            "schema_version": 13,
             "seed": self._seed,
             "rules": asdict(self._rules),
             "pending_geometry": {
@@ -572,6 +648,8 @@ class Simulation:
             "map": _map_payload(self._map),
             "base_map": _map_payload(self._base_map),
             "environment": asdict(self._environment) if self._environment else None,
+            "scoring": asdict(self._scoring),
+            "intruder_start": asdict(self._start) if self._start else None,
         }
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), allow_nan=False)
         return sha256(canonical.encode()).hexdigest()

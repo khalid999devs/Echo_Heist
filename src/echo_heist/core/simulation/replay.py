@@ -21,7 +21,7 @@ from echo_heist.core.contracts.world import StaticMap
 from echo_heist.core.simulation.engine import Simulation
 
 REPLAY_SCHEMA = 1
-FINGERPRINT_SCHEMA = 12
+FINGERPRINT_SCHEMA = 13
 
 
 def canonical_hash(value: object) -> str:

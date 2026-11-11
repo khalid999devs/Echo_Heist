@@ -60,7 +60,10 @@ def test_real_carrier_theft_lockdown_and_original_exit(rules: GameRules, kind: A
         if result.mission_end:
             break
     assert result.mission_end is not None and result.mission_end.outcome == RunOutcome.WIN
-    assert result.terminal is None  # no fabricated P06 score/rank
+    # P06: the authoritative approved score (no encounters, well under the pace reference).
+    assert result.terminal is not None
+    assert (result.terminal.score, result.terminal.grade) == (100, "S")
+    assert result.terminal.detection_encounters == 0
     terminal_hash, terminal_tick = sim.fingerprint(), sim.tick
     assert sim.step().events == ()
     assert sim.tick == terminal_tick and sim.fingerprint() == terminal_hash

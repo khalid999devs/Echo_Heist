@@ -4,7 +4,7 @@ Owner: Khalid. Date: 2026-10-31. Branch: `work/khalid-p06-ui`, stacked on `work/
 
 ## Connection
 
-Pass an `ExperienceGateway` to `GameFlow(..., experience_gateway=...)` alongside the separate existing `autonomy_gateway`. The desktop default passes neither; Human gameplay works, Companion stays unavailable, profiles/history do not pretend to save, and results remain explicitly unscored. A test gateway exists only under `tests/fixtures/experience` and is never imported by the application.
+Pass an `ExperienceGateway` to `GameFlow(..., experience_gateway=...)` alongside the separate existing `autonomy_gateway`. The current desktop passes the production autonomy gateway for both Human and Companion. It still has no production ExperienceGateway: profiles/history do not pretend to save, and results remain explicitly unscored. A test gateway exists only under `tests/fixtures/experience` and is never imported by the application.
 
 Contracts are in `core/contracts/experience/{model,ports}.py`; they import no pygame or storage code. Reuse existing `RunResult` rather than introducing a competing scoring result. The immutable wrapper is `RunReport(run_key, map_id, result, ticks_per_second, tools, achievements, policy_label)`.
 
@@ -22,7 +22,7 @@ Expected operational/data errors must be translated to `ExperienceUnavailable` (
 
 A gateway may obtain results from its shared runtime/service registry. `ResultRequest` contains legitimate end metadata and real own committed tool usage, not an observation dump or fabricated detection total. Runtime `StepResult.terminal` is also supported when no ExperienceGateway is installed; its data must match the same request. Abort handling now retains that terminal value as well. If an experience gateway is installed it is authoritative; None/error does not silently substitute another provider's result.
 
-`RunReport` validates supplied component sums, approved ranges/ranks, win-only unique achievements and metadata before display. These are boundary assertions, not an implementation of encounter lifetime, pace calculation or achievements. UI never infers score from guard states, event counts, wall time or gizmo animation. Fingerprint schema remains **10**; no physics/AI/scoring mutation is added here.
+`RunReport` validates supplied component sums, approved ranges/ranks, win-only unique achievements and metadata before display. These are boundary assertions, not an implementation of encounter lifetime, pace calculation or achievements. UI never infers score from guard states, event counts, wall time or gizmo animation. This independent consumer checkpoint originally used schema **10**. Current merged gameplay uses **12**; the consumer adds no physics/AI/scoring mutation.
 
 ## Preferences and input
 

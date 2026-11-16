@@ -12,7 +12,7 @@ from echo_heist.core.contracts.autonomy.runtime import AutonomousRun, MissionRun
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.results import MissionEnd, RunResult
-from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, Tile
+from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, ActorKind, Tile
 from echo_heist.core.simulation.engine import Simulation
 from echo_heist.infrastructure.resources import load_environment_rules, load_sensor_rules
 from echo_heist.level.environment import build_environment
@@ -118,9 +118,11 @@ class HeistSession:
         self.announcement_serial = 0
         self._last_announcement: tuple[int | None, str] | None = None
         self.art = art or WorldArt.load()
-        self.map_surface = map_surface or build_map_surface(level, fonts, self.art)
         self.furnishings = (
             furnishings if furnishings is not None else prepare_furniture(level, self.art.props)
+        )
+        self.map_surface = map_surface or build_map_surface(
+            level, fonts, self.art, furnishings=self.furnishings
         )
         self.camera = Camera(*view_size, *self.map_surface.get_size())
         self.paused = self.summary = self.lab_note = self.confirm_abort = False
@@ -392,12 +394,30 @@ class HeistSession:
                     if moving
                     else actor.facing
                 )
-                sprinting = actor.actor_id == self.observer_id and (
-                    dx * dx + dy * dy > sprint_delta * sprint_delta
+                base_speed = {
+                    ActorKind.SENTINEL: self.rules.sentinel_speed_units_per_second,
+                    ActorKind.TRACKER: self.rules.tracker_speed_units_per_second,
+                    ActorKind.INTERCEPTOR: self.rules.interceptor_speed_units_per_second,
+                }.get(actor.kind)
+                threshold = (
+                    base_speed * 1.10 / self.simulation.ticks_per_second
+                    if base_speed
+                    else sprint_delta
                 )
-                phase_step = hypot(dx, dy) / (
-                    POSITION_UNITS_PER_TILE * (1.85 if sprinting else 1.6)
+                sprinting = dx * dx + dy * dy > threshold * threshold
+                stride = (
+                    (1.85 if sprinting else 1.6)
+                    if actor.kind == ActorKind.OPERATIVE
+                    else {
+                        ActorKind.SENTINEL: 1.0,
+                        ActorKind.TRACKER: 1.25,
+                        ActorKind.INTERCEPTOR: 1.40,
+                        ActorKind.COMPANION: 1.10,
+                    }.get(actor.kind, 1.0)
                 )
+                if sprinting and actor.kind != ActorKind.OPERATIVE:
+                    stride *= 1.35 if actor.kind == ActorKind.COMPANION else 1.2
+                phase_step = hypot(dx, dy) / (POSITION_UNITS_PER_TILE * stride)
                 self.actor_motion[actor.actor_id] = ActorMotion(
                     direction,
                     moving,
@@ -516,6 +536,10 @@ class HeistSession:
             fraction=self.render_fraction,
             observer_id=self.observer_id,
         )
+        if snapshot.mission_end is not None:
+            # Results reuse the actual facility as their backdrop. Ended-run
+            # diagnostics, captions and pause controls must not bleed through it.
+            return
         draw_cues(
             canvas,
             self.level,

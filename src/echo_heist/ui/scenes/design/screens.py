@@ -26,7 +26,7 @@ GUIDE_COPY = (
         (
             "LISTEN TO YOUR FOOTSTEPS",
             "Sprint is loud. C toggles a slower, quieter crouch.",
-            "E: lockers and doors. Breaking glass or a kicked canister is loud.",
+            "Crouch beneath open desks. Leave the low space before standing.",
         ),
     ),
     (
@@ -36,9 +36,9 @@ GUIDE_COPY = (
             "BFS routes around obstacles; fuzzy urgency shapes its response.",
         ),
         (
-            "TRACKER AND INTERCEPTOR",
-            "Tracker: A* to actual sightings, then searches that area.",
-            "Interceptor: depth-3 alpha-beta picks which gate to hold.",
+            "TRACKER / ACTIVE",
+            "A* pursues actual sightings, then searches the last known area.",
+            "Reports retain their original time; hidden routes stay unknown.",
         ),
     ),
     (
@@ -48,21 +48,21 @@ GUIDE_COPY = (
             "Rush accepts more risk. Edit the design in Workshop.",
         ),
         (
-            "DECISION STACK",
-            "Utility rules react first when grabbed or seen.",
-            "MCTS runs 64 simulations; A* avoids observed danger.",
+            "DECISION STACK / ACTIVE",
+            "A* follows known routes; utility handles immediate danger.",
+            "MCTS selects, expands, rolls out and backs up belief-based choices.",
         ),
     ),
     (
         (
-            "THE FACILITY RESPONDS",
-            "Recovering the Core starts lockdown.",
-            "Expect quicker guards, longer searches and warning lights.",
+            "INTERCEPTOR / ACTIVE",
+            "Minimax chooses a reachable post; alpha-beta prunes branches.",
+            "The robot travels there physically using legitimate sightings.",
         ),
         (
-            "NEXUS COORDINATION",
-            "Dispatches guards from heard, seen or reported evidence only.",
-            "May adapt one protocol between attempts; reset in Workshop.",
+            "COORDINATION / ACTIVE",
+            "NEXUS dispatches from guard reports and preserves coverage.",
+            "One evidence-backed protocol can adapt; reset clears its memory.",
         ),
     ),
 )

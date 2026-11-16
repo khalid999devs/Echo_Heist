@@ -1,0 +1,842 @@
+{
+  "base_commit": "df7dbdb",
+  "date": "2026-11-10",
+  "fingerprint": 12,
+  "hardware": {
+    "model": "Mac16,12",
+    "cpu": "Apple M4",
+    "ram_gib": 16,
+    "macos": "26.4.1"
+  },
+  "reports": {
+    "props": {
+      "driver": "cocoa",
+      "audio_ready": true,
+      "checks": [
+        "door-cross-link: real close/open and geometry",
+        "door-core-north: real close/open and geometry",
+        "glass-research-rack: once-only shatter, cue and physical crossing",
+        "glass-research-cell: once-only shatter, cue and physical crossing",
+        "Real Echo/EMP use and rejected empty EMP/out-of-range melee",
+        "Real guard melee contact, one charge spent; recovery rejects repeat"
+      ],
+      "shots": [
+        "door-cross-link-before",
+        "door-cross-link-motion",
+        "door-cross-link-closed",
+        "door-cross-link-open",
+        "door-core-north-before",
+        "door-core-north-motion",
+        "door-core-north-closed",
+        "door-core-north-open",
+        "glass-research-rack-before",
+        "glass-research-rack-motion",
+        "glass-research-rack-shattered",
+        "glass-research-rack-crossed",
+        "glass-research-cell-before",
+        "glass-research-cell-motion",
+        "glass-research-cell-shattered",
+        "glass-research-cell-crossed",
+        "tool-echo",
+        "tool-emp",
+        "tool-emp-empty",
+        "tool-melee-no-target",
+        "melee-real-guard",
+        "melee-recovery-rejected"
+      ],
+      "environment_cues": [
+        {
+          "kind": "DOOR",
+          "object": "door-cross-link",
+          "tick": 470,
+          "noise": "470:2452"
+        },
+        {
+          "kind": "DOOR",
+          "object": "door-cross-link",
+          "tick": 488,
+          "noise": "488:2550"
+        },
+        {
+          "kind": "DOOR",
+          "object": "door-core-north",
+          "tick": 531,
+          "noise": "531:2787"
+        },
+        {
+          "kind": "DOOR",
+          "object": "door-core-north",
+          "tick": 549,
+          "noise": "549:2881"
+        },
+        {
+          "kind": "GLASS",
+          "object": "glass-research-rack",
+          "tick": 528,
+          "noise": "528:2757"
+        },
+        {
+          "kind": "GLASS",
+          "object": "glass-research-cell",
+          "tick": 506,
+          "noise": "506:2668"
+        }
+      ],
+      "submitted_audio": {
+        "stair-start": 9,
+        "step-0": 32,
+        "step-1": 31,
+        "step-2": 26,
+        "walk-1": 28,
+        "walk-2": 33,
+        "walk-0": 27,
+        "discovery": 6,
+        "alert": 9,
+        "ready": 7,
+        "stair-arrive": 4,
+        "door": 4,
+        "glass": 2,
+        "echo": 1,
+        "emp": 1,
+        "unavailable": 2,
+        "melee": 1
+      },
+      "audio": {
+        "music_track": "pulse",
+        "audio_assets_loaded": 33,
+        "audio_cues_played": 223,
+        "lockdown_alarm_active": false,
+        "room_ambience_active": true
+      },
+      "scope": "Production gateway/map/security and keyboard; no world-state injection. Accelerated QA verifies mixer submission, not subjective mix quality."
+    },
+    "experience": {
+      "driver": "cocoa",
+      "audio_ready": true,
+      "shots": [
+        "workshop-real",
+        "profiles-honestly-unavailable",
+        "workshop-1280x720",
+        "workshop-1440x900",
+        "workshop-1366x768",
+        "workshop-1024x768",
+        "workshop-fullscreen",
+        "companion-live",
+        "actual-companion-win-unscored",
+        "actual-report-details",
+        "history-honestly-unavailable",
+        "new-seed-protocol-review",
+        "controls-remapped",
+        "accessibility-session-only",
+        "actual-accessible-companion-hud",
+        "actual-companion-abort",
+        "guide-0",
+        "guide-1",
+        "guide-2",
+        "guide-3",
+        "actual-remapped-human-hud"
+      ],
+      "checks": [
+        "Real Companion deployment/win/result through production gateway",
+        "Four editable blocks, real Balanced selection and responsive pointer navigation",
+        "Explicit seed cancel/change retains Companion mode and policy",
+        "Actual paused Companion settings freeze and confirmed abort",
+        "Controls/captions/contrast apply in session; persistence honestly unavailable"
+      ],
+      "experience_service": "NOT_IMPLEMENTED: no production ExperienceGateway in main",
+      "fullscreen_size": [
+        1470,
+        923
+      ],
+      "windows": [
+        {
+          "requested": [
+            1280,
+            720
+          ],
+          "actual": [
+            1280,
+            720
+          ],
+          "logical": [
+            1280,
+            720
+          ]
+        },
+        {
+          "requested": [
+            1440,
+            900
+          ],
+          "actual": [
+            1440,
+            900
+          ],
+          "logical": [
+            1280,
+            800
+          ]
+        },
+        {
+          "requested": [
+            1366,
+            768
+          ],
+          "actual": [
+            1366,
+            768
+          ],
+          "logical": [
+            1281,
+            720
+          ]
+        },
+        {
+          "requested": [
+            1024,
+            768
+          ],
+          "actual": [
+            1024,
+            768
+          ],
+          "logical": [
+            1280,
+            960
+          ]
+        }
+      ],
+      "scope": "Actual AI/gameplay/UI; no synthetic scores/profiles/preferences/history."
+    },
+    "performance": {
+      "video_driver": "cocoa",
+      "audio_ready": true,
+      "cycles": 12,
+      "frames": 7200,
+      "measured_frames_after_warmup": 4800,
+      "sizes": [
+        [
+          1280,
+          720
+        ],
+        [
+          1440,
+          900
+        ]
+      ],
+      "security_enabled": true,
+      "production_gateway": true,
+      "python_tracing": false,
+      "runs": [
+        {
+          "cycle": 1,
+          "mode": "HUMAN",
+          "tick": 306,
+          "deployment_ms": 22.101,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 2,
+          "mode": "COMPANION",
+          "tick": 306,
+          "deployment_ms": 20.603,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 3,
+          "mode": "HUMAN",
+          "tick": 306,
+          "deployment_ms": 21.652,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 4,
+          "mode": "COMPANION",
+          "tick": 306,
+          "deployment_ms": 20.733,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 5,
+          "mode": "HUMAN",
+          "tick": 306,
+          "deployment_ms": 19.961,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 6,
+          "mode": "COMPANION",
+          "tick": 306,
+          "deployment_ms": 20.607,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 7,
+          "mode": "HUMAN",
+          "tick": 306,
+          "deployment_ms": 20.548,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 8,
+          "mode": "COMPANION",
+          "tick": 306,
+          "deployment_ms": 20.68,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 9,
+          "mode": "HUMAN",
+          "tick": 306,
+          "deployment_ms": 20.037,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 10,
+          "mode": "COMPANION",
+          "tick": 306,
+          "deployment_ms": 20.498,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 11,
+          "mode": "HUMAN",
+          "tick": 306,
+          "deployment_ms": 21.011,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 12,
+          "mode": "COMPANION",
+          "tick": 306,
+          "deployment_ms": 20.49,
+          "companion_search": 64,
+          "props": 13
+        }
+      ],
+      "mode_frame_ms": {
+        "HUMAN": {
+          "update": {
+            "median": 0.688,
+            "p95": 0.894,
+            "max": 1.364
+          },
+          "draw": {
+            "median": 1.708,
+            "p95": 2.405,
+            "max": 4.786
+          },
+          "present": {
+            "median": 4.269,
+            "p95": 14.647,
+            "max": 15.012
+          },
+          "total": {
+            "median": 7.365,
+            "p95": 16.771,
+            "max": 17.327
+          }
+        },
+        "COMPANION": {
+          "update": {
+            "median": 0.782,
+            "p95": 1.129,
+            "max": 7.461
+          },
+          "draw": {
+            "median": 1.929,
+            "p95": 2.696,
+            "max": 7.059
+          },
+          "present": {
+            "median": 5.323,
+            "p95": 14.357,
+            "max": 253.39
+          },
+          "total": {
+            "median": 8.134,
+            "p95": 16.732,
+            "max": 255.286
+          }
+        }
+      },
+      "teaching_view": false,
+      "frame_ms": {
+        "update": {
+          "median": 0.697,
+          "p95": 1.063,
+          "max": 7.461
+        },
+        "draw": {
+          "median": 1.805,
+          "p95": 2.577,
+          "max": 7.059
+        },
+        "present": {
+          "median": 5.221,
+          "p95": 14.558,
+          "max": 253.39
+        },
+        "total": {
+          "median": 7.897,
+          "p95": 16.754,
+          "max": 255.286
+        }
+      },
+      "memory": [
+        {
+          "cycle": 1,
+          "rss_mb": 459.81,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 2,
+          "rss_mb": 476.97,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 3,
+          "rss_mb": 331.69,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 4,
+          "rss_mb": 382.84,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 5,
+          "rss_mb": 390.16,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 6,
+          "rss_mb": 392.42,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 7,
+          "rss_mb": 392.91,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 8,
+          "rss_mb": 400.22,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 9,
+          "rss_mb": 398.94,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 10,
+          "rss_mb": 400.91,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 11,
+          "rss_mb": 406.19,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 12,
+          "rss_mb": 398.36,
+          "python_mb": 0.0
+        }
+      ],
+      "last_six_rss_span_mb": 13.28,
+      "python_growth_after_warmup_mb": null,
+      "rss_change_from_warmup_mb": 15.52,
+      "bounded_in_this_run": true,
+      "scope": "Native macOS uncapped CPU/presentation workload, production AI/security/props; restarts and resizes, four warmup cycles (both modes at both sizes). Optional Python tracing adds overhead. Each run starts at seed 1042 with reset protocol memory; no actor state injection. RSS includes OS compression and compositor buffers; bounded means final six samples stay within 64 MB of warmup and Python growth below 4 MB (including telemetry). A bounded short run is not proof against every long-session memory leak.",
+      "complete_mission": {
+        "outcome": "WIN",
+        "tick": 2463,
+        "lockdown_alarm_seen": true,
+        "phase_frame_ms": {
+          "INFILTRATE": {
+            "frames": 1961,
+            "update": {
+              "median": 0.759,
+              "p95": 1.034,
+              "max": 7.62
+            },
+            "draw": {
+              "median": 2.218,
+              "p95": 2.999,
+              "max": 6.29
+            },
+            "present": {
+              "median": 13.153,
+              "p95": 14.346,
+              "max": 14.673
+            },
+            "total": {
+              "median": 16.455,
+              "p95": 16.729,
+              "max": 17.282
+            }
+          },
+          "LOCKDOWN": {
+            "frames": 2869,
+            "update": {
+              "median": 0.762,
+              "p95": 1.504,
+              "max": 7.627
+            },
+            "draw": {
+              "median": 3.046,
+              "p95": 4.067,
+              "max": 7.079
+            },
+            "present": {
+              "median": 12.929,
+              "p95": 13.648,
+              "max": 14.108
+            },
+            "total": {
+              "median": 16.553,
+              "p95": 16.777,
+              "max": 17.174
+            }
+          }
+        },
+        "python_tracing": false
+      }
+    },
+    "memory": {
+      "video_driver": "cocoa",
+      "audio_ready": true,
+      "cycles": 16,
+      "frames": 4800,
+      "measured_frames_after_warmup": 3600,
+      "sizes": [
+        [
+          1280,
+          720
+        ],
+        [
+          1440,
+          900
+        ]
+      ],
+      "security_enabled": true,
+      "production_gateway": true,
+      "python_tracing": true,
+      "runs": [
+        {
+          "cycle": 1,
+          "mode": "HUMAN",
+          "tick": 153,
+          "deployment_ms": 22.546,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 2,
+          "mode": "COMPANION",
+          "tick": 153,
+          "deployment_ms": 20.732,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 3,
+          "mode": "HUMAN",
+          "tick": 153,
+          "deployment_ms": 20.521,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 4,
+          "mode": "COMPANION",
+          "tick": 153,
+          "deployment_ms": 20.532,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 5,
+          "mode": "HUMAN",
+          "tick": 153,
+          "deployment_ms": 24.554,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 6,
+          "mode": "COMPANION",
+          "tick": 153,
+          "deployment_ms": 25.833,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 7,
+          "mode": "HUMAN",
+          "tick": 153,
+          "deployment_ms": 25.407,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 8,
+          "mode": "COMPANION",
+          "tick": 153,
+          "deployment_ms": 25.909,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 9,
+          "mode": "HUMAN",
+          "tick": 153,
+          "deployment_ms": 26.171,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 10,
+          "mode": "COMPANION",
+          "tick": 153,
+          "deployment_ms": 26.707,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 11,
+          "mode": "HUMAN",
+          "tick": 153,
+          "deployment_ms": 26.458,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 12,
+          "mode": "COMPANION",
+          "tick": 153,
+          "deployment_ms": 27.553,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 13,
+          "mode": "HUMAN",
+          "tick": 153,
+          "deployment_ms": 26.572,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 14,
+          "mode": "COMPANION",
+          "tick": 153,
+          "deployment_ms": 26.882,
+          "companion_search": 64,
+          "props": 13
+        },
+        {
+          "cycle": 15,
+          "mode": "HUMAN",
+          "tick": 153,
+          "deployment_ms": 26.669,
+          "companion_search": null,
+          "props": 13
+        },
+        {
+          "cycle": 16,
+          "mode": "COMPANION",
+          "tick": 153,
+          "deployment_ms": 27.11,
+          "companion_search": 64,
+          "props": 13
+        }
+      ],
+      "mode_frame_ms": {
+        "HUMAN": {
+          "update": {
+            "median": 4.463,
+            "p95": 5.214,
+            "max": 5.642
+          },
+          "draw": {
+            "median": 3.946,
+            "p95": 9.125,
+            "max": 10.211
+          },
+          "present": {
+            "median": 1.083,
+            "p95": 3.047,
+            "max": 3.354
+          },
+          "total": {
+            "median": 9.23,
+            "p95": 15.127,
+            "max": 16.228
+          }
+        },
+        "COMPANION": {
+          "update": {
+            "median": 4.973,
+            "p95": 5.807,
+            "max": 31.63
+          },
+          "draw": {
+            "median": 4.217,
+            "p95": 9.706,
+            "max": 10.76
+          },
+          "present": {
+            "median": 1.077,
+            "p95": 3.037,
+            "max": 3.319
+          },
+          "total": {
+            "median": 9.464,
+            "p95": 16.312,
+            "max": 41.755
+          }
+        }
+      },
+      "teaching_view": true,
+      "frame_ms": {
+        "update": {
+          "median": 4.569,
+          "p95": 5.707,
+          "max": 31.63
+        },
+        "draw": {
+          "median": 4.077,
+          "p95": 9.474,
+          "max": 10.76
+        },
+        "present": {
+          "median": 1.08,
+          "p95": 3.041,
+          "max": 3.354
+        },
+        "total": {
+          "median": 9.301,
+          "p95": 15.922,
+          "max": 41.755
+        }
+      },
+      "memory": [
+        {
+          "cycle": 1,
+          "rss_mb": 466.25,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 2,
+          "rss_mb": 477.91,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 3,
+          "rss_mb": 501.72,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 4,
+          "rss_mb": 514.84,
+          "python_mb": 0.0
+        },
+        {
+          "cycle": 5,
+          "rss_mb": 509.3,
+          "python_mb": 1.028
+        },
+        {
+          "cycle": 6,
+          "rss_mb": 515.2,
+          "python_mb": 1.118
+        },
+        {
+          "cycle": 7,
+          "rss_mb": 520.23,
+          "python_mb": 1.402
+        },
+        {
+          "cycle": 8,
+          "rss_mb": 519.75,
+          "python_mb": 1.527
+        },
+        {
+          "cycle": 9,
+          "rss_mb": 518.58,
+          "python_mb": 2.204
+        },
+        {
+          "cycle": 10,
+          "rss_mb": 520.36,
+          "python_mb": 2.293
+        },
+        {
+          "cycle": 11,
+          "rss_mb": 525.09,
+          "python_mb": 1.767
+        },
+        {
+          "cycle": 12,
+          "rss_mb": 450.27,
+          "python_mb": 1.868
+        },
+        {
+          "cycle": 13,
+          "rss_mb": 449.17,
+          "python_mb": 2.542
+        },
+        {
+          "cycle": 14,
+          "rss_mb": 447.77,
+          "python_mb": 2.629
+        },
+        {
+          "cycle": 15,
+          "rss_mb": 456.84,
+          "python_mb": 2.105
+        },
+        {
+          "cycle": 16,
+          "rss_mb": 441.28,
+          "python_mb": 2.193
+        }
+      ],
+      "last_six_rss_span_mb": 83.81,
+      "python_growth_after_warmup_mb": 2.193,
+      "rss_change_from_warmup_mb": -73.56,
+      "bounded_in_this_run": true,
+      "scope": "Native macOS uncapped CPU/presentation workload, production AI/security/props; restarts and resizes, four warmup cycles (both modes at both sizes). Optional Python tracing adds overhead. Each run starts at seed 1042 with reset protocol memory; no actor state injection. RSS includes OS compression and compositor buffers; bounded means final six samples stay within 64 MB of warmup and Python growth below 4 MB (including telemetry). A bounded short run is not proof against every long-session memory leak."
+    }
+  },
+  "checks": {
+    "command": "uv run --locked --cache-dir .cache/uv python scripts/checks/run.py",
+    "tests": 301,
+    "elapsed_seconds": 44.32,
+    "structure": "PASS",
+    "ruff": "PASS",
+    "format": "PASS",
+    "mypy": "PASS"
+  },
+  "terminal_backdrop_followup": {
+    "presentation_tests": 50,
+    "seconds": 14.28,
+    "native_journey": "PASS",
+    "lint_types_format": "PASS",
+    "scope": "Draw-only terminal overlay removal after initial full checks/performance; final CI repeats suite"
+  }
+}

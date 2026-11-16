@@ -1,10 +1,12 @@
 # Start or resume developer work
 
-Updated **2026-10-31**: fetch **main**. PRs #2/#3/#4 are merged with original commits preserved; their former Khalid branches are retired after ancestry checks. Main contains the P04/P05/P06 presentation, approved limited melee and current-build review/delivery preparation. See the [consolidation handoff](../tracking/handoffs/khalid/day_03/MAIN.md). Do not fetch or merge the retired work branches referenced in older dated handoffs.
+Updated **2026-11-10**: PRs **#5/#6 are merged into main**, preserving Suhita's original commits, after review fixes and successful CI. Read the [merged runtime handoff](../quality/reports/phase05/review/INTEGRATION.md). Current baseline: **fingerprint 12 / 301 tests**. Old work branches and earlier schema/count/checkout instructions are historical.
 
-**P01/P02/P03 are DONE; P04 remains IN_PROGRESS.** Merging presentation does not implement Companion/MCTS, Interceptor/minimax, NEXUS/protocols, full environment lifecycles, authoritative scoring or persistence. Suhita starts **P04-SR1/SR2/SR3** from current main and stops at that slice boundary. Khalid's next connected work is real-backend visual acceptance. The revised [workload](../planning/WORKLOAD.md), KR/SR ownership and eight-phase/four-development-day scope still apply.
+Khalid's [connected Mac review](../tracking/handoffs/khalid/day_04/CONNECTED_REVIEW.md) verifies actual props/tools, current UI and both-mode profiling. P06 connected score/profile/history acceptance still depends on Suhita's services.
 
-Current consumer **fingerprint 10**, **246 tests** at the latest verified baseline. Retrieve [P06 handoff](../tracking/handoffs/khalid/day_03/P06.md), [P05 presentation](../tracking/handoffs/khalid/day_03/P05.md), [limited melee](../tracking/handoffs/khalid/day_03/MELEE.md), [P04 port/screens](../tracking/handoffs/khalid/day_02/phase04/P04.md) and their concrete contracts. Default Human is playable; Companion/history/scoring/profile saving stay explicitly unavailable until their real services connect. Fixture views are test-only, never algorithm or persistence evidence.
+**P01/P02/P03 are DONE.** P04/P05 runtime now includes real Companion/MCTS, Interceptor/minimax, NEXUS/protocol persistence/reset and doors/glass/canisters/lockers. Production Companion deployment is available; native actual-data review is recorded. Full P04/P05 gate sign-off remains conservative; Khalid's Mac door/glass/ability acceptance is now recorded; current-build physical Windows review remains. Do not rebuild these implemented systems.
+
+Authoritative scoring/encounters, editable saved policies/profiles, history and additional preferences persistence remain P06 work. P06 consumers already exist; retrieve their [handoff](../tracking/handoffs/khalid/day_03/P06.md). P07 balance/fairness/performance and P08 delivery remain open. A future request to implement the next slice must check current gates and claims first; this PR review does not authorize automatic later-phase implementation.
 
 Preserve the [P03 combined behavior/guard contract](../architecture/integration/defenders/GUARD_CONTRACT.md): original evidence timestamps/tiles, geometry revisions and retained actual fuzzy traces. Schema-9 P03, schema-7 [physical fixture/input/startup](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md) and earlier source hashes are historical subsets. Current rules include exact obstacle bodies, reciprocal timed stairs, crouch/clearance, three-second sprint/four-second recharge, two-charge melee/four-second recovery and legitimate noise consequences. Do not downgrade to an old replay schema or unlimited melee.
 
@@ -14,7 +16,7 @@ This is the operational entry point for either developer's separately invoked ag
 
 - If the user/context identifies Khalid, or explicitly points to his guide, use [Khalid's queue](owners/KHALID.md).
 - If the user/context identifies Suhita, or explicitly points to her guide, use [Suhita's queue](owners/SUHITA.md).
-- Suhita's Windows x64 machine uses the [Windows setup/handoff](setup/WINDOWS_SUHITA.md); it includes current clone/bootstrap commands, the P04-SR1/SR2/SR3 boundary and a complete starting prompt.
+- Suhita's Windows x64 machine uses the [Windows setup/handoff](setup/WINDOWS_SUHITA.md); it includes current clone/bootstrap commands, the merged-runtime baseline and current review boundary.
 - Keep that identity for later messages such as "start", "continue" or "finish my part" in the same conversation. Do not ask repeatedly.
 - If no identity is available, read the plan/state without mutations and ask one concise identity question. Do not guess or claim the other developer's slice.
 

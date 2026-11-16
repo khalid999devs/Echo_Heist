@@ -1,5 +1,15 @@
 # Suhita: Windows setup and current-main handoff
 
+## Current instructions — 2026-11-10
+
+PRs #5/#6 are merged into main after review fixes. **Fingerprint 12 / 301 tests**; real Companion/Interceptor/NEXUS/protocol reset and physical props are implemented. Read the [merged runtime handoff](../../quality/reports/phase05/review/INTEGRATION.md) and current [Status](../../tracking/STATUS.md). Fetch current main while preserving local changes/unpushed commits; do not recreate or resume the merged P04/P05 branches. Use a new branch for newly assigned work.
+
+P04 actual-data Mac visual review is recorded. Remaining connected P05 review covers native door/glass/ability cues and current-build physical Windows gameplay. Full gate sign-off remains with the integration lead. P06 scoring/encounters, editable policies/profiles, history and extra preferences persistence are still pending; ready consumers must be reused when that slice is assigned. No automatic later-phase implementation is authorized by the PR merge.
+
+The earlier dated instructions below are historical checkpoints. Their P04/P05 implementation queues, unavailable-Companion statements, old branch commands and fingerprint/test baselines are superseded by this section. Preserve their contracts and authorship. Windows setup commands remain usable; replace old data/output directory names with the current review name and omit creation of the merged work branch.
+
+## Earlier checkpoint instructions
+
 **2026-11-05 update:** SR1/SR2/SR3 are on `work/suhita-p04`, merged with current main; fingerprint is now **11**. Resume that branch and use the run/inspect block in the [SR handoff](../../tracking/handoffs/suhita/day_02/P04.md); the steps below remain the general setup reference.
 
 Updated **2026-10-31**. [Repository](https://github.com/khalid999devs/Echo_Heist), native Windows x64 / PowerShell. PRs #2/#3/#4 are merged into **main**; the former Khalid branches are retired. Main includes the P04/P05/P06 presentation, approved limited melee and current-build delivery preparation. **246 tests / fingerprint 10** is the latest verified baseline; fetch and record the actual current commit. Read the [consolidation handoff](../../tracking/handoffs/khalid/day_03/MAIN.md) and [owner guide](../owners/SUHITA.md). **P01–P03 are complete; P04-SR1/SR2/SR3 is your next assignment.**
@@ -68,50 +78,27 @@ uv run --locked --all-extras python scripts/packaging/smoke.py dist/EchoHeist/Ec
 
 Use native display/audio for physical evidence, not mute/dummy. Retain the executable's complete support folder. Record actual Windows hardware/OS/commit/commands/archive hash/results under `docs/development/quality/reports/phase04/windows/`; large output stays ignored. Write `docs/development/tracking/handoffs/suhita/day_02/P04.md` with actual APIs/events, algorithm/run evidence and exact visual review steps. Use short natural commits with your identity and no assistant attribution; push `work/suhita-p04`, open a reviewable PR against main when permitted, then **stop at P04-SR1/SR2/SR3**. Khalid's real-data visual acceptance and the combined gate still apply. No self-merge, automatic P05 work, scoring-rule change, sub-agents or external teammate messages.
 
-## Starting prompt
+## Current starting prompt
 
 ```text
-I'm Suhita, working on Windows x64.
-
-Clone https://github.com/khalid999devs/Echo_Heist.git or safely reuse my checkout.
-Inspect and preserve local changes and unpushed/unmerged work. Fetch/prune, switch
-cleanly to main and pull --ff-only; then create work/suhita-p04. If that branch
-already contains work, preserve/resume it and merge origin/main instead. Never
-hard-reset, clean or delete unmerged work. Use my Git identity.
+I'm Suhita on Windows x64. Safely reuse or clone
+https://github.com/khalid999devs/Echo_Heist.git. Preserve local changes and unique
+commits; fetch/prune, switch to main and pull --ff-only. PRs #5/#6 are already
+merged. Delete old local work branches only after proving they are in main.
 
 Read AGENTS.md, docs/development/workflow/START_HERE.md,
-docs/development/workflow/owners/SUHITA.md and
-docs/development/workflow/setup/WINDOWS_SUHITA.md.
-Follow their context sequence for the blueprint, hub, Status/HANDOFFS, WORKLOAD,
-P04 specification, code rules, architecture/data contracts and approved scoring/melee.
-Read docs/development/tracking/handoffs/khalid/day_03/MAIN.md and P06.md,
-day_03/P05.md and MELEE.md, day_02/phase04/P04.md, plus the autonomy,
-environment and experience PRESENTATION.md contracts under
-docs/development/architecture/integration/.
+docs/development/workflow/owners/SUHITA.md, current STATUS.md/HANDOFFS.md, and
+docs/development/quality/reports/phase05/review/INTEGRATION.md.
+Main has real P04 AI/protocols and P05 interactive props, fingerprint 12,
+301 tests. Do not reimplement them or resume the merged branches.
 
-Main already includes merged PRs #2/#3/#4: the Human game, polished scenes/audio,
-Companion/NEXUS/Lab and prop/tool presentation, limited melee, result/profile
-interfaces, seed/retry and session controls/accessibility. Baseline is 246 tests,
-fingerprint 10. Retired Khalid branches are unnecessary. These merges do not
-implement the missing AI, environment lifecycles, score engine or persistence.
-
-Verify the locked Windows environment and actual launch/audio. Check claims, then
-claim and complete only P04-SR1/SR2/SR3: genuine Companion FSM/utility/A*/belief-only
-MCTS; Interceptor minimax/alpha-beta and physical travel; evidence-limited NEXUS,
-versioned protocols/reset and functional first-launch deployment. Implement
-AutonomyGateway and wire it to the existing GameFlow/startup. Preserve Khalid's
-visuals, experience ports, Human behavior and approved sprint/melee rules. No
-hidden-state cheats, replayed Human paths, fake metrics or production QA fixtures.
-
-Keep files <=1000 lines, <=6 direct files/directory, with necessary tests under
-root tests/. Verify actual autonomous win/capture, algorithm traces, fairness,
-reset/retry and Human regressions; run appropriate checks and native Windows
-build/smoke. Record actual results and a runnable P04 handoff, guide my visible
-inspection, make short natural commits without assistant attribution, push my
-branch and open a reviewable PR to main when access permits.
-
-Later work is P05 environment/tool completion, P06 scoring/policy/persistence,
-then P07/P08 evidence and Windows acceptance. Stop after my P04 SR slices; leave
-shared visual acceptance open. Do not start later phases, self-merge, redesign
-scenes, change scoring rules, spawn agents or message teammates externally.
+On a new review branch, finish outstanding current-build Windows/native P05
+acceptance: doors, glass, canisters, lockers and both-mode tool/capture cues,
+alongside Human and Companion launch, pause, outcomes, protocol/reset and audio.
+Use actual production behavior; no synthetic fixture as algorithm evidence.
+Record exact commands/results and fix reproducible issues within the claimed
+boundary. Preserve approved scoring/melee, visuals and ownership. Run relevant
+checks and native build/smoke, commit naturally, push and open a PR when ready.
+Stop at that review boundary. P06 scoring/policy/profile/history/preferences
+implementation requires its own assigned slice and existing contracts.
 ```

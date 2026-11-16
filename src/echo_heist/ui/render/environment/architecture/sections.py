@@ -47,17 +47,6 @@ def paint_mounts(surface: pygame.Surface, level: LevelData) -> None:
                     ),
                     2,
                 )
-        endpoint = (rect.centerx, rect.top + 5)
-        feeds = (
-            (endpoint[0], room.top * size),
-            (room.left * size, endpoint[1]),
-            ((room.left + room.width) * size, endpoint[1]),
-        )
-        start = min(feeds, key=lambda p: abs(p[0] - endpoint[0]) + abs(p[1] - endpoint[1]))
-        if abs(start[0] - endpoint[0]) + abs(start[1] - endpoint[1]) <= size * 2:
-            pygame.draw.line(surface, (28, 35, 33), start, endpoint, 6)
-            pygame.draw.line(surface, (80, 90, 83), start, endpoint, 3)
-            pygame.draw.circle(surface, (127, 136, 119), endpoint, 4)
 
 
 def wall_section(surface: pygame.Surface, level: LevelData, tile: tuple[int, int]) -> None:

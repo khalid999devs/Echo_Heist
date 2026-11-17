@@ -10,8 +10,12 @@
 | same | full `pytest` in two parts (unit + audio/persistence/replay/perception/experiments/smoke: 249; mission + presentation: 78) | **327 passed** |
 | same | 96-run comparison in two 12-scenario halves | all 96 records identical to the container run |
 | Agent container (CPython 3.13.17, non-locked tools) | full 96-run comparison; 4-scenario hash check | hash `279ce530…8f82e40`; 4-scenario hash `2eb0c8e5…23673c0` also matched on Suhita's computer |
-| Physical Windows desktop | P08-SR1 checklist | **NOT_RUN** (needs Suhita at the desktop) |
+| Physical Windows desktop, 2026-11-16, at `59ed6ff` (merged with main) | native locked checks, 4-scenario comparison, build, frozen smoke, 8 checklist steps in the packaged game | structure/Ruff/format/mypy PASS; **327 passed, 1 failed** (bootstrap smoke 30 s timeout, slow startup on this machine for every commit); 16/16 runs identical; build PASS; smoke 9/9 PASS with real video/audio; [checklist](../../phase08/suhita/WINDOWS_QA.md) |
 | Hosted CI / packaged builds | on push / Khalid's P08-KR1 | NOT_RUN here |
+
+## After merging main (2026-11-16)
+
+`59ed6ff` merges main `34d68cf` (P04/P05 merged, Khalid's connected review and robot lighting). No simulation, AI, level or data file changed. Linux shell, locked environment: structure, Ruff, format, mypy (189 files) PASS; **328 tests pass** (run in four parts because of the shell's time limit: unit+smoke 188, integration excluding mission/experiments 95, mission 42, experiments 3). The four-scenario comparison is run-for-run identical to the recorded CSV; its hash is `2eb0c8e5…` when the old commit ID is substituted (the commit is part of the hash).
 
 ## Evidence by slice
 
@@ -31,4 +35,4 @@
 
 ## Not verified
 
-Physical Windows play/audio/save/download (P08-SR1), hosted CI, packaged builds, Khalid's KR visual acceptance of the real reports/profiles/preferences and of the guide text, and the Human side of pace calibration.
+Human-play checklist steps on Windows (wins, capture/retry, props, calibration), hosted CI, packaged builds, Khalid's KR visual acceptance of the real reports/profiles/preferences and of the guide text, and the Human side of pace calibration.

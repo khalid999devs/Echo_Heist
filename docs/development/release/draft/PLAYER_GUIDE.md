@@ -27,7 +27,7 @@ Take either stairway upstairs. Hold Interact beside the Core, then escape downst
 | Escape | Pause/resume; settings, retry and confirmed abort are available here |
 | F2 / F3 | Companion decision / guard diagnostic panels when applicable |
 
-Melee has two charges and four seconds of recovery. A legal resisted hit still costs a charge and makes noise. Crouch to move through clearances beneath marked desks. Lockers conceal you when entered out of view. A hard sprint into breakable glass or a loose canister can make noise and draw a guard away.
+Melee has two charges and four seconds of recovery. A legal resisted hit still costs a charge and makes noise. Crouch to move through clearances beneath marked desks. Lockers conceal you when entered out of view. Sprint into breakable glass or walk into a loose canister to make noise and draw a guard away.
 
 Settings → Controls remaps the ten gameplay actions. Open Accessibility to choose sound captions and high-contrast HUD, and use Save Preferences to retain those choices and key bindings. Music, sound effects, window mode and reduced flashing use the general settings.
 

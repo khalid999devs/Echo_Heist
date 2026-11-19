@@ -1,12 +1,10 @@
 # Suhita's agent guide
 
-## Current instructions — 2026-11-10
+## Current instructions · 2026-11-19
 
-PRs #5/#6 are merged into main after review fixes. **Fingerprint 12 / 301 tests**; real Companion/Interceptor/NEXUS/protocol reset and physical props are implemented. Read the [merged runtime handoff](../../quality/reports/phase05/review/INTEGRATION.md) and current [Status](../../tracking/STATUS.md). Fetch current main while preserving local changes/unpushed commits; do not recreate or resume the merged P04/P05 branches. Use a new branch for newly assigned work.
+Use the [two-exit candidate handoff](../../tracking/handoffs/khalid/day_04/RELEASE_CANDIDATE.md) and [Status](../../tracking/STATUS.md). PRs #9/#10 are merged. Preserve prior commits and use current main (fingerprint 14, 330 tests). Earlier branches, setup counts and unfinished runtime descriptions below are historical.
 
-P04 actual-data Mac visual review is recorded. Khalid's [Mac connected review](../../tracking/handoffs/khalid/day_04/CONNECTED_REVIEW.md) now covers doors/glass/ability cues, real navigation/accessibility and current AI-enabled profiling. Current-build physical Windows gameplay/audio remains. Full gate sign-off remains with the integration lead. P06 scoring/encounters, editable policies/profiles, history and extra preferences persistence are still pending; ready consumers must be reused when that slice is assigned. No automatic later-phase implementation is authorized by the PR merge.
-
-The earlier dated instructions below are historical checkpoints. Their P04/P05 implementation queues, unavailable-Companion statements, old branch commands and fingerprint/test baselines are superseded by this section. Preserve their contracts and authorship. Windows setup commands remain usable; replace old data/output directory names with the current review name and omit creation of the merged work branch.
+Your gameplay implementation and 96-run comparison are integrated. The remaining P08-SR1 task is physical Windows QA on the exact two-exit candidate. Retrieve the earlier [Windows checklist](../../quality/reports/phase08/suhita/WINDOWS_QA.md) and use a fresh QA data directory. Keep gameplay and build/archive evidence tied to the tested commit.
 
 ## Earlier checkpoint instructions
 

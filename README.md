@@ -1,76 +1,44 @@
 # ECHO HEIST
 
-A Python + pygame-ce desktop stealth game. Human infiltration is playable; autonomous Companion mode is in development.
+Infiltrate Nexus Research, steal the experimental Core, and escape the lockdown. Play as the Human operative or configure Echo in the AI Workshop and watch it take on the same security team. Choose the Entry Airlock or the Cargo Airlock on your way out.
 
-Latest refinement adds an animated logo/loading opening, pressure-door entrance and extraction, collision bounds matched to visible fixtures, a desktop app icon and varied laboratory floors/lights. Music transitions now fade across frames without blocking gameplay. **C toggles crouch/creep**; Shift provides the timed sprint. [Verified screenshots, performance and builds](docs/development/quality/reports/cinematic_startup/REVIEW.md), [current runnable handoff](docs/development/tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md).
+**Desktop release candidate · Windows x64 and macOS Apple Silicon.** Follow the [player guide](docs/development/release/draft/PLAYER_GUIDE.md) and [current QA and delivery status](docs/development/tracking/STATUS.md).
 
-Current refinement adds coherent neutral floor/wall materials, attached contact shadows, equipment bases/service feeds, **C to crouch/crouch-walk beneath three open desks**, ambient exploration music and explicit hover/click feedback. [Review and current builds](docs/development/quality/reports/material_cohesion/REVIEW.md), [runnable handoff](docs/development/tracking/handoffs/khalid/presentation/MATERIALS_AND_CROUCH.md).
+## Run from source
 
-Latest scene pass: fullscreen fills the display, the closer camera follows a larger animated operative, laboratories show distinct equipment and interrupted research, and quiet walking contrasts with the louder timed sprint. [Verified scene/build record](docs/development/quality/reports/facility_finish/REVIEW.md) and [runnable handoff](docs/development/tracking/handoffs/khalid/presentation/SCENE_FINISH.md).
-
-Current development: **Phases 1-3 complete** (`0.1.0a1`). Both Human routes are playable with two real Sentinels, a Tracker, fair sight/hearing/hiding/capture, and optional live AI teaching diagnostics. Companion/MCTS, Interceptor/minimax, NEXUS, full environment lifecycles, Workshop and scoring remain in P04-P08. Target distribution is free itch.io downloads for Windows x64 and macOS Apple Silicon; Linux is optional after testing.
-
-## Development setup
-
-Suhita on Windows: use the [Windows setup and next Phase 4 handoff](docs/development/workflow/setup/WINDOWS_SUHITA.md) for PowerShell commands, your work branch and assigned implementation boundaries.
-
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.13. The project requires that minor version; uv can provision it on your development machine when needed.
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and use Python 3.13.
 
 ```sh
-uv sync --locked --extra dev --extra build
+uv sync --locked --all-extras
 uv run --locked echo-heist
-uv run --locked echo-heist --headless --seed 1042
 uv run --locked python scripts/checks/run.py
 ```
 
-The desktop entry opens a Chapter 01 card. Play Chapter opens the briefing, where you choose a mode and use Launch Mission. Select with mouse or arrows/Enter; Back returns without starting a run. In the mission, move with WASD/arrows, sprint with Shift, hold E near the Core, and return to the original Exit after lockdown. Q deploys Echo, F uses EMP, Space uses one of two loud emergency stuns (four-second recovery), Tab opens the paused facility map, and Escape pauses. Pause offers resume, same-seed retry and confirmed abort. Companion remains visibly unavailable until Phase 4.
+| Default binding | Action |
+| --- | --- |
+| WASD or arrows | Move |
+| C | Crouch or stand |
+| Left Shift | Sprint for up to 3 seconds, then recharge for 4 seconds |
+| E | Interact with stairs, doors and lockers. Hold beside the Core |
+| Q / F / Space | Deploy Echo / use EMP / stun |
+| Tab / Esc | Facility map / pause |
+| F2 / F3 | Companion decisions / guard diagnostics |
 
-The game fills the resized/fullscreen window, expands the visible world proportionally and keeps menu controls inside a centered safe area. Pointer input uses that same mapping. `--mute` skips audio initialization; unavailable audio devices fall back silently. `--headless` repeats the small seeded foundation diagnostic without importing pygame.
+Use corners and cover to break sight during pursuit. Sprint footsteps attract guards. The Tracker and Interceptor close distance over repeated sprint bursts if you stay in view. Settings provides key bindings, sound captions, contrast, reduced flashing and fullscreen. Use `--mute` to start silently or `--data-dir` to isolate local saves for testing.
 
-The older diagnostic contact room is still available for focused core-rule inspection:
+## AI and experiments
 
-```sh
-uv run --locked python -m echo_heist.diagnostics.human_preview
-```
+- Sentinels use BFS, a finite-state machine and fuzzy investigation. The Tracker uses A* and follows the last confirmed sighting.
+- The Interceptor uses bounded minimax with alpha-beta pruning to predict a chokepoint and travels there physically. NEXUS coordinates using observed reports and sounds.
+- Companion uses a mission state machine, emergency utility, observed-risk A* and bounded MCTS. The four Workshop settings change tactical choices. Open F2 in Companion mode to see its real search evidence.
+- Reproduce the 24-scenario, four-policy experiment with `uv run --locked python scripts/experiments/comparison.py --output-dir output/comparison`.
 
-The research facility spans two floors with 14 purposeful rooms and 101 physical furnishings. Entry and Service are downstairs; Security, Research and Core are upstairs. Press E on either stair landing to change floors. The original alternative routes and cross-link remain connected. Walk at 2.4 tiles/s; hold Shift for a louder 4 tiles/s sprint lasting up to three seconds, followed by four seconds of recharge. C toggles slower, quieter crouch movement and permits clearance beneath three open desks. The HUD shows readiness; pause/map freeze recharge. A confirmed Sentinel pursuit is 15% faster; lockdown's 20% boost takes precedence. The registry runs two BFS/FSM/fuzzy Sentinels, the A* Tracker and a sensing-only Core post until P04 adds Interceptor strategy. F3 opens actual sensor/path/evidence/fuzzy teaching data; 1-4 or tabs select guards; Tab shows both floors with mission time paused. Settings groups Audio and Display controls. Successful extraction has its own exterior cinematic. See the [P03 combined review](docs/development/quality/reports/phase03/integration/VERIFICATION.md) and [runnable handoff](docs/development/tracking/handoffs/khalid/day_02/phase03/P03.md) for actual checks and current contracts.
+## Native package
 
-For an isolated window check:
+On the target operating system, run `uv run --locked --all-extras python scripts/packaging/build.py`. It produces a Windows x64 or macOS arm64 ZIP and a manifest in `dist/`. Keep the whole extracted folder or bundle together. The macOS development package is ad-hoc signed. See the [release plan](docs/development/release/RELEASE_PLAN.md) for download and platform checks.
 
-```sh
-uv run --locked echo-heist --smoke-frames 12 --mute --data-dir .local/profile --report output/smoke.json
-```
+## Development and credits
 
-Settings normally live in the OS user application-data folder (`Echo Heist`), never beside the executable. `--data-dir` overrides that location for checks. Invalid files are backed up before recovery; settings from a newer schema stay untouched. Test data/logs/builds are ignored by Git. Use `uv run --locked pytest` for the focused behavior suite; the combined check command also runs structure/lint/format/type checks.
+Start with [AGENTS.md](AGENTS.md) and the [development hub](docs/development/README.md). The blueprint under `docs/idea` governs the game with the recorded owner decisions. Tests are grouped under `tests/`.
 
-## Native draft build
-
-On Apple Silicon macOS or Windows x64:
-
-```sh
-uv run --locked --all-extras python scripts/packaging/build.py
-```
-
-On macOS this produces `dist/Echo Heist.app` and a platform ZIP. On Windows it produces `dist/EchoHeist/EchoHeist.exe` with its support folder and a platform ZIP. Keep the whole bundle/folder. The local macOS build is ad-hoc signed, not notarized. It contains the current Human stealth slice; the full V1 remains in development.
-
-```sh
-uv run --locked --all-extras python scripts/packaging/smoke.py "dist/Echo Heist.app" --mute
-```
-
-Use `dist/EchoHeist/EchoHeist.exe` on Windows. The smoke helper runs the frozen app from an unrelated directory, compares headless hashes and checks resources/settings. `--dummy-video` is available for CI and does not verify a real desktop. See [current Status](docs/development/tracking/STATUS.md) for hosted CI evidence. Windows wheel availability is verified; native Windows desktop QA remains pending.
-
-See the [P01 handoff](docs/development/tracking/handoffs/khalid/day_01/P01.md) and [Phase 2 evidence](docs/development/quality/reports/phase02/integration/VERIFICATION.md). P03 is complete with 195 passing tests and combined native/hosted evidence; P04-P08 remain in the development plan.
-
-Current camera/detail pass: a closer 13⅓×7½-tile view, larger foot-anchored operative, distance-driven walk/run cycles, depth-sorted furniture, translucent glass and room-local lighting. [Screenshots and actual checks](docs/development/quality/reports/close_camera/REVIEW.md); [developer handoff](docs/development/tracking/handoffs/khalid/day_02/CLOSE_CAMERA.md). Movement rules and approved scoring are unchanged.
-
-Previous visual pass: [scene review and screenshots](docs/development/quality/reports/scene_presentation/REVIEW.md). Mouse navigation, draggable audio sliders, timed climbing, continuous lockdown siren and directional character art are connected. Companion opens a clearly marked Workshop/scene design preview; its AI deployment is later work. The Field Guide opens from the title. A real extraction unlocks the encrypted epilogue. [Runnable developer handoff](docs/development/tracking/handoffs/khalid/day_02/SCENE_PRESENTATION.md).
-
-## Development plan
-
-Start with [AGENTS.md](AGENTS.md), the [development hub](docs/development/README.md), and your owner guide. The eight-phase plan splits work between Khalid and Suhita; Phase 1 belongs to Khalid. All authored files are limited to 1,000 lines, with six maintained direct files per directory and useful tests grouped under root `tests/`.
-
-The blueprint in `docs/idea` is the gameplay authority, with the recorded user-approved schedule, workload and scoring overrides. Dependencies are locked in `uv.lock`; avoid installing the separate `pygame` distribution beside `pygame-ce`.
-
-## License
-
-The project source license is pending the owners' decision before public release. Third-party dependencies retain their own licenses. Do not treat free game downloads or a visible repository as a license grant.
+Developed by Khalid and Suhita. See the [asset credits and license inventory](docs/development/release/draft/CREDITS.md). The project source license awaits the owners' release decision. Third-party assets and dependencies retain their own terms.

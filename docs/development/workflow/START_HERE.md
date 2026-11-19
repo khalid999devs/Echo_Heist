@@ -1,16 +1,8 @@
 # Start or resume developer work
 
-Updated **2026-11-10**: PRs **#5/#6 are merged into main**, preserving Suhita's original commits, after review fixes and successful CI. Read the [merged runtime handoff](../quality/reports/phase05/review/INTEGRATION.md). Current baseline: **fingerprint 12 / 301 tests**. Old work branches and earlier schema/count/checkout instructions are historical.
+Updated **2026-11-19**. PRs #9/#10 are merged. Main has the scoring/Workshop/history services, two exits, stronger confirmed pursuit and the candidate QA pass. Read [Status](../tracking/STATUS.md) and the [two-exit handoff](../tracking/handoffs/khalid/day_04/RELEASE_CANDIDATE.md) for current evidence and platform gaps. Fingerprint 14 and 330 locked tests supersede all previous branch/schema/test-count instructions.
 
-Khalid's [connected Mac review](../tracking/handoffs/khalid/day_04/CONNECTED_REVIEW.md) verifies actual props/tools, current UI and both-mode profiling. P06 connected score/profile/history acceptance still depends on Suhita's services.
-
-**P01/P02/P03 are DONE.** P04/P05 runtime now includes real Companion/MCTS, Interceptor/minimax, NEXUS/protocol persistence/reset and doors/glass/canisters/lockers. Production Companion deployment is available; native actual-data review is recorded. Full P04/P05 gate sign-off remains conservative; Khalid's Mac door/glass/ability acceptance is now recorded; current-build physical Windows review remains. Do not rebuild these implemented systems.
-
-Authoritative scoring/encounters, editable saved policies/profiles, history and additional preferences persistence remain P06 work. P06 consumers already exist; retrieve their [handoff](../tracking/handoffs/khalid/day_03/P06.md). P07 balance/fairness/performance and P08 delivery remain open. A future request to implement the next slice must check current gates and claims first; this PR review does not authorize automatic later-phase implementation.
-
-Preserve the [P03 combined behavior/guard contract](../architecture/integration/defenders/GUARD_CONTRACT.md): original evidence timestamps/tiles, geometry revisions and retained actual fuzzy traces. Schema-9 P03, schema-7 [physical fixture/input/startup](../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md) and earlier source hashes are historical subsets. Current rules include exact obstacle bodies, reciprocal timed stairs, crouch/clearance, three-second sprint/four-second recharge, two-charge melee/four-second recovery and legitimate noise consequences. Do not downgrade to an old replay schema or unlimited melee.
-
-This is the operational entry point for either developer's separately invoked agent. Read the owner guide after resolving identity. Preserve existing local/unpushed work; never delete a teammate's unmerged branch. A phase is complete only after both owner slices and its combined gate pass.
+Suhita's current delivery work is P08-SR1 physical Windows QA on the candidate. Khalid maintains the Mac build and integrates delivery evidence. Both plans retain the four main guards, approved scoring, timed sprint and limited melee. Existing dated implementation records remain historical.
 
 ## Resolve the developer once
 

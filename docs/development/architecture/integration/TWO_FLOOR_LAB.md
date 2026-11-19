@@ -1,5 +1,7 @@
 # Two-floor laboratory and timed movement
 
+2026-11-19 candidate update: the service-wing loop reaches Cargo Airlock at `(25,37)`; the Entry exit and both stair pairs keep their IDs and coordinates. The optional Tiled `Exit` uses `alternate=true`. Import validation checks that both extraction anchors are distinct and reachable. `LevelData.exit_ids`, `MissionSpec.exit_ids` and `RouteGraph.exit_tiles` expose the anchors to consumers. Capture still resolves before automatic extraction, and the actual exit is recorded in `MissionEnd.extraction_id` and the terminal event. See the [candidate report](../../quality/reports/release_candidate/REVIEW.md) for schema, pursuit and evidence.
+
 Follow-up: [scene presentation contract](SCENE_PRESENTATION.md) supersedes immediate stair transfer, fingerprint schema 4 and the earlier menu/lockdown presentation. It adds timed interruptible travel and all navigable screen designs; existing map/deck/route/sprint geometry below remains valid.
 
 Khalid, 2026-10-21; user-directed refinement of `2be5f61` on `work/two-floor-atmosphere`. Supersedes CHAPTER_AND_ROUTES for stairs, presentation and sprint. P03 and later shared gates stay open. Scoring is unchanged. Glass, doors, hiding and canisters remain P05.

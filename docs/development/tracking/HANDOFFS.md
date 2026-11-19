@@ -1,5 +1,7 @@
 # Work claims and runnable handoffs
 
+2026-11-19: [Two-exit desktop candidate](handoffs/khalid/day_04/RELEASE_CANDIDATE.md). PRs #9/#10 merged and prior implementation claims released. Physical Windows delivery QA remains with Suhita.
+
 2026-11-10: **PRs #5/#6 merged into main**, runtime bf3db94, fingerprint 12 / 301 tests. Read the [merged runtime handoff](../quality/reports/phase05/review/INTEGRATION.md). Real P04 AI/protocols and P05 lifecycles are now implemented; earlier "not published / unavailable / start P04" notes below are historical. Connected review and remaining gate boundaries are recorded in current Status. Khalid's review/fix/integration claim is **DONE and released**; no files remain claimed by this review.
 
 

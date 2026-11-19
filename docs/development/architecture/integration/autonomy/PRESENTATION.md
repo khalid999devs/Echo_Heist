@@ -15,7 +15,7 @@
 
 ## Telemetry semantics
 
-`CompanionTrace` is the last actual decision: original tick, FSM state, chosen action/reason, completed simulation count, alternatives with visits and normalized mean rewards, actual A* path/cost/expanded nodes, and optional actual utility override/reason. Unknown rewards are None; unvisited alternatives are not shown as measured zero rewards. Visits cannot exceed completed simulations. Drawing never runs MCTS, A*, utility or an inference function.
+`CompanionTrace` separates the last MCTS search from live execution. The search winner, trigger, time, depth cap, visits and normalized mean rewards describe one evaluation. FSM state, active A* goal/path/plan metrics and utility override describe current execution context. `AutonomyTelemetry.execution` carries the latest Companion action, committed tick and any Simulation rejection independently of the search. Unknown rewards are None. Visits cannot exceed completed simulations. Drawing never runs MCTS, A*, utility or an inference function.
 
 `NexusTrace` carries actual evaluation/announcement ticks, current legitimate-evidence task assignments and optional measured Interceptor depth/value/evaluated/pruned-node trace. `LearnedProtocol` includes a stable ID, label, rationale and observed evidence summary. `ProtocolState` describes the real backend revision/memory setting/active protocol/reset capability. Absence of a trace or service is shown honestly, not as fabricated baseline statistics.
 

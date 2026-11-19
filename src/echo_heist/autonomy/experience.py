@@ -42,8 +42,16 @@ from echo_heist.infrastructure.persistence.experience import (
 
 
 class ExperienceService:
-    def __init__(self, map_id: str, scoring: ScoringRules, data_dir: Path | None) -> None:
+    def __init__(
+        self,
+        map_id: str,
+        scoring: ScoringRules,
+        data_dir: Path | None,
+        *,
+        ticks_per_second: int = 30,
+    ) -> None:
         self.map_id, self.scoring = map_id, scoring
+        self.ticks_per_second = ticks_per_second
         self.profile_store = ProfileStore(data_dir / PROFILES_FILE if data_dir else None)
         self.history_store = HistoryStore(data_dir / HISTORY_FILE if data_dir else None)
         self.preference_store = PreferenceStore(data_dir / PREFERENCES_FILE if data_dir else None)
@@ -68,9 +76,10 @@ class ExperienceService:
 
     # ExperienceGateway ----------------------------------------------------
     def report(self, request: ResultRequest) -> RunReport | None:
-        if request.run_key in self._reported:
-            return self._reported[request.run_key]
-        if request.map_id != self.map_id:
+        existing = self._reported.get(request.run_key)
+        if existing is not None:
+            return existing if existing.matches(request) else None
+        if request.map_id != self.map_id or request.ticks_per_second != self.ticks_per_second:
             return None
         match = next(
             (
@@ -80,6 +89,7 @@ class ExperienceService:
                 and result.mode == request.mode.value
                 and result.outcome == request.end.outcome
                 and result.elapsed_ticks == request.end.elapsed_ticks
+                and tools == request.tools
             ),
             None,
         )
@@ -97,6 +107,8 @@ class ExperienceService:
             self._label(deployment),
         )
         self._reported[request.run_key] = report
+        if len(self._reported) > MAX_HISTORY:
+            del self._reported[next(iter(self._reported))]
         try:
             history = self.history_store.load()
         except ExperienceUnavailable:

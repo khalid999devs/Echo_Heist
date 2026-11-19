@@ -35,7 +35,7 @@ def zone_routes(
     start_zone, goal_zone = graph.zone_of(evidence), graph.zone_of(goal)
     if not start_zone or not goal_zone or start_zone == goal_zone:
         return ()
-    goal_name = "CORE" if goal == graph.core_tile else "EXIT"
+    goal_name = graph.anchor_name(goal)
     found: list[tuple[int, tuple[str, ...], tuple[int, ...]]] = []
 
     def extend(zone: str, path: tuple[str, ...], arrivals: tuple[int, ...]) -> None:

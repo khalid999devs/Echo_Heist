@@ -162,6 +162,11 @@ def connect_gateway(
 
 def connect_experience(gateway: NexusGateway, data_dir: Path | None) -> ExperienceService:
     """The real P06 experience service, fed by every attempt the gateway deploys."""
-    service = ExperienceService(gateway.level.static_map.map_id, gateway.scoring, data_dir)
+    service = ExperienceService(
+        gateway.level.static_map.map_id,
+        gateway.scoring,
+        data_dir,
+        ticks_per_second=gateway.rules.simulation_hz,
+    )
     gateway.result_listener = service.attempt_finished
     return service

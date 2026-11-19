@@ -15,7 +15,7 @@ from echo_heist.infrastructure.resources import load_sensor_rules, resource_byte
 from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 
-COMPANION_WIN, COMPANION_CAPTURE = 1, 4  # Balanced outcomes with the authored props
+COMPANION_WIN, COMPANION_CAPTURE = 1042, 4  # Balanced outcomes with the authored props
 
 
 @pytest.fixture(scope="module")

@@ -89,7 +89,9 @@ def draw_results(
     tools = report.tools if report else request.tools if request else None
     usage = f"Echo {tools.echo}   EMP {tools.emp}   Stun {tools.melee}" if tools else "—"
     label(canvas, fonts, "TOOLS  " + usage, (662, 362))
-    label(canvas, fonts, "Tool use carries no direct score penalty.", (662, 385))
+    if end.extraction_id:
+        exit_name = "Cargo Airlock" if end.extraction_id == "cargo-exit" else "Entry Airlock"
+        label(canvas, fonts, "EXIT  " + exit_name, (662, 385))
     badges = " / ".join(ACHIEVEMENTS[a] for a in report.achievements) if report else ""
     label(
         canvas,
@@ -123,6 +125,11 @@ class ReportInspector:
 
     def controls(self) -> tuple[pygame.Rect, ...]:
         return REPORT_CONTROLS
+
+    def show(self, *, saved: bool = False) -> None:
+        self.open = True
+        self.history = self.state.history() if saved else ()
+        self.index = 0 if self.history else -1
 
     def handle(self, events: list[pygame.event.Event]) -> None:
         for event in events:
@@ -178,7 +185,9 @@ class ReportInspector:
             request = self.state.request
             rows = (
                 f"Seed {request.seed} / {request.mode}" if request else "No completed attempt.",
-                "A score breakdown is unavailable for this attempt.",
+                "A score breakdown is unavailable for this attempt."
+                if request
+                else "Completed missions will appear here.",
             )
         for i, row in enumerate(rows):
             canvas.blit(

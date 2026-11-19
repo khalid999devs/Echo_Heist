@@ -56,8 +56,8 @@ class GameRules:
             raise ValueError("Sprint must not be slower than walking")
         if not 10 <= self.crouch_speed_percent <= 90:
             raise ValueError("Crouch speed must stay below walking speed")
-        if not 100 <= self.chase_guard_speed_percent <= 130:
-            raise ValueError("Pursuit speed must stay within 100-130 percent")
+        if not 100 <= self.chase_guard_speed_percent <= 150:
+            raise ValueError("Pursuit speed must stay within 100-150 percent")
 
     @classmethod
     def from_payload(cls, payload: object) -> Self:

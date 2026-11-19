@@ -89,7 +89,7 @@ def test_invalid_rules_and_spawn_fail_at_boundary(rules: GameRules) -> None:
     with pytest.raises(ValueError):
         replace(rules, actor_radius_units=UNIT)
     with pytest.raises(ValueError, match="Pursuit speed"):
-        replace(rules, chase_guard_speed_percent=150)
+        replace(rules, chase_guard_speed_percent=151)
     with pytest.raises(ValueError):
         GameRules.from_payload({"schema_version": 1})
     with pytest.raises(ValueError, match="walkable"):

@@ -73,14 +73,21 @@ def draw_overview(
                     pygame.draw.rect(
                         canvas, color, (*point((x, y)), max(1, round(scale)), max(1, round(scale)))
                     )
+        labels: list[pygame.Rect] = []
         for zone in level.zones:
             if not deck.contains((zone.left + zone.width // 2, zone.top + zone.height // 2)):
                 continue
             center = point((zone.left + zone.width / 2, zone.top + zone.height / 2))
             zone_text = fonts.micro.render(zone.label.upper(), True, theme.MUTED)
-            canvas.blit(zone_text, zone_text.get_rect(center=center))
+            label_rect = zone_text.get_rect(center=center)
+            labels.append(label_rect)
+            canvas.blit(zone_text, label_rect)
         anchors = {obj.object_id: obj.tile for obj in world.objects}
-        markers = [(anchors[level.exit_id], theme.ACCENT, "EXIT"), (tile, theme.TEXT, "YOU")]
+        markers = [
+            (anchors[key], theme.ACCENT, label)
+            for key, label in zip(level.exit_ids, ("ENTRY EXIT", "CARGO EXIT"), strict=False)
+        ]
+        markers.append((tile, theme.TEXT, "YOU"))
         if phase == MissionPhase.INFILTRATE:
             markers.append((anchors[level.core_id], theme.WARNING, "CORE"))
         for location, color, label in markers:
@@ -89,12 +96,18 @@ def draw_overview(
             center = point((location[0] + 0.5, location[1] + 0.5))
             pygame.draw.circle(canvas, color, center, 5)
             text = fonts.micro.render(label, True, color)
-            canvas.blit(
-                text,
-                text.get_rect(
-                    midtop=(center[0], center[1] - 24 if label == "EXIT" else center[1] + 9)
-                ),
+            x, y = center
+            positions = (
+                text.get_rect(midtop=(x, y + 9)),
+                text.get_rect(midbottom=(x, y - 9)),
+                text.get_rect(midleft=(x + 9, y)),
+                text.get_rect(midright=(x - 9, y)),
             )
+            for rect in positions:
+                if frame.contains(rect) and rect.inflate(6, 4).collidelist(labels) == -1:
+                    labels.append(rect)
+                    canvas.blit(text, rect)
+                    break
         for link in world.stairs:
             if deck.contains(link.tile):
                 center = point((link.tile[0] + 0.5, link.tile[1] + 0.5))

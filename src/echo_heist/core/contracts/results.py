@@ -22,6 +22,11 @@ class MissionSpec:
     core_object_id: str
     exit_object_id: str
     mode: str = "HUMAN"
+    alternate_exit_ids: tuple[str, ...] = ()
+
+    @property
+    def exit_ids(self) -> tuple[str, ...]:
+        return (self.exit_object_id, *self.alternate_exit_ids)
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,6 +37,7 @@ class MissionEnd:
     elapsed_ticks: int
     operative_id: str
     capture_by: str | None = None
+    extraction_id: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

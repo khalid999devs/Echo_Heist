@@ -252,8 +252,14 @@ def run_route(
     )
 
 
-def route_steps(level: LevelData, branch: Branch, back: Branch) -> list[Step]:
-    return [*mission_path(level, branch), "HOLD", *mission_path(level, back, returning=True)]
+def route_steps(
+    level: LevelData, branch: Branch, back: Branch, *, exit_id: str | None = None
+) -> list[Step]:
+    return [
+        *mission_path(level, branch),
+        "HOLD",
+        *mission_path(level, back, returning=True, exit_id=exit_id),
+    ]
 
 
 def replay_matches(

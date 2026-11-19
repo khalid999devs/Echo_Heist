@@ -31,11 +31,13 @@ def walk_path(
     return result.path
 
 
-def mission_path(level: LevelData, branch: Branch, *, returning: bool = False) -> tuple[Tile, ...]:
+def mission_path(
+    level: LevelData, branch: Branch, *, returning: bool = False, exit_id: str | None = None
+) -> tuple[Tile, ...]:
     core = anchor(level, level.core_id)
     approach = core
     start = approach if returning else level.spawn_tile
-    goal = anchor(level, level.exit_id) if returning else approach
+    goal = anchor(level, exit_id or level.exit_id) if returning else approach
     if branch == "cross":
         crossing = next(
             point.tile for point in level.chokepoints if point.point_id == "choke-cross-link"

@@ -53,6 +53,7 @@ STALL_TICKS = 600
 FLEE_TICKS = 75
 BLOCK_TILES = 4
 ABANDON_TICKS = 180
+RECOVERY_TICKS = 900  # time without getting closer to the actual objective
 
 
 @dataclass(frozen=True, slots=True)
@@ -118,7 +119,20 @@ class CompanionController:
         self.hidden_since = -1
         self.utility = ("", "")
         self.geometry_revision = 0
-        self.homeward = self._legs_from(briefing.core_tile, briefing.exit_tile, None)
+        self.objective_key: tuple[bool, int] | None = None
+        self.objective_steps: dict[Tile, int] = {}
+        self.objective_best: int | None = None
+        self.objective_progress_at = 0
+        self.exit_replan_at = 0
+        self.extraction_goal = briefing.exit_tile
+        graph = briefing.graph
+        return_legs = [
+            (self._legs_from(briefing.core_tile, exit_tile, None), exit_tile)
+            for exit_tile in graph.exit_tiles
+        ]
+        self.homeward, self.extraction_goal = min(
+            return_legs, key=lambda item: item[0][0].route.total_steps
+        )
 
     # ----------------------------------------------------------------- planning
     def _legs_from(
@@ -138,7 +152,7 @@ class CompanionController:
 
     def _anchor_steps(self, start: Tile) -> dict[Tile, int]:
         graph = self.briefing.graph
-        name = "CORE" if start == self.briefing.core_tile else "EXIT"
+        name = graph.anchor_name(start)
         steps: dict[Tile, int] = {}
         for node in graph.nodes:
             value = graph.distance(node.node_id, name)
@@ -148,11 +162,57 @@ class CompanionController:
 
     def _goal(self, observation: Observation) -> Tile:
         carrying = observation.own_status.inventory.core_held
-        return self.briefing.exit_tile if carrying else self.briefing.core_tile
+        return self.extraction_goal if carrying else self.briefing.core_tile
+
+    def _choose_exit(self, observation: Observation) -> None:
+        exits = self.briefing.graph.exit_tiles
+        self.exit_replan_at = observation.tick + SEARCH_GAP_TICKS
+        if len(exits) < 2:
+            return
+        danger = self.beliefs.danger(observation.tick)
+        bodies = {guard.tile for guard in active_guards(observation)}
+        own = observation.own_status.tile
+
+        def penalty(tile: Tile) -> int:
+            return self.weights.risk_weight * danger.get(tile, 0) // 2 + (
+                BODY_COST if tile in bodies else 0
+            )
+
+        options = []
+        for tile in exits:
+            path = astar(observation.map_static, own, tile, penalty=penalty)
+            if path.path:
+                # Require a small gain to change destination between tactical searches.
+                options.append((path.cost + (4 if tile != self.extraction_goal else 0), tile))
+        if options:
+            self.extraction_goal = min(options)[1]
+
+    def _needs_recovery(self, observation: Observation) -> bool:
+        own = observation.own_status
+        carrying = own.inventory.core_held
+        key = (carrying, observation.geometry_revision)
+        if self.objective_key != key:
+            # Public walkable geometry only; cache reverse distances until it changes.
+            goals = self.briefing.graph.exit_tiles if carrying else (self.briefing.core_tile,)
+            steps: dict[Tile, int] = {}
+            for goal in goals:
+                for tile, distance in distances_from(observation.map_static, goal).items():
+                    steps[tile] = min(steps.get(tile, distance), distance)
+            if self.objective_key is None or self.objective_key[0] != carrying:
+                self.objective_best, self.objective_progress_at = None, observation.tick
+            self.objective_key, self.objective_steps = key, steps
+        remaining = self.objective_steps.get(own.tile)
+        if remaining is not None and (
+            self.objective_best is None or remaining < self.objective_best
+        ):
+            self.objective_best, self.objective_progress_at = remaining, observation.tick
+        return observation.tick - self.objective_progress_at >= RECOVERY_TICKS
 
     def _strategize(self, observation: Observation) -> None:
         own = observation.own_status
         carrying = own.inventory.core_held
+        if carrying:
+            self._choose_exit(observation)
         remaining = self.legs[0].route.nodes[self.progress :] if self.legs else ()
         legs = self._legs_from(own.tile, self._goal(observation), observation)
         tick = observation.tick
@@ -567,8 +627,13 @@ class CompanionController:
             self.melee_ready_at,
             watched,
         )
+        recover = self._needs_recovery(observation)
+        grabbed = own.capture_ticks_remaining is not None
+        if recover and not grabbed and override and override.kind in ("REACT", "ESCAPE"):
+            # Repeated retreats can create a stable loop at a guarded gate.
+            # Commit to the observed-risk path until progress resumes.
+            override = None
         if override is not None and override.kind == "ESCAPE" and override.away_from:
-            grabbed = own.capture_ticks_remaining is not None
             if grabbed or self.tile_ticks >= STUCK_TICKS:
                 # Remember where this guard stands so the route stops leading back
                 # into its reach (otherwise grab/escape can alternate forever).
@@ -579,6 +644,13 @@ class CompanionController:
                 self.pending, override = "escape blocked", None
         action = self._override(observation, override) if override else None
         self.utility = (override.kind, override.reason) if override and action else ("", "")
+        if action is None and recover:
+            if own.inventory.core_held and tick >= self.exit_replan_at:
+                self._choose_exit(observation)
+            self.directive = Directive(tactics.ADVANCE)
+            self.flee_started = -1
+            self.utility = ("REPLAN", "Stalled: commit to the safest available objective path")
+            action = self._execute(observation, self._goal(observation))
         if action is None:
             trigger = (
                 ""

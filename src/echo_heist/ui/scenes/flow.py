@@ -406,7 +406,7 @@ class GameFlow:
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.scene == Scene.RESULTS:
                     if RESULT_DETAILS.collidepoint(event.pos):
-                        self.inspector.open = True
+                        self.inspector.show()
                         return
                     if RESULT_NEW_SEED.collidepoint(event.pos):
                         self.seed_dialog.show((self.seed + 1) % 2**31)
@@ -444,6 +444,8 @@ class GameFlow:
                 elif self.selected == 1:
                     if self.session is not None and self.session.mission_end is not None:
                         self._go(Scene.RESULTS)
+                    elif self.reports.gateway is not None:
+                        self.inspector.show(saved=True)
                     else:
                         self.notice = "Complete a mission to view its report."
                 elif self.selected == 2:
@@ -472,7 +474,7 @@ class GameFlow:
                     self.notice = "Companion deployment unavailable. Check the Workshop notice."
         elif self.scene == Scene.RESULTS:
             if key == pygame.K_d:
-                self.inspector.open = True
+                self.inspector.show()
             elif key == pygame.K_n:
                 self.seed_dialog.show((self.seed + 1) % 2**31)
             elif key == pygame.K_r:
@@ -564,7 +566,7 @@ class GameFlow:
                         for a, name in (("echo", "Echo"), ("emp", "EMP"), ("melee", "Stun"))
                     ),
                 ),
-                report_available=end is not None,
+                report_available=end is not None or self.reports.gateway is not None,
                 companion_available=self.deployment.can_deploy,
                 protocols=self.deployment.protocols_for(
                     ControlMode.COMPANION if self.mode_choice else ControlMode.HUMAN

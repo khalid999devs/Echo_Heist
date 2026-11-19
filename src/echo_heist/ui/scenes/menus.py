@@ -260,7 +260,7 @@ def _briefing(
     steps = (
         ("01  INFILTRATE", "Take either stairway to the upper floor."),
         ("02  RECOVER", f"Hold {control_hints[0]} beside the experimental Core."),
-        ("03  EXTRACT", "Escape lockdown. Return downstairs."),
+        ("03  EXTRACT", "Return downstairs to the entry or cargo exit."),
     )
     for index, (label, description) in enumerate(steps):
         y = 323 + index * 67

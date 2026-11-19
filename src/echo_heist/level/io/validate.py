@@ -86,6 +86,7 @@ def _anchors(level: LevelData) -> list[str]:
         (level.spawn_id, "entry"),
         (level.exit_id, "entry"),
         (level.core_id, "core-chamber"),
+        *((exit_id, "service-wing") for exit_id in level.alternate_exit_ids),
     )
     for object_id, zone_id in expected:
         tile = anchors[object_id].tile
@@ -94,8 +95,8 @@ def _anchors(level: LevelData) -> list[str]:
         zone = level.zone_at(tile)
         if zone is None or zone.zone_id != zone_id:
             problems.append(f"anchor {object_id!r} must lie inside zone {zone_id!r}")
-    if anchors[level.exit_id].tile == anchors[level.core_id].tile:
-        problems.append("Exit and Core must use different tiles")
+    if len({anchors[key].tile for key, _ in expected}) != len(expected):
+        problems.append("Spawn, Core and extraction anchors must use different tiles")
     for marker in level.markers:
         if not world_map.can_walk(marker.tile, crouched=marker.kind == "UnderDesk"):
             problems.append(f"{marker.kind} {marker.marker_id!r} at {marker.tile} is not walkable")
@@ -164,7 +165,7 @@ def _patrols(level: LevelData) -> list[str]:
     reserved = {
         obj.tile
         for obj in world_map.objects
-        if obj.object_id in (level.spawn_id, level.exit_id, level.core_id)
+        if obj.object_id in (level.spawn_id, *level.exit_ids, level.core_id)
     }
     spawn = level.spawn_tile
     for post in level.guards:
@@ -183,12 +184,14 @@ def _patrols(level: LevelData) -> list[str]:
 def _connectivity(level: LevelData) -> list[str]:
     problems: list[str] = []
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
-    spawn, core, exit_tile = level.spawn_tile, anchors[level.core_id], anchors[level.exit_id]
+    spawn, core = level.spawn_tile, anchors[level.core_id]
     from_spawn = reachable(level, (spawn,), frozenset())
     if core not in from_spawn:
         problems.append("Core is unreachable from the operative spawn")
-    if exit_tile not in reachable(level, (core,), frozenset()):
-        problems.append("lockdown return: Exit is unreachable from the Core")
+    from_core = reachable(level, (core,), frozenset())
+    for exit_id in level.exit_ids:
+        if anchors[exit_id] not in from_core:
+            problems.append(f"lockdown return: Exit is unreachable from the Core ({exit_id})")
     for room in level.rooms:
         interior = {
             (x, y)

@@ -41,12 +41,23 @@ def _objective(
     _label(
         canvas,
         fonts.body,
-        "Escape to Extraction" if view.core_held else "Reach the Core",
+        "Reach either exit"
+        if view.core_held and level.alternate_exit_ids
+        else "Escape to Extraction"
+        if view.core_held
+        else "Reach the Core",
         theme.TEXT,
         (83, 52),
     )
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
-    target = anchors[level.exit_id if view.core_held else level.core_id]
+    destinations = (
+        [anchors[key] for key in level.exit_ids] if view.core_held else [anchors[level.core_id]]
+    )
+
+    def distance(first: Tile, second: Tile) -> int:
+        return abs(first[0] - second[0]) + abs(first[1] - second[1])
+
+    target = min(destinations, key=lambda tile: distance(tile, operative_tile))
     deck = level.deck_at(operative_tile)
     if deck and not deck.contains(target):
         links = [link for link in level.static_map.stairs if deck.contains(link.tile)]
@@ -54,7 +65,8 @@ def _objective(
             target = min(
                 links,
                 key=lambda link: (
-                    abs(link.tile[0] - operative_tile[0]) + abs(link.tile[1] - operative_tile[1])
+                    distance(link.tile, operative_tile)
+                    + min(distance(link.destination, tile) for tile in destinations)
                 ),
             ).tile
     angle = atan2(target[1] - operative_tile[1], target[0] - operative_tile[0])

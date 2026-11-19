@@ -28,7 +28,9 @@ def test_desktop_resources_audio_fallback_and_saved_settings_outside_repo(tmp_pa
         check=True,
         capture_output=True,
         text=True,
-        timeout=30,
+        # The verified Windows laptop has cold source starts up to 72 seconds.
+        # Startup latency is measured separately by the native profile.
+        timeout=90,
     )
     result = json.loads(report.read_text())
     assert result["frames"] == 2

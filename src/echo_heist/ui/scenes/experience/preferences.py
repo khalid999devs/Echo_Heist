@@ -64,7 +64,12 @@ class PreferencesPanel:
                     else:
                         try:
                             self.preferences = assign(self.preferences, self.capturing, event.key)
-                            self.capturing, self.notice = None, "Applied for this session."
+                            self.capturing = None
+                            self.notice = (
+                                "Select Save Preferences to keep this binding."
+                                if self.gateway
+                                else "Applied for this session."
+                            )
                         except ValueError as error:
                             self.notice = str(error)
                 continue

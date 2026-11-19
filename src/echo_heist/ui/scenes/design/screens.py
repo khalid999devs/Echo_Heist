@@ -174,6 +174,9 @@ class SceneDesigns:
                         self.notice = ""
                     else:
                         self.notice = "NEXUS memory is not available to reset."
+                elif i == 11:
+                    self.deployment.toggle_memory()
+                    self.notice = self.deployment.notice
                 else:
                     return "MODE"
             elif scene == "GUIDE":

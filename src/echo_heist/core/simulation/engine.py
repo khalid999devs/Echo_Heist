@@ -170,7 +170,7 @@ class Simulation:
         if mission is not None and environment is not None:
             anchors = {
                 mission_object(world_map, object_id).tile
-                for object_id in (mission.core_object_id, mission.exit_object_id)
+                for object_id in (mission.core_object_id, *mission.exit_ids)
             }
             if any(tile in anchors for prop in environment.props for tile in prop.tiles):
                 raise ValueError("A prop may not cover the Core or Exit anchor")
@@ -187,15 +187,15 @@ class Simulation:
             if mission.mode not in ("HUMAN", "COMPANION"):
                 raise ValueError("Unsupported mission mode")
             core = mission_object(world_map, mission.core_object_id)
-            exit_object = mission_object(world_map, mission.exit_object_id)
+            exits = tuple(mission_object(world_map, key) for key in mission.exit_ids)
             if (
                 core.kind.lower() != "core"
-                or exit_object.kind.lower() != "exit"
-                or core.tile == exit_object.tile
+                or any(obj.kind.lower() != "exit" for obj in exits)
+                or len({core.tile, *(obj.tile for obj in exits)}) != len(exits) + 1
             ):
                 raise ValueError("Mission needs distinct Core and Exit anchors")
-            if not world_map.can_walk(exit_object.tile):
-                raise ValueError("Extraction marker must be walkable")
+            if any(not world_map.can_walk(obj.tile) for obj in exits):
+                raise ValueError("Extraction markers must be walkable")
         if security is not None:
             for patrol in security.patrols:
                 guard = self._world.actors.get(patrol.actor_id)

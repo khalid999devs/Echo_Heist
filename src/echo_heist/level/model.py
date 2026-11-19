@@ -177,6 +177,11 @@ class LevelData:
     rooms: tuple[Room, ...] = ()
     floor_details: tuple[FloorDetail, ...] = ()
     decks: tuple[Deck, ...] = ()
+    alternate_exit_ids: tuple[str, ...] = ()
+
+    @property
+    def exit_ids(self) -> tuple[str, ...]:
+        return (self.exit_id, *self.alternate_exit_ids)
 
     def deck_at(self, tile: Tile) -> Deck | None:
         return next((deck for deck in self.decks if deck.contains(tile)), None)
@@ -187,7 +192,9 @@ class LevelData:
         return (operative, *posts)
 
     def mission(self, mode: str = "HUMAN") -> MissionSpec:
-        return MissionSpec(self.operative_id, self.core_id, self.exit_id, mode=mode)
+        return MissionSpec(
+            self.operative_id, self.core_id, self.exit_id, mode, self.alternate_exit_ids
+        )
 
     def zone_at(self, tile: Tile) -> Zone | None:
         return next((zone for zone in self.zones if zone.contains(tile)), None)

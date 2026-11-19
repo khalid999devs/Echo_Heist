@@ -319,7 +319,7 @@ def build_map_surface(
     draw_room_trim(surface, level, fonts)
     anchors = {obj.object_id: obj.tile for obj in world_map.objects}
     for object_id, painter in (
-        (level.exit_id, motifs.extraction_floor),
+        *((exit_id, motifs.extraction_floor) for exit_id in level.exit_ids),
         (level.core_id, motifs.core_floor),
     ):
         tile = anchors[object_id]
@@ -386,6 +386,8 @@ def _anchor(
     clock_ms: int = 0,
 ) -> None:
     point = camera.to_screen(((tile[0] + 0.5) * size, (tile[1] + 0.5) * size))
+    if not canvas.get_rect().inflate(180, 180).collidepoint(point):
+        return
     color = theme.ACCENT
     if kind == "CORE" and not active:
         color = theme.DANGER if alert else theme.DISABLED
@@ -503,17 +505,20 @@ def draw_world(
     }
     draw_vision(canvas, snapshot.world_map, snapshot, camera)
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
-    _anchor(
-        canvas,
-        anchors[level.exit_id],
-        size,
-        camera,
-        kind="EXIT",
-        active=True,
-        pulse=pulse,
-        fonts=fonts,
-        clock_ms=clock_ms,
-    )
+    for index, exit_id in enumerate(level.exit_ids):
+        target = anchors[exit_id]
+        if deck is None or deck.contains(target):
+            _anchor(
+                canvas,
+                target,
+                size,
+                camera,
+                kind="CARGO EXIT" if index else "ENTRY EXIT",
+                active=True,
+                pulse=pulse,
+                fonts=fonts,
+                clock_ms=clock_ms,
+            )
     _anchor(
         canvas,
         anchors[level.core_id],

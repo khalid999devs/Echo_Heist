@@ -138,6 +138,7 @@ def run_scenario(
         "outcome": end.outcome.value if end else "TIMEOUT",
         "ticks": run.tick,
         "capture_by": end.capture_by if end else None,
+        "extraction_id": end.extraction_id if end else None,
         "capture_zone": capture_zone,
         "score": terminal.score if terminal else None,
         "grade": terminal.grade if terminal else None,

@@ -1,6 +1,7 @@
 """P06 experience service: real scored reports, history, profiles, preferences, protocol switch."""
 
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -61,11 +62,14 @@ def test_scored_reports_are_authoritative_matched_and_persisted(
     # A request that does not describe a finished attempt gets no report.
     wrong = ResultRequest("app:x", map_id, 8, ControlMode.HUMAN, aborted.end, 30)
     assert service.report(wrong) is None
+    # Rejected metadata must leave the real finished run available.
+    assert service.report(replace(aborted, tools=replace(aborted.tools, echo=1))) is None
+    assert service.report(replace(aborted, ticks_per_second=60)) is None
     report = service.report(aborted)
     assert report is not None and report.matches(aborted)
     assert (report.result.score, report.result.grade, report.policy_label) == (0, "F", "Human")
     assert service.report(aborted) is report  # one report per run key
-    win = finish(gateway, DeploymentRequest("COMPANION", 1, map_id), "app:2", abort=False)
+    win = finish(gateway, DeploymentRequest("COMPANION", 1042, map_id), "app:2", abort=False)
     scored = service.report(win)
     assert scored is not None and scored.result.outcome == RunOutcome.WIN
     r = scored.result

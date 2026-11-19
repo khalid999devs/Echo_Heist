@@ -104,6 +104,27 @@ class DeploymentPanel:
         self.notice = "NEXUS memory reset."
         return True
 
+    @property
+    def can_toggle_memory(self) -> bool:
+        return self.protocol_state is not None and callable(
+            getattr(self.gateway, "set_protocols_enabled", None)
+        )
+
+    def toggle_memory(self) -> None:
+        if not self.can_toggle_memory or self.gateway is None or self.protocol_state is None:
+            self.notice = "NEXUS memory is unavailable."
+            return
+        try:
+            self.protocol_state = self.gateway.set_protocols_enabled(
+                not self.protocol_state.enabled
+            )
+        except DeploymentUnavailable as error:
+            self.notice = str(error)
+        else:
+            self.notice = (
+                "NEXUS memory enabled." if self.protocol_state.enabled else "NEXUS memory disabled."
+            )
+
     def deploy(
         self, request: DeploymentRequest, level: LevelData, rules: GameRules
     ) -> AutonomousRun | None:

@@ -7,7 +7,7 @@ from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind
 from echo_heist.core.contracts.observations import InteractionHint
 from echo_heist.core.contracts.results import MissionEnd, MissionSpec, RunOutcome
-from echo_heist.core.contracts.world import MapObject, MissionPhase, StaticMap, tile_center
+from echo_heist.core.contracts.world import MapObject, MissionPhase, Scalar, StaticMap, tile_center
 from echo_heist.core.environment.lifecycle import hints as prop_hints
 from echo_heist.core.simulation.systems.motion import clear_reach, distance_squared
 from echo_heist.core.simulation.systems.traversal import stair_hints
@@ -125,6 +125,7 @@ def end_mission(
     emit: Emit,
     *,
     capture_by: str | None = None,
+    extraction_id: str | None = None,
 ) -> None:
     if world.mission_end is not None:
         return
@@ -133,13 +134,15 @@ def end_mission(
         RunOutcome.CAPTURED: MissionPhase.CAPTURED,
         RunOutcome.ABORTED: MissionPhase.ABORTED,
     }[outcome]
-    world.mission_end = MissionEnd(outcome, world.tick, operative_id, capture_by)
+    world.mission_end = MissionEnd(outcome, world.tick, operative_id, capture_by, extraction_id)
     world.captures.clear()
-    emit(
-        EventKind.MISSION_ENDED,
-        operative_id,
-        (("outcome", outcome.value), ("capture_by", capture_by)),
+    details: tuple[tuple[str, Scalar], ...] = (
+        ("outcome", outcome.value),
+        ("capture_by", capture_by),
     )
+    if extraction_id is not None:
+        details += (("exit_id", extraction_id),)
+    emit(EventKind.MISSION_ENDED, operative_id, details)
 
 
 def check_extraction(
@@ -148,10 +151,10 @@ def check_extraction(
     if mission is None or world.mission_end is not None:
         return
     actor = world.actors[mission.operative_id]
-    exit_tile = mission_object(world_map, mission.exit_object_id).tile
-    if (
-        world.core_owner == actor.actor_id
-        and actor.inventory.core_held
-        and exit_tile in actor.traversed_tiles
-    ):
-        end_mission(world, actor.actor_id, RunOutcome.WIN, emit)
+    if world.core_owner != actor.actor_id or not actor.inventory.core_held:
+        return
+    exits = {mission_object(world_map, key).tile: key for key in mission.exit_ids}
+    for tile in actor.traversed_tiles:
+        if tile in exits:
+            end_mission(world, actor.actor_id, RunOutcome.WIN, emit, extraction_id=exits[tile])
+            break

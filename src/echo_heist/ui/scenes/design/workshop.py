@@ -5,7 +5,7 @@ from math import sin
 import pygame
 
 from echo_heist.ui.render import theme
-from echo_heist.ui.render.autonomy.protocols import RESET_MEMORY, draw_protocol
+from echo_heist.ui.render.autonomy.protocols import RESET_MEMORY, TOGGLE_MEMORY, draw_protocol
 from echo_heist.ui.render.environment.art import image
 from echo_heist.ui.render.hud import panel
 from echo_heist.ui.render.theme import Fonts
@@ -20,6 +20,7 @@ WORKSHOP_CONTROLS = (
     pygame.Rect(810, 588, 380, 54),
     pygame.Rect(44, 650, 130, 42),
     RESET_MEMORY,
+    TOGGLE_MEMORY,
 )
 
 
@@ -46,7 +47,14 @@ def draw_workshop(
     canvas.blit(fonts.micro.render("ECHO / RECON COMPANION", True, theme.ACCENT), (66, 182))
     bob = 0 if reduced_motion else round(2 * sin(clock_ms / 600))
     canvas.blit(robot, robot.get_rect(midbottom=(212, 371 + bob)))
-    draw_protocol(canvas, fonts, deployment.protocol_state, selected=selected == 10)
+    draw_protocol(
+        canvas,
+        fonts,
+        deployment.protocol_state,
+        selected=selected == 10,
+        toggle_selected=selected == 11,
+        can_toggle=deployment.can_toggle_memory,
+    )
     for i, label in enumerate(PRESETS):
         button(canvas, WORKSHOP_CONTROLS[i], label, fonts, selected == i or draft.preset == i)
     for i, (label, options) in enumerate(POLICIES):

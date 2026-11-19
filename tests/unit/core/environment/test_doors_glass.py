@@ -60,6 +60,8 @@ def test_closed_door_blocks_body_and_sight_but_still_routes_and_reopens_on_push(
     assert not line_of_sight(closed, operative, guard)
     # A controlled passage still routes: whoever pushes into it opens it.
     assert bfs(closed, (5, 3), (9, 3)).path
+    # Leave the doorway clear so this isolates the door from body-to-body collision.
+    run(sim, rules.simulation_hz, Action("operative", ActionKind.MOVE, 0, (0, 1)))
     # The guard walks up and its own push opens the door silently; geometry
     # follows at the next tick start, then it actually walks through.
     events = run(sim, 4 * rules.simulation_hz, Action("guard", ActionKind.MOVE, 0, (-1, 0)))

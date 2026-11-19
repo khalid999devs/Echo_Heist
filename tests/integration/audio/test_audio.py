@@ -5,8 +5,11 @@ from dataclasses import replace
 import pygame
 import pytest
 
+from echo_heist.core.contracts.actions import Action, ActionKind
+from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind, GameEvent
-from echo_heist.core.contracts.world import MissionPhase
+from echo_heist.core.contracts.world import ActorKind, ActorSpawn, MissionPhase, StaticMap
+from echo_heist.core.simulation.engine import Simulation
 from echo_heist.ui.audio.director import AudioDirector, event_cue
 from echo_heist.ui.audio.model import AudioFrame
 from echo_heist.ui.scenes.flow import GameFlow, Scene
@@ -149,6 +152,39 @@ def test_settings_controls_change_real_values_and_return_to_menu() -> None:
     assert flow.settings.reduced_flashing
     press(pygame.K_ESCAPE)
     assert flow.scene == Scene.TITLE
+
+
+def test_melee_plays_one_real_impact_for_stun_or_resistance_and_none_for_rejection(
+    rules: GameRules, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("SDL_AUDIODRIVER", "dummy")
+    pygame.mixer.init()
+    try:
+        audio = AudioDirector(enabled=True)
+        assert any(pygame.mixer.Sound.get_raw(audio.sounds["melee"]))
+        sim = Simulation(
+            StaticMap("impact-sound", 8, 8),
+            (ActorSpawn("operative", (2, 2)), ActorSpawn("guard", (3, 2), ActorKind.SENTINEL)),
+            rules=replace(rules, melee_cooldown_ticks=1),
+        )
+        frame = AudioFrame("HEIST", "0", 1, MissionPhase.INFILTRATE)
+        audio.update(frame, 0)
+        for expected in ("melee", "melee", "unavailable"):
+            hit = sim.step((Action("operative", ActionKind.MELEE, sim.tick),))
+            if expected == "unavailable":
+                assert any(event.kind == EventKind.ACTION_REJECTED for event in hit.events)
+            current = replace(frame, events=hit.events)
+            count = audio.cues_played
+            audio.update(current, 500)
+            assert audio.cues_played == count + 1
+            assert any(
+                pygame.mixer.Channel(index).get_sound() is audio.sounds[expected]
+                for index in range(4, 12)
+            )
+            audio.update(current, 500)
+            assert audio.cues_played == count + 1
+    finally:
+        pygame.mixer.quit()
 
 
 def test_music_transition_ramps_across_frames_without_blocking_fadeout(

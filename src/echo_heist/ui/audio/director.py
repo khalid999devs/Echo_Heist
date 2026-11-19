@@ -71,6 +71,10 @@ def event_cue(event: GameEvent) -> tuple[str, float, bool] | None:
         sprint = details["kind"] == "SPRINT"
         gain = 0.42 if sprint else 0.045 if details["kind"] == "CROUCH" else 0.09
         return f"{'step' if sprint else 'walk'}-{event.tick % 3}", gain, False
+    if event.kind == EventKind.NOISE_CREATED and details.get("kind") == "MELEE":
+        # The same committed impact drives the clang and guard hearing, even
+        # when a guard resists the stun. TOOL_USED only drives the result UI.
+        return "melee", 0.65, False
     if event.kind == EventKind.CORE_TAKEN:
         return "core", 0.3, False
     if event.kind == EventKind.STAIR_CANCELED:
@@ -86,10 +90,8 @@ def event_cue(event: GameEvent) -> tuple[str, float, bool] | None:
     ):
         return "unavailable", 0.15, False
     if event.kind == EventKind.TOOL_USED:
-        if details.get("tool") == "MELEE" and details.get("affected") is False:
-            return "unavailable", 0.2, False
         cue = str(details.get("tool", "")).lower()
-        return (cue, 0.65, False) if cue in ("echo", "emp", "melee") else None
+        return (cue, 0.65, False) if cue in ("echo", "emp") else None
     if event.kind == EventKind.LOCKDOWN_STARTED:
         return "alarm", 0.42, True
     if event.kind in (EventKind.SIGHTING_CONFIRMED, EventKind.CAPTURE_STARTED):

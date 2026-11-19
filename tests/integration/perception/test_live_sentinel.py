@@ -41,6 +41,18 @@ def test_timed_sprint_is_audible_while_light_walk_stays_local(rules: GameRules) 
     assert guard.state == GuardState.INVESTIGATE
 
 
+def test_wider_cone_catches_oblique_movement_and_respects_cover(rules: GameRules) -> None:
+    # Offset (3, 4) is about 53 degrees off-axis. It used to miss the cone.
+    exposed = simulation(rules, (6, 7))
+    occluded = simulation(rules, (6, 7), opaque=frozenset({(4, 4), (5, 4)}))
+    rear = simulation(rules, (1, 3))
+    for sim in (exposed, occluded, rear):
+        sim.step()
+    assert exposed.presentation_snapshot().guards[0].state == GuardState.SPOTTED
+    assert not occluded.observe("sentinel").visible_entities
+    assert not rear.observe("sentinel").visible_entities
+
+
 def test_bfs_patrol_is_physical_and_unseen_position_cannot_change_decisions(
     rules: GameRules,
 ) -> None:

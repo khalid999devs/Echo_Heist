@@ -59,6 +59,11 @@ class GameRules:
         if not 100 <= self.chase_guard_speed_percent <= 150:
             raise ValueError("Pursuit speed must stay within 100-150 percent")
 
+    @property
+    def guard_intruder_clearance_units(self) -> int:
+        # Allow for the defender chassis when an intruder tries to squeeze past.
+        return self.actor_radius_units * 13 // 5
+
     @classmethod
     def from_payload(cls, payload: object) -> Self:
         names = {field.name for field in fields(cls)}

@@ -128,7 +128,7 @@ def test_mouse_menu_and_responsive_coordinates() -> None:
     assert flow.scene == Scene.HEIST
     assert flow.session is not None
     flow.frame([key(pygame.KEYDOWN, pygame.K_F3), key(pygame.KEYUP, pygame.K_F3)], 0)
-    target = GUARD_TABS[1]
+    target = GUARD_TABS[4]
     flow.frame(
         [
             pygame.event.Event(
@@ -137,8 +137,11 @@ def test_mouse_menu_and_responsive_coordinates() -> None:
         ],
         0,
     )
-    assert flow.session.lab_note and flow.session.lab_selected == 1
-    assert flow.session.simulation.presentation_snapshot().guards[1].algorithm == "A*"
+    assert flow.session.lab_note and flow.session.lab_selected == 4
+    flow.frame([key(pygame.KEYDOWN, pygame.K_2), key(pygame.KEYUP, pygame.K_2)], 0)
+    assert flow.session.lab_selected == 1
+    selected = flow.session.simulation.presentation_snapshot().guards[1]
+    assert selected.actor_id == "guard-core-sentinel" and selected.algorithm == "BFS"
     fingerprint = flow.session.simulation.fingerprint()
     for _ in range(3):
         flow.draw(pygame.Surface((1280, 1440)))
@@ -190,6 +193,7 @@ def test_default_live_guard_allows_actual_lower_route_core_and_extraction() -> N
     # The validated registry activates every authored post with its real role.
     assert {(guard.actor_id, guard.algorithm) for guard in first.guards} == {
         ("guard-core", "ALPHA-BETA"),
+        ("guard-core-sentinel", "BFS"),
         ("guard-research", "A*"),
         ("guard-security", "BFS"),
         ("guard-service", "BFS"),

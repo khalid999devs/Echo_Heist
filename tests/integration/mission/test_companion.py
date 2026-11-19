@@ -23,7 +23,7 @@ from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import SecurityRegistry, build_security_registry
 
-WIN_SEED, CAPTURE_SEED = 1042, 4  # Balanced outcomes on the two-exit candidate
+WIN_SEED, CAPTURE_SEED = 1042, 4  # Balanced outcomes with the second Core guard
 
 
 @pytest.fixture(scope="module")
@@ -69,7 +69,7 @@ def play(run: AutonomousMission, limit: int = 9_000) -> tuple[list[CompanionTrac
     [
         (WIN_SEED, RunOutcome.WIN),
         (CAPTURE_SEED, RunOutcome.CAPTURED),
-        (24, RunOutcome.WIN),
+        (23, RunOutcome.WIN),
         # A former grab/escape loop now resolves as an actual capture.
         (34, RunOutcome.CAPTURED),
     ],

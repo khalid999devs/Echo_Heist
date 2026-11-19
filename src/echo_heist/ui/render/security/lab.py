@@ -14,7 +14,8 @@ from echo_heist.ui.render.surfaces.glass import panel
 from echo_heist.ui.render.theme import Fonts
 
 LAB_RECT = pygame.Rect(20, 156, 462, 500)
-GUARD_TABS = tuple(pygame.Rect(36 + i * 108, 200, 104, 30) for i in range(4))
+GUARD_TABS = tuple(pygame.Rect(36 + i * 87, 200, 82, 30) for i in range(5))
+GUARD_NAMES = {"guard-core-sentinel": "VAULT", "guard-research": "LAB", "guard-security": "SEC"}
 RULE_NAMES = ("Loud + near", "Partial + near", "Notable + far", "Unseen + quiet", "Notable + near")
 
 
@@ -38,14 +39,14 @@ def draw_lab(
         canvas.blit(_text(fonts.micro, value, color), (x, y))
 
     text("AI LAB", 170, theme.ACCENT)
-    text("1-4 Guard   /   F3 Close", 170, theme.MUTED, 266)
+    text(f"1-{len(snapshot.guards)} Guard   /   F3 Close", 170, theme.MUTED, 266)
     for index, item in enumerate(snapshot.guards):
         if index >= len(GUARD_TABS):
             break
         selected = item.actor_id == guard.actor_id
         rect = GUARD_TABS[index]
         panel(canvas, rect, border=theme.ACCENT if selected else theme.BORDER)
-        name = item.actor_id.removeprefix("guard-").upper()
+        name = GUARD_NAMES.get(item.actor_id, item.actor_id.removeprefix("guard-").upper())
         label = _text(fonts.micro, f"{index + 1} {name}", theme.TEXT if selected else theme.MUTED)
         canvas.blit(label, label.get_rect(center=rect.center))
     role = (

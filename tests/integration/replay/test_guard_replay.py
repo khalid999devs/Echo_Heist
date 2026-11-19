@@ -48,7 +48,7 @@ def upper(
     ("branch", "back", "exit_id"),
     [
         ("lower", "upper", "entry-exit"),
-        ("cross", "upper", "cargo-exit"),
+        ("upper", "upper", "cargo-exit"),
     ],
 )
 def test_default_security_routes_win_with_real_guard_algorithms(
@@ -93,21 +93,29 @@ def test_blind_return_through_the_predicted_gate_is_intercepted(
     assert held == gate and abs(caught[0] - gate[0]) + abs(caught[1] - gate[1]) <= 1
 
 
+@pytest.mark.parametrize(
+    ("branch", "captor"),
+    [("lower", "guard-research"), ("upper", "guard-core-sentinel")],
+)
 def test_careless_route_is_captured_by_a_live_defender(
-    level: LevelData, rules: GameRules, sensors: SensorRules, registry: SecurityRegistry
+    level: LevelData,
+    rules: GameRules,
+    sensors: SensorRules,
+    registry: SecurityRegistry,
+    branch: Branch,
+    captor: str,
 ) -> None:
     result = run_route(
-        "lower-no-tools",
+        f"{branch}-no-tools",
         level,
         rules,
         sensors,
         registry,
-        route_steps(level, "lower", "lower"),
+        route_steps(level, branch, "lower", exit_id="cargo-exit"),
         use_tools=False,
     )
-    assert result.outcome == "CAPTURED" and result.capture_by in {
-        value.guard_id for value in registry.assignments
-    }
+    assert result.outcome == "CAPTURED" and result.capture_by == captor
+    assert "CHASE" in result.states[captor]
     assert result.events["CAPTURE_STARTED"] >= result.events["CAPTURE_COMPLETED"] == 1
 
 
@@ -120,7 +128,7 @@ def test_recorded_run_replays_exactly_and_detects_changed_inputs(
 ) -> None:
     assert replay_matches(level, rules, sensors, registry, upper)
     log = upper.log
-    assert log.header.fingerprint_schema == 14 and log.header.registry_revision == registry.revision
+    assert log.header.fingerprint_schema == 15 and log.header.registry_revision == registry.revision
     header = build_header(
         level.static_map, rules, sensors, registry_revision=registry.revision, seed=1042
     )

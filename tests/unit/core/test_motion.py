@@ -7,9 +7,11 @@ from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind
 from echo_heist.core.contracts.results import MissionSpec
+from echo_heist.core.contracts.security.model import GuardPatrol, GuardRole, SecuritySpec
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
 from echo_heist.core.contracts.world import ActorKind, ActorSpawn, MapObject, StaticMap, tile_center
 from echo_heist.core.simulation.engine import Simulation
+from echo_heist.infrastructure.resources import load_sensor_rules
 
 
 @pytest.mark.parametrize("sprint", [False, True])
@@ -57,6 +59,47 @@ def test_diagonal_corner_and_other_actor_block_physical_body(rules: GameRules) -
     own, other = pair.observe("a").own_status.position, pair.observe("b").own_status.position
     assert own is not None and other is not None
     assert own[0] < other[0] and other[0] - own[0] >= 2 * rules.actor_radius_units
+
+
+@pytest.mark.parametrize("intruder", [ActorKind.OPERATIVE, ActorKind.COMPANION])
+def test_chassis_blocks_sprint_but_stun_buys_time_to_go_around(
+    rules: GameRules, intruder: ActorKind
+) -> None:
+    rules = replace(rules, sprint_speed_units_per_second=960_000)
+    # One tile wide approaching a guard, with a side bay at the contact point.
+    open_tiles = {(x, 2) for x in range(1, 7)} | {(x, 3) for x in range(3, 7)}
+    walls = frozenset((x, y) for x in range(8) for y in range(6) if (x, y) not in open_tiles)
+    sim = Simulation(
+        StaticMap("guard-chassis", 8, 6, walls, walls),
+        (
+            ActorSpawn("intruder", (1, 2), intruder),
+            ActorSpawn("guard", (4, 2), ActorKind.SENTINEL),
+        ),
+        rules=rules,
+        security=SecuritySpec(
+            (GuardPatrol("guard", ((4, 2), (5, 2)), role=GuardRole.POST),), load_sensor_rules()
+        ),
+    )
+
+    def sprint(direction: tuple[int, int]) -> None:
+        sim.step((Action("intruder", ActionKind.MOVE, sim.tick, direction, sprint=True),))
+
+    for _ in range(5):
+        sprint((1, 0))
+    blocked = sim.observe("intruder").own_status.position
+    assert blocked is not None
+    assert tile_center((4, 2))[0] - blocked[0] >= rules.guard_intruder_clearance_units
+
+    hit = sim.step((Action("intruder", ActionKind.MELEE, sim.tick),))
+    assert any(event.kind == EventKind.GUARD_STUNNED for event in hit.events)
+    sprint((1, 0))
+    assert sim.observe("intruder").own_status.position == blocked
+    for _ in range(13):
+        sprint((0, 1))
+    for _ in range(24):
+        sprint((1, 0))
+    assert sim.observe("intruder").own_status.tile == (5, 3)
+    assert sim.presentation_snapshot().mission_end is None
 
 
 def test_step_order_is_stable_and_noise_is_not_per_render_frame(rules: GameRules) -> None:

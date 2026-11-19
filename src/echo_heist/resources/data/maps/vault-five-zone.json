@@ -9,7 +9,7 @@
   "height": 40,
   "tilewidth": 96,
   "tileheight": 96,
-  "nextobjectid": 196,
+  "nextobjectid": 198,
   "nextlayerid": 9,
   "properties": [{"name": "schema", "type": "string", "value": "echo-heist-map/1"}, {"name": "map_id", "type": "string", "value": "vault-five-zone"}],
   "tilesets": [{"firstgid": 1, "name": "facility-geometry", "tilewidth": 96, "tileheight": 96, "tilecount": 4, "columns": 4}],
@@ -249,7 +249,9 @@
         {"id": 163, "name": "route-research", "type": "PatrolRoute", "x": 3552, "y": 3264, "width": 0, "height": 0, "rotation": 0, "visible": true, "polyline": [{"x": 0, "y": 0}, {"x": -192, "y": 0}, {"x": -192, "y": -96}, {"x": 0, "y": -96}, {"x": 0, "y": 0}], "properties": []},
         {"id": 164, "name": "guard-research", "type": "GuardSpawn", "x": 3600, "y": 3312, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": [{"name": "guard_kind", "type": "string", "value": "TRACKER"}, {"name": "route_id", "type": "string", "value": "route-research"}]},
         {"id": 165, "name": "route-core", "type": "PatrolRoute", "x": 5664, "y": 2496, "width": 0, "height": 0, "rotation": 0, "visible": true, "polyline": [{"x": 0, "y": 0}, {"x": -480, "y": 0}, {"x": -480, "y": -96}, {"x": 0, "y": -96}, {"x": 0, "y": 0}], "properties": []},
-        {"id": 166, "name": "guard-core", "type": "GuardSpawn", "x": 5712, "y": 2544, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": [{"name": "guard_kind", "type": "string", "value": "INTERCEPTOR"}, {"name": "route_id", "type": "string", "value": "route-core"}]}
+        {"id": 166, "name": "guard-core", "type": "GuardSpawn", "x": 5712, "y": 2544, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": [{"name": "guard_kind", "type": "string", "value": "INTERCEPTOR"}, {"name": "route_id", "type": "string", "value": "route-core"}]},
+        {"id": 196, "name": "route-core-sentinel", "type": "PatrolRoute", "x": 5664, "y": 2016, "width": 0, "height": 0, "rotation": 0, "visible": true, "polyline": [{"x": 0, "y": 0}, {"x": -192, "y": 0}, {"x": -192, "y": 288}, {"x": 0, "y": 288}, {"x": 0, "y": 0}], "properties": []},
+        {"id": 197, "name": "guard-core-sentinel", "type": "GuardSpawn", "x": 5712, "y": 2064, "width": 0, "height": 0, "rotation": 0, "visible": true, "point": true, "properties": [{"name": "guard_kind", "type": "string", "value": "SENTINEL"}, {"name": "route_id", "type": "string", "value": "route-core-sentinel"}]}
       ]
     },
     {

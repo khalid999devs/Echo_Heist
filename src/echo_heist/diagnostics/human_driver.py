@@ -44,7 +44,7 @@ class HumanDriver:
             actor.position is None
             or not (actor.disabled or actor.stunned)
             or sum((a - b) ** 2 for a, b in zip(center, actor.position, strict=True))
-            >= (2 * self.rules.actor_radius_units) ** 2
+            >= self.rules.guard_intruder_clearance_units**2
             for actor in observation.visible_entities
         )
 

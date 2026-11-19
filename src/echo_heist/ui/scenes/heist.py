@@ -272,7 +272,7 @@ class HeistSession:
         if self.lab_note and self.panels_interactive:
             for event in events:
                 if event.type == pygame.KEYDOWN and not getattr(event, "repeat", False):
-                    if pygame.K_1 <= event.key <= pygame.K_4:
+                    if pygame.K_1 <= event.key < pygame.K_1 + len(GUARD_TABS):
                         self.lab_selected = event.key - pygame.K_1
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     selected = hit(GUARD_TABS, event.pos)

@@ -34,7 +34,12 @@ from echo_heist.core.environment.state import (
     GlassState,
     LockerState,
 )
-from echo_heist.core.simulation.systems.motion import body_fits, clear_reach, distance_squared
+from echo_heist.core.simulation.systems.motion import (
+    body_fits,
+    body_occupied,
+    clear_reach,
+    distance_squared,
+)
 from echo_heist.core.simulation.world import ActorState, Emit, WorldState
 
 INTRUDERS = frozenset({ActorKind.OPERATIVE, ActorKind.COMPANION})
@@ -335,10 +340,7 @@ def enter_locker(t: Tick, actor_id: str, locker: LockerState) -> str | None:
     radius = t.rules.actor_radius_units
     if locker.occupant is not None:
         return "hide_spot_occupied"
-    if not body_fits(t.world_map, center, radius) or any(
-        other.actor_id != actor_id and distance_squared(other.position, center) < (2 * radius) ** 2
-        for other in t.world.actors.values()
-    ):
+    if not body_fits(t.world_map, center, radius) or body_occupied(t.world, actor, center, t.rules):
         return "hide_spot_blocked"
     actor.position, actor.crouched, actor.hidden_in = center, False, locker.spec.object_id
     locker.occupant, locker.moved_tick = actor_id, t.world.tick

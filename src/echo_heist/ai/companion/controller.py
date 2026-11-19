@@ -375,11 +375,14 @@ class CompanionController:
 
     def _plan_path(self, observation: Observation, goal: Tile) -> None:
         own = observation.own_status
+        recovering = observation.tick - self.objective_progress_at >= RECOVERY_TICKS
         stale = (
             goal != self.path_goal
             or observation.geometry_revision != self.geometry_revision
             or not self.path
-            or (self.beliefs.visible and observation.tick - self.path_tick >= 15)
+            # Recovery commits to a route through changing patrol risk. Real
+            # geometry changes and blocked motion can still force a replan.
+            or (not recovering and self.beliefs.visible and observation.tick - self.path_tick >= 15)
             or self.still_ticks >= 4
         )
         if not stale:

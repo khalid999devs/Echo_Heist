@@ -21,12 +21,13 @@ from echo_heist.infrastructure.resources import load_sensor_rules
 
 @pytest.mark.parametrize("kind", [ActorKind.OPERATIVE, ActorKind.COMPANION])
 def test_only_audible_guards_investigate_original_impact_and_memory_expires(rules, kind):
-    wall = frozenset({(3, 5)})
+    wall = frozenset({(3, 5), *((x, 1) for x in range(18))})
     world = StaticMap("melee-hearing", 18, 12, wall, wall)
     patrols = (
         GuardPatrol("target", ((4, 3), (5, 3)), role=GuardRole.POST),
         GuardPatrol("near", ((3, 7), (7, 7))),
         GuardPatrol("far", ((12, 7), (16, 7))),
+        GuardPatrol("sealed", ((3, 0), (7, 0))),
     )
     sensors = load_sensor_rules()
     sim = Simulation(
@@ -36,15 +37,17 @@ def test_only_audible_guards_investigate_original_impact_and_memory_expires(rule
             ActorSpawn("target", (4, 3), ActorKind.SENTINEL),
             ActorSpawn("near", (3, 7), ActorKind.SENTINEL),
             ActorSpawn("far", (12, 7), ActorKind.SENTINEL),
+            ActorSpawn("sealed", (3, 0), ActorKind.SENTINEL),
         ),
         rules=rules,
         security=SecuritySpec(patrols, sensors, wall),
     )
     first = sim.step((Action("intruder", ActionKind.MELEE, 0),))
-    noise = next(e for e in first.events if e.kind == EventKind.NOISE_CREATED)
+    (noise,) = (e for e in first.events if e.kind == EventKind.NOISE_CREATED)
     heard = sim.observe("near").heard_events
     assert [(cue.event_id, cue.tile, cue.tick) for cue in heard] == [(noise.event_id, (3, 3), 1)]
     assert not sim.observe("far").heard_events
+    assert not sim.observe("sealed").heard_events
     assert not any(e.kind == EventKind.SIGHTING_CONFIRMED for e in first.events)
     for _ in range(12):
         sim.step((Action("intruder", ActionKind.MOVE, sim.tick, (0, -1)),))

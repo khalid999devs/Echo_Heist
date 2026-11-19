@@ -25,12 +25,14 @@ def test_packaged_posts_get_real_roles_and_a_stable_revision(
     roles = {value.guard_id: value.role for value in registry.assignments}
     assert roles == {
         "guard-core": GuardRole.INTERCEPTOR,
+        "guard-core-sentinel": GuardRole.SENTINEL,
         "guard-research": GuardRole.TRACKER,
         "guard-security": GuardRole.SENTINEL,
         "guard-service": GuardRole.SENTINEL,
     }
     core = registry.assignment("guard-core")
     assert core.zone_id == "core-chamber"
+    assert registry.assignment("guard-core-sentinel").zone_id == "core-chamber"
     assert core.chokepoint_ids == ("choke-research-core", "choke-security-core")
     assert all(value.patrol.points[0] != value.patrol.points[-1] for value in registry.assignments)
     spec = registry.spec(load_sensor_rules())

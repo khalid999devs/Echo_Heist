@@ -16,11 +16,26 @@ from echo_heist.core.contracts.world import (
     StaticMap,
     position_tile,
 )
-from echo_heist.core.simulation.world import Emit, WorldState
+from echo_heist.core.simulation.world import GUARD_KINDS, ActorState, Emit, WorldState
 
 
 def distance_squared(first: Position, second: Position) -> int:
     return (first[0] - second[0]) ** 2 + (first[1] - second[1]) ** 2
+
+
+def body_occupied(world: WorldState, actor: ActorState, target: Position, rules: GameRules) -> bool:
+    guard = actor.kind in GUARD_KINDS
+    return any(
+        other is not actor
+        and distance_squared(target, other.position)
+        < (
+            rules.guard_intruder_clearance_units
+            if guard != (other.kind in GUARD_KINDS)
+            else 2 * rules.actor_radius_units
+        )
+        ** 2
+        for other in world.actors.values()
+    )
 
 
 def clear_reach(
@@ -139,14 +154,10 @@ def move_actor(
             candidate = list(actor.position)
             candidate[axis] += delta[axis]
             target = candidate[0], candidate[1]
-            occupied = any(
-                other.actor_id != actor.actor_id
-                and distance_squared(target, other.position) < (2 * rules.actor_radius_units) ** 2
-                for other in world.actors.values()
-            )
             if (
-                body_fits(world_map, target, rules.actor_radius_units, crouched=actor.crouched)
-                and not occupied
+                delta[axis]
+                and body_fits(world_map, target, rules.actor_radius_units, crouched=actor.crouched)
+                and not body_occupied(world, actor, target, rules)
             ):
                 actor.position = target
         if actor.tile != visited[-1]:

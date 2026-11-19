@@ -4,7 +4,7 @@ from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind
 from echo_heist.core.contracts.observations import InteractionHint
 from echo_heist.core.contracts.world import StaticMap, tile_center
-from echo_heist.core.simulation.systems.motion import body_fits, distance_squared
+from echo_heist.core.simulation.systems.motion import body_fits, body_occupied
 from echo_heist.core.simulation.world import Emit, WorldState
 
 
@@ -34,10 +34,8 @@ def use_stair(
         link for link in world_map.stairs if link.tile == actor.tile and link.object_id == target_id
     )
     destination = tile_center(link.destination)
-    if not body_fits(world_map, destination, rules.actor_radius_units) or any(
-        other.actor_id != actor_id
-        and distance_squared(other.position, destination) < (2 * rules.actor_radius_units) ** 2
-        for other in world.actors.values()
+    if not body_fits(world_map, destination, rules.actor_radius_units) or body_occupied(
+        world, actor, destination, rules
     ):
         emit(EventKind.ACTION_REJECTED, actor_id, (("reason", "stair_landing_occupied"),))
         return
@@ -73,12 +71,9 @@ def advance_stairs(world: WorldState, world_map: StaticMap, rules: GameRules, em
         link = next(link for link in world_map.stairs if link.object_id == actor.stair_source_id)
         actor.stair_source_id, actor.stair_arrives_at = None, 0
         destination = tile_center(link.destination)
-        occupied = any(
-            other.actor_id != actor.actor_id
-            and distance_squared(other.position, destination) < (2 * rules.actor_radius_units) ** 2
-            for other in world.actors.values()
-        )
-        if occupied or not body_fits(world_map, destination, rules.actor_radius_units):
+        if not body_fits(world_map, destination, rules.actor_radius_units) or body_occupied(
+            world, actor, destination, rules
+        ):
             emit(EventKind.ACTION_REJECTED, actor.actor_id, (("reason", "stair_landing_occupied"),))
             continue
         actor.position = destination

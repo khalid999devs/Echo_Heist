@@ -36,7 +36,7 @@ def draw_vision(
     actors = {actor.actor_id: actor for actor in snapshot.actors}
     layer = pygame.Surface(canvas.get_size(), pygame.SRCALPHA)
     size = world_map.tile_size_px
-    for view in snapshot.guards:
+    for view in sorted(snapshot.guards, key=lambda guard: guard.state == GuardState.CHASE):
         actor = actors[view.actor_id]
         if actor.position is None or actor.disabled or actor.stunned:
             continue
@@ -60,10 +60,12 @@ def draw_vision(
                 view.half_angle_degrees,
             )
         ]
-        pygame.draw.polygon(layer, (*color, 28), points)
-        pygame.draw.lines(layer, (*color, 60), False, points[1:], 1)
+        tracking = view.state in (GuardState.SPOTTED, GuardState.CHASE)
+        fill, rim, edge_width = (52, 148, 2) if tracking else (38, 100, 1)
+        pygame.draw.polygon(layer, (*color, fill), points)
+        pygame.draw.lines(layer, (*color, rim), False, points[1:], edge_width)
         for edge in (points[1], points[-1]):
-            pygame.draw.line(layer, (*color, 100), points[0], edge, 1)
+            pygame.draw.line(layer, (*color, rim), points[0], edge, edge_width)
         if view.identification_ticks:
             x, y = points[0]
             top = y - DEFENDER_SIZE[1] - 8

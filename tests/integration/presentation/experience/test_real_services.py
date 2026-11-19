@@ -9,8 +9,11 @@ from echo_heist.core.contracts.autonomy.policy import PRESETS
 from echo_heist.core.contracts.experience.model import DesktopPreferences
 from echo_heist.infrastructure.resources import load_game_rules, load_sensor_rules
 from echo_heist.ui.render.autonomy.protocols import TOGGLE_MEMORY
+from echo_heist.ui.scenes.companion.deployment import selection
+from echo_heist.ui.scenes.design.workshop import WORKSHOP_CONTROLS
+from echo_heist.ui.scenes.experience.profiles import PROFILE_ACTIONS, PROFILE_BUTTON
 from echo_heist.ui.scenes.flow import GameFlow, Scene, load_level
-from echo_heist.ui.scenes.menus import TITLE_BUTTONS
+from echo_heist.ui.scenes.menus import CHAPTER_CARD, MODE_BUTTONS, TITLE_BUTTONS
 
 
 def test_real_report_history_profile_and_preferences_round_trip(tmp_path: Path) -> None:
@@ -63,3 +66,38 @@ def test_real_report_history_profile_and_preferences_round_trip(tmp_path: Path) 
         [pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=TOGGLE_MEMORY.center)], 0
     )
     assert not connect_gateway(level, rules, load_sensor_rules(), tmp_path).protocols().enabled
+
+
+def test_new_policy_can_be_loaded_directly_after_saving(tmp_path: Path) -> None:
+    pygame.font.init()
+    level, rules = load_level(), load_game_rules()
+    gateway = connect_gateway(level, rules, load_sensor_rules(), tmp_path)
+    experience = connect_experience(gateway, tmp_path)
+    experience.save_profile("First", PRESETS["GHOST"])
+    flow = GameFlow(
+        (1280, 720),
+        level=level,
+        rules=rules,
+        autonomy_gateway=gateway,
+        experience_gateway=experience,
+    )
+
+    def click(rect: pygame.Rect) -> None:
+        flow.frame([pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=rect.center)], 0)
+
+    click(CHAPTER_CARD)
+    click(MODE_BUTTONS[1])
+    click(WORKSHOP_CONTROLS[2])
+    assert selection(flow.designs.draft) == PRESETS["RUSH"]
+    click(PROFILE_BUTTON)
+    flow.frame(
+        [
+            pygame.event.Event(pygame.KEYDOWN, key=pygame.K_n),
+            pygame.event.Event(pygame.TEXTINPUT, text="Demo Rush"),
+        ],
+        0,
+    )
+    click(PROFILE_ACTIONS[0])
+    click(PROFILE_ACTIONS[1])
+    assert selection(flow.designs.draft) == PRESETS["RUSH"]
+    assert flow.profiles.name == "Demo Rush"

@@ -118,6 +118,14 @@ class ProfilePanel:
                             continue
                         saved = self.gateway.save_profile(self.name.strip(), policy)
                         self.refresh()
+                        self.selected = next(
+                            (
+                                index
+                                for index, profile in enumerate(self.profiles)
+                                if profile.profile_id == saved.profile_id
+                            ),
+                            self.selected,
+                        )
                         self.name, self.notice = saved.name, "Profile saved."
                         self.editing = False
                     elif action == 1 and chosen:

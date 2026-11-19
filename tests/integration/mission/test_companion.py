@@ -9,8 +9,9 @@ from echo_heist.ai.companion.controller import CompanionController, Directive
 from echo_heist.autonomy.mission import COMPANION_ID, AutonomousMission, build_briefing
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.autonomy.model import CompanionTrace
-from echo_heist.core.contracts.autonomy.policy import DeploymentRequest, PolicySelection
+from echo_heist.core.contracts.autonomy.policy import PRESETS, DeploymentRequest, PolicySelection
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.events import EventKind
 from echo_heist.core.contracts.observations import Observation
 from echo_heist.core.contracts.results import RunOutcome
 from echo_heist.core.contracts.security.model import SensorRules
@@ -42,9 +43,14 @@ def registry(level: LevelData, rules: GameRules) -> SecurityRegistry:
 
 
 def deploy(
-    level: LevelData, rules: GameRules, sensors: SensorRules, registry: SecurityRegistry, seed: int
+    level: LevelData,
+    rules: GameRules,
+    sensors: SensorRules,
+    registry: SecurityRegistry,
+    seed: int,
+    policy: str = "BALANCED",
 ) -> AutonomousMission:
-    request = DeploymentRequest("COMPANION", seed, level.static_map.map_id, PolicySelection())
+    request = DeploymentRequest("COMPANION", seed, level.static_map.map_id, PRESETS[policy])
     return AutonomousMission(
         level, rules, sensors, registry, request, protocol=None, protocol_state=None
     )
@@ -56,22 +62,33 @@ def play(run: AutonomousMission, limit: int = 9_000) -> tuple[list[CompanionTrac
     while run.tick < limit:
         result = run.step(())  # the UI supplies no movement or tools in Companion mode
         kinds.extend(event.kind.value for event in result.events)
-        trace = run.telemetry().companion
-        if trace is not None and (not traces or traces[-1].evaluated_tick != trace.evaluated_tick):
+        telemetry = run.telemetry()
+        trace = telemetry.companion
+        if trace is not None and traces and traces[-1].evaluated_tick == trace.evaluated_tick:
+            assert trace.chosen_action == traces[-1].chosen_action
+            assert trace.search_trigger == traces[-1].search_trigger
+        elif trace is not None:
             traces.append(trace)
+        assert telemetry.execution is not None and telemetry.execution.tick == result.tick
+        rejected = any(
+            event.kind == EventKind.ACTION_REJECTED and event.actor_id == run.actor_id
+            for event in result.events
+        )
+        assert bool(telemetry.execution.rejection) == rejected
         if result.mission_end is not None:
             break
     return traces, kinds
 
 
 @pytest.mark.parametrize(
-    ("seed", "outcome"),
+    ("seed", "policy", "outcome"),
     [
-        (WIN_SEED, RunOutcome.WIN),
-        (CAPTURE_SEED, RunOutcome.CAPTURED),
-        (23, RunOutcome.WIN),
+        (WIN_SEED, "BALANCED", RunOutcome.WIN),
+        (WIN_SEED, "RUSH", RunOutcome.CAPTURED),
+        (CAPTURE_SEED, "BALANCED", RunOutcome.CAPTURED),
+        (23, "BALANCED", RunOutcome.WIN),
         # A former grab/escape loop now resolves as an actual capture.
-        (34, RunOutcome.CAPTURED),
+        (34, "BALANCED", RunOutcome.CAPTURED),
     ],
 )
 def test_companion_genuinely_wins_or_is_captured_without_recordings(
@@ -80,9 +97,10 @@ def test_companion_genuinely_wins_or_is_captured_without_recordings(
     sensors: SensorRules,
     registry: SecurityRegistry,
     seed: int,
+    policy: str,
     outcome: RunOutcome,
 ) -> None:
-    run = deploy(level, rules, sensors, registry, seed)
+    run = deploy(level, rules, sensors, registry, seed, policy)
     actor = next(a for a in run.presentation_snapshot().actors if a.actor_id == COMPANION_ID)
     assert actor.kind == ActorKind.COMPANION and run.tick == 0
     traces, kinds = play(run)
@@ -91,12 +109,18 @@ def test_companion_genuinely_wins_or_is_captured_without_recordings(
     if outcome == RunOutcome.WIN:
         assert end.extraction_id in level.exit_ids
         assert kinds.count("CORE_TAKEN") == 1 and kinds.count("LOCKDOWN_STARTED") == 1
+    else:
+        assert end.capture_by in {item.guard_id for item in registry.assignments}
+        assert kinds.count("CAPTURE_COMPLETED") == 1
     # Real search evidence: 64 simulations, visits within budget, >=3 alternatives.
     assert traces and all(trace.simulations == 64 for trace in traces)
     assert all(sum(a.visits for a in trace.alternatives) <= 64 for trace in traces)
     assert any(len([a for a in t.alternatives if a.visits]) >= 3 for t in traces)
     assert any(a.mean_reward is None and not a.legal for t in traces for a in t.alternatives)
     assert any(t.path and t.path_cost is not None and t.expanded_nodes > 0 for t in traces)
+    for trace in traces:
+        chosen = next(a for a in trace.alternatives if a.action == trace.chosen_action)
+        assert chosen.legal and chosen.visits == max(a.visits for a in trace.alternatives)
 
 
 def test_controller_depends_only_on_its_observations_and_seed(

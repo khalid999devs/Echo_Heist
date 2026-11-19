@@ -1,125 +1,229 @@
-"""Actual decision alternatives and director traces in an optional teaching panel."""
+"""Companion, NEXUS and Interceptor monitors for committed runtime data."""
 
 import pygame
 
+from echo_heist.core.contracts.actions import ActionKind
 from echo_heist.core.contracts.autonomy.model import AutonomyTelemetry
+from echo_heist.core.contracts.observations import OwnStatus
 from echo_heist.ui.render import theme
-from echo_heist.ui.render.hud import panel
-from echo_heist.ui.render.layout.text import fit, lines, render
+from echo_heist.ui.render.layout.monitor import Monitor, age, identifier, tabs
+from echo_heist.ui.render.security.signals import GUARD_NAMES
 from echo_heist.ui.render.theme import Fonts
 
-PANEL_RECT = pygame.Rect(20, 156, 462, 500)
-AUTONOMY_TABS = tuple(pygame.Rect(36 + i * 145, 200, 139, 30) for i in range(3))
+AUTONOMY_TABS = tabs(3)
+TACTICS = {
+    "ADVANCE": "Advance",
+    "ALTERNATE": "Switch route",
+    "HIDE": "Take cover",
+    "WAIT": "Wait",
+    "RETREAT": "Fall back",
+    "ECHO": "Deploy decoy",
+    "EMP": "Use EMP",
+    "MELEE": "Stun a guard",
+}
+OBJECTIVES = {
+    "INFILTRATE": "Infiltrate",
+    "REACH_CORE": "Reach the Core",
+    "TAKE_CORE": "Take the Core",
+    "EXTRACT": "Reach an exit",
+}
+INTENTS = {
+    ActionKind.MOVE: "Moving",
+    ActionKind.WAIT: "Holding position",
+    ActionKind.INTERACT: "Interacting",
+    ActionKind.CROUCH: "Changing posture",
+    ActionKind.HIDE: "Taking cover",
+    ActionKind.ECHO: "Deploying Echo",
+    ActionKind.EMP: "Discharging EMP",
+    ActionKind.MELEE: "Striking a guard",
+}
+POST_NAMES = {
+    "choke-security-core": "Security gate",
+    "choke-research-core": "Research gate",
+}
+
+
+def _trigger(value: str) -> str:
+    if value.startswith("seeing guard-"):
+        actor_id = value.removeprefix("seeing ")
+        return "Spotted " + GUARD_NAMES.get(actor_id, ("", identifier(actor_id)))[1]
+    if value.startswith("reaching junction "):
+        junction = value.removeprefix("reaching junction ")
+        return "Reached " + POST_NAMES.get(junction, identifier(junction.removeprefix("choke-")))
+    if value.startswith("objective "):
+        state = value.removeprefix("objective ")
+        return "New goal: " + OBJECTIVES.get(state, identifier(state)).lower()
+    return identifier(value)
+
+
+def _companion(
+    ui: Monitor, data: AutonomyTelemetry, own: OwnStatus | None, tick: int, hz: int
+) -> None:
+    trace = data.companion
+    execution = data.execution
+    objective = OBJECTIVES.get(trace.state, identifier(trace.state)) if trace else ""
+    ui.card(234, 92)
+    ui.text("CURRENT ACTION", 244, theme.ACCENT, 48, width=178)
+    if objective:
+        ui.text(objective, 244, theme.MUTED, right=454, width=220)
+    if execution is None:
+        action, detail = "Awaiting first action", ""
+    else:
+        action = INTENTS[execution.action]
+        detail = ""
+        if execution.rejection:
+            denied = TACTICS.get(execution.action.value, identifier(execution.action.value))
+            action = (
+                "Movement blocked" if execution.action == ActionKind.MOVE else f"{denied} denied"
+            )
+            detail = identifier(execution.rejection) if execution.rejection != "blocked" else ""
+        elif own and own.stair_ticks_remaining:
+            action = "Taking the stairs"
+        elif own and own.concealed:
+            action = "Staying in cover"
+        elif own and execution.action == ActionKind.MOVE:
+            action = (
+                "Sprinting" if own.sprinting else "Crouch-walking" if own.crouched else "Walking"
+            )
+    ui.text(action, 264, theme.TEXT, 48, font=ui.fonts.body)
+    if not detail and trace and trace.utility_action:
+        detail = f"Utility override · {trace.utility_reason}"
+    if detail:
+        ui.text(detail, 300, theme.WARNING, 48, width=405)
+    if trace is None:
+        ui.text("The plan appears after the first tactical search.", 347, theme.MUTED)
+        return
+
+    ui.text("LAST TACTICAL PLAN", 340, theme.ACCENT)
+    ui.text(age(tick, trace.evaluated_tick, hz), 340, theme.MUTED, right=466)
+    tactic = TACTICS.get(trace.chosen_action, identifier(trace.chosen_action))
+    trigger = _trigger(trace.search_trigger)
+    ui.text(tactic, 361, theme.TEXT, font=ui.fonts.small, width=150)
+    ui.text(trigger, 363, theme.MUTED, 195, width=271)
+    depth = f"  /  depth cap {trace.search_depth}" if trace.search_depth else ""
+    ui.text(f"MCTS  /  {trace.simulations} simulations{depth}", 389, theme.ACCENT)
+    ui.text("CONSIDERED OPTIONS", 416, theme.MUTED, width=190)
+    ui.text("VISITS", 416, theme.MUTED, 292)
+    ui.text("MEAN REWARD", 416, theme.MUTED, right=466)
+    options = sorted(
+        (item for item in trace.alternatives if item.legal),
+        key=lambda item: (item.action != trace.chosen_action, -item.visits, item.action),
+    )
+    for i, item in enumerate(options[:4]):
+        y = 440 + i * 22
+        color = theme.ACCENT if item.action == trace.chosen_action else theme.TEXT
+        ui.text(TACTICS.get(item.action, identifier(item.action)), y, color, width=176)
+        ui.bar((210, y + 6, 69, 5), item.visits / max(1, trace.simulations), color)
+        ui.text(str(item.visits), y, color, 302)
+        ui.text(
+            "—" if item.mean_reward is None else f"{item.mean_reward:.2f}",
+            y,
+            color,
+            right=466,
+        )
+    reward = "Reward is estimated from rollouts (0 to 1)."
+    if len(options) > 4:
+        reward += f"  /  Top 4 of {len(options)}"
+    ui.text(reward, 529, theme.MUTED)
+
+    ui.rule(552)
+    ui.text("A* NAVIGATION", 565, theme.ACCENT)
+    if trace.path_goal is not None and trace.path_cost is not None:
+        ui.text(f"Waypoint {trace.path_goal}  /  {len(trace.path)} tiles left", 586)
+        ui.text(
+            f"Plan cost {trace.path_cost}  /  {trace.expanded_nodes} nodes expanded",
+            607,
+            theme.MUTED,
+        )
+    else:
+        ui.text("No active route. The next move uses local observations.", 586, theme.MUTED)
+
+
+def _nexus(ui: Monitor, data: AutonomyTelemetry, tick: int, hz: int) -> None:
+    nexus = data.nexus
+    protocol = data.protocols
+    ui.card(234, 91)
+    ui.text("FACILITY DIRECTOR", 244, theme.ACCENT, 48)
+    ui.paragraph("Rule-based dispatch uses reported evidence and the facility alarm.", 272, x=48)
+    if nexus is not None:
+        ui.text("GUARD ASSIGNMENTS", 342, theme.ACCENT)
+        ui.text(age(tick, nexus.evaluated_tick, hz), 342, theme.MUTED, right=466)
+        if not nexus.tasks:
+            ui.text("No active assignments.", 368, theme.MUTED)
+        for i, task in enumerate(nexus.tasks[:4]):
+            y = 367 + i * 35
+            name = GUARD_NAMES.get(task.guard_id, ("", identifier(task.guard_id)))[1]
+            ui.text(f"{name}  /  {identifier(task.task)}", y)
+            ui.text(
+                f"Goal {task.target}  ·  evidence {age(tick, task.evidence_tick, hz)}",
+                y + 16,
+                theme.MUTED,
+            )
+        if nexus.announcement:
+            ui.paragraph(nexus.announcement, 514, theme.WARNING, limit=1)
+    else:
+        ui.text("Awaiting the live director trace.", 342, theme.MUTED)
+    if protocol is not None:
+        ui.rule(548)
+        ui.text("NEXUS MEMORY", 561, theme.ACCENT)
+        state = "Memory off" if not protocol.enabled else "Memory on"
+        ui.text(state, 561, theme.MUTED, right=466)
+        active = protocol.active
+        ui.text(active.label if active else "Standard security response", 584)
+        if active:
+            ui.paragraph(active.reason, 608)
+
+
+def _interceptor(ui: Monitor, data: AutonomyTelemetry, tick: int, hz: int) -> None:
+    trace = data.nexus.interceptor if data.nexus else None
+    ui.card(234, 106)
+    ui.text("INTERCEPT PLAN", 244, theme.ACCENT, 48)
+    if trace is None:
+        ui.text("Awaiting evidence", 267, theme.TEXT, 48, font=ui.fonts.body)
+        ui.paragraph("The guard needs a sighting, a radio report or a director order.", 300, x=48)
+    else:
+        label = POST_NAMES.get(trace.post_id, identifier(trace.post_id.removeprefix("choke-")))
+        ui.text(label, 266, theme.TEXT, 48, font=ui.fonts.body)
+        ui.text(
+            f"Target tile {trace.target}  /  searched {age(tick, trace.evaluated_tick, hz)}",
+            304,
+            theme.MUTED,
+            48,
+        )
+        ui.text("SEARCH TRACE", 366, theme.ACCENT)
+        ui.text(f"Depth {trace.depth}   •   {trace.evaluated_nodes} leaves scored", 396)
+        ui.text(f"{trace.pruned_nodes} branches pruned   •   escape value {trace.value:.2f}", 426)
+    ui.rule(461)
+    ui.text("MINIMAX + ALPHA-BETA", 475, theme.ACCENT)
+    ui.paragraph(
+        "Minimax picks a gate against plausible routes. "
+        "Alpha-beta skips branches that cannot improve the choice.",
+        501,
+        limit=3,
+    )
+    ui.paragraph(
+        "A* then routes the guard to the post on foot. The plan is a prediction based on evidence.",
+        570,
+        limit=3,
+    )
 
 
 def draw_telemetry(
-    canvas: pygame.Surface, fonts: Fonts, data: AutonomyTelemetry, tab: int, tick: int, hz: int
+    canvas: pygame.Surface,
+    fonts: Fonts,
+    data: AutonomyTelemetry,
+    tab: int,
+    tick: int,
+    hz: int,
+    own: OwnStatus | None = None,
 ) -> None:
-    panel(canvas, PANEL_RECT, fill=(5, 16, 25, 242), border=theme.ACCENT_DIM)
-
-    def text(value: str, y: int, color: theme.Color = theme.TEXT, x: int = 36) -> None:
-        canvas.blit(render(fonts.micro, fit(fonts.micro, value, 466 - x), color), (x, y))
-
-    def wrapped(value: str, y: int, color: theme.Color = theme.MUTED, limit: int = 2) -> None:
-        for i, line in enumerate(lines(fonts.micro, value, 430, limit)):
-            text(line, y + i * 20, color)
-
-    text("LIVE AI / F2 CLOSE", 170, theme.ACCENT)
-    text("1-3 Select", 170, theme.MUTED, 363)
-    for i, label in enumerate(("COMPANION", "NEXUS", "INTERCEPTOR")):
-        rect = AUTONOMY_TABS[i]
-        panel(canvas, rect, border=theme.ACCENT if tab == i else theme.BORDER)
-        title = render(fonts.micro, label, theme.TEXT if tab == i else theme.MUTED)
-        canvas.blit(title, title.get_rect(center=rect.center))
-
-    def age(at: int) -> str:
-        return f"{max(0, tick - at) / hz:.1f}s ago"
-
+    ui = Monitor(canvas, fonts, "Decision monitor", "F2 Close")
+    for i, label in enumerate(("1  Companion", "2  NEXUS", "3  Interceptor")):
+        ui.select(AUTONOMY_TABS[i], label, tab == i)
     if tab == 0:
-        trace = data.companion
-        if trace is None:
-            text("Awaiting an actual Companion decision.", 252, theme.MUTED)
-        else:
-            text(trace.state.replace("_", " "), 247, theme.ACCENT)
-            text("LAST DECISION / " + age(trace.evaluated_tick), 272, theme.MUTED)
-            text(trace.chosen_action.replace("_", " "), 300, theme.TEXT)
-            wrapped(trace.reason, 326)
-            text(f"MCTS / {trace.simulations} simulations", 378, theme.ACCENT)
-            text("ACTION", 405, theme.MUTED)
-            text("VISITS", 405, theme.MUTED, 299)
-            text("MEAN", 405, theme.MUTED, 410)
-            maximum = max((item.visits for item in trace.alternatives), default=1)
-            alternatives = sorted(
-                trace.alternatives,
-                key=lambda item: (
-                    item.action != trace.chosen_action,
-                    -item.visits,
-                    not item.legal,
-                    item.action,
-                ),
-            )
-            for i, item in enumerate(alternatives[:4]):
-                y = 432 + i * 29
-                color = (
-                    theme.ACCENT
-                    if item.action == trace.chosen_action
-                    else theme.TEXT
-                    if item.legal
-                    else theme.DISABLED
-                )
-                label = item.action.replace("_", " ")
-                canvas.blit(render(fonts.micro, fit(fonts.micro, label, 185), color), (36, y))
-                pygame.draw.rect(canvas, theme.BORDER, (224, y + 7, 64, 4))
-                pygame.draw.rect(
-                    canvas, color, (224, y + 7, round(64 * item.visits / max(1, maximum)), 4)
-                )
-                text(str(item.visits), y, color, 305)
-                text("--" if item.mean_reward is None else f"{item.mean_reward:.2f}", y, color, 418)
-            cost = "--" if trace.path_cost is None else str(trace.path_cost)
-            text(f"A* / cost {cost} / expanded {trace.expanded_nodes}", 559, theme.MUTED)
-            if trace.utility_action:
-                text("UTILITY / " + trace.utility_action.replace("_", " "), 586, theme.WARNING)
-                wrapped(trace.utility_reason, 608, limit=1)
-            else:
-                text("Measured alternatives / unknown rewards shown as --", 608, theme.MUTED)
+        _companion(ui, data, own, tick, hz)
     elif tab == 1:
-        nexus = data.nexus
-        protocols = data.protocols
-        text("FACILITY DIRECTOR", 251, theme.ACCENT)
-        if nexus is None:
-            text("No live NEXUS trace available.", 282, theme.MUTED)
-        else:
-            text("LAST EVALUATION / " + age(nexus.evaluated_tick), 278, theme.MUTED)
-            wrapped(nexus.announcement or "No director announcement.", 307, theme.WARNING)
-            for i, task in enumerate(nexus.tasks[:4]):
-                y = 367 + i * 42
-                text(task.guard_id.removeprefix("guard-").upper() + " / " + task.task, y)
-                text(
-                    f"Goal {task.target} / evidence {age(task.evidence_tick)}", y + 20, theme.MUTED
-                )
-        if protocols is not None:
-            text(
-                "PROTOCOL / " + (protocols.active.label if protocols.active else "BASELINE"),
-                558,
-                theme.ACCENT,
-            )
-            wrapped(
-                protocols.active.reason
-                if protocols.active
-                else "Standard security response. No active adaptation.",
-                586,
-            )
+        _nexus(ui, data, tick, hz)
     else:
-        interceptor = data.nexus.interceptor if data.nexus else None
-        text("MINIMAX / ALPHA-BETA", 251, theme.ACCENT)
-        if interceptor is None:
-            text("No Interceptor decision has been reported.", 282, theme.MUTED)
-        else:
-            text(interceptor.guard_id.upper(), 284)
-            text("LAST SEARCH / " + age(interceptor.evaluated_tick), 311, theme.MUTED)
-            text("SELECTED POST / " + interceptor.post_id, 351, theme.ACCENT)
-            text(f"Target {interceptor.target}", 379)
-            text(f"Depth {interceptor.depth} / evaluated {interceptor.evaluated_nodes}", 422)
-            text(f"Pruned {interceptor.pruned_nodes} / value {interceptor.value:.2f}", 453)
-            wrapped("The guard must travel to this post. Search telemetry does not move it.", 508)
-    text("Privileged display / never a controller input", 633, theme.MUTED)
+        _interceptor(ui, data, tick, hz)
+    ui.text("F3  Open guard monitor", 650, theme.MUTED)

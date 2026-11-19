@@ -41,23 +41,26 @@ def test_workshop_presets_match_the_backend_presets() -> None:
 def test_decision_panel_keeps_a_chosen_action_beyond_the_first_four_rows(monkeypatch) -> None:
     import pygame
 
+    from echo_heist.core.contracts.actions import ActionKind
     from echo_heist.core.contracts.autonomy.model import (
         Alternative,
         AutonomyTelemetry,
+        CompanionExecution,
         CompanionTrace,
     )
     from echo_heist.ui.render.autonomy import panel
+    from echo_heist.ui.render.layout import monitor
     from echo_heist.ui.render.theme import Fonts
 
     pygame.font.init()
-    original = panel.render
+    original = monitor.render
     labels = []
 
     def recorded(font, text, color):
         labels.append(text)
         return original(font, text, color)
 
-    monkeypatch.setattr(panel, "render", recorded)
+    monkeypatch.setattr(monitor, "render", recorded)
     trace = CompanionTrace(
         "robot",
         10,
@@ -70,7 +73,8 @@ def test_decision_panel_keeps_a_chosen_action_beyond_the_first_four_rows(monkeyp
             Alternative("EMP", 60, 0.8),
         ),
     )
-    panel.draw_telemetry(
-        pygame.Surface((1280, 720)), Fonts(), AutonomyTelemetry(companion=trace), 0, 10, 30
+    telemetry = AutonomyTelemetry(
+        companion=trace, execution=CompanionExecution(11, ActionKind.MOVE, "blocked")
     )
-    assert "EMP" in labels and "60" in labels and "0.80" in labels
+    panel.draw_telemetry(pygame.Surface((1280, 720)), Fonts(), telemetry, 0, 11, 30)
+    assert {"Use EMP", "60", "0.80", "Movement blocked"} <= set(labels)

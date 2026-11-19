@@ -9,6 +9,7 @@ from echo_heist.ui.presenters.reporting import ReportState
 from echo_heist.ui.render import theme
 from echo_heist.ui.render.hud import panel
 from echo_heist.ui.render.layout.text import fit, lines
+from echo_heist.ui.render.security.signals import GUARD_NAMES
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.scenes.navigation.controls import button, hit
 
@@ -93,6 +94,8 @@ def draw_results(
     if end.extraction_id:
         exit_name = "Cargo Airlock" if end.extraction_id == "cargo-exit" else "Entry Airlock"
         label(canvas, fonts, "EXIT  " + exit_name, (662, 385))
+    elif end.capture_by in GUARD_NAMES:
+        label(canvas, fonts, "CAUGHT BY  " + GUARD_NAMES[end.capture_by][1], (662, 385))
     badges = " / ".join(ACHIEVEMENTS[a] for a in report.achievements) if report else ""
     label(
         canvas,

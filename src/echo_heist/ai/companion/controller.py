@@ -96,6 +96,7 @@ class CompanionController:
         self.expanded = 0
         self.path_tick = -1
         self.last_search_tick = -10_000
+        self.last_search_trigger = ""
         self.last_result: MctsResult[str] | None = None
         self.trace: CompanionTrace | None = None
         self.reason = ""
@@ -286,6 +287,7 @@ class CompanionController:
             model, iterations=ITERATIONS, max_depth=MAX_DEPTH, rng=self.rng
         )
         self.last_result, self.last_search_tick = result, observation.tick
+        self.last_search_trigger = self.trigger
         choice = result.best or tactics.WAIT
         ranked = sorted(
             (item for item in result.alternatives if item.visits),
@@ -317,7 +319,6 @@ class CompanionController:
         else:
             self.directive = Directive(choice)
         self.path_goal = None  # replan the physical path for the new directive
-        self._record(observation)
 
     def _branch_threatened(self, observation: Observation, legs: tuple[tactics.Leg, ...]) -> bool:
         """Switch branches only on observed danger: a recent sighting in the sector
@@ -693,7 +694,7 @@ class CompanionController:
             self.echo_ready_at = tick + 120
         self.previous = position
         self.last_kind, self.last_tick = action.kind, tick
-        self._record(observation)
+        self._record()
         return action
 
     def _override(self, observation: Observation, override: Override) -> Action | None:
@@ -830,7 +831,7 @@ class CompanionController:
         )
 
     # --------------------------------------------------------------- telemetry
-    def _record(self, observation: Observation) -> None:
+    def _record(self) -> None:
         result = self.last_result
         if result is None:
             return
@@ -852,9 +853,7 @@ class CompanionController:
             self.actor_id,
             self.last_search_tick,
             self.state,
-            self.directive.action
-            if self.directive.action in legal
-            else result.best or tactics.WAIT,
+            result.best or tactics.WAIT,
             self.reason,
             result.simulations,
             tuple(alternatives),
@@ -863,4 +862,7 @@ class CompanionController:
             self.expanded,
             self.utility[0],
             self.utility[1],
+            search_trigger=self.last_search_trigger,
+            search_depth=MAX_DEPTH,
+            path_goal=self.path_goal,
         )

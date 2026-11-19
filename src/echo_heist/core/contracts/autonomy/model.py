@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from math import isfinite
 
+from echo_heist.core.contracts.actions import ActionKind
 from echo_heist.core.contracts.world import Tile, immutable_tile
 
 
@@ -42,10 +43,17 @@ class CompanionTrace:
     expanded_nodes: int = 0
     utility_action: str = ""
     utility_reason: str = ""
+    search_trigger: str = ""
+    search_depth: int | None = None
+    path_goal: Tile | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "alternatives", tuple(self.alternatives))
         object.__setattr__(self, "path", tuple(immutable_tile(tile) for tile in self.path))
+        if self.path_goal is not None:
+            object.__setattr__(self, "path_goal", immutable_tile(self.path_goal))
+        if self.search_depth is not None and self.search_depth < 1:
+            raise ValueError("Search depth must be positive")
         if not self.actor_id or not self.state or not self.chosen_action:
             raise ValueError("A decision needs its actor, state and chosen action")
         if min(self.evaluated_tick, self.simulations, self.expanded_nodes) < 0:
@@ -130,7 +138,17 @@ class NexusTrace:
 
 
 @dataclass(frozen=True, slots=True)
+class CompanionExecution:
+    """The most recent Companion intent and its resolution by Simulation."""
+
+    tick: int
+    action: ActionKind
+    rejection: str = ""
+
+
+@dataclass(frozen=True, slots=True)
 class AutonomyTelemetry:
     companion: CompanionTrace | None = None
     nexus: NexusTrace | None = None
     protocols: ProtocolState | None = None
+    execution: CompanionExecution | None = None

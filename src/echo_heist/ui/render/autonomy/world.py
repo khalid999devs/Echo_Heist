@@ -17,7 +17,7 @@ def draw_route(
     trace: CompanionTrace | None,
     actor_id: str,
 ) -> None:
-    if trace is None or trace.actor_id != actor_id:
+    if trace is None or trace.actor_id != actor_id or trace.path_goal is None:
         return
     actor = next((actor for actor in snapshot.actors if actor.actor_id == actor_id), None)
     if actor is None:

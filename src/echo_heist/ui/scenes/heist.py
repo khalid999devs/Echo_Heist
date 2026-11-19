@@ -560,7 +560,7 @@ class HeistSession:
                 self.fonts,
                 observer_id=self.observer_id,
             )
-        if self.autonomy_panel:
+        if self.autonomy_panel and self.autonomy_tab == 0:
             draw_route(
                 canvas,
                 self.level,
@@ -582,6 +582,9 @@ class HeistSession:
         )
         operative_tile = observation.own_status.tile
         if snapshot.mission_end is None:
+            notice = self.notice if self.clock_ms < self.notice_until_ms else ""
+            if self.autonomy_panel and self.autonomy_tab == 1 and notice.startswith("NEXUS / "):
+                notice = ""  # The open director monitor already shows the announcement.
             if self.high_contrast:
                 backplates(canvas)
             draw_hud(
@@ -593,7 +596,7 @@ class HeistSession:
                 operative_tile=operative_tile,
                 phase=snapshot.phase,
                 clock_ms=self.clock_ms,
-                notice=self.notice if self.clock_ms < self.notice_until_ms else "",
+                notice=notice,
                 feedback=self.interactions.feedback_at(snapshot.tick),
                 guards=snapshot.guards,
                 unavailable_guards=frozenset(
@@ -633,6 +636,7 @@ class HeistSession:
                 self.autonomy_tab,
                 snapshot.tick,
                 self.simulation.ticks_per_second,
+                observation.own_status if self.autonomous else None,
             )
         if self.lab_note:
             self._draw_lab(canvas)

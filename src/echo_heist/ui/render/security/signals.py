@@ -14,6 +14,13 @@ from echo_heist.ui.render.actors.model import DEFENDER_SIZE
 from echo_heist.ui.render.camera import Camera
 from echo_heist.ui.render.theme import Fonts
 
+GUARD_NAMES = {
+    "guard-core": ("Core", "Core Interceptor"),
+    "guard-core-sentinel": ("Vault", "Vault Sentinel"),
+    "guard-research": ("Lab", "Research Tracker"),
+    "guard-security": ("Sec", "Security Sentinel"),
+    "guard-service": ("Service", "Service Sentinel"),
+}
 STATE_COLORS = {
     GuardState.PATROL: theme.MUTED,
     GuardState.INVESTIGATE: theme.WARNING,

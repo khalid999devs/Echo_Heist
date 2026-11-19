@@ -15,6 +15,7 @@ from echo_heist.ai.companion.controller import CompanionController
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.autonomy.model import (
     AutonomyTelemetry,
+    CompanionExecution,
     ControlMode,
     GuardTask,
     InterceptorTrace,
@@ -142,6 +143,7 @@ class AutonomousMission:
         # Own committed tool uses (TOOL_USED by this actor), for the report.
         self.tools = ToolUsage()
         self.terminal: RunResult | None = None
+        self._execution: CompanionExecution | None = None
         self._telemetry = self._sample()
 
     # MissionRuntime -------------------------------------------------------
@@ -175,6 +177,16 @@ class AutonomousMission:
                     else self.controller.act(observation)
                 )
                 result = self.simulation.step((choice,))
+                rejection = next(
+                    (
+                        str(dict(event.details)["reason"])
+                        for event in result.events
+                        if event.actor_id == self._actor_id
+                        and event.kind == EventKind.ACTION_REJECTED
+                    ),
+                    "",
+                )
+                self._execution = CompanionExecution(result.tick, choice.kind, rejection)
             else:
                 result = self.simulation.step(())
         else:
@@ -299,4 +311,4 @@ class AutonomousMission:
                 else None,
             )
         trace = self.controller.trace if self.controller is not None else None
-        return AutonomyTelemetry(trace, nexus, self._protocol_state)
+        return AutonomyTelemetry(trace, nexus, self._protocol_state, self._execution)

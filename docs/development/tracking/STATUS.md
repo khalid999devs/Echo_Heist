@@ -1,5 +1,7 @@
 # Current development status
 
+2026-11-16 Suhita update: `work/suhita-p06-p08` is merged with main 34d68cf (`59ed6ff`) and pushed for review; 328 tests pass on the Linux shell, 327/328 natively on Windows (bootstrap smoke times out on that laptop's slow startup for every commit). [Handoff](handoffs/suhita/day_04/P06_P08.md), [Windows QA](../quality/reports/phase08/suhita/WINDOWS_QA.md).
+
 2026-11-10 visual follow-up: [robot/light/wiring handoff](handoffs/khalid/day_04/ROBOT_LIGHTING.md) records four-direction sixteen-pose robot walk/fast gaits, source-directed room shadows and connected wall/machine services. Current fingerprint stays 12; this is a presentation refinement, not closure of pending scoring/persistence/platform gates.
 
 
@@ -29,11 +31,11 @@ Native prop-enabled Companion seed 1042 **WIN at 2463**; seed 4 **CAPTURED at 11
 | P01/P02/P03 | DONE | Preserve accepted behavior/contracts |
 | P04 | Runtime and real-data review merged; combined sign-off retained IN_PROGRESS | Integration lead reconciles full gate with recorded actual algorithm/protocol/visual evidence; no missing runtime implementation claim |
 | P05 | SR runtime merged; Khalid Mac connected acceptance verified | Current-build physical Windows gameplay/audio and combined sign-off |
-| P06 | IN_PROGRESS, KR consumers ready | Approved authoritative scoring/encounters, editable policies/profiles, history/preferences persistence and connected acceptance |
-| P07 | IN_PROGRESS, earlier current-build review only | Both-mode fairness/replay/scenarios, Ghost/Rush balance, rare corridor body-block, whole-game performance/memory/usability |
-| P08 | IN_PROGRESS, delivery preparation only | Final primary packages, clean-machine/platform QA, complete comparison/feature audit, licensing/credits/media/demo and delivery |
+| P06 | IN_PROGRESS: KR consumers ready; SR1/SR2/SR3 scoring, encounters, reports/history/profiles/preferences and production `ExperienceGateway` on `work/suhita-p06-p08` (merged with main 34d68cf) | Khalid's connected acceptance of real scores/profiles/history/preferences against the existing screens, then the combined gate |
+| P07 | IN_PROGRESS: Khalid current-build review; SR1/SR2 24-scenario registry/harness, guard corridor-deadlock fix and guide accuracy on `work/suhita-p06-p08` | Both-mode fairness/replay/scenarios, Ghost/Rush balance, whole-game performance/memory/usability |
+| P08 | IN_PROGRESS: Khalid delivery preparation; SR2 96-run comparison done ([report](../quality/experiments/POLICY_COMPARISON.md)); SR1 Windows QA partial: native checks, build/smoke and 8 of 15 in-game steps pass; Human-play steps remain ([checklist](../quality/reports/phase08/suhita/WINDOWS_QA.md)) | Final primary packages, clean-machine/platform QA, complete comparison/feature audit, licensing/credits/media/demo and delivery |
 
-Khalid's [connected Mac handoff](handoffs/khalid/day_04/CONNECTED_REVIEW.md) records 22 actual interaction views, 21 current UI views and both-mode/full-Companion profiling; guide descriptions now match the actual algorithms. P06 real services remain the connection dependency.
+Khalid's [connected Mac handoff](handoffs/khalid/day_04/CONNECTED_REVIEW.md) records 22 actual interaction views, 21 current UI views and both-mode/full-Companion profiling; guide descriptions now match the actual algorithms. P06 real services are supplied by Suhita's [P06-P08 handoff](handoffs/suhita/day_04/P06_P08.md) ([verification](../quality/reports/phase06/suhita/VERIFICATION.md)), pending PR review.
 
 Suhita's P04-SR1/SR2/SR3 and P05-SR1/SR2 code is merged. Preserve it and finish outstanding gate evidence before a separately assigned P06 slice. Khalid's remaining connected review is scoped above. All PR-review editing claims are released; inspect [claims](HANDOFFS.md) before new work. [Owner-aware startup](../workflow/START_HERE.md), [Windows guide](../workflow/setup/WINDOWS_SUHITA.md), [workload](../planning/WORKLOAD.md).
 

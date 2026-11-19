@@ -1,0 +1,9 @@
+{
+  "scoring_version": 1,
+  "completion_points": 50,
+  "stealth_points": 40,
+  "encounter_penalty": 12,
+  "pace_points": 10,
+  "pace_reference_ticks": 27000,
+  "speedrunner_ticks": 9000
+}

@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from echo_heist.core.contracts.events import EventKind, HeardCue, SecurityReport
+from echo_heist.core.contracts.events import EventKind, GameEvent, HeardCue, SecurityReport
 from echo_heist.core.contracts.observations import EntityView
 from echo_heist.core.contracts.results import MissionEnd
 from echo_heist.core.contracts.security.director import NexusMemory
@@ -18,6 +18,7 @@ from echo_heist.core.contracts.world import (
     position_tile,
 )
 from echo_heist.core.environment.state import EnvironmentState
+from echo_heist.core.scoring.encounters import EncounterState
 
 type Emit = Callable[[EventKind, str, tuple[tuple[str, Scalar], ...]], None]
 GUARD_KINDS = frozenset({ActorKind.SENTINEL, ActorKind.TRACKER, ActorKind.INTERCEPTOR})
@@ -93,3 +94,6 @@ class WorldState:
     nexus: NexusMemory = field(default_factory=NexusMemory)
     # P05 interactive props: doors, glass, canisters and lockers.
     environment: EnvironmentState = field(default_factory=EnvironmentState)
+    # P06 scoring: team detection encounters and the run's decisive events.
+    encounters: EncounterState = field(default_factory=EncounterState)
+    decisive_events: list[GameEvent] = field(default_factory=list)

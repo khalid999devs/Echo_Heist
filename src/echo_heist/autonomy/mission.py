@@ -10,9 +10,9 @@ each committed step an immutable telemetry record is cached for presentation;
 from collections.abc import Callable, Iterable
 from dataclasses import replace
 
-from echo_heist.ai.companion.briefing import GuardBrief, MissionBriefing
+from echo_heist.ai.companion.briefing import GuardBrief, MissionBriefing, policy_weights
 from echo_heist.ai.companion.controller import CompanionController
-from echo_heist.core.contracts.actions import Action
+from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.autonomy.model import (
     AutonomyTelemetry,
     ControlMode,
@@ -23,9 +23,18 @@ from echo_heist.core.contracts.autonomy.model import (
 )
 from echo_heist.core.contracts.autonomy.policy import DeploymentRequest
 from echo_heist.core.contracts.config.gameplay import GameRules
+from echo_heist.core.contracts.config.scenario import IntruderStart
+from echo_heist.core.contracts.config.scoring import ScoringRules
 from echo_heist.core.contracts.environment.model import EnvironmentSpec
+from echo_heist.core.contracts.events import EventKind
+from echo_heist.core.contracts.experience.model import ToolUsage
 from echo_heist.core.contracts.observations import Observation
-from echo_heist.core.contracts.results import MissionEnd, PresentationSnapshot, StepResult
+from echo_heist.core.contracts.results import (
+    MissionEnd,
+    PresentationSnapshot,
+    RunResult,
+    StepResult,
+)
 from echo_heist.core.contracts.security.director import ActiveProtocol, NexusStatus
 from echo_heist.core.contracts.security.model import SensorRules
 from echo_heist.core.contracts.world import ActorKind
@@ -43,6 +52,7 @@ TASK_LABELS = {
 }
 
 type AttemptEnded = Callable[[MissionEnd, NexusStatus | None], ProtocolState | None]
+type ResultListener = Callable[[DeploymentRequest, RunResult, ToolUsage], None]
 
 
 def build_briefing(level: LevelData, registry: SecurityRegistry) -> MissionBriefing:
@@ -77,16 +87,29 @@ class AutonomousMission:
         protocol_state: ProtocolState | None,
         on_end: AttemptEnded | None = None,
         environment: EnvironmentSpec | None = None,
+        scoring: ScoringRules | None = None,
+        on_result: ResultListener | None = None,
+        start: IntruderStart | None = None,
+        hold_ticks: int = 0,
     ) -> None:
         self._mode = ControlMode(request.mode)
         companion = self._mode == ControlMode.COMPANION
         self._actor_id = COMPANION_ID if companion else level.operative_id
         spawns = tuple(
-            replace(spawn, actor_id=self._actor_id, kind=ActorKind.COMPANION)
-            if companion and spawn.actor_id == level.operative_id
+            replace(
+                spawn,
+                actor_id=self._actor_id,
+                kind=ActorKind.COMPANION if companion else spawn.kind,
+                tile=start.tile if start is not None and start.tile is not None else spawn.tile,
+            )
+            if spawn.actor_id == level.operative_id
             else spawn
             for spawn in level.spawns()
         )
+        if not 0 <= hold_ticks <= 3_600:
+            raise ValueError("A deployment hold must be 0-3600 ticks")
+        # Experiment deployment delay: the Companion waits this many ticks first.
+        self.hold_ticks = hold_ticks
         self.simulation = Simulation(
             level.static_map,
             spawns,
@@ -95,6 +118,8 @@ class AutonomousMission:
             seed=request.seed,
             security=registry.spec(sensors, protocol),
             environment=environment,
+            scoring=scoring,
+            intruder_start=start,
         )
         self.request, self.protocol = request, protocol
         self.controller = (
@@ -112,7 +137,11 @@ class AutonomousMission:
         )
         self._protocol_state = protocol_state
         self._on_end = on_end
+        self._on_result = on_result
         self._ended = False
+        # Own committed tool uses (TOOL_USED by this actor), for the report.
+        self.tools = ToolUsage()
+        self.terminal: RunResult | None = None
         self._telemetry = self._sample()
 
     # MissionRuntime -------------------------------------------------------
@@ -139,15 +168,37 @@ class AutonomousMission:
             result = self.simulation.step(abort=True)
         elif self.controller is not None:
             if self.simulation.presentation_snapshot().mission_end is None:
-                choice = self.controller.act(self.simulation.observe(self._actor_id))
+                observation = self.simulation.observe(self._actor_id)
+                choice = (
+                    Action(self._actor_id, ActionKind.WAIT, observation.tick)
+                    if observation.tick < self.hold_ticks
+                    else self.controller.act(observation)
+                )
                 result = self.simulation.step((choice,))
             else:
                 result = self.simulation.step(())
         else:
             result = self.simulation.step(supplied)
         self._telemetry = self._sample()
+        used = [
+            str(dict(e.details).get("tool"))
+            for e in result.events
+            if e.kind == EventKind.TOOL_USED and e.actor_id == self._actor_id
+        ]
+        if used:
+            self.tools = ToolUsage(
+                self.tools.echo + used.count("ECHO"),
+                self.tools.emp + used.count("EMP"),
+                self.tools.melee + used.count("MELEE"),
+            )
+        if result.terminal is not None:
+            policy_id = policy_weights(self.request.policy).policy_id if self.controller else None
+            self.terminal = replace(result.terminal, policy_id=policy_id)
+            result = replace(result, terminal=self.terminal)
         if result.mission_end is not None and not self._ended:
             self._ended = True
+            if self._on_result is not None and self.terminal is not None:
+                self._on_result(self.request, self.terminal, self.tools)
             if self._on_end is not None:
                 # The service records this attempt once and returns its new state.
                 self._protocol_state = self._on_end(

@@ -1,0 +1,111 @@
+{
+  "deterministic_hash": "279ce5309092a7bf0e1ae2ade1c229e54788cad44d9387b819a27108e8f82e40",
+  "metadata": {
+    "commit": "765a164",
+    "environment_hash": "26395c81724b7e7d57cafe060f48d7d9d7a3e42f3bdd4f24003c49a02bf5c546",
+    "map_hash": "508876852551cd73110ea6b8f4015025a848d6505bd38bc3a0fd402a7737f0df",
+    "nexus_memory": "reset baseline (no protocol)",
+    "pace_reference_ticks": 27000,
+    "registry_revision": "8df64eef74a3640c4924e185aeb63a24de35d9da1f83e53bba0ef9f640aade03",
+    "rng": "seeded per scenario (companion-mcts stream)",
+    "rules_hash": "3f3ca42ccd1a881f2487707cf57b2a5d85778412ddae6ce5027a795dc5fa791e",
+    "scoring": "449cd33e04f1eede1777dc9bc561e6793a8c0264ba122797b6ea7bc3915ae62b",
+    "scoring_version": 1,
+    "sensors_hash": "4594f530d051eb37885f50d3ab547330f510faa0ecf8c7115ba408a84dfd0546",
+    "suite": "vault-five-zone/v1",
+    "tick_cap": 9000,
+    "uv_lock_sha256": "f4961e410a9a17247044750ab300d4ec277bc16970487ac4bd2046db23e264d5",
+    "version": "0.1.0a1"
+  },
+  "profiling": {
+    "machine": "x86_64",
+    "processor": "x86_64",
+    "python": "3.13.17",
+    "seconds": 210.5,
+    "system": "Linux",
+    "tick_ms_p95_max_across_runs": 5.0091,
+    "tick_ms_p95_median_across_runs": 2.8075
+  },
+  "repeat_first_run_matches": true,
+  "summary": {
+    "BALANCED": {
+      "grades": {
+        "A": 4,
+        "B": 4,
+        "F": 16
+      },
+      "mean_encounters": 2.08,
+      "mean_tools": [
+        2.58,
+        0.92,
+        1.38
+      ],
+      "median_win_ticks": 1699.5,
+      "outcomes": {
+        "CAPTURED": 16,
+        "WIN": 8
+      },
+      "runs": 24,
+      "win_rate": 0.333
+    },
+    "CUSTOM": {
+      "grades": {
+        "A": 6,
+        "B": 5,
+        "F": 13
+      },
+      "mean_encounters": 2.38,
+      "mean_tools": [
+        2.54,
+        0.92,
+        1.42
+      ],
+      "median_win_ticks": 1898,
+      "outcomes": {
+        "CAPTURED": 13,
+        "WIN": 11
+      },
+      "runs": 24,
+      "win_rate": 0.458
+    },
+    "GHOST": {
+      "grades": {
+        "B": 3,
+        "F": 21
+      },
+      "mean_encounters": 2.08,
+      "mean_tools": [
+        1.88,
+        0.83,
+        1.79
+      ],
+      "median_win_ticks": 2921,
+      "outcomes": {
+        "CAPTURED": 21,
+        "WIN": 3
+      },
+      "runs": 24,
+      "win_rate": 0.125
+    },
+    "RUSH": {
+      "grades": {
+        "A": 10,
+        "B": 3,
+        "F": 11
+      },
+      "mean_encounters": 2.0,
+      "mean_tools": [
+        2.71,
+        0.83,
+        1.42
+      ],
+      "median_win_ticks": 1460,
+      "outcomes": {
+        "CAPTURED": 11,
+        "WIN": 13
+      },
+      "runs": 24,
+      "win_rate": 0.542
+    }
+  }
+}

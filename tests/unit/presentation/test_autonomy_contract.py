@@ -26,6 +26,18 @@ def test_nested_decision_values_are_detached_from_mutable_inputs() -> None:
     assert trace.path == ((1, 1), (1, 2)) and len(trace.alternatives) == 1
 
 
+def test_workshop_presets_match_the_backend_presets() -> None:
+    from echo_heist.core.contracts.autonomy.policy import PRESETS
+    from echo_heist.ui.scenes.companion.deployment import selection
+    from echo_heist.ui.scenes.design.model import PRESETS as NAMES
+    from echo_heist.ui.scenes.design.model import WorkshopDraft
+
+    for index, name in enumerate(NAMES):
+        draft = WorkshopDraft()
+        draft.select_preset(index)
+        assert selection(draft) == PRESETS[name]
+
+
 def test_decision_panel_keeps_a_chosen_action_beyond_the_first_four_rows(monkeypatch) -> None:
     import pygame
 

@@ -91,7 +91,11 @@ def test_results_retry_and_new_seed_preserve_mode_and_do_not_start_unavailable_c
     flow.frame([key(pygame.K_ESCAPE)], 0)
     flow.frame([click(PAUSE_BUTTONS[3])], 0)
     flow.frame([click(ABORT_BUTTONS[0])], 0)
-    assert flow.scene == Scene.RESULTS and flow.reports.report is None
+    # P06: even without a saved-history service the Simulation's own approved
+    # terminal result is authoritative: an abort is 0/F.
+    report = flow.reports.report
+    assert flow.scene == Scene.RESULTS and report is not None
+    assert (report.result.score, report.result.grade) == (0, "F")
     flow.frame([key(pygame.K_d), key(pygame.K_r)], 0)
     assert flow.inspector.open and flow.runs_started == 1
     flow.frame([key(pygame.K_ESCAPE)], 0)

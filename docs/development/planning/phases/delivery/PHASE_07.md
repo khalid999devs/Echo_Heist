@@ -2,7 +2,7 @@
 
 2026-10-31 user-authorized independent work is recorded in the [P06/current-build review handoff](../../../tracking/handoffs/khalid/day_03/P06.md). Ready consumers and delivery preparation do not close this phase's combined runtime/platform gate.
 
-Day 4, first block. Integrator: **Khalid**. Remaining effort: Khalid 9, Suhita 6. Status: IN_PROGRESS (independent Khalid subset only). Prerequisite: P06. Feature anchors: EH-026 and harness/fixtures portion of EH-027. Source: PDF pp. 15-19.
+Day 4, first block. Integrator: **Khalid**. Remaining effort: Khalid 9, Suhita 6. Status: IN_PROGRESS (independent Khalid subset; Suhita's P07-SR1/SR2 on `work/suhita-p06-p08`, see her [handoff](../../../tracking/handoffs/suhita/day_04/P06_P08.md)). Prerequisite: P06. Feature anchors: EH-026 and harness/fixtures portion of EH-027. Source: PDF pp. 15-19.
 
 Ownership revised 2026-10-22: [remaining-work allocation](../../WORKLOAD.md). **KR/SR IDs supersede the original P03-P08 assignments for future work; completed subsets remain credited.** Reuse the [latest consumer baseline](../../../tracking/handoffs/khalid/presentation/CINEMATIC_STARTUP.md). Khalid leads graphics/presentation; Suhita leads gameplay logic. The integration lead closes the phase only after both revised queues and the combined gate pass.
 

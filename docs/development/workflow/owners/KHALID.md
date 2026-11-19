@@ -1,8 +1,8 @@
 # Khalid's agent guide
 
-## Current instructions · 2026-11-19
+## Current instructions · 2026-11-20
 
-Use the [two-exit candidate handoff](../../tracking/handoffs/khalid/day_04/RELEASE_CANDIDATE.md) and [Status](../../tracking/STATUS.md). PRs #9/#10 are merged. Preserve prior commits and use current main (fingerprint 14, 330 tests). Earlier branches, setup counts and unfinished runtime descriptions below are historical.
+Use the [desktop candidate handoff](../../tracking/handoffs/khalid/day_04/RELEASE_CANDIDATE.md) and [Status](../../tracking/STATUS.md). Earlier branches, setup counts and unfinished runtime descriptions below are historical.
 
 Maintain the final Mac package, candidate evidence and release handoff. Physical Windows acceptance and public release gates remain open.
 

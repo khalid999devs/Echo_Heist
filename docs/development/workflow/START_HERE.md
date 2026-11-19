@@ -1,6 +1,6 @@
 # Start or resume developer work
 
-Updated **2026-11-19**. PRs #9/#10 are merged. Main has the scoring/Workshop/history services, two exits, stronger confirmed pursuit and the candidate QA pass. Read [Status](../tracking/STATUS.md) and the [two-exit handoff](../tracking/handoffs/khalid/day_04/RELEASE_CANDIDATE.md) for current evidence and platform gaps. Fingerprint 14 and 330 locked tests supersede all previous branch/schema/test-count instructions.
+Updated **2026-11-20**. Read [Status](../tracking/STATUS.md) and the [desktop candidate handoff](../tracking/handoffs/khalid/day_04/RELEASE_CANDIDATE.md) for the active Core security revision, replay/test baseline and remaining platform checks.
 
 Suhita's current delivery work is P08-SR1 physical Windows QA on the candidate. Khalid maintains the Mac build and integrates delivery evidence. Both plans retain the four main guards, approved scoring, timed sprint and limited melee. Existing dated implementation records remain historical.
 

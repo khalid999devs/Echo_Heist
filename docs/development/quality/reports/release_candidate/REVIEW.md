@@ -1,5 +1,7 @@
 # Two-exit desktop candidate verification
 
+This report records the November 19 baseline. See the [Core security review](CORE_SECURITY.md) for the revised guard roster, current balance and package evidence.
+
 2026-11-19, Khalid. The clean source build used `65160e99406aef8c7b1e12018521abc8f309f307`. Main merge `876c7bdc28d75a90a117dc81821f461c86f6e3e0` has the same tree. Game 0.1.0a1, fingerprint 14, Python 3.13.16, pygame-ce 2.5.8, SDL 2.32.10. Local Mac is Apple M4, 16 GiB, macOS 26.4.1 arm64.
 
 Suhita's approved score, profile/history/preferences service and experiment runner were accepted from [PR #9](https://github.com/khalid999devs/Echo_Heist/pull/9). The exact PR head passed 328 local locked tests before the second exit work. [PR #10](https://github.com/khalid999devs/Echo_Heist/pull/10) adds Cargo Airlock, stronger pursuit, recovery from AI retreat loops, title history access, the Workshop NEXUS memory switch and real decision notes in terminal reports.

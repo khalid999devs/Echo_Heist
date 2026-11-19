@@ -1,10 +1,10 @@
 # Suhita's agent guide
 
-## Current instructions · 2026-11-19
+## Current instructions · 2026-11-20
 
-Use the [two-exit candidate handoff](../../tracking/handoffs/khalid/day_04/RELEASE_CANDIDATE.md) and [Status](../../tracking/STATUS.md). PRs #9/#10 are merged. Preserve prior commits and use current main (fingerprint 14, 330 tests). Earlier branches, setup counts and unfinished runtime descriptions below are historical.
+Use the [desktop candidate handoff](../../tracking/handoffs/khalid/day_04/RELEASE_CANDIDATE.md) and [Status](../../tracking/STATUS.md). Earlier branches, setup counts and unfinished runtime descriptions below are historical.
 
-Your gameplay implementation and 96-run comparison are integrated. The remaining P08-SR1 task is physical Windows QA on the exact two-exit candidate. Retrieve the earlier [Windows checklist](../../quality/reports/phase08/suhita/WINDOWS_QA.md) and use a fresh QA data directory. Keep gameplay and build/archive evidence tied to the tested commit.
+Your gameplay implementation and comparison harness are integrated. The remaining P08-SR1 task is physical Windows QA on the current Core security revision. Retrieve the earlier [Windows checklist](../../quality/reports/phase08/suhita/WINDOWS_QA.md) and use a fresh QA data directory. Keep gameplay and build/archive evidence tied to the tested commit.
 
 ## Earlier checkpoint instructions
 

@@ -1,10 +1,10 @@
 # Suhita: Windows setup and current-main handoff
 
-## Current instructions — 2026-11-10
+## Current instructions — 2026-11-20
 
-PRs #5/#6 are merged into main after review fixes. **Fingerprint 12 / 301 tests**; real Companion/Interceptor/NEXUS/protocol reset and physical props are implemented. Read the [merged runtime handoff](../../quality/reports/phase05/review/INTEGRATION.md) and current [Status](../../tracking/STATUS.md). Fetch current main while preserving local changes/unpushed commits; do not recreate or resume the merged P04/P05 branches. Use a new branch for newly assigned work.
+Read [Status](../../tracking/STATUS.md) and the [runnable release handoff](../../tracking/handoffs/khalid/day_04/RELEASE_CANDIDATE.md). Fetch current main while preserving local changes and unpublished commits. Use a new branch for newly assigned fixes.
 
-P04 actual-data Mac visual review is recorded. Remaining connected P05 review covers native door/glass/ability cues and current-build physical Windows gameplay. Full gate sign-off remains with the integration lead. P06 scoring/encounters, editable policies/profiles, history and extra preferences persistence are still pending; ready consumers must be reused when that slice is assigned. No automatic later-phase implementation is authorized by the PR merge.
+Build the current Windows x64 candidate and run the physical P08 checklist. Include both exits, a capture and retry, a pursuit escaped through cover, stun audio and nearby guard reaction. Record the actual commit, archive hash and observed behavior.
 
 The earlier dated instructions below are historical checkpoints. Their P04/P05 implementation queues, unavailable-Companion statements, old branch commands and fingerprint/test baselines are superseded by this section. Preserve their contracts and authorship. Windows setup commands remain usable; replace old data/output directory names with the current review name and omit creation of the merged work branch.
 

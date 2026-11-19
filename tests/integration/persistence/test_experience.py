@@ -78,6 +78,7 @@ def test_scored_reports_are_authoritative_matched_and_persisted(
     assert Achievement.AI_MASTER in scored.achievements and scored.policy_label == "Balanced"
     assert r.policy_id == "BALANCED-RETREAT-EMP_IF_TRAPPED-BALANCED"
     assert r.decisive_events and r.decisive_events[-1].kind.value == "MISSION_ENDED"
+    assert any(dict(event.details).get("algorithm") == "MCTS" for event in r.decisive_events)
     # A fresh process sees the same history, newest first.
     again = connect_experience(connect_gateway(level, rules, sensors, tmp_path), tmp_path)
     assert [h.run_key for h in again.history()] == ["app:2", "app:1"]

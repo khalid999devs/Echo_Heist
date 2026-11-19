@@ -2,6 +2,7 @@
 
 import pygame
 
+from echo_heist.core.contracts.events import EventKind
 from echo_heist.core.contracts.experience.model import Achievement, ResultRequest, RunReport
 from echo_heist.core.contracts.results import MissionEnd, RunOutcome
 from echo_heist.ui.presenters.reporting import ReportState
@@ -170,10 +171,11 @@ class ReportInspector:
         )
         canvas.blit(fonts.heading.render("MISSION DETAILS", True, theme.TEXT), (78, 119))
         rows: tuple[str, ...]
+        decisions: list[str] = []
         if report:
             r = report.result
             rows = (
-                f"{r.mode} / Seed {r.seed} / {report.policy_label}",
+                f"{r.outcome.value}  /  {r.mode}  /  Seed {r.seed}  /  {report.policy_label}",
                 f"Score {r.score}   Rank {r.grade}   Encounters {r.detection_encounters}",
                 f"Extraction {r.completion_points}/50   Stealth {r.stealth_points}/40   "
                 f"Pace {r.pace_points}/10",
@@ -181,6 +183,22 @@ class ReportInspector:
                 f"Scoring version {r.scoring_version} / Pace reference "
                 f"{r.pace_reference_ticks // report.ticks_per_second}s",
             )
+            for event in r.decisive_events:
+                if event.kind != EventKind.POLICY_DECISION:
+                    continue
+                data = dict(event.details)
+                if data.get("algorithm") == "MCTS" and isinstance(
+                    reason := data.get("reason"), str
+                ):
+                    decisions.append(reason)
+                elif data.get("algorithm") == "ALPHA-BETA" and isinstance(
+                    gate := data.get("post"), str
+                ):
+                    post = gate.removeprefix("choke-").replace("-", " ")
+                    decisions.append(
+                        f"Interceptor selected {post} "
+                        f"({data.get('evaluated', 0)} leaves, {data.get('pruned', 0)} pruned)"
+                    )
         else:
             request = self.state.request
             rows = (
@@ -198,8 +216,12 @@ class ReportInspector:
             "Confirmed encounters reduce stealth. Hearing and suspicion alone do not count. "
             "Tool use is unpenalized."
         )
-        for i, row in enumerate(lines(fonts.small, explanatory, 1070, 2)):
-            canvas.blit(fonts.small.render(row, True, theme.MUTED), (80, 432 + i * 28))
+        notes = decisions or lines(fonts.small, explanatory, 1070, 2)
+        for i, row in enumerate(notes):
+            canvas.blit(
+                fonts.small.render(fit(fonts.small, row, 1070), True, theme.MUTED),
+                (80, 432 + i * 28),
+            )
         label(canvas, fonts, fit(fonts.micro, self.state.notice, 1070), (80, 526))
         position = f"{self.index + 1} / {len(self.history)}" if self.index >= 0 else "Current"
         label(canvas, fonts, "ARROWS Browse    ESC Close    " + position, (80, 565))

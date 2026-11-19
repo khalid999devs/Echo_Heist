@@ -1,12 +1,12 @@
 # V1 scope and traceability
 
-Authority: [blueprint](../../idea/ECHO_HEIST_Complete_V1_Game_Development_Blueprint.pdf), with the user's explicit platform priorities, eight-phase/four-day working-draft target, named workload and chat-approved scoring revision. Implementation and test artifacts listed below are planned, not existing.
+Authority: [blueprint](../../idea/ECHO_HEIST_Complete_V1_Game_Development_Blueprint.pdf), with the user's explicit platform priorities, eight-phase/four-day working-draft target, named workload and chat-approved scoring revision. Current verification and delivery status are in [Status](../tracking/STATUS.md).
 
 ## Required scope
 
 | ID | Requirement | PDF pages | Planned acceptance evidence |
 | --- | --- | --- | --- |
-| R01 | One Chapter One heist: enter, steal core, mandatory lockdown, return to original extraction | 1-3, 6 | T02, T08; complete gameplay recording |
+| R01 | One Chapter One heist: enter, steal core, mandatory lockdown, escape through Entry or Cargo Airlock | 1-3, 6 | T02, T08; complete gameplay recording |
 | R02 | Human vs AI and autonomous Companion vs defenders available on first launch | 1, 5, 12, 15, 18 | T01; fresh-profile checks in both packages |
 | R03 | Five connected zones, upper/lower branches, a cross-link, valid return paths during lockdown | 3 | Map validator, route checks, physical playthrough |
 | R04 | Capture-based failure; discovery and noise remain recoverable; no health/combat damage system | 6, 8 | Capture, escape, stun, and terminal-order integration tests |

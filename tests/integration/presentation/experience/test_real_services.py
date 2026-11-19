@@ -11,6 +11,7 @@ from echo_heist.infrastructure.resources import load_game_rules, load_sensor_rul
 from echo_heist.ui.render.autonomy.protocols import TOGGLE_MEMORY
 from echo_heist.ui.scenes.companion.deployment import selection
 from echo_heist.ui.scenes.design.workshop import WORKSHOP_CONTROLS
+from echo_heist.ui.scenes.experience.preferences import EXTRA_SETTINGS, KEY_FOOTER, KEY_ROWS
 from echo_heist.ui.scenes.experience.profiles import PROFILE_ACTIONS, PROFILE_BUTTON
 from echo_heist.ui.scenes.flow import GameFlow, Scene, load_level
 from echo_heist.ui.scenes.menus import CHAPTER_CARD, MODE_BUTTONS, TITLE_BUTTONS
@@ -30,6 +31,13 @@ def test_real_report_history_profile_and_preferences_round_trip(tmp_path: Path) 
         experience_gateway=experience,
     )
     assert flow.preferences.preferences.high_contrast and not flow.preferences.notice
+    for rect in (TITLE_BUTTONS[2], EXTRA_SETTINGS[0], KEY_ROWS[3]):
+        flow.frame([pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=rect.center)], 0)
+    flow.frame([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_l)], 0)
+    flow.frame([pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=KEY_FOOTER[1].center)], 0)
+    assert flow.preferences.notice == "Preferences saved."
+    for _ in range(2):
+        flow.frame([pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE)], 0)
     assert flow._start_run()
     flow.airlock.skip()
     session = flow.session
@@ -55,6 +63,10 @@ def test_real_report_history_profile_and_preferences_round_trip(tmp_path: Path) 
         rules=rules,
         autonomy_gateway=relaunched_gateway,
         experience_gateway=connect_experience(relaunched_gateway, tmp_path),
+    )
+    assert any(
+        item.action == "right" and pygame.K_l in item.keys
+        for item in relaunched.preferences.preferences.controls
     )
     relaunched.frame(
         [pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=TITLE_BUTTONS[1].center)], 0

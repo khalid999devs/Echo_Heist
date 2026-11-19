@@ -17,7 +17,7 @@ from echo_heist.ui.scenes.settings import OPTION_RECTS, adjust, click, draw_sett
 
 EXTRA_SETTINGS = (pygame.Rect(640, 260, 548, 58), pygame.Rect(640, 344, 548, 58))
 KEY_ROWS = tuple(pygame.Rect(64 + i // 5 * 584, 190 + i % 5 * 74, 552, 62) for i in range(10))
-KEY_FOOTER = (pygame.Rect(64, 596, 552, 48), pygame.Rect(648, 596, 552, 48))
+KEY_FOOTER = tuple(pygame.Rect(64 + i * 384, 596, 368, 48) for i in range(3))
 ACCESS_ROWS = (
     pygame.Rect(64, 210, 1136, 78),
     pygame.Rect(64, 312, 1136, 78),
@@ -50,6 +50,16 @@ class PreferencesPanel:
 
     def reset_page(self) -> None:
         self.page, self.selected, self.capturing, self.dragging = "GENERAL", 0, None, None
+
+    def _save(self) -> None:
+        if self.gateway is None:
+            self.notice = "Applied for this session. Saving is unavailable in this build."
+            return
+        try:
+            self.gateway.save_preferences(self.preferences)
+            self.notice = "Preferences saved."
+        except (ExperienceUnavailable, ValueError) as error:
+            self.notice = str(error)
 
     def handle(self, events: list[pygame.event.Event], settings: Settings) -> tuple[Settings, bool]:
         for event in events:
@@ -127,6 +137,8 @@ class PreferencesPanel:
                 elif activate == 10:
                     self.preferences = replace(self.preferences, controls=())
                     self.notice = "Default controls restored for this session."
+                elif activate == 11:
+                    self._save()
                 else:
                     self.reset_page()
             elif activate < 2:
@@ -138,15 +150,7 @@ class PreferencesPanel:
                 )
                 self.notice = "Applied for this session."
             elif activate == 2:
-                try:
-                    if self.gateway is None:
-                        raise ExperienceUnavailable(
-                            "Applied for this session. Saving is unavailable in this build."
-                        )
-                    self.gateway.save_preferences(self.preferences)
-                    self.notice = "Preferences saved."
-                except (ExperienceUnavailable, ValueError) as error:
-                    self.notice = str(error)
+                self._save()
             else:
                 self.reset_page()
         return settings, False
@@ -180,8 +184,15 @@ class PreferencesPanel:
                 for i, action in enumerate(ACTIONS):
                     text = f"{action.replace('_', ' ').upper()}    {key_label(bindings, action)}"
                     button(canvas, KEY_ROWS[i], text, fonts, self.selected == i)
-                for i, name in enumerate(("RESTORE DEFAULTS", "BACK")):
-                    button(canvas, KEY_FOOTER[i], name, fonts, self.selected == i + 10)
+                for i, name in enumerate(("RESTORE DEFAULTS", "SAVE PREFERENCES", "BACK")):
+                    button(
+                        canvas,
+                        KEY_FOOTER[i],
+                        name,
+                        fonts,
+                        self.selected == i + 10,
+                        enabled=i != 1 or self.gateway is not None,
+                    )
             else:
                 descriptions = (
                     (

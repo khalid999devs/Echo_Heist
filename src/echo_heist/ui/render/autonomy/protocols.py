@@ -9,7 +9,8 @@ from echo_heist.ui.render.layout.text import lines
 from echo_heist.ui.render.theme import Fonts
 from echo_heist.ui.scenes.navigation.controls import button
 
-RESET_MEMORY = pygame.Rect(64, 578, 296, 44)
+RESET_MEMORY = pygame.Rect(64, 578, 142, 44)
+TOGGLE_MEMORY = pygame.Rect(218, 578, 142, 44)
 RESET_BUTTONS = (pygame.Rect(334, 424, 282, 48), pygame.Rect(638, 424, 282, 48))
 
 
@@ -19,6 +20,8 @@ def draw_protocol(
     state: ProtocolState | None,
     *,
     selected: bool = False,
+    toggle_selected: bool = False,
+    can_toggle: bool = False,
 ) -> None:
     rect = pygame.Rect(62, 384, 300, 238)
     panel(canvas, rect, fill=(5, 18, 27, 238))
@@ -44,10 +47,18 @@ def draw_protocol(
     button(
         canvas,
         RESET_MEMORY,
-        "RESET MEMORY",
+        "RESET",
         fonts,
         selected,
         enabled=state is not None and state.can_reset,
+    )
+    button(
+        canvas,
+        TOGGLE_MEMORY,
+        "TURN OFF" if state and state.enabled else "TURN ON",
+        fonts,
+        toggle_selected,
+        enabled=can_toggle,
     )
 
 

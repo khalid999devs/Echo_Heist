@@ -81,7 +81,8 @@ def draw_minimap(
     base = (layer or MinimapLayer()).base(source, (left, top, width, height))
     canvas.blit(base, (round(origin[0]), round(origin[1])))
     anchors = {obj.object_id: obj.tile for obj in level.static_map.objects}
-    markers = [(anchors[level.exit_id], theme.ACCENT), (operative_tile, theme.TEXT)]
+    markers = [(anchors[key], theme.ACCENT) for key in level.exit_ids]
+    markers.append((operative_tile, theme.TEXT))
     if phase == MissionPhase.INFILTRATE:
         markers.append((anchors[level.core_id], theme.WARNING))
     for tile, color in markers:

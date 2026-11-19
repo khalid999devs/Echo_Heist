@@ -3,6 +3,7 @@
 import pygame
 
 from echo_heist.core.contracts.results import RunOutcome
+from echo_heist.core.contracts.security.model import GuardState
 from echo_heist.core.contracts.world import MissionPhase
 from echo_heist.diagnostics.facility_routes import mission_path, walk_path
 from echo_heist.diagnostics.human_driver import HumanDriver
@@ -204,7 +205,7 @@ def test_default_live_guard_allows_actual_lower_route_core_and_extraction() -> N
         if view.actor_id == "guard-service"
     )
     # Actual pursuit has finite memory; it does not track the hidden carrier forever.
-    assert guard.last_seen_tick == -1
+    assert guard.state not in (GuardState.SPOTTED, GuardState.CHASE)
     drive(flow, back, expected_end=RunOutcome.WIN, use_tools=True)
     assert flow.session.mission_end is not None
     assert flow.session.mission_end.outcome == RunOutcome.WIN

@@ -394,7 +394,18 @@ def build_level(raw: RawMap) -> LevelData:
             if type(rotation) is not int or rotation not in (0, 90, 180, 270):
                 raise MapFormatError(f"{obj.object_id!r}: unsupported floor detail rotation")
             details.append(FloorDetail(obj.object_id, str(style), *obj.rect, rotation))
-    spawn, exit_anchor, core = one("Spawn"), one("Exit"), one("Core")
+    spawn, core = one("Spawn"), one("Core")
+    exits = of("Exit")
+    primary = [obj for obj in exits if obj.properties.get("alternate", False) is False]
+    if (
+        len(exits) > 2
+        or len(primary) != 1
+        or any(type(obj.properties.get("alternate", False)) is not bool for obj in exits)
+    ):
+        raise MapFormatError(
+            "Expected one primary Exit and at most one alternate Exit with a boolean flag"
+        )
+    exit_anchor = primary[0]
     operative = _text(spawn.properties.get("actor_id", "operative"), "Spawn actor_id")
     guards: list[GuardPost] = []
     for obj in of("GuardSpawn"):
@@ -491,6 +502,7 @@ def build_level(raw: RawMap) -> LevelData:
             for obj in of("Deck")
             if obj.rect is not None
         ),
+        tuple(obj.object_id for obj in exits if obj != exit_anchor),
     )
 
 

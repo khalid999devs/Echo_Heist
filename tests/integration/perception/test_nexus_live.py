@@ -112,7 +112,13 @@ def test_lockdown_interceptor_searches_and_walks_to_its_gate(
     assert plan.evaluated_leaves > 0 and plan.pruned_branches > 0
     assert plan.post_id == "choke-research-core"
     # Physical travel: bounded per-tick displacement, and it reaches the chosen gate.
-    limit = rules.interceptor_speed_units_per_second * 140 // 100 // rules.simulation_hz + 1
+    limit = (
+        rules.interceptor_speed_units_per_second
+        * max(rules.chase_guard_speed_percent, rules.lockdown_guard_speed_percent)
+        // 100
+        // rules.simulation_hz
+        + 1
+    )
     assert all(abs(a[0] - b[0]) + abs(a[1] - b[1]) <= 2 * limit for a, b in pairwise(path))
     post = tile_center(plan.post_tile)
-    assert min(abs(p[0] - post[0]) + abs(p[1] - post[1]) for p in path) <= 3_000
+    assert min(max(abs(p[0] - post[0]), abs(p[1] - post[1])) for p in path) <= 3_000

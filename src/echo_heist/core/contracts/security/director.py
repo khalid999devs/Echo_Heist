@@ -49,12 +49,27 @@ class RouteGraph:
     core_tile: Tile
     exit_tile: Tile
     distances: tuple[tuple[str, str, int], ...]
+    alternate_exits: tuple[Tile, ...] = ()
+
+    @property
+    def exit_tiles(self) -> tuple[Tile, ...]:
+        return (self.exit_tile, *self.alternate_exits)
+
+    def anchor_name(self, tile: Tile) -> str:
+        if tile == self.core_tile:
+            return "CORE"
+        if tile == self.exit_tile:
+            return "EXIT"
+        return f"EXIT-{self.alternate_exits.index(tile) + 2}"
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "zones", tuple(self.zones))
         object.__setattr__(self, "nodes", tuple(self.nodes))
         object.__setattr__(self, "core_tile", immutable_tile(self.core_tile))
         object.__setattr__(self, "exit_tile", immutable_tile(self.exit_tile))
+        object.__setattr__(
+            self, "alternate_exits", tuple(map(immutable_tile, self.alternate_exits))
+        )
         object.__setattr__(self, "distances", tuple(self.distances))
         if len({node.node_id for node in self.nodes}) != len(self.nodes):
             raise ValueError("Route nodes need unique IDs")

@@ -86,3 +86,11 @@ def test_guard_bodies_no_longer_deadlock_a_pursuit(facility: Facility, suite: Su
     scenario = next(s for s in suite.scenarios if s.scenario_id == "s06-upper-stairs-late")
     record = run_scenario(facility, scenario, "BALANCED", PRESETS["BALANCED"], suite.tick_cap)
     assert record["outcome"] != "TIMEOUT"
+
+
+def test_rush_resumes_goal_progress_after_repeated_retreats(
+    facility: Facility, suite: Suite
+) -> None:
+    scenario = next(s for s in suite.scenarios if s.scenario_id == "s03-patrol-6s")
+    record = run_scenario(facility, scenario, "RUSH", PRESETS["RUSH"], 4_000)
+    assert record["outcome"] == "WIN" and record["extraction_id"] in facility.level.exit_ids

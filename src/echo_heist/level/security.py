@@ -93,6 +93,11 @@ def build_route_graph(level: LevelData) -> RouteGraph:
         "CORE": next(obj.tile for obj in world_map.objects if obj.object_id == level.core_id),
         "EXIT": next(obj.tile for obj in world_map.objects if obj.object_id == level.exit_id),
     }
+    exit_tiles = tuple(
+        next(obj.tile for obj in world_map.objects if obj.object_id == key)
+        for key in level.alternate_exit_ids
+    )
+    anchors.update((f"EXIT-{index}", tile) for index, tile in enumerate(exit_tiles, 2))
     nodes = tuple(
         RouteNode(point.point_id, point.tile, point.zones)
         for point in sorted(level.chokepoints, key=lambda value: value.point_id)
@@ -112,6 +117,7 @@ def build_route_graph(level: LevelData) -> RouteGraph:
         anchors["CORE"],
         anchors["EXIT"],
         tuple(distances),
+        exit_tiles,
     )
 
 

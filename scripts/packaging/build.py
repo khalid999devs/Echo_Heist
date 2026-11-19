@@ -6,11 +6,15 @@ import platform
 import shutil
 import subprocess
 import sys
+from dataclasses import asdict
 from hashlib import file_digest
 from importlib.metadata import version
 from pathlib import Path
 
 from echo_heist import __version__
+from echo_heist.core.simulation.replay import FINGERPRINT_SCHEMA, canonical_hash, map_hash
+from echo_heist.infrastructure.resources import load_game_rules, load_scoring_rules, resource_bytes
+from echo_heist.level.io import load_tiled_map
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -64,9 +68,14 @@ def main() -> int:
     changes = subprocess.run(
         ["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True, check=True
     ).stdout.strip()
+    level = load_tiled_map(resource_bytes("data/maps/vault-five-zone.json"))
     manifest = {
         "version": __version__,
-        "stage": "Human stealth vertical slice; full V1 remains in development",
+        "stage": "ECHO HEIST V1 desktop release candidate",
+        "fingerprint_schema": FINGERPRINT_SCHEMA,
+        "map_hash": map_hash(level.static_map),
+        "gameplay_hash": canonical_hash(asdict(load_game_rules())),
+        "scoring_hash": canonical_hash(asdict(load_scoring_rules())),
         "target": target,
         "python": platform.python_version(),
         "host_os": platform.platform(),

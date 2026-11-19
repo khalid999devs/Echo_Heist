@@ -8,7 +8,9 @@ from echo_heist.autonomy.gateway import connect_experience, connect_gateway
 from echo_heist.core.contracts.autonomy.policy import PRESETS
 from echo_heist.core.contracts.experience.model import DesktopPreferences
 from echo_heist.infrastructure.resources import load_game_rules, load_sensor_rules
+from echo_heist.ui.render.autonomy.protocols import TOGGLE_MEMORY
 from echo_heist.ui.scenes.flow import GameFlow, Scene, load_level
+from echo_heist.ui.scenes.menus import TITLE_BUTTONS
 
 
 def test_real_report_history_profile_and_preferences_round_trip(tmp_path: Path) -> None:
@@ -41,3 +43,23 @@ def test_real_report_history_profile_and_preferences_round_trip(tmp_path: Path) 
     saved = experience.save_profile("Quiet", PRESETS["GHOST"])
     flow.profiles.refresh()
     assert flow.profiles.profiles == (saved,) and not flow.profiles.notice
+
+    # A fresh flow represents a relaunch with persisted history/preferences.
+    relaunched_gateway = connect_gateway(level, rules, load_sensor_rules(), tmp_path)
+    relaunched = GameFlow(
+        (1280, 720),
+        level=level,
+        rules=rules,
+        autonomy_gateway=relaunched_gateway,
+        experience_gateway=connect_experience(relaunched_gateway, tmp_path),
+    )
+    relaunched.frame(
+        [pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=TITLE_BUTTONS[1].center)], 0
+    )
+    assert relaunched.inspector.open and relaunched.inspector.history[0].run_key == report.run_key
+    relaunched.inspector.open = False
+    relaunched.scene = Scene.WORKSHOP
+    relaunched.frame(
+        [pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=TOGGLE_MEMORY.center)], 0
+    )
+    assert not connect_gateway(level, rules, load_sensor_rules(), tmp_path).protocols().enabled

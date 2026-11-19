@@ -199,9 +199,13 @@ def light_pool(
 @lru_cache(maxsize=24)
 def _soft_light(radius: int, color: theme.Color) -> pygame.Surface:
     layer = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
+    previous_alpha = 0
     for distance in range(radius, 0, -1):
         alpha = round(32 * (1 - distance / radius) ** 2)
-        pygame.draw.circle(layer, (*color, alpha), (radius, radius), distance)
+        if alpha != previous_alpha:
+            # Smaller circles with the same colour overwrite identical pixels.
+            pygame.draw.circle(layer, (*color, alpha), (radius, radius), distance)
+            previous_alpha = alpha
     return layer
 
 

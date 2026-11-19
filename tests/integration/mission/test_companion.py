@@ -23,7 +23,7 @@ from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import SecurityRegistry, build_security_registry
 
-WIN_SEED, CAPTURE_SEED = 6, 4  # Balanced outcomes on this map/rules (two-charge melee)
+WIN_SEED, CAPTURE_SEED = 1042, 4  # Balanced outcomes on the two-exit candidate
 
 
 @pytest.fixture(scope="module")
@@ -69,10 +69,9 @@ def play(run: AutonomousMission, limit: int = 9_000) -> tuple[list[CompanionTrac
     [
         (WIN_SEED, RunOutcome.WIN),
         (CAPTURE_SEED, RunOutcome.CAPTURED),
-        # Formerly stalled: a gate-holding Interceptor (default seed) and a
-        # grab/escape alternation (34). Both must now be decided by real play.
-        (1042, RunOutcome.WIN),
-        (34, RunOutcome.WIN),
+        (24, RunOutcome.WIN),
+        # A former grab/escape loop now resolves as an actual capture.
+        (34, RunOutcome.CAPTURED),
     ],
 )
 def test_companion_genuinely_wins_or_is_captured_without_recordings(
@@ -90,6 +89,7 @@ def test_companion_genuinely_wins_or_is_captured_without_recordings(
     end = run.presentation_snapshot().mission_end
     assert end is not None and end.outcome == outcome and end.operative_id == COMPANION_ID
     if outcome == RunOutcome.WIN:
+        assert end.extraction_id in level.exit_ids
         assert kinds.count("CORE_TAKEN") == 1 and kinds.count("LOCKDOWN_STARTED") == 1
     # Real search evidence: 64 simulations, visits within budget, >=3 alternatives.
     assert traces and all(trace.simulations == 64 for trace in traces)

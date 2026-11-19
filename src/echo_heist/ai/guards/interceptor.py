@@ -133,9 +133,10 @@ def plan_intercept(
     articulation point is never sealed and every branch keeps a counterplay.
     """
     world_map = observation.map_static
-    goal = graph.exit_tile if observation.phase == MissionPhase.LOCKDOWN else graph.core_tile
-    hypotheses = route_hypotheses(
-        graph, evidence_tile, goal, distances_from(world_map, evidence_tile)
+    goals = graph.exit_tiles if observation.phase == MissionPhase.LOCKDOWN else (graph.core_tile,)
+    steps = distances_from(world_map, evidence_tile)
+    hypotheses = tuple(
+        route for goal in goals for route in route_hypotheses(graph, evidence_tile, goal, steps)
     )
     if not hypotheses:
         return None

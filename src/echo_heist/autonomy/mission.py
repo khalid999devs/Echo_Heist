@@ -26,7 +26,7 @@ from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.config.scenario import IntruderStart
 from echo_heist.core.contracts.config.scoring import ScoringRules
 from echo_heist.core.contracts.environment.model import EnvironmentSpec
-from echo_heist.core.contracts.events import EventKind
+from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.experience.model import ToolUsage
 from echo_heist.core.contracts.observations import Observation
 from echo_heist.core.contracts.results import (
@@ -193,7 +193,16 @@ class AutonomousMission:
             )
         if result.terminal is not None:
             policy_id = policy_weights(self.request.policy).policy_id if self.controller else None
-            self.terminal = replace(result.terminal, policy_id=policy_id)
+            if self.terminal is None:
+                # Attach the decision evidence to the report once. Simulation scores
+                # and replay events stay the authority for the mission outcome.
+                evidence = sorted(
+                    (*self._decision_evidence(), *result.terminal.decisive_events),
+                    key=lambda event: event.tick,
+                )
+                self.terminal = replace(
+                    result.terminal, policy_id=policy_id, decisive_events=tuple(evidence[-24:])
+                )
             result = replace(result, terminal=self.terminal)
         if result.mission_end is not None and not self._ended:
             self._ended = True
@@ -206,6 +215,40 @@ class AutonomousMission:
                 )
                 self._telemetry = self._sample()
         return result
+
+    def _decision_evidence(self) -> tuple[GameEvent, ...]:
+        evidence: list[GameEvent] = []
+        trace, nexus = self._telemetry.companion, self._telemetry.nexus
+        if trace is not None:
+            evidence.append(
+                GameEvent(
+                    f"companion-plan:{trace.evaluated_tick}",
+                    trace.evaluated_tick,
+                    EventKind.POLICY_DECISION,
+                    trace.actor_id,
+                    (
+                        ("algorithm", "MCTS"),
+                        ("reason", trace.reason),
+                        ("simulations", trace.simulations),
+                    ),
+                )
+            )
+        if nexus is not None and (interceptor := nexus.interceptor) is not None:
+            evidence.append(
+                GameEvent(
+                    f"interceptor-plan:{interceptor.evaluated_tick}",
+                    interceptor.evaluated_tick,
+                    EventKind.POLICY_DECISION,
+                    interceptor.guard_id,
+                    (
+                        ("algorithm", "ALPHA-BETA"),
+                        ("post", interceptor.post_id),
+                        ("evaluated", interceptor.evaluated_nodes),
+                        ("pruned", interceptor.pruned_nodes),
+                    ),
+                )
+            )
+        return tuple(evidence)
 
     # AutonomousRun --------------------------------------------------------
     @property

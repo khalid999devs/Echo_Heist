@@ -110,6 +110,7 @@ def write_csv(path: Path, runs: list[dict[str, Any]]) -> None:
         "raw_confirmed_sightings",
         "capture_by",
         "capture_zone",
+        "extraction_id",
         "longest_still_ticks",
         "fingerprint",
     ]

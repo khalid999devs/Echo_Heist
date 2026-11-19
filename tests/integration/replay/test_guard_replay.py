@@ -8,7 +8,7 @@ from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.security.model import SensorRules
 from echo_heist.core.simulation.replay import build_header, verify_replay
-from echo_heist.diagnostics.facility_routes import Branch
+from echo_heist.diagnostics.facility_routes import Branch, anchor
 from echo_heist.diagnostics.guard_evidence import (
     ScenarioResult,
     build_simulation,
@@ -44,7 +44,13 @@ def upper(
     return run_route("upper", level, rules, sensors, registry, route_steps(level, "upper", "upper"))
 
 
-@pytest.mark.parametrize(("branch", "back"), [("lower", "upper"), ("cross", "upper")])
+@pytest.mark.parametrize(
+    ("branch", "back", "exit_id"),
+    [
+        ("lower", "upper", "entry-exit"),
+        ("cross", "upper", "cargo-exit"),
+    ],
+)
 def test_default_security_routes_win_with_real_guard_algorithms(
     level: LevelData,
     rules: GameRules,
@@ -53,8 +59,12 @@ def test_default_security_routes_win_with_real_guard_algorithms(
     upper: ScenarioResult,
     branch: Branch,
     back: Branch,
+    exit_id: str,
 ) -> None:
-    result = run_route(branch, level, rules, sensors, registry, route_steps(level, branch, back))
+    result = run_route(
+        branch, level, rules, sensors, registry, route_steps(level, branch, back, exit_id=exit_id)
+    )
+    assert result.final_tiles[level.operative_id] == anchor(level, exit_id)
     for outcome in (upper, result):
         assert outcome.outcome == "WIN"
         assert outcome.events["CORE_TAKEN"] == outcome.events["LOCKDOWN_STARTED"] == 1
@@ -110,7 +120,7 @@ def test_recorded_run_replays_exactly_and_detects_changed_inputs(
 ) -> None:
     assert replay_matches(level, rules, sensors, registry, upper)
     log = upper.log
-    assert log.header.fingerprint_schema == 13 and log.header.registry_revision == registry.revision
+    assert log.header.fingerprint_schema == 14 and log.header.registry_revision == registry.revision
     header = build_header(
         level.static_map, rules, sensors, registry_revision=registry.revision, seed=1042
     )

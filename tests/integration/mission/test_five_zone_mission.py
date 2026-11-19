@@ -79,17 +79,27 @@ def drive(
     return None, counts, simulation.fingerprint()
 
 
-@pytest.mark.parametrize("branch", ["upper", "lower", "cross"])
-def test_human_takes_core_once_and_extracts_at_original_exit(
-    level: LevelData, rules: GameRules, branch: Branch
+@pytest.mark.parametrize(
+    ("branch", "exit_id"),
+    [
+        ("upper", "entry-exit"),
+        ("lower", "cargo-exit"),
+        ("cross", "entry-exit"),
+    ],
+)
+def test_human_takes_core_once_and_extracts_at_real_exit(
+    level: LevelData, rules: GameRules, branch: Branch, exit_id: str
 ) -> None:
     route: list[Step] = [
         *mission_path(level, branch),
         "HOLD",
-        *mission_path(level, "upper" if branch == "cross" else branch, returning=True),
+        *mission_path(
+            level, "upper" if branch == "cross" else branch, returning=True, exit_id=exit_id
+        ),
     ]
     end, counts, _ = drive(level, rules, route)
     assert end is not None and end.outcome == RunOutcome.WIN
+    assert end.extraction_id == exit_id
     assert counts["CORE_TAKEN"] == counts["LOCKDOWN_STARTED"] == counts["MISSION_ENDED"] == 1
     assert counts["ACTION_REJECTED"] == 0
 
@@ -104,12 +114,13 @@ def test_stationary_guard_post_captures_on_contact(level: LevelData, rules: Game
     assert counts["CAPTURE_STARTED"] == counts["CAPTURE_COMPLETED"] == 1
 
 
-def test_exit_without_core_never_wins(level: LevelData, rules: GameRules) -> None:
+@pytest.mark.parametrize("exit_id", ["entry-exit", "cargo-exit"])
+def test_exit_without_core_never_wins(level: LevelData, rules: GameRules, exit_id: str) -> None:
     end, counts, _ = drive(
         level,
         rules,
-        list(walk_path(level, level.spawn_tile, anchor(level, level.exit_id))),
-        limit=300,
+        list(walk_path(level, level.spawn_tile, anchor(level, exit_id))),
+        limit=900,
     )
     assert end is None and counts["MISSION_ENDED"] == 0
 

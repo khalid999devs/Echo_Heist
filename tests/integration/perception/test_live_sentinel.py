@@ -189,9 +189,13 @@ def test_only_confirmed_pursuit_accelerates_guard(
                 // 100
                 // rules.simulation_hz
             )
+            assert distances[0] > distances[1]
             if lockdown:
-                assert distances[0] == distances[1]  # no runaway stacked multiplier
-            else:
-                assert distances[0] > distances[1]
+                assert distances[1] == (
+                    rules.sentinel_speed_units_per_second
+                    * rules.lockdown_guard_speed_percent
+                    // 100
+                    // rules.simulation_hz
+                )
             break
     assert saw_partial and saw_confirmed

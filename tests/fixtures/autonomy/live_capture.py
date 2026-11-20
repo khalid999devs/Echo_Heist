@@ -23,6 +23,8 @@ from echo_heist.ui.scenes.design.workshop import WORKSHOP_CONTROLS
 from echo_heist.ui.scenes.flow import GameFlow, Scene, load_level
 from echo_heist.ui.scenes.menus import CHAPTER_CARD, MODE_BUTTONS
 
+WIN_SEED = 23
+
 
 def key(code: int) -> list[pygame.event.Event]:
     return [pygame.event.Event(kind, key=code) for kind in (pygame.KEYDOWN, pygame.KEYUP)]
@@ -44,7 +46,9 @@ def main() -> int:
     outcomes = {}
     with TemporaryDirectory(prefix="echo-real-ai-") as data:
         gateway = connect_gateway(level, rules, load_sensor_rules(), Path(data))
-        flow = GameFlow((1280, 720), level=level, rules=rules, autonomy_gateway=gateway)
+        flow = GameFlow(
+            (1280, 720), seed=WIN_SEED, level=level, rules=rules, autonomy_gateway=gateway
+        )
 
         def frame(events=(), elapsed=0):
             pygame.event.pump()
@@ -69,8 +73,8 @@ def main() -> int:
         click(WORKSHOP_CONTROLS[8])
         assert flow.session and flow.session.autonomous
         flow.airlock.skip()
-        for seed in (1042, 4):
-            if seed != 1042:
+        for seed in (WIN_SEED, 4):
+            if seed != WIN_SEED:
                 flow._start_run(
                     DeploymentRequest(ControlMode.COMPANION, seed, level.static_map.map_id)
                 )
@@ -81,7 +85,7 @@ def main() -> int:
             while flow.scene == Scene.HEIST and session.simulation.tick < 9000:
                 frame(elapsed=100)
                 tick = session.simulation.tick
-                if seed == 1042 and tick >= 90 and not captured_telemetry:
+                if seed == WIN_SEED and tick >= 90 and not captured_telemetry:
                     for i, rect in enumerate(AUTONOMY_TABS):
                         click(rect)
                         shot(f"live-tab-{i}")
@@ -93,13 +97,13 @@ def main() -> int:
                     frame(key(pygame.K_ESCAPE))
                     captured_telemetry = True
                 if (
-                    seed == 1042
+                    seed == WIN_SEED
                     and session.simulation.presentation_snapshot().core_owner
                     and "lockdown" not in shots
                 ):
                     shot("lockdown")
                 if (
-                    seed == 1042
+                    seed == WIN_SEED
                     and session.telemetry.nexus is not None
                     and session.telemetry.nexus.interceptor is not None
                     and "interceptor-search" not in shots
@@ -116,7 +120,7 @@ def main() -> int:
             flow.airlock.skip()
             outcomes[str(seed)] = asdict(session.mission_end)
             shot(f"result-{seed}")
-        assert outcomes["1042"]["outcome"] == "WIN"
+        assert outcomes[str(WIN_SEED)]["outcome"] == "WIN"
         assert outcomes["4"]["outcome"] == "CAPTURED"
         flow._go(Scene.WORKSHOP)
         shot("workshop-after-attempts")

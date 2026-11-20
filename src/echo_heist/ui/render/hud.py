@@ -33,6 +33,8 @@ def _objective(
     fonts: Fonts,
     capture: CaptureView | None,
     ticks_per_second: int,
+    *,
+    autonomous: bool,
 ) -> None:
     rect = pygame.Rect(20, 20, 400, 72)
     color = theme.ACCENT if view.core_held else theme.WARNING
@@ -79,7 +81,9 @@ def _objective(
     pygame.draw.polygon(canvas, color, points)
     prompt = view.warning or view.interaction
     if capture is not None:
-        prompt = f"GRAB IN {capture.remaining_ticks / ticks_per_second:.1f}s / ESCAPE, EMP OR STUN"
+        prompt = f"GRAB IN {capture.remaining_ticks / ticks_per_second:.1f}s"
+        if not autonomous:
+            prompt += " / ESCAPE, EMP OR STUN"
     if prompt:
         panel(
             canvas,
@@ -129,7 +133,16 @@ def draw_hud(
     world_map: StaticMap | None = None,
 ) -> None:
     _objective(
-        canvas, view, zone_label, level, operative_tile, phase, fonts, capture, ticks_per_second
+        canvas,
+        view,
+        zone_label,
+        level,
+        operative_tile,
+        phase,
+        fonts,
+        capture,
+        ticks_per_second,
+        autonomous=autonomous,
     )
     status = pygame.Rect(canvas.get_width() - 236, 20, 216, 72)
     panel(canvas, status, fill=(5, 15, 25, 180))

@@ -5,6 +5,7 @@ from math import sin
 import pygame
 
 from echo_heist.core.contracts.results import StairView
+from echo_heist.core.contracts.world import Tile
 from echo_heist.ui.render.environment.art import image
 from echo_heist.ui.render.hud import panel
 from echo_heist.ui.render.layout.viewport import interface_canvas
@@ -26,12 +27,17 @@ class Stairwell:
         fonts: Fonts,
         clock_ms: int,
         *,
+        observer_tile: Tile,
         reduced_motion: bool,
         autonomous: bool = False,
     ) -> None:
         if travel is not None:
             self.active, self.finished_at = travel, clock_ms
-        elif self.active is None or clock_ms - self.finished_at > 220:
+        elif (
+            self.active is None
+            or observer_tile != self.active.destination
+            or clock_ms - self.finished_at > 220
+        ):
             self.active = None
             return
         current = travel or self.active

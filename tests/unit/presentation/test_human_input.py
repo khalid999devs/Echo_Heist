@@ -62,7 +62,12 @@ def test_interaction_and_objective_follow_committed_own_values(rules: GameRules)
     original = sim.observe("operative")
     view = build_objective_view(original, ticks_per_second=rules.simulation_hz)
     assert view.interaction == "Hold E  Recover core"
-    for _ in range(rules.core_interaction_ticks):
+    assert build_objective_view(original, ticks_per_second=30, autonomous=True).interaction == ""
+    sim.step((adapter.action_for(original),))
+    spectator = build_objective_view(sim.observe("operative"), ticks_per_second=30, autonomous=True)
+    assert spectator.interaction == "Companion recovering Core"
+    assert spectator.interaction_progress == (1, rules.core_interaction_ticks)
+    for _ in range(rules.core_interaction_ticks - 1):
         sim.step((adapter.action_for(sim.observe("operative")),))
     updated = build_objective_view(sim.observe("operative"), ticks_per_second=rules.simulation_hz)
     assert updated.objective == "Return to Entry extraction"

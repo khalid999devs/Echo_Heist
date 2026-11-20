@@ -452,9 +452,6 @@ class HeistSession:
         for event in events:
             if event.kind == EventKind.STAIR_USED and event.actor_id == self.observer_id:
                 self.notice = ""
-            elif event.kind == EventKind.CORE_TAKEN:
-                self.notice = "CORE SECURED  /  RETURN TO THE GREEN EXIT"
-                self.notice_until_ms = self.clock_ms + 4200
             elif (
                 event.kind == EventKind.ACTION_REJECTED
                 and event.actor_id == self.observer_id
@@ -500,8 +497,6 @@ class HeistSession:
             if key != self._last_announcement:
                 self._last_announcement = key
                 self.announcement_serial += 1
-                self.notice = "NEXUS / " + nexus.announcement
-                self.notice_until_ms = self.clock_ms + 3500
 
     def zone_label(self, tile: Tile | None = None) -> str:
         tile = self.simulation.observe(self.observer_id).own_status.tile if tile is None else tile
@@ -579,12 +574,11 @@ class HeistSession:
             observation,
             ticks_per_second=self.simulation.ticks_per_second,
             interact_key=key_label(self.input.bindings, "interact"),
+            autonomous=self.autonomous,
         )
         operative_tile = observation.own_status.tile
         if snapshot.mission_end is None:
             notice = self.notice if self.clock_ms < self.notice_until_ms else ""
-            if self.autonomy_panel and self.autonomy_tab == 1 and notice.startswith("NEXUS / "):
-                notice = ""  # The open director monitor already shows the announcement.
             if self.high_contrast:
                 backplates(canvas)
             draw_hud(
@@ -649,6 +643,7 @@ class HeistSession:
             self.art.companion if self.autonomous else self.art.operative,
             self.fonts,
             self.clock_ms,
+            observer_tile=operative_tile,
             reduced_motion=self.reduced_flashing,
             autonomous=self.autonomous,
         )

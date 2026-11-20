@@ -26,7 +26,11 @@ class ObjectiveView:
 
 
 def build_objective_view(
-    observation: Observation, *, ticks_per_second: int, interact_key: str = "E"
+    observation: Observation,
+    *,
+    ticks_per_second: int,
+    interact_key: str = "E",
+    autonomous: bool = False,
 ) -> ObjectiveView:
     if ticks_per_second <= 0:
         raise ValueError("Tick rate must be positive")
@@ -41,17 +45,22 @@ def build_objective_view(
     interaction_progress = None
     if observation.interactions:
         hint = observation.interactions[0]
-        label = {
-            "Stair": "Use stairs",
-            "Core": "Recover core",
-            "Door": "Use door",
-            "HideSpot": "Enter cover",
-            "LeaveHide": "Leave cover",
-            "Canister": "Push canister",
-            "Glass": "Break glass",
-        }.get(hint.kind, "Interact")
-        interaction = (("Hold " if hint.required_ticks > 1 else "") + interact_key + "  ") + label
-        if hint.required_ticks > 1:
+        if not autonomous:
+            label = {
+                "Stair": "Use stairs",
+                "Core": "Recover core",
+                "Door": "Use door",
+                "HideSpot": "Enter cover",
+                "LeaveHide": "Leave cover",
+                "Canister": "Push canister",
+                "Glass": "Break glass",
+            }.get(hint.kind, "Interact")
+            prefix = "Hold " if hint.required_ticks > 1 else ""
+            interaction = f"{prefix}{interact_key}  {label}"
+            if hint.required_ticks > 1:
+                interaction_progress = hint.progress_ticks, hint.required_ticks
+        elif hint.kind == "Core" and 0 < hint.progress_ticks < hint.required_ticks:
+            interaction = "Companion recovering Core"
             interaction_progress = hint.progress_ticks, hint.required_ticks
     inventory = observation.own_status.inventory
     seconds = observation.tick // ticks_per_second
@@ -63,7 +72,9 @@ def build_objective_view(
         f"Stun {inventory.melee_charges} | "
         f"Core {'YES' if inventory.core_held else 'NO'}",
         f"{seconds // 60:02d}:{seconds % 60:02d}",
-        "CAPTURE WIND-UP - Escape, EMP or melee" if remaining is not None else "",
+        ("CAPTURE WIND-UP" if autonomous else "CAPTURE WIND-UP - Escape, EMP or melee")
+        if remaining is not None
+        else "",
         interaction_progress,
         inventory.echo_charges,
         inventory.emp_charges,

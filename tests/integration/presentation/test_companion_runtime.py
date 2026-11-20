@@ -8,6 +8,7 @@ import pygame
 from echo_heist.autonomy.gateway import connect_gateway
 from echo_heist.autonomy.mission import COMPANION_ID
 from echo_heist.core.contracts.autonomy.model import ControlMode
+from echo_heist.core.contracts.results import StairView
 from echo_heist.infrastructure.persistence.protocols import FILE_NAME
 from echo_heist.infrastructure.resources import load_game_rules, load_sensor_rules
 from echo_heist.ui.render.layout.viewport import interface_origin
@@ -50,3 +51,34 @@ def test_first_launch_deploys_the_real_companion_through_the_workshop(tmp_path: 
     assert trace is not None and trace.actor_id == COMPANION_ID and trace.simulations == 64
     assert sum(item.visits for item in trace.alternatives) == 64 and trace.path
     assert not (tmp_path / FILE_NAME).exists()  # evidence is written once, at attempt end
+
+
+def test_stair_overlay_clears_if_travel_ends_without_arrival() -> None:
+    pygame.font.init()
+    flow = GameFlow((1280, 720))
+    flow._start_run()
+    assert flow.session is not None
+    session = flow.session
+    overlay = session.stairwell
+    canvas = pygame.Surface(flow.view_size)
+    travel = StairView(COMPANION_ID, (28, 11), (32, 11), 3, 24)
+    overlay.draw(
+        canvas,
+        travel,
+        flow.art.companion,
+        flow.fonts,
+        10,
+        observer_tile=travel.source,
+        reduced_motion=False,
+    )
+    assert overlay.active == travel
+    overlay.draw(
+        canvas,
+        None,
+        flow.art.companion,
+        flow.fonts,
+        20,
+        observer_tile=travel.source,
+        reduced_motion=False,
+    )
+    assert overlay.active is None

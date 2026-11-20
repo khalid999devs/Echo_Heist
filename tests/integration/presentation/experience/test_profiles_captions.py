@@ -7,6 +7,7 @@ import pygame
 from echo_heist.core.contracts.autonomy.policy import Navigation, PolicySelection
 from echo_heist.core.contracts.environment.presentation import EnvironmentCue, EnvironmentCueKind
 from echo_heist.core.contracts.events import EventKind, GameEvent, HeardCue
+from echo_heist.core.contracts.world import MissionPhase
 from echo_heist.ui.presenters.captions import CaptionStream
 from echo_heist.ui.scenes.experience.profiles import PROFILE_ACTIONS, ProfilePanel
 from echo_heist.ui.scenes.flow import GameFlow
@@ -89,3 +90,17 @@ def test_captions_require_legitimate_hearing_and_deduplicate_without_extending_l
             replace(heard, tick=100 + i), (replace(own, event_id=str(i), tick=100 + i),), ()
         )
     assert len(captions.seen) == 256
+
+
+def test_lockdown_accessibility_status_does_not_add_a_center_caption() -> None:
+    pygame.font.init()
+    flow = GameFlow((1280, 720), security_enabled=False)
+    flow._start_run()
+    assert flow.session
+    observation = flow.session.simulation.observe(flow.session.observer_id)
+    lockdown = replace(observation, phase=MissionPhase.LOCKDOWN, tick=40)
+    event = GameEvent("lockdown", 40, EventKind.LOCKDOWN_STARTED, lockdown.agent_id)
+    captions = CaptionStream(30)
+    captions.observe(lockdown, (event,), ())
+    assert captions.at(lockdown) == ""
+    assert captions.at(replace(lockdown, tick=120)) == ""

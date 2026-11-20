@@ -81,9 +81,11 @@ def test_records_are_deterministic_and_carry_metadata(facility: Facility, suite:
     assert ghost["mcts"] != first["mcts"] or ghost["route_zones"] != first["route_zones"]
 
 
-def test_guard_bodies_no_longer_deadlock_a_pursuit(facility: Facility, suite: Suite) -> None:
-    """Regression: two guards pushing into each other in the core corridor stalled forever."""
-    scenario = next(s for s in suite.scenarios if s.scenario_id == "s06-upper-stairs-late")
+@pytest.mark.parametrize("scenario_id", ["s06-upper-stairs-late", "s08-lower-stairs-late"])
+def test_pursuit_reaches_an_outcome_around_either_stair_route(
+    facility: Facility, suite: Suite, scenario_id: str
+) -> None:
+    scenario = next(s for s in suite.scenarios if s.scenario_id == scenario_id)
     record = run_scenario(facility, scenario, "BALANCED", PRESETS["BALANCED"], suite.tick_cap)
     assert record["outcome"] != "TIMEOUT"
 

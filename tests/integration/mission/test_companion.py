@@ -24,7 +24,7 @@ from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import SecurityRegistry, build_security_registry
 
-WIN_SEED, CAPTURE_SEED = 1042, 4  # Balanced outcomes with the second Core guard
+WIN_SEED, CAPTURE_SEED = 23, 4
 
 
 @pytest.fixture(scope="module")
@@ -86,7 +86,7 @@ def play(run: AutonomousMission, limit: int = 9_000) -> tuple[list[CompanionTrac
         (WIN_SEED, "BALANCED", RunOutcome.WIN),
         (WIN_SEED, "RUSH", RunOutcome.CAPTURED),
         (CAPTURE_SEED, "BALANCED", RunOutcome.CAPTURED),
-        (23, "BALANCED", RunOutcome.WIN),
+        (1042, "BALANCED", RunOutcome.CAPTURED),  # the former landing loop ends by capture
         # A former grab/escape loop now resolves as an actual capture.
         (34, "BALANCED", RunOutcome.CAPTURED),
     ],
@@ -121,6 +121,44 @@ def test_companion_genuinely_wins_or_is_captured_without_recordings(
     for trace in traces:
         chosen = next(a for a in trace.alternatives if a.action == trace.chosen_action)
         assert chosen.legal and chosen.visits == max(a.visits for a in trace.alternatives)
+
+
+@pytest.mark.parametrize("arrived", [True, False])
+def test_companion_leaves_the_landing_instead_of_reversing_or_retrying_immediately(
+    level: LevelData,
+    rules: GameRules,
+    sensors: SensorRules,
+    registry: SecurityRegistry,
+    arrived: bool,
+) -> None:
+    run = deploy(level, rules, sensors, registry, WIN_SEED)
+    controller = run.controller
+    assert controller is not None
+    original = run.observe(COMPANION_ID)
+    source = next(
+        link for link in original.map_static.stairs if link.object_id == "stairs-security-up"
+    )
+    before = replace(
+        original, own_status=replace(original.own_status, tile=source.tile, position=None)
+    )
+    assert controller._steer(before, source.destination, False).target_id == source.object_id
+    tile = source.destination if arrived else source.tile
+    goal = source.tile if arrived else source.destination
+    after = replace(
+        before,
+        tick=rules.stair_travel_ticks if arrived else 1,
+        own_status=replace(before.own_status, tile=tile),
+    )
+    controller._remember_stair(after)
+    if arrived:
+        # A first reversal can be a valid retreat. Only a rapid repeat should reroute.
+        assert controller._steer(after, goal, False).target_id == source.destination_id
+        after = replace(after, tick=rules.stair_travel_ticks * 2, own_status=before.own_status)
+        goal = source.destination
+        controller._remember_stair(after)
+    next_action = controller._steer(after, goal, False)
+    assert next_action.kind == ActionKind.MOVE
+    assert controller.path and controller.path[0] != goal
 
 
 def test_controller_depends_only_on_its_observations_and_seed(

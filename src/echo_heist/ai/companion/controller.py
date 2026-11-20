@@ -10,7 +10,8 @@ the same movement, tool and mission rules as for the Human operative.
 """
 
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from itertools import pairwise
 from random import Random
 
 from echo_heist.ai.companion import tactics
@@ -32,7 +33,7 @@ from echo_heist.core.contracts.autonomy.policy import PolicySelection
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.observations import Observation
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
-from echo_heist.core.contracts.world import MissionPhase, Position, Tile, tile_center
+from echo_heist.core.contracts.world import MissionPhase, Position, StairLink, Tile, tile_center
 
 ITERATIONS = 64
 MAX_DEPTH = 4
@@ -54,6 +55,8 @@ FLEE_TICKS = 75
 BLOCK_TILES = 4
 ABANDON_TICKS = 180
 RECOVERY_TICKS = 900  # time without getting closer to the actual objective
+STAIR_COMMIT_SECONDS = 2
+STAIR_RETRY_TICKS = 12
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,6 +66,13 @@ class Directive:
     action: str
     until_tick: int = 0
     goal: Tile | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class StairBackoff:
+    link: StairLink
+    until_tick: int
+    blocked: bool
 
 
 def _sign(value: int) -> int:
@@ -125,6 +135,9 @@ class CompanionController:
         self.objective_best: int | None = None
         self.objective_progress_at = 0
         self.exit_replan_at = 0
+        self.stair_attempt: StairLink | None = None
+        self.last_stair_crossing: tuple[StairLink, int] | None = None
+        self.stair_backoff: StairBackoff | None = None
         self.extraction_goal = briefing.exit_tile
         graph = briefing.graph
         return_legs = [
@@ -377,10 +390,14 @@ class CompanionController:
     def _plan_path(self, observation: Observation, goal: Tile) -> None:
         own = observation.own_status
         recovering = observation.tick - self.objective_progress_at >= RECOVERY_TICKS
+        backoff = self.stair_backoff
+        if backoff is not None and backoff.link.tile != own.tile:
+            backoff = None
         stale = (
             goal != self.path_goal
             or observation.geometry_revision != self.geometry_revision
             or not self.path
+            or (backoff is not None and backoff.link.destination in self.path[:2])
             # Recovery commits to a route through changing patrol risk. Real
             # geometry changes and blocked motion can still force a replan.
             or (not recovering and self.beliefs.visible and observation.tick - self.path_tick >= 15)
@@ -406,7 +423,21 @@ class CompanionController:
                 + (JAM_COST if tile in jammed else 0)
             )
 
-        result = astar(observation.map_static, own.tile, goal, penalty=penalty)
+        world_map = observation.map_static
+        result = astar(world_map, own.tile, goal, penalty=penalty)
+        if backoff is not None and (backoff.link.tile, backoff.link.destination) in pairwise(
+            result.path
+        ):
+            # A room-scale detour can cost less than another stair transition or
+            # running straight back into the same patrol. Keep the other stairway.
+            avoided = {backoff.link.object_id, backoff.link.destination_id}
+            alternate_map = replace(
+                world_map,
+                stairs=tuple(link for link in world_map.stairs if link.object_id not in avoided),
+            )
+            alternative = astar(alternate_map, own.tile, goal, penalty=penalty)
+            if alternative.path:
+                result = alternative
         self.path = result.path[1:] if result.path else ()
         self.path_goal, self.path_tick = goal, observation.tick
         self.path_cost = result.cost if result.path else None
@@ -433,6 +464,10 @@ class CompanionController:
             None,
         )
         if stair is not None:
+            backoff = self.stair_backoff
+            if backoff is not None and backoff.blocked and stair == backoff.link:
+                return Action(self.actor_id, ActionKind.WAIT, tick)
+            self.stair_attempt = stair
             return Action(self.actor_id, ActionKind.INTERACT, tick, target_id=stair.object_id)
         target = tile_center(self.path[0] if self.path else goal)
         center = tile_center(own.tile)
@@ -604,6 +639,32 @@ class CompanionController:
             return "REACH_CORE"
         return "INFILTRATE"
 
+    def _remember_stair(self, observation: Observation) -> None:
+        if self.stair_backoff is not None and observation.tick >= self.stair_backoff.until_tick:
+            self.stair_backoff = None
+        attempt, self.stair_attempt = self.stair_attempt, None
+        if attempt is None:
+            return
+        if observation.own_status.tile == attempt.destination:
+            commit_ticks = self.rules.simulation_hz * STAIR_COMMIT_SECONDS
+            previous = self.last_stair_crossing
+            self.last_stair_crossing = attempt, observation.tick
+            if (
+                previous is not None
+                and previous[0].object_id == attempt.destination_id
+                and observation.tick - previous[1] < commit_ticks
+            ):
+                # An immediate retreat can be legitimate. The third trip across
+                # the same stairs should give the other route a chance.
+                self.stair_backoff = StairBackoff(
+                    previous[0], observation.tick + commit_ticks, False
+                )
+        else:
+            # The controller sees its own unchanged landing, never who blocked it.
+            self.stair_backoff = StairBackoff(attempt, observation.tick + STAIR_RETRY_TICKS, True)
+            self.path_goal = None
+            self.pending = "blocked stair landing"
+
     def act(self, observation: Observation) -> Action:
         own = observation.own_status
         tick = observation.tick
@@ -618,6 +679,7 @@ class CompanionController:
         self.state = phase
         if own.stair_ticks_remaining or phase in ("WIN", "CAPTURED"):
             return Action(self.actor_id, ActionKind.WAIT, tick)
+        self._remember_stair(observation)
         self.still_ticks = self.still_ticks + 1 if self.previous == position else 0
         self.tile_ticks = self.tile_ticks + 1 if self.last_tile == own.tile else 0
         self.last_tile = own.tile

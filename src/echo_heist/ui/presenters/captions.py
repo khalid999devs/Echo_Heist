@@ -28,9 +28,7 @@ class CaptionStream:
         for event in events:
             details = dict(event.details)
             message = ""
-            if event.kind == EventKind.LOCKDOWN_STARTED:
-                message = "[Lockdown alarm]"
-            elif event.kind == EventKind.TOOL_USED and event.actor_id == own:
+            if event.kind == EventKind.TOOL_USED and event.actor_id == own:
                 message = {
                     "ECHO": "[Echo deployed]",
                     "EMP": "[EMP burst]",
@@ -73,4 +71,4 @@ class CaptionStream:
     def at(self, observation: Observation) -> str:
         if observation.tick < self.until:
             return self.message
-        return "[Lockdown alarm]" if observation.phase.value == "LOCKDOWN" else ""
+        return ""

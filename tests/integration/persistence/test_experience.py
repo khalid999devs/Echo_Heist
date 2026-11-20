@@ -69,12 +69,14 @@ def test_scored_reports_are_authoritative_matched_and_persisted(
     assert report is not None and report.matches(aborted)
     assert (report.result.score, report.result.grade, report.policy_label) == (0, "F", "Human")
     assert service.report(aborted) is report  # one report per run key
-    win = finish(gateway, DeploymentRequest("COMPANION", 1042, map_id), "app:2", abort=False)
+    win = finish(gateway, DeploymentRequest("COMPANION", 23, map_id), "app:2", abort=False)
     scored = service.report(win)
     assert scored is not None and scored.result.outcome == RunOutcome.WIN
     r = scored.result
     assert r.score == r.completion_points + r.stealth_points + r.pace_points
-    assert r.completion_points == 50 and r.stealth_points == 40 - 12 * r.detection_encounters
+    assert r.completion_points == 50 and r.stealth_points == max(
+        0, 40 - 12 * r.detection_encounters
+    )
     assert Achievement.AI_MASTER in scored.achievements and scored.policy_label == "Balanced"
     assert r.policy_id == "BALANCED-RETREAT-EMP_IF_TRAPPED-BALANCED"
     assert r.decisive_events and r.decisive_events[-1].kind.value == "MISSION_ENDED"

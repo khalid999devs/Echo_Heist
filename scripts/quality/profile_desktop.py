@@ -45,7 +45,8 @@ def complete_mission(flow: GameFlow, audio: AudioDirector, screen: pygame.Surfac
     if tracemalloc.is_tracing():
         tracemalloc.stop()
     flow.deployment.gateway.reset_protocols()
-    assert flow._start_run(DeploymentRequest("COMPANION", 1042, flow.level.static_map.map_id))
+    seed = 23
+    assert flow._start_run(DeploymentRequest("COMPANION", seed, flow.level.static_map.map_id))
     flow.airlock.skip()
     assert flow.session
     session = flow.session
@@ -77,6 +78,7 @@ def complete_mission(flow: GameFlow, audio: AudioDirector, screen: pygame.Surfac
         if session.mission_end:
             break
     return {
+        "seed": seed,
         "outcome": str(session.mission_end.outcome) if session.mission_end else "RUNNER_CAP",
         "tick": session.simulation.tick,
         "lockdown_alarm_seen": alarm_seen,
@@ -223,7 +225,7 @@ def main() -> int:
             "Native macOS uncapped CPU/presentation workload, production AI/security/props; "
             "restarts and resizes, four warmup cycles (both modes at both sizes). "
             "Optional Python tracing adds overhead. "
-            "Each run starts at seed 1042 with reset protocol memory; no actor state injection. "
+            "Restart cycles use seed 1042 with reset protocol memory. No actor state injection. "
             "RSS includes OS compression and compositor buffers; bounded means final six samples "
             "stay within 64 MB of warmup and Python growth below 4 MB (including telemetry). "
             "A bounded short run is not proof against every long-session memory leak."

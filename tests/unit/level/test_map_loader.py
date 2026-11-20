@@ -61,6 +61,7 @@ def test_packaged_map_loads_with_stable_anchors_zones_and_tags() -> None:
     kinds = {obj.kind for obj in world_map.objects}
     assert not kinds & {"GuardSpawn", "PatrolRoute"}
     assert {post.guard_id for post in level.guards} == {
+        "guard-cargo",
         "guard-service",
         "guard-security",
         "guard-research",
@@ -203,7 +204,7 @@ def test_prepared_hide_recesses_have_access_and_stay_off_patrol_lanes() -> None:
 
     patrol = {tile for route in level.routes for tile in route.tiles()}
     spots = [marker for marker in level.markers if marker.kind == "HideSpot"]
-    assert len(spots) == 5
+    assert len(spots) == 8
     for spot in spots:
         assert spot.tile not in patrol
         assert bfs(level.static_map, level.spawn_tile, spot.tile).path
@@ -211,6 +212,22 @@ def test_prepared_hide_recesses_have_access_and_stay_off_patrol_lanes() -> None:
             (spot.tile[0] + dx, spot.tile[1] + dy) in level.static_map.opaque_tiles
             for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0))
         )
+
+
+def test_cargo_exit_requires_the_patrolled_bend() -> None:
+    from echo_heist.ai.navigation.grid import bfs
+
+    level = load_tiled_map(resource_bytes(f"data/maps/{MAP_ID}.json"))
+    world = level.static_map
+    exit_tile = next(obj.tile for obj in world.objects if obj.object_id == "cargo-exit")
+    path = bfs(world, (28, 34), exit_tile).path
+    assert len(path) >= 13
+    assert any((25, y) in path for y in (37, 38))
+    assert {(23, 35), (24, 35), (25, 36)} <= world.opaque_tiles
+    assert (21, 36) in world.crouch_tiles and not world.can_walk((21, 36))
+    assert any(marker.marker_id == "hide-cargo" for marker in level.markers)
+    patrol = next(route for route in level.routes if route.route_id == "route-cargo").tiles()
+    assert (25, 37) in patrol and exit_tile not in patrol
 
 
 def test_compact_facility_and_stair_gangways_keep_accessible_aisles() -> None:

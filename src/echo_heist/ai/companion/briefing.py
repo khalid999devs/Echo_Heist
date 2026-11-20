@@ -33,12 +33,16 @@ class MissionBriefing:
     graph: RouteGraph
     hide_tiles: tuple[Tile, ...]
     guards: tuple[GuardBrief, ...]
+    locker_tiles: tuple[Tile, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "core_tile", immutable_tile(self.core_tile))
         object.__setattr__(self, "exit_tile", immutable_tile(self.exit_tile))
         object.__setattr__(self, "hide_tiles", tuple(immutable_tile(t) for t in self.hide_tiles))
         object.__setattr__(self, "guards", tuple(self.guards))
+        object.__setattr__(
+            self, "locker_tiles", tuple(immutable_tile(t) for t in self.locker_tiles)
+        )
 
 
 @dataclass(frozen=True, slots=True)

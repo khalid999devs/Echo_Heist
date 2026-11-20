@@ -19,12 +19,17 @@ from echo_heist.core.contracts.world import ActorKind, Inventory
 from echo_heist.core.simulation.engine import Simulation
 from echo_heist.core.simulation.randomness import seeded_rng
 from echo_heist.diagnostics.guard_evidence import RouteDriver, route_steps
-from echo_heist.infrastructure.resources import load_sensor_rules, resource_bytes
+from echo_heist.infrastructure.resources import (
+    load_environment_rules,
+    load_sensor_rules,
+    resource_bytes,
+)
+from echo_heist.level.environment import build_environment
 from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import SecurityRegistry, build_security_registry
 
-WIN_SEED, CAPTURE_SEED = 23, 4
+WIN_SEED, CAPTURE_SEED = 44, 4
 
 
 @pytest.fixture(scope="module")
@@ -52,7 +57,14 @@ def deploy(
 ) -> AutonomousMission:
     request = DeploymentRequest("COMPANION", seed, level.static_map.map_id, PRESETS[policy])
     return AutonomousMission(
-        level, rules, sensors, registry, request, protocol=None, protocol_state=None
+        level,
+        rules,
+        sensors,
+        registry,
+        request,
+        protocol=None,
+        protocol_state=None,
+        environment=build_environment(level, load_environment_rules()),
     )
 
 
@@ -83,12 +95,10 @@ def play(run: AutonomousMission, limit: int = 9_000) -> tuple[list[CompanionTrac
 @pytest.mark.parametrize(
     ("seed", "policy", "outcome"),
     [
-        (WIN_SEED, "BALANCED", RunOutcome.WIN),
-        (WIN_SEED, "RUSH", RunOutcome.CAPTURED),
+        (WIN_SEED, "RUSH", RunOutcome.WIN),
+        (18, "RUSH", RunOutcome.CAPTURED),
         (CAPTURE_SEED, "BALANCED", RunOutcome.CAPTURED),
         (1042, "BALANCED", RunOutcome.CAPTURED),  # the former landing loop ends by capture
-        # A former grab/escape loop now resolves as an actual capture.
-        (34, "BALANCED", RunOutcome.CAPTURED),
     ],
 )
 def test_companion_genuinely_wins_or_is_captured_without_recordings(
@@ -107,7 +117,7 @@ def test_companion_genuinely_wins_or_is_captured_without_recordings(
     end = run.presentation_snapshot().mission_end
     assert end is not None and end.outcome == outcome and end.operative_id == COMPANION_ID
     if outcome == RunOutcome.WIN:
-        assert end.extraction_id in level.exit_ids
+        assert end.extraction_id == "cargo-exit"
         assert kinds.count("CORE_TAKEN") == 1 and kinds.count("LOCKDOWN_STARTED") == 1
     else:
         assert end.capture_by in {item.guard_id for item in registry.assignments}

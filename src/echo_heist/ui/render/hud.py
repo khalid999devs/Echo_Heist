@@ -121,6 +121,7 @@ def draw_hud(
     ticks_per_second: int = 30,
     crouched: bool = False,
     concealed: bool = False,
+    in_locker: bool = False,
     teaching_view: bool = False,
     autonomous: bool = False,
     capture: CaptureView | None = None,
@@ -147,6 +148,9 @@ def draw_hud(
     status = pygame.Rect(canvas.get_width() - 236, 20, 216, 72)
     panel(canvas, status, fill=(5, 15, 25, 180))
     states = {guard.state for guard in guards if guard.actor_id not in unavailable_guards}
+    closing = any(
+        guard.closing_ground and guard.actor_id not in unavailable_guards for guard in guards
+    )
     alert = (
         "DETECTED"
         if GuardState.CHASE in states
@@ -173,7 +177,7 @@ def draw_hud(
         (status.x + 13, 31),
     )
     _label(canvas, fonts.body, view.elapsed, theme.TEXT, (status.x + 13, 54))
-    _label(canvas, fonts.micro, alert, color, (status.x + 98, 62))
+    _label(canvas, fonts.micro, "BREAK SIGHT" if closing else alert, color, (status.x + 98, 62))
     if not teaching_view:
         draw_minimap(
             canvas, level, operative_tile, phase, fonts, layer=minimap, world_map=world_map
@@ -193,7 +197,9 @@ def draw_hud(
     )
     if autonomous and not recharge:
         label = "AI / SPRINT"
-    if crouched:
+    if in_locker:
+        label = "HIDDEN IN LOCKER"
+    elif crouched:
         label = "UNDER DESK" if concealed else f"{crouch_key} Crouched"
     _label(
         canvas,

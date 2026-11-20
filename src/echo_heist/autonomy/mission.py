@@ -70,6 +70,7 @@ def build_briefing(level: LevelData, registry: SecurityRegistry) -> MissionBrief
         tuple(
             GuardBrief(value.guard_id, value.kind, value.zone_id) for value in registry.assignments
         ),
+        locker_tiles=tuple(marker.tile for marker in level.markers if marker.kind == "HideSpot"),
     )
 
 

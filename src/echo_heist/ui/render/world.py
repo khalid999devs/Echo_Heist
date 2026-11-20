@@ -8,8 +8,13 @@ import pygame
 
 from echo_heist.core.contracts.environment.presentation import PropKind, PropView
 from echo_heist.core.contracts.observations import EntityView
-from echo_heist.core.contracts.results import PresentationSnapshot
-from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, ActorKind, MissionPhase
+from echo_heist.core.contracts.results import EchoView, PresentationSnapshot
+from echo_heist.core.contracts.world import (
+    POSITION_UNITS_PER_TILE,
+    ActorKind,
+    MissionPhase,
+    position_tile,
+)
 from echo_heist.infrastructure.resources import resource_bytes
 from echo_heist.level.model import LevelData
 from echo_heist.ui.presenters.interactions import Effect
@@ -40,6 +45,7 @@ from echo_heist.ui.render.environment.furnishings.story import paint_room_story
 from echo_heist.ui.render.environment.illumination.model import shadow_at
 from echo_heist.ui.render.environment.interiors import draw_details, draw_room_trim, room_floors
 from echo_heist.ui.render.environment.lighting import bake_lighting, draw_equipment
+from echo_heist.ui.render.interactions.decoy import draw_echo
 from echo_heist.ui.render.interactions.effects import draw_effects
 from echo_heist.ui.render.interactions.props import depth as prop_depth
 from echo_heist.ui.render.interactions.props import draw_prop
@@ -475,7 +481,7 @@ def draw_world(
     else:
         canvas.blit(map_surface, camera.to_screen((0, 0)))
     draw_equipment(canvas, level, camera, 0 if reduced_motion else clock_ms, deck)
-    layers: list[tuple[float, str, FurnitureVisual | EntityView | PropView]] = []
+    layers: list[tuple[float, str, FurnitureVisual | EntityView | PropView | EchoView]] = []
     for item in furnishings:
         screen_rect = pygame.Rect(camera.to_screen(item.render_rect.topleft), item.render_rect.size)
         if (deck is not None and not deck.contains(item.tile)) or not screen_rect.colliderect(
@@ -533,14 +539,8 @@ def draw_world(
     )
     captures = {capture.target_id: capture for capture in snapshot.captures}
     for echo in snapshot.echoes:
-        point = camera.to_screen(to_pixels(echo.position, size))
-        radius = 12 + round(3 * pulse)
-        pygame.draw.circle(canvas, theme.ACCENT, point, radius, 2)
-        pygame.draw.circle(canvas, theme.ACCENT_DIM, point, 8, 1)
-        for index in range(3):
-            theta = clock_ms / 400 + index * 2 * pi / 3
-            trace = (round(point[0] + 19 * cos(theta)), round(point[1] + 19 * sin(theta)))
-            pygame.draw.circle(canvas, theme.ACCENT, trace, 2)
+        if deck is None or deck.contains(position_tile(echo.position)):
+            layers.append((to_pixels(echo.position, size)[1], echo.echo_id, echo))
     for entity in snapshot.actors:
         if entity.position is None or (deck is not None and not deck.contains(entity.tile)):
             continue
@@ -555,6 +555,17 @@ def draw_world(
             continue
         if isinstance(layer_item, PropView):
             draw_prop(canvas, layer_item, camera, size, fraction, art.props[46] if art else None)
+            continue
+        if isinstance(layer_item, EchoView):
+            previous = to_pixels(layer_item.previous_position, size)
+            current = to_pixels(layer_item.position, size)
+            point = camera.to_screen(
+                (
+                    previous[0] + (current[0] - previous[0]) * fraction,
+                    previous[1] + (current[1] - previous[1]) * fraction,
+                )
+            )
+            draw_echo(canvas, point, layer_item, art, effect_tick, reduced_motion=reduced_motion)
             continue
         entity = layer_item
         cover = locker_cover.get(entity.actor_id, 0.0) if entity.concealed else 0.0

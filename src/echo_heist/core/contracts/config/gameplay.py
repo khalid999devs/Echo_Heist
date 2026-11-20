@@ -40,6 +40,8 @@ class GameRules:
     sprint_footstep_interval_ticks: int = 7
     chase_guard_speed_percent: int = 115
     melee_cooldown_ticks: int = 120
+    pursuit_grace_ms: int = 500
+    pursuit_pressure_percent: int = 108
 
     def __post_init__(self) -> None:
         for field in fields(self):
@@ -58,6 +60,14 @@ class GameRules:
             raise ValueError("Crouch speed must stay below walking speed")
         if not 100 <= self.chase_guard_speed_percent <= 150:
             raise ValueError("Pursuit speed must stay within 100-150 percent")
+        if not 100 <= self.pursuit_grace_ms <= 2_000:
+            raise ValueError("Pursuit grace must be 100-2000 milliseconds")
+        if not 100 < self.pursuit_pressure_percent <= 125:
+            raise ValueError("Sustained pursuit must close distance against sprint")
+
+    @property
+    def pursuit_grace_ticks(self) -> int:
+        return (self.pursuit_grace_ms * self.simulation_hz + 999) // 1000
 
     @property
     def guard_intruder_clearance_units(self) -> int:

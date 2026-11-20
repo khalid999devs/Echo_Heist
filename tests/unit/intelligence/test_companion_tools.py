@@ -10,6 +10,7 @@ from random import Random
 import pytest
 
 from echo_heist.ai.companion import tactics
+from echo_heist.ai.companion.belief import Sighting
 from echo_heist.ai.companion.briefing import policy_weights
 from echo_heist.ai.companion.utility import emergency
 from echo_heist.core.contracts.autonomy.policy import Emergency, PolicySelection
@@ -51,6 +52,24 @@ def test_grab_breaking_strike_needs_own_charge_and_finished_recovery(
     assert override is not None and override.kind == expected
     if expected == "MELEE":
         assert override.target_id == "guard-a"
+
+
+def test_companion_saves_emp_when_a_close_guard_leaves_an_escape(rules: GameRules) -> None:
+    observation = grabbed(0, 0)
+    own = replace(
+        observation.own_status,
+        inventory=Inventory(echo_charges=0, emp_charges=1, melee_charges=0),
+        capture_ticks_remaining=None,
+    )
+    watcher = Sighting("guard-a", ActorKind.SENTINEL, (5, 4), (-1, 0), 300, False)
+    watched = replace(observation, own_status=own)
+    escape = emergency(watched, rules, Emergency.EMP_IF_TRAPPED, {}, watcher)
+    assert escape is not None and escape.kind == "ESCAPE"
+
+    walls = frozenset({(3, 4), (4, 3), (4, 5)})
+    trapped = replace(watched, map_static=replace(ROOM, blocked_tiles=walls))
+    response = emergency(trapped, rules, Emergency.EMP_IF_TRAPPED, {}, watcher)
+    assert response is not None and response.kind == "EMP"
 
 
 def model(rules: GameRules, root: tactics.TacticalState) -> tactics.CompanionModel:

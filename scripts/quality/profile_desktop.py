@@ -13,7 +13,7 @@ from time import perf_counter
 import pygame
 
 from echo_heist.autonomy.gateway import NexusGateway
-from echo_heist.core.contracts.autonomy.policy import DeploymentRequest
+from echo_heist.core.contracts.autonomy.policy import PRESETS, DeploymentRequest
 from echo_heist.infrastructure.resources import load_game_rules, load_sensor_rules
 from echo_heist.ui.audio.director import AudioDirector
 from echo_heist.ui.render.surfaces.formats import opaque_surface
@@ -45,8 +45,10 @@ def complete_mission(flow: GameFlow, audio: AudioDirector, screen: pygame.Surfac
     if tracemalloc.is_tracing():
         tracemalloc.stop()
     flow.deployment.gateway.reset_protocols()
-    seed = 23
-    assert flow._start_run(DeploymentRequest("COMPANION", seed, flow.level.static_map.map_id))
+    seed = 44
+    assert flow._start_run(
+        DeploymentRequest("COMPANION", seed, flow.level.static_map.map_id, PRESETS["RUSH"])
+    )
     flow.airlock.skip()
     assert flow.session
     session = flow.session

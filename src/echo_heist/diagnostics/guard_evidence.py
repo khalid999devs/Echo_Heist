@@ -178,6 +178,7 @@ def run_route(
     limit: int = 9_000,
     use_tools: bool = True,
     sprint: bool = True,
+    wait_start_ticks: int = 0,
     environment: EnvironmentSpec | None = None,
 ) -> ScenarioResult:
     simulation = build_simulation(level, rules, sensors, registry, seed, environment)
@@ -196,7 +197,9 @@ def run_route(
     end = None
     while simulation.tick < limit:
         observation = simulation.observe(level.operative_id)
-        if pending and pending[0] == "HOLD":
+        if observation.tick < wait_start_ticks:
+            action = Action(level.operative_id, ActionKind.WAIT, observation.tick)
+        elif pending and pending[0] == "HOLD":
             if observation.phase == MissionPhase.LOCKDOWN:
                 pending.pop(0)
                 continue

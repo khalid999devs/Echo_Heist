@@ -10,6 +10,7 @@ the Companion's own observed melee stock and recovery allow a strike.
 from dataclasses import dataclass
 
 from echo_heist.ai.companion.belief import Sighting
+from echo_heist.ai.navigation.grid import neighbors
 from echo_heist.core.contracts.autonomy.policy import Emergency
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.observations import EntityView, Observation
@@ -45,12 +46,32 @@ def active_guards(observation: Observation) -> tuple[EntityView, ...]:
     )
 
 
+def escape_available(observation: Observation, rules: GameRules) -> bool:
+    """Can an ordinary move gain distance from the visible threats?"""
+    own = observation.own_status
+    origin = own.position or tile_center(own.tile)
+    threats = tuple(
+        entity.position or tile_center(entity.tile) for entity in active_guards(observation)
+    )
+    if not threats:
+        return True
+    clearance = rules.guard_intruder_clearance_units**2
+    nearest = min(_distance2(origin, point) for point in threats)
+    return any(
+        observation.map_static.can_walk(tile, crouched=own.crouched)
+        and min(_distance2(tile_center(tile), point) for point in threats) > max(nearest, clearance)
+        for tile in neighbors(own.tile)
+    )
+
+
 def emergency(
     observation: Observation,
     rules: GameRules,
     choice: Emergency,
     melee_ready_at: dict[str, int],
     watched: Sighting | None,
+    *,
+    stalled: bool = False,
 ) -> Override | None:
     own = observation.own_status
     position = own.position or tile_center(own.tile)
@@ -97,6 +118,10 @@ def emergency(
     in_emp = nearest_d2 <= (rules.emp_radius_units * 8 // 10) ** 2
     close = nearest_d2 <= (rules.capture_range_units * 3 // 2) ** 2
     if close and watched is not None:
+        if not stalled and escape_available(observation, rules):
+            return Override(
+                "ESCAPE", "Guard is close: take the open way out", away_from=nearest_position
+            )
         if choice == Emergency.MELEE_IF_ADJACENT and can_melee:
             return Override("MELEE", "Adjacent guard is about to grab", nearest_id)
         if choice == Emergency.EMP_IF_TRAPPED and emp and in_emp:

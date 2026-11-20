@@ -11,7 +11,8 @@ from math import cos, radians
 
 from echo_heist.ai.companion.briefing import GuardBrief, MissionBriefing
 from echo_heist.core.contracts.observations import EntityView, Observation
-from echo_heist.core.contracts.world import ActorKind, Tile
+from echo_heist.core.contracts.world import ActorKind, Tile, tile_center
+from echo_heist.core.perception.sensors import line_of_sight
 
 GUARDS = frozenset({ActorKind.SENTINEL, ActorKind.TRACKER, ActorKind.INTERCEPTOR})
 DANGER_TTL_TICKS = 90
@@ -127,9 +128,12 @@ class Beliefs:
             dx, dy = tile[0] - sighting.tile[0], tile[1] - sighting.tile[1]
             length = (dx * dx + dy * dy) ** 0.5
             fx, fy = sighting.facing
-            if length == 0 or (
+            inside = length == 0 or (
                 length <= self.sight_range_tiles
                 and dx * fx + dy * fy >= threshold * length * max(1.0, (fx * fx + fy * fy) ** 0.5)
+            )
+            if inside and line_of_sight(
+                observation.map_static, tile_center(sighting.tile), tile_center(tile)
             ):
                 return sighting
         return None

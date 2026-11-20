@@ -1,10 +1,14 @@
 from dataclasses import replace
 
+import pytest
+
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.events import EventKind
 from echo_heist.core.contracts.world import ActorKind, ActorSpawn, StaticMap
 from echo_heist.core.simulation.engine import Simulation
+from echo_heist.core.simulation.systems.capture import update_captures
+from echo_heist.core.simulation.world import ActorState, WorldState
 
 
 def contact(rules: GameRules) -> Simulation:
@@ -82,10 +86,13 @@ def test_melee_cannot_reach_through_blocked_diagonal_corner(rules: GameRules) ->
     assert not any(event.kind == EventKind.NOISE_CREATED for event in result.events)
 
 
+@pytest.mark.parametrize("kind", [ActorKind.OPERATIVE, ActorKind.COMPANION])
 def test_echo_replays_backwards_has_no_body_or_actor_authority_and_expires(
-    rules: GameRules,
+    rules: GameRules, kind: ActorKind
 ) -> None:
-    sim = Simulation(StaticMap("echo", 15, 8), (ActorSpawn("operative", (3, 3)),), rules=rules)
+    sim = Simulation(
+        StaticMap("echo", 15, 8), (ActorSpawn("operative", (3, 3), kind),), rules=rules
+    )
     positions = [sim.observe("operative").own_status.position]
     for _ in range(30):
         sim.step((Action("operative", ActionKind.MOVE, sim.tick, (1, 0)),))
@@ -93,9 +100,11 @@ def test_echo_replays_backwards_has_no_body_or_actor_authority_and_expires(
     sim.step((Action("operative", ActionKind.ECHO, sim.tick),))
     echo = sim.presentation_snapshot().echoes[0]
     assert echo.position == positions[-1]
+    assert echo.owner_kind == kind
     rejected = sim.step((Action(echo.echo_id, ActionKind.INTERACT, sim.tick),))
     assert rejected.events[0].details == (("reason", "unknown_actor"),)
     assert sim.presentation_snapshot().echoes[0].position == positions[-2]
+    assert sim.presentation_snapshot().echoes[0].facing[0] < 0
     for _ in range(30):
         sim.step((Action("operative", ActionKind.MOVE, sim.tick, (-1, 0)),))
     assert sim.observe("operative").own_status.tile == (3, 3)
@@ -103,6 +112,44 @@ def test_echo_replays_backwards_has_no_body_or_actor_authority_and_expires(
         sim.step()
     assert not sim.presentation_snapshot().echoes
     assert len(sim.presentation_snapshot().actors) == 1
+
+
+@pytest.mark.parametrize("kind", [ActorKind.OPERATIVE, ActorKind.COMPANION])
+def test_contact_grab_survives_turning_unless_target_reaches_cover(
+    rules: GameRules, kind: ActorKind
+) -> None:
+    guard = ActorState("guard", ActorKind.SENTINEL, (105_000, 105_000))
+    intruder = ActorState(
+        "intruder", kind, (105_000 + rules.guard_intruder_clearance_units, 105_000)
+    )
+    world = WorldState({actor.actor_id: actor for actor in (guard, intruder)})
+    level = StaticMap("contact", 8, 8)
+    events: list[EventKind] = []
+
+    def step(seen: bool) -> None:
+        update_captures(
+            world,
+            level,
+            rules,
+            None,
+            lambda event, _actor, _details: events.append(event),
+            {"guard": frozenset({"intruder"}) if seen else frozenset()},
+        )
+
+    step(False)
+    assert not events
+    step(True)
+    world.tick += rules.capture_windup_ticks - 1
+    step(False)
+    assert events == [EventKind.CAPTURE_STARTED]
+    intruder.hidden_in = "locker"
+    step(False)
+    assert events[-1] == EventKind.CAPTURE_CANCELED
+    intruder.hidden_in = None
+    step(True)
+    world.tick += rules.capture_windup_ticks
+    step(False)
+    assert EventKind.CAPTURE_COMPLETED in events and world.mission_end is not None
 
 
 def test_empty_echo_and_malformed_tools_never_spend_resources(rules: GameRules) -> None:

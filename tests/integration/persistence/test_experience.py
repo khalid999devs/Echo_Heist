@@ -69,7 +69,9 @@ def test_scored_reports_are_authoritative_matched_and_persisted(
     assert report is not None and report.matches(aborted)
     assert (report.result.score, report.result.grade, report.policy_label) == (0, "F", "Human")
     assert service.report(aborted) is report  # one report per run key
-    win = finish(gateway, DeploymentRequest("COMPANION", 23, map_id), "app:2", abort=False)
+    win = finish(
+        gateway, DeploymentRequest("COMPANION", 44, map_id, PRESETS["RUSH"]), "app:2", abort=False
+    )
     scored = service.report(win)
     assert scored is not None and scored.result.outcome == RunOutcome.WIN
     r = scored.result
@@ -77,8 +79,8 @@ def test_scored_reports_are_authoritative_matched_and_persisted(
     assert r.completion_points == 50 and r.stealth_points == max(
         0, 40 - 12 * r.detection_encounters
     )
-    assert Achievement.AI_MASTER in scored.achievements and scored.policy_label == "Balanced"
-    assert r.policy_id == "BALANCED-RETREAT-EMP_IF_TRAPPED-BALANCED"
+    assert Achievement.AI_MASTER in scored.achievements and scored.policy_label == "Rush"
+    assert r.policy_id == "SHORTEST-CONSIDER_ECHO-MELEE_IF_ADJACENT-BOLD"
     assert r.decisive_events and r.decisive_events[-1].kind.value == "MISSION_ENDED"
     assert any(dict(event.details).get("algorithm") == "MCTS" for event in r.decisive_events)
     # A fresh process sees the same history, newest first.

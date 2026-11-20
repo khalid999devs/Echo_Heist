@@ -57,11 +57,14 @@ def test_lockdown_interceptor_searches_and_walks_to_its_gate(
 ) -> None:
     sim = simulation(level, rules)
     driver = RouteDriver(rules, level.operative_id)
-    pending = route_steps(level, "lower", "lower")
+    pending = route_steps(level, "upper", "upper")
+    for _ in range(270):
+        sim.step((Action(level.operative_id, ActionKind.WAIT, sim.tick),))
     taken: int | None = None
     path: list[tuple[int, int]] = []
     announcements: set[tuple[str, int | None]] = set()
     lockdown_plans = []
+    dispatched = False
     while sim.tick < 4000 and sim.presentation_snapshot().mission_end is None:
         observation = sim.observe(level.operative_id)
         if pending and pending[0] == "HOLD":
@@ -85,6 +88,12 @@ def test_lockdown_interceptor_searches_and_walks_to_its_gate(
         assert status is not None
         if status.announcement:
             announcements.add((status.announcement, status.announcement_tick))
+        dispatched |= any(
+            order.guard_id == "guard-core"
+            and order.task == TaskKind.INTERCEPT
+            and order.evidence_tick == taken
+            for order in status.dispatches
+        )
         plan = dict(sim.intercept_plans()).get("guard-core")
         if (
             taken is not None
@@ -98,14 +107,7 @@ def test_lockdown_interceptor_searches_and_walks_to_its_gate(
             assert core.position is not None
             path.append(core.position)
     assert taken is not None and announcements == {(next(iter(announcements))[0], taken)}
-    status = sim.nexus_status()
-    assert status is not None
-    assert any(
-        order.guard_id == "guard-core"
-        and order.task == TaskKind.INTERCEPT
-        and order.evidence_tick == taken
-        for order in status.dispatches
-    )
+    assert dispatched
     # Searched on the first post-alarm evidence (the order or its own lost sighting).
     plan = lockdown_plans[0]
     assert plan.depth == 3 and len(plan.hypotheses) >= 2

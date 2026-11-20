@@ -3,13 +3,14 @@
 from collections import deque
 from collections.abc import Callable
 from io import BytesIO
+from pathlib import Path
 
 import pygame
 
 from echo_heist.core.contracts.events import EventKind, GameEvent
 from echo_heist.core.contracts.results import RunOutcome
 from echo_heist.core.contracts.world import MissionPhase
-from echo_heist.infrastructure.resources import resource_bytes
+from echo_heist.infrastructure.resources import resource_bytes, resource_path
 from echo_heist.ui.audio.model import AudioFrame
 from echo_heist.ui.audio.spatial import environment_sound, stereo
 
@@ -113,7 +114,7 @@ class AudioDirector:
         self.enabled = enabled and pygame.mixer.get_init() is not None
         self.music_volume, self.sfx_volume = music_volume, sfx_volume
         self.sounds: dict[str, pygame.mixer.Sound] = {}
-        self.music_data: dict[str, bytes] = {}
+        self.music_paths: dict[str, Path] = {}
         if self.enabled:
             if pygame.mixer.get_num_channels() < 12:
                 pygame.mixer.set_num_channels(12)
@@ -125,13 +126,12 @@ class AudioDirector:
                 if loading is not None:
                     loading(len(self.sounds) / count)
             for name in MUSIC:
-                self.music_data[name] = resource_bytes(f"assets/audio/music/{name}.ogg")
+                self.music_paths[name] = resource_path(f"assets/audio/music/{name}.ogg")
                 if loading is not None:
-                    loading((len(self.sounds) + len(self.music_data)) / count)
+                    loading((len(self.sounds) + len(self.music_paths)) / count)
         self.current_music: str | None = None
         self.target_music: str | None = None
         self.change_in_ms = 0
-        self.stream: BytesIO | None = None
         self.last_frame: AudioFrame | None = None
         self.seen: set[str] = set()
         self.seen_order: deque[str] = deque()
@@ -317,8 +317,9 @@ class AudioDirector:
         self.change_in_ms = max(0, self.change_in_ms - max(0, elapsed_ms))
         duck = 0.3 if frame.paused else 1.0
         if self.current_music != self.target_music and self.change_in_ms == 0:
-            self.stream = BytesIO(self.music_data[desired])
-            pygame.mixer.music.load(self.stream, f"{desired}.ogg")
+            # SDL's audio thread reads the file directly. A Python file callback
+            # can deadlock when the main thread pauses or changes the track.
+            pygame.mixer.music.load(self.music_paths[desired])
             # load resets volume; set it before play to avoid a full-volume burst.
             pygame.mixer.music.set_volume(self.music_volume * MUSIC_GAINS[desired] * duck)
             pygame.mixer.music.play(loops=-1, fade_ms=700)
@@ -338,7 +339,7 @@ class AudioDirector:
     def report(self) -> dict[str, object]:
         return {
             "music_track": self.current_music,
-            "audio_assets_loaded": len(self.sounds) + len(self.music_data),
+            "audio_assets_loaded": len(self.sounds) + len(self.music_paths),
             "audio_cues_played": self.cues_played,
             "lockdown_alarm_active": self.enabled and pygame.mixer.Channel(2).get_busy(),
             "room_ambience_active": self.enabled and pygame.mixer.Channel(3).get_busy(),

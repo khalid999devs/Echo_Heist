@@ -1,6 +1,7 @@
 """Decode shipped audio and verify event deduplication, context and independent volumes."""
 
 from dataclasses import replace
+from pathlib import Path
 
 import pygame
 import pytest
@@ -196,7 +197,16 @@ def test_music_transition_ramps_across_frames_without_blocking_fadeout(
     def blocking_api_forbidden(*args: object) -> None:
         pytest.fail("Music transitions must not block the main loop with fadeout")
 
+    load = pygame.mixer.music.load
+    opened = []
+
+    def open_native_track(path: Path) -> None:
+        assert isinstance(path, Path) and path.is_file()
+        opened.append(path.stem)
+        load(path)
+
     monkeypatch.setattr(pygame.mixer.music, "fadeout", blocking_api_forbidden)
+    monkeypatch.setattr(pygame.mixer.music, "load", open_native_track)
     try:
         audio = AudioDirector(enabled=True, music_volume=1.0)
         title = AudioFrame("TITLE", "0", 0)
@@ -217,6 +227,7 @@ def test_music_transition_ramps_across_frames_without_blocking_fadeout(
         audio.volumes(0.0, 0.7)
         audio.update(heist, 17)
         assert pygame.mixer.music.get_volume() == 0
+        assert opened == ["title", "sector"]
     finally:
         pygame.mixer.quit()
 

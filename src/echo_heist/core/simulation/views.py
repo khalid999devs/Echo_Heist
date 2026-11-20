@@ -9,12 +9,17 @@ from echo_heist.core.contracts.results import (
     PresentationSnapshot,
     StairView,
 )
-from echo_heist.core.contracts.security.model import ROLE_ALGORITHMS, GuardView, SecuritySpec
-from echo_heist.core.contracts.world import StaticMap
+from echo_heist.core.contracts.security.model import (
+    ROLE_ALGORITHMS,
+    GuardState,
+    GuardView,
+    SecuritySpec,
+)
+from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE, StaticMap
 from echo_heist.core.environment.view import environment_view
 from echo_heist.core.perception.concealment import is_concealed
 from echo_heist.core.simulation.systems.mission import interaction_hints
-from echo_heist.core.simulation.world import WorldState
+from echo_heist.core.simulation.world import EchoState, WorldState
 
 
 def observe(
@@ -66,6 +71,23 @@ def observe(
     )
 
 
+def _echo_view(world: WorldState, echo: EchoState) -> EchoView:
+    owner = world.actors[echo.owner_id]
+    position = echo.path[echo.index]
+    previous = echo.path[max(0, echo.index - 1)]
+    dx, dy = position[0] - previous[0], position[1] - previous[1]
+    if max(abs(dx), abs(dy)) >= POSITION_UNITS_PER_TILE:
+        previous, dx, dy = position, 0, 0
+    return EchoView(
+        echo.echo_id,
+        position,
+        len(echo.path) - echo.index,
+        owner.kind,
+        previous,
+        (dx, dy) if dx or dy else owner.facing,
+    )
+
+
 def presentation(
     world: WorldState, world_map: StaticMap, rules: GameRules, security: SecuritySpec | None = None
 ) -> PresentationSnapshot:
@@ -87,10 +109,7 @@ def presentation(
             for actor in world.actors.values()
         ),
         phase=world.phase,
-        echoes=tuple(
-            EchoView(echo.echo_id, echo.path[echo.index], len(echo.path) - echo.index)
-            for echo in world.echoes.values()
-        ),
+        echoes=tuple(_echo_view(world, echo) for echo in world.echoes.values()),
         captures=tuple(
             CaptureView(
                 guard_id,
@@ -126,6 +145,11 @@ def presentation(
                 memory.path_revision,
                 memory.evidence_tile,
                 memory.fuzzy_trace,
+                closing_ground=(
+                    memory.state == GuardState.CHASE
+                    and memory.last_seen_tick == world.tick - 1
+                    and memory.live_pursuit_ticks > rules.pursuit_grace_ticks
+                ),
             )
             for patrol in security.patrols
             for actor_id, memory in ((patrol.actor_id, world.guard_memories[patrol.actor_id]),)

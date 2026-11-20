@@ -211,3 +211,34 @@ def test_only_confirmed_pursuit_accelerates_guard(
                 )
             break
     assert saw_partial and saw_confirmed
+
+
+def test_sustained_sight_closes_on_sprint_until_a_wall_breaks_contact(rules: GameRules) -> None:
+    world = StaticMap("pursuit-contact", 24, 12)
+    spec = SecuritySpec((GuardPatrol("sentinel", ((3, 4), (18, 4))),), load_sensor_rules())
+    sim = Simulation(
+        world,
+        (ActorSpawn("operative", (10, 4)), ActorSpawn("sentinel", (3, 4), ActorKind.SENTINEL)),
+        rules=rules,
+        security=spec,
+    )
+    first_confirmation: int | None = None
+    for _ in range(100):
+        start = sim.observe("sentinel").own_status.position
+        step = sim.step()
+        guard = sim.presentation_snapshot().guards[0]
+        if any(event.kind == EventKind.SIGHTING_CONFIRMED for event in step.events):
+            first_confirmation = sim.tick
+        if guard.closing_ground:
+            end = sim.observe("sentinel").own_status.position
+            assert start is not None and end is not None and first_confirmation is not None
+            assert sim.tick - first_confirmation == rules.pursuit_grace_ticks
+            assert end[0] - start[0] > rules.sprint_speed_units_per_second // rules.simulation_hz
+            block = frozenset({(8, 4)})
+            sim.request_geometry_revision(
+                replace(world, blocked_tiles=block, opaque_tiles=block), "close sightline"
+            )
+            sim.step()
+            assert not sim.presentation_snapshot().guards[0].closing_ground
+            return
+    pytest.fail("The guard never held a live sightline long enough to close")

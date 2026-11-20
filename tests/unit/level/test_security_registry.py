@@ -24,6 +24,7 @@ def test_packaged_posts_get_real_roles_and_a_stable_revision(
     registry = build_security_registry(level, rules)
     roles = {value.guard_id: value.role for value in registry.assignments}
     assert roles == {
+        "guard-cargo": GuardRole.SENTINEL,
         "guard-core": GuardRole.INTERCEPTOR,
         "guard-core-sentinel": GuardRole.SENTINEL,
         "guard-research": GuardRole.TRACKER,

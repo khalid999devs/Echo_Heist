@@ -17,10 +17,12 @@ from random import Random
 from echo_heist.ai.companion import tactics
 from echo_heist.ai.companion.belief import Beliefs
 from echo_heist.ai.companion.briefing import MissionBriefing, PolicyWeights, policy_weights
+from echo_heist.ai.companion.stealth.cover import safe_cover
 from echo_heist.ai.companion.utility import (
     Override,
     active_guards,
     emergency,
+    escape_available,
     melee_available,
 )
 from echo_heist.ai.navigation.astar import astar
@@ -34,6 +36,7 @@ from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.observations import Observation
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
 from echo_heist.core.contracts.world import MissionPhase, Position, StairLink, Tile, tile_center
+from echo_heist.core.perception.sensors import line_of_sight
 
 ITERATIONS = 64
 MAX_DEPTH = 4
@@ -128,6 +131,8 @@ class CompanionController:
         self.melee_ready_at: dict[str, int] = {}
         self.echo_ready_at = 0
         self.hidden_since = -1
+        self.cover_ready_at = 0
+        self.hide_approach: Tile | None = None
         self.utility = ("", "")
         self.geometry_revision = 0
         self.objective_key: tuple[bool, int] | None = None
@@ -237,19 +242,12 @@ class CompanionController:
         self.legs, self.progress = legs, 0
         guards = {brief.guard_id: brief for brief in self.briefing.guards}
         threats = active_guards(observation)
-        position = own.position or tile_center(own.tile)
-
-        def within(reach: int) -> bool:
-            return any(
-                (lambda p: (p[0] - position[0]) ** 2 + (p[1] - position[1]) ** 2 <= reach**2)(
-                    entity.position or tile_center(entity.tile)
-                )
-                for entity in threats
-            )
-
+        watched_recently = tick - self.last_watched <= CLEAR_TICKS
+        cover = safe_cover(observation, self.briefing, self.beliefs) if watched_recently else None
         zone = self.briefing.graph.zone_of(own.tile)
         hide_zones = frozenset(
-            self.briefing.graph.zone_of(tile) for tile in self.briefing.hide_tiles
+            self.briefing.graph.zone_of(tile)
+            for tile in (*self.briefing.hide_tiles, *self.briefing.locker_tiles)
         )
         root = tactics.TacticalState(
             leg=0,
@@ -284,13 +282,16 @@ class CompanionController:
             },
             {gid: brief.kind for gid, brief in guards.items()},
             hide_zones,
-            own.inventory.emp_charges > 0 and within(self.rules.emp_radius_units * 8 // 10),
-            melee_available(observation) and within(self.rules.melee_range_units),
+            False,  # EMP and melee are handled by immediate-danger utility.
+            False,
             len(self.crumbs) > 8,
-            not self.beliefs.visible
-            and any(observation.tick - seen.tick <= 150 for seen in self.beliefs.sightings.values())
-            and self._hide_spot(observation) is not None,
-            bool(threats),
+            cover is not None and tick >= self.cover_ready_at,
+            bool(threats)
+            and watched_recently
+            and cover is None
+            and tick >= self.echo_ready_at
+            and self.tile_ticks >= STUCK_TICKS
+            and not escape_available(observation, self.rules),
             {gid: self.beliefs.prior(brief) for gid, brief in guards.items()},
             self._branch_threatened(observation, legs),
             observation.tick - self.progress_tick >= STALL_TICKS,
@@ -319,10 +320,8 @@ class CompanionController:
             self.directive = Directive(tactics.ADVANCE)
         elif choice == tactics.WAIT:
             self.directive = Directive(tactics.WAIT, observation.tick + WAIT_TICKS)
-        elif choice == tactics.HIDE:
-            self.directive = Directive(
-                tactics.HIDE, observation.tick + HIDE_MAX_TICKS, self._hide_spot(observation)
-            )
+        elif choice == tactics.HIDE and cover is not None:
+            self._begin_hide(cover, tick)
         elif choice == tactics.RETREAT:
             self.directive = Directive(
                 tactics.RETREAT,
@@ -346,20 +345,6 @@ class CompanionController:
             and self.briefing.graph.zone_of(seen.tile) in upcoming
             for seen in self.beliefs.sightings.values()
         )
-
-    def _hide_spot(self, observation: Observation) -> Tile | None:
-        steps = distances_from(observation.map_static, observation.own_status.tile)
-        best: tuple[int, Tile] | None = None
-        for tile in self.briefing.hide_tiles:
-            for x, y in (
-                (tile[0], tile[1] - 1),
-                (tile[0] + 1, tile[1]),
-                (tile[0], tile[1] + 1),
-                (tile[0] - 1, tile[1]),
-            ):
-                if (x, y) in steps and (best is None or (steps[(x, y)], tile) < best):
-                    best = (steps[(x, y)], tile)
-        return best[1] if best is not None and best[0] <= 14 else None
 
     def _safe_crumb(self, tick: int, *, far: bool = False) -> Tile | None:
         """A remembered tile some steps back that no observed cone covers."""
@@ -485,6 +470,16 @@ class CompanionController:
             direction = (_sign(dx), 0)
         if direction == (0, 0):
             return Action(self.actor_id, ActionKind.WAIT, tick)
+        ahead = (own.tile[0] + direction[0], own.tile[1] + direction[1])
+        if (
+            self.directive.action == tactics.ADVANCE
+            and self.weights.risk_weight > 0
+            and tick - self.last_watched > self.rules.pursuit_grace_ticks
+            and self.tile_ticks < self.rules.simulation_hz * 3
+            and self.beliefs.watched_by(observation, ahead) is not None
+        ):
+            self.utility = ("HOLD", "Wait at cover until the patrol turns")
+            return Action(self.actor_id, ActionKind.WAIT, tick)
         if self.still_ticks >= 2:
             # Pressed against a body: side-step into an open parallel lane.
             bodies = {e.tile for e in observation.visible_entities if e.actor_id != self.actor_id}
@@ -512,83 +507,111 @@ class CompanionController:
     def _escape(self, observation: Observation, away: Position) -> Action:
         own = observation.own_status
         position = own.position or tile_center(own.tile)
+        threats = tuple(
+            guard.position or tile_center(guard.tile) for guard in active_guards(observation)
+        ) or (away,)
+        occupied = {guard.tile for guard in observation.visible_entities}
         options = []
         for direction in ((1, 0), (-1, 0), (0, 1), (0, -1)):
             tile = (own.tile[0] + direction[0], own.tile[1] + direction[1])
             if not observation.map_static.can_walk(tile, crouched=own.crouched):
                 continue
             point = tile_center(tile)
-            gain = (point[0] - away[0]) ** 2 + (point[1] - away[1]) ** 2
-            options.append((-gain, direction))
+            if tile in occupied:
+                continue
+            exposed = sum(line_of_sight(observation.map_static, guard, point) for guard in threats)
+            distance = min((point[0] - x) ** 2 + (point[1] - y) ** 2 for x, y in threats)
+            options.append((exposed, -distance, direction))
         if not options:
             return Action(self.actor_id, ActionKind.WAIT, observation.tick)
         options.sort()
         # A rejected step (a body or an exact fixture edge) rotates to the next option.
         choice = (self.still_ticks // 3) % len(options) if self.previous == position else 0
-        direction = options[choice][1]
+        direction = options[choice][2]
         return Action(
             self.actor_id, ActionKind.MOVE, observation.tick, direction, sprint=not own.crouched
         )
 
+    def _begin_hide(self, cover: tuple[Tile, Tile], tick: int) -> None:
+        tile, self.hide_approach = cover
+        self.directive = Directive(tactics.HIDE, tick + HIDE_MAX_TICKS, tile)
+        self.path_goal = None
+
     def _hide(self, observation: Observation) -> Action | None:
-        own = observation.own_status
-        locker = next((h for h in observation.interactions if h.kind == "HideSpot"), None)
-        threatened = (
-            observation.tick
-            - max((s.tick for s in self.beliefs.sightings.values()), default=-10_000)
-            <= CLEAR_TICKS
-        )
-        if locker is not None and not own.concealed and not self.beliefs.visible and threatened:
-            # An authored locker offered right here is the same legal hiding
-            # action the Human has; entering in view of a guard would only be
-            # inspected, so it is used out of sight. Simulation decides success.
-            return Action(
-                self.actor_id, ActionKind.HIDE, observation.tick, target_id=locker.target_id
-            )
-        tile = self.directive.goal
-        if tile is None:
+        own, tick = observation.own_status, observation.tick
+        tile, approach = self.directive.goal, self.hide_approach
+        if tile is None or approach is None:
             return None
+        watching_cover = self.beliefs.watched_by(observation, approach)
         if own.concealed:
             if self.hidden_since < 0:
-                self.hidden_since = observation.tick
-            clear = (
-                not self.beliefs.visible
-                and observation.tick
-                - max((s.tick for s in self.beliefs.sightings.values()), default=-10_000)
-                > CLEAR_TICKS
+                self.hidden_since = tick
+            held = tick - self.hidden_since
+            guard_near = any(
+                abs(guard.tile[0] - approach[0]) + abs(guard.tile[1] - approach[1]) <= 3
+                for guard in active_guards(observation)
             )
-            if not clear and observation.tick < self.directive.until_tick:
-                return Action(self.actor_id, ActionKind.WAIT, observation.tick)
+            if held < self.rules.simulation_hz * 5 or (
+                (watching_cover is not None or guard_near) and held < HIDE_MAX_TICKS
+            ):
+                return Action(self.actor_id, ActionKind.WAIT, tick)
+            if own.hidden_in is None:
+                return Action(self.actor_id, ActionKind.MOVE, tick, (0, 1))
+        elif self.hidden_since >= 0:
+            # Keep a single outward heading until fully clear of the desk.
             self.directive = Directive(tactics.ADVANCE)
             self.hidden_since = -1
+            self.cover_ready_at = tick + self.rules.simulation_hz * 4
             self.pending = "leaving cover"
             return None
-        approach = min(
-            (
-                (abs(n[0] - own.tile[0]) + abs(n[1] - own.tile[1]), n)
-                for n in (
-                    (tile[0], tile[1] - 1),
-                    (tile[0] + 1, tile[1]),
-                    (tile[0], tile[1] + 1),
-                    (tile[0] - 1, tile[1]),
+        elif tick < self.directive.until_tick and watching_cover is None:
+            if tile in self.briefing.locker_tiles:
+                locker = next(
+                    (
+                        obj
+                        for obj in observation.map_static.objects
+                        if obj.tile == tile and obj.kind == "HideSpot"
+                    ),
+                    None,
                 )
-                if observation.map_static.can_walk(n)
-            ),
-            default=None,
-        )
-        if approach is None:
+                if locker and any(
+                    hint.kind == "HideSpot" and hint.target_id == locker.object_id
+                    for hint in observation.interactions
+                ):
+                    return Action(self.actor_id, ActionKind.HIDE, tick, target_id=locker.object_id)
+                if own.tile != approach:
+                    return self._steer(observation, approach, False)
+            else:
+                if own.tile != approach:
+                    return self._steer(observation, approach, False)
+                position = own.position or tile_center(own.tile)
+                dx = tile_center(tile)[0] - position[0]
+                if abs(dx) > ARRIVE:
+                    return Action(self.actor_id, ActionKind.MOVE, tick, (_sign(dx), 0))
+                if not own.crouched:
+                    return Action(self.actor_id, ActionKind.CROUCH, tick)
+                return Action(self.actor_id, ActionKind.MOVE, tick, (0, -1))
+        self.directive = Directive(tactics.ADVANCE)
+        self.hidden_since = -1
+        self.cover_ready_at = tick + self.rules.simulation_hz * 4
+        self.pending = "leaving cover" if own.concealed else "cover approach exposed"
+        if own.hidden_in is not None:
+            return Action(self.actor_id, ActionKind.INTERACT, tick, target_id=own.hidden_in)
+        return None
+
+    def _cover_response(self, observation: Observation) -> Action | None:
+        tick = observation.tick
+        if self.directive.action == tactics.HIDE:
+            return self._hide(observation)
+        if tick < self.cover_ready_at or tick - self.last_watched > CLEAR_TICKS:
             return None
-        if own.tile != approach[1] and own.tile != tile:
-            return self._steer(observation, approach[1], False)
-        if not own.crouched:
-            return Action(self.actor_id, ActionKind.CROUCH, observation.tick)
-        position = own.position or tile_center(own.tile)
-        point = tile_center(tile)
-        dx, dy = point[0] - position[0], point[1] - position[1]
-        direction = (_sign(dx), 0) if abs(dx) > ARRIVE else (0, _sign(dy))
-        if direction == (0, 0):
-            return Action(self.actor_id, ActionKind.WAIT, observation.tick)
-        return Action(self.actor_id, ActionKind.MOVE, observation.tick, direction)
+        limit = 3 if self.weights.sprint_always else 6
+        cover = safe_cover(observation, self.briefing, self.beliefs, max_steps=limit)
+        if cover is None:
+            self.cover_ready_at = tick + SEARCH_GAP_TICKS
+            return None
+        self._begin_hide(cover, tick)
+        return self._hide(observation)
 
     def _stand(self, observation: Observation, goal: Tile) -> Action:
         """Stand at a tile centre clear of the desk; low headroom moves one tile further."""
@@ -692,6 +715,7 @@ class CompanionController:
             self.weights.emergency,
             self.melee_ready_at,
             watched,
+            stalled=self.still_ticks >= STUCK_TICKS,
         )
         recover = self._needs_recovery(observation)
         grabbed = own.capture_ticks_remaining is not None
@@ -708,8 +732,12 @@ class CompanionController:
                 # Backing off gains nothing and the guard is not grabbing (e.g. it
                 # holds a gate): let the strategy pick another way out.
                 self.pending, override = "escape blocked", None
-        action = self._override(observation, override) if override else None
-        self.utility = (override.kind, override.reason) if override and action else ("", "")
+        action = self._cover_response(observation) if not grabbed and not recover else None
+        if action is not None:
+            self.utility = ("COVER", "Break line of sight and wait in cover")
+        else:
+            action = self._override(observation, override) if override else None
+            self.utility = (override.kind, override.reason) if override and action else ("", "")
         if action is None and recover:
             if own.inventory.core_held and tick >= self.exit_replan_at:
                 self._choose_exit(observation)
@@ -772,9 +800,8 @@ class CompanionController:
             return self._escape(observation, override.away_from)
         if override.kind == "REACT" and self.directive.action != FLEE:
             if self.weights.sprint:
-                # Non-cautious policies press on: a patrol is slower than a moving
-                # intruder, while turning back hands it time and the dead-end entry
-                # (measured on the packaged map). Grabs are still handled above.
+                # Bolder policies keep their route if they have no safe nearby
+                # cover. Actual grab danger is handled by the utility override.
                 return None
             watcher = self.beliefs.watched_by(observation, own.tile)
             ahead = self._route_goal(observation)
@@ -787,13 +814,6 @@ class CompanionController:
                 < abs(own.tile[0] - ahead[0]) + abs(own.tile[1] - ahead[1])
             )
             # Cautious policy: break line of sight, backing off if the watcher blocks.
-            if (
-                self.weights.preferred == "ECHO"
-                and own.inventory.echo_charges > 0
-                and tick >= self.echo_ready_at
-            ):
-                self.directive = Directive(FLEE, tick + FLEE_TICKS)
-                return Action(self.actor_id, ActionKind.ECHO, tick)
             self.directive = Directive(
                 FLEE, tick + FLEE_TICKS, self._safe_crumb(tick, far=True) if blocked else None
             )
@@ -886,10 +906,16 @@ class CompanionController:
             return False
         if self.directive.action in (FLEE, tactics.RETREAT):
             return True  # breaking contact outweighs the louder footsteps
-        # Transit between briefed patrol sectors is fastest at the timed sprint;
-        # Simulation still enforces its three-second burst and recharge.
-        return self.weights.sprint_always or (
-            self.weights.sprint and (own.inventory.core_held or self.state == "INFILTRATE")
+        if self.weights.sprint_always:
+            return True
+        if not self.weights.sprint:
+            return False
+        if observation.tick - self.last_watched <= CLEAR_TICKS:
+            return True
+        # Keep footfalls light when a known patrol is near enough to hear them.
+        return (own.inventory.core_held or self.state == "INFILTRATE") and not any(
+            abs(guard.tile[0] - own.tile[0]) + abs(guard.tile[1] - own.tile[1]) <= 4
+            for guard in active_guards(observation)
         )
 
     # --------------------------------------------------------------- telemetry

@@ -23,7 +23,7 @@ from echo_heist.ui.scenes.design.workshop import WORKSHOP_CONTROLS
 from echo_heist.ui.scenes.flow import GameFlow, Scene, load_level
 from echo_heist.ui.scenes.menus import CHAPTER_CARD, MODE_BUTTONS
 
-WIN_SEED = 23
+WIN_SEED = 44
 
 
 def key(code: int) -> list[pygame.event.Event]:
@@ -70,6 +70,7 @@ def main() -> int:
         click(MODE_BUTTONS[1])
         assert flow.scene == Scene.WORKSHOP and flow.deployment.can_deploy
         shot("workshop-baseline")
+        click(WORKSHOP_CONTROLS[2])  # Rush, the verified extraction policy for this seed.
         click(WORKSHOP_CONTROLS[8])
         assert flow.session and flow.session.autonomous
         flow.airlock.skip()

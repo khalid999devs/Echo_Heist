@@ -173,7 +173,13 @@ def apply_decisions(
                     ("expires_at_tick", report.expires_at_tick),
                 ),
             )
-        world.guard_memories[actor_id] = memory
+        sight = memory.state == GuardState.CHASE and memory.last_seen_tick == observation.tick
+        sustained = (
+            previous.live_pursuit_ticks if previous.last_seen_tick == observation.tick - 1 else 0
+        )
+        world.guard_memories[actor_id] = replace(
+            memory, live_pursuit_ticks=sustained + 1 if sight else 0
+        )
 
 
 def _sees(

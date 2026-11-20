@@ -131,6 +131,15 @@ def move_actor(
             rules.lockdown_guard_speed_percent if world.phase == MissionPhase.LOCKDOWN else 100,
         )
         speed = speed * multiplier // 100
+        if (
+            memory is not None
+            and chase
+            and memory.last_seen_tick == world.tick - 1
+            and memory.live_pursuit_ticks > rules.pursuit_grace_ticks
+        ):
+            speed = max(
+                speed, rules.sprint_speed_units_per_second * rules.pursuit_pressure_percent // 100
+            )
     step = speed // rules.simulation_hz
     if actor.crouched:
         step = step * rules.crouch_speed_percent // 100

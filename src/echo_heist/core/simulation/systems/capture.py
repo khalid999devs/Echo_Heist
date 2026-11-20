@@ -25,10 +25,14 @@ def update_captures(
     Registry guards may grab only targets listed for them (actual current sight).
     Guards outside the registry keep P02 contact capture, but nobody can grab an
     intruder concealed in authored cover without legitimately seeing it.
+    At contact distance a guard can finish a grab it already started even if
+    its vision cone turns. Cover, blocked reach and disabling the guard win.
     """
+    contact = rules.guard_intruder_clearance_units + rules.actor_radius_units // 2
     for guard in world.actors.values():
         if guard.kind not in GUARD_KINDS:
             continue
+        previous = world.captures.get(guard.actor_id)
         targets = (
             [
                 actor
@@ -36,7 +40,17 @@ def update_captures(
                 if actor.kind in (ActorKind.OPERATIVE, ActorKind.COMPANION)
                 and (mission is None or actor.actor_id == mission.operative_id)
                 and (
-                    actor.actor_id in allowed_targets[guard.actor_id]
+                    (
+                        actor.actor_id in allowed_targets[guard.actor_id]
+                        or (
+                            previous is not None
+                            and previous.target_id == actor.actor_id
+                            and distance_squared(guard.position, actor.position) <= contact**2
+                            and not is_concealed(
+                                world_map, actor.tile, actor.crouched, hidden_in=actor.hidden_in
+                            )
+                        )
+                    )
                     if allowed_targets is not None and guard.actor_id in allowed_targets
                     else not is_concealed(
                         world_map, actor.tile, actor.crouched, hidden_in=actor.hidden_in
@@ -57,7 +71,6 @@ def update_captures(
         targets.sort(
             key=lambda actor: (distance_squared(guard.position, actor.position), actor.actor_id)
         )
-        previous = world.captures.get(guard.actor_id)
         if previous is not None and not any(t.actor_id == previous.target_id for t in targets):
             del world.captures[guard.actor_id]
             emit(EventKind.CAPTURE_CANCELED, guard.actor_id, (("target_id", previous.target_id),))

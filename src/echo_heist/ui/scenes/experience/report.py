@@ -3,7 +3,7 @@
 import pygame
 
 from echo_heist.core.contracts.events import EventKind
-from echo_heist.core.contracts.experience.model import Achievement, ResultRequest, RunReport
+from echo_heist.core.contracts.experience.model import ResultRequest, RunReport
 from echo_heist.core.contracts.results import MissionEnd, RunOutcome
 from echo_heist.ui.presenters.reporting import ReportState
 from echo_heist.ui.render import theme
@@ -11,6 +11,7 @@ from echo_heist.ui.render.hud import panel
 from echo_heist.ui.render.layout.text import fit, lines
 from echo_heist.ui.render.security.signals import GUARD_NAMES
 from echo_heist.ui.render.theme import Fonts
+from echo_heist.ui.scenes.experience.badges import draw_badges
 from echo_heist.ui.scenes.navigation.controls import button, hit
 
 RESULT_RETRY = pygame.Rect(660, 590, 552, 48)
@@ -24,11 +25,6 @@ REPORT_CONTROLS = (
     pygame.Rect(410, 610, 220, 46),
     pygame.Rect(650, 610, 220, 46),
 )
-ACHIEVEMENTS = {
-    Achievement.GHOST: "GHOST",
-    Achievement.AI_MASTER: "AI MASTER",
-    Achievement.SPEEDRUNNER: "SPEEDRUNNER",
-}
 
 
 def label(
@@ -96,15 +92,10 @@ def draw_results(
         label(canvas, fonts, "EXIT  " + exit_name, (662, 385))
     elif end.capture_by in GUARD_NAMES:
         label(canvas, fonts, "CAUGHT BY  " + GUARD_NAMES[end.capture_by][1], (662, 385))
-    badges = " / ".join(ACHIEVEMENTS[a] for a in report.achievements) if report else ""
-    label(
-        canvas,
-        fonts,
-        badges or ("SEED  " + str(request.seed) if request else ""),
-        (662, 420),
-        accent=bool(badges),
-    )
-    label(canvas, fonts, "D  Details     N  New seed", (662, 448))
+    if end.outcome == RunOutcome.WIN and report:
+        draw_badges(canvas, fonts, report.achievements)
+    elif request:
+        label(canvas, fonts, f"SEED  {request.seed}", (662, 420))
     button(canvas, RESULT_DETAILS, "DETAILS", fonts, hovered == "DETAILS")
     button(canvas, RESULT_NEW_SEED, "NEW SEED", fonts, hovered == "NEW_SEED")
     if end.outcome == RunOutcome.WIN:

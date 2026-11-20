@@ -176,6 +176,7 @@ class GuardMemory:
     evidence_tile: Tile | None = None
     fuzzy_trace: FuzzyTrace | None = None
     intercept: InterceptPlan | None = None
+    live_pursuit_ticks: int = 0
 
     def __post_init__(self) -> None:
         for name in ("last_seen_tile", "target", "path_goal", "search_origin", "evidence_tile"):
@@ -220,3 +221,4 @@ class GuardView:
     path_revision: int = 0
     evidence_tile: Tile | None = None
     fuzzy_trace: FuzzyTrace | None = None
+    closing_ground: bool = False

@@ -7,7 +7,14 @@ from echo_heist.core.contracts.environment.presentation import EnvironmentView
 from echo_heist.core.contracts.events import GameEvent
 from echo_heist.core.contracts.observations import EntityView, Observation
 from echo_heist.core.contracts.security.model import GuardView
-from echo_heist.core.contracts.world import MissionPhase, Position, StaticMap, Tile, immutable_tile
+from echo_heist.core.contracts.world import (
+    ActorKind,
+    MissionPhase,
+    Position,
+    StaticMap,
+    Tile,
+    immutable_tile,
+)
 
 
 class RunOutcome(StrEnum):
@@ -45,9 +52,14 @@ class EchoView:
     echo_id: str
     position: Position
     remaining_ticks: int
+    owner_kind: ActorKind
+    previous_position: Position
+    facing: Tile
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "position", immutable_tile(self.position))
+        object.__setattr__(self, "previous_position", immutable_tile(self.previous_position))
+        object.__setattr__(self, "facing", immutable_tile(self.facing))
 
 
 @dataclass(frozen=True, slots=True)

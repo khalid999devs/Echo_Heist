@@ -2,7 +2,7 @@
 
 Updated **2026-11-20**. Read [Status](../tracking/STATUS.md) and the [desktop candidate handoff](../tracking/handoffs/khalid/day_04/RELEASE_CANDIDATE.md) for the active Core security revision, replay/test baseline and remaining platform checks.
 
-Suhita's current delivery work is P08-SR1 physical Windows QA on the candidate. Khalid maintains the Mac build and integrates delivery evidence. The candidate uses five guards, approved scoring, timed sprint and limited melee. Existing dated implementation records remain historical.
+Suhita's current delivery work is P08-SR1 physical Windows QA on the candidate. Khalid maintains the Mac build and integrates delivery evidence. The candidate uses six guards, approved scoring, timed sprint and limited melee. Existing dated implementation records remain historical.
 
 ## Resolve the developer once
 

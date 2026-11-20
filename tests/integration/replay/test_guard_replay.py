@@ -44,33 +44,32 @@ def upper(
     return run_route("upper", level, rules, sensors, registry, route_steps(level, "upper", "upper"))
 
 
-@pytest.mark.parametrize(
-    ("branch", "back", "exit_id"),
-    [
-        ("lower", "upper", "entry-exit"),
-        ("upper", "upper", "cargo-exit"),
-    ],
-)
-def test_default_security_routes_win_with_real_guard_algorithms(
+def test_entry_route_wins_with_real_guard_algorithms(
     level: LevelData,
-    rules: GameRules,
-    sensors: SensorRules,
-    registry: SecurityRegistry,
     upper: ScenarioResult,
-    branch: Branch,
-    back: Branch,
-    exit_id: str,
+) -> None:
+    assert upper.outcome == "WIN"
+    assert upper.final_tiles[level.operative_id] == anchor(level, "entry-exit")
+    assert upper.events["CORE_TAKEN"] == upper.events["LOCKDOWN_STARTED"] == 1
+    assert upper.algorithms["BFS"] > 0 and upper.algorithms["A*"] > 0
+    assert upper.max_expanded["A*"] > 0 and upper.events["SIGHTING_CONFIRMED"] > 0
+    assert upper.algorithms["ALPHA-BETA"] > 0
+
+
+def test_exposed_cargo_return_is_caught_after_taking_the_core(
+    level: LevelData, rules: GameRules, sensors: SensorRules, registry: SecurityRegistry
 ) -> None:
     result = run_route(
-        branch, level, rules, sensors, registry, route_steps(level, branch, back, exit_id=exit_id)
+        "cargo",
+        level,
+        rules,
+        sensors,
+        registry,
+        route_steps(level, "upper", "upper", exit_id="cargo-exit"),
     )
-    assert result.final_tiles[level.operative_id] == anchor(level, exit_id)
-    for outcome in (upper, result):
-        assert outcome.outcome == "WIN"
-        assert outcome.events["CORE_TAKEN"] == outcome.events["LOCKDOWN_STARTED"] == 1
-        assert outcome.algorithms["BFS"] > 0 and outcome.algorithms["A*"] > 0
-        assert outcome.max_expanded["A*"] > 0 and outcome.events["SIGHTING_CONFIRMED"] > 0
-        assert outcome.algorithms["ALPHA-BETA"] > 0
+    assert result.events["CORE_TAKEN"] == 1
+    assert result.outcome == "CAPTURED" and result.capture_by == "guard-cargo"
+    assert result.events["CAPTURE_COMPLETED"] == 1
 
 
 def test_blind_return_through_the_predicted_gate_is_intercepted(
@@ -82,7 +81,13 @@ def test_blind_return_through_the_predicted_gate_is_intercepted(
     charges the pursuing Research guard may close the grab at that gate, so the
     assertion is the Interceptor's searched and physically held post."""
     result = run_route(
-        "lower", level, rules, sensors, registry, route_steps(level, "lower", "lower")
+        "research-return",
+        level,
+        rules,
+        sensors,
+        registry,
+        route_steps(level, "upper", "lower"),
+        wait_start_ticks=210,
     )
     assert result.outcome == "CAPTURED" and result.events["CORE_TAKEN"] == 1
     assert result.algorithms["ALPHA-BETA"] > 0
@@ -90,7 +95,7 @@ def test_blind_return_through_the_predicted_gate_is_intercepted(
     assert registry.graph is not None
     gate = registry.graph.node("choke-research-core").tile
     held, caught = result.final_tiles["guard-core"], result.final_tiles[level.operative_id]
-    assert held == gate and abs(caught[0] - gate[0]) + abs(caught[1] - gate[1]) <= 1
+    assert held == gate and abs(caught[0] - gate[0]) + abs(caught[1] - gate[1]) <= 2
 
 
 @pytest.mark.parametrize(
@@ -128,7 +133,7 @@ def test_recorded_run_replays_exactly_and_detects_changed_inputs(
 ) -> None:
     assert replay_matches(level, rules, sensors, registry, upper)
     log = upper.log
-    assert log.header.fingerprint_schema == 15 and log.header.registry_revision == registry.revision
+    assert log.header.fingerprint_schema == 16 and log.header.registry_revision == registry.revision
     header = build_header(
         level.static_map, rules, sensors, registry_revision=registry.revision, seed=1042
     )

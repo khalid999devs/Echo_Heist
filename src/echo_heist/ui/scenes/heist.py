@@ -599,6 +599,7 @@ class HeistSession:
                 sprint_duration_ticks=self.rules.sprint_duration_ticks,
                 crouched=observation.own_status.crouched,
                 concealed=observation.own_status.concealed,
+                in_locker=observation.own_status.hidden_in is not None,
                 sprint_recharge_ticks=self.rules.sprint_recharge_ticks,
                 ticks_per_second=self.rules.simulation_hz,
                 teaching_view=self.lab_note or self.autonomy_panel,

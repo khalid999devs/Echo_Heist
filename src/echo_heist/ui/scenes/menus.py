@@ -258,7 +258,7 @@ def _briefing(
     _text(canvas, fonts.micro, "CHAPTER 01", theme.ACCENT, (64, 204))
     _text(canvas, fonts.heading, "The Core Rebellion", theme.TEXT, (62, 229))
     steps = (
-        ("01  INFILTRATE", "Take either stairway to the upper floor."),
+        ("01  INFILTRATE", "Stay unseen. Use cover to reach either stairway."),
         ("02  RECOVER", f"Hold {control_hints[0]} beside the experimental Core."),
         ("03  EXTRACT", "Return downstairs to the entry or cargo exit."),
     )

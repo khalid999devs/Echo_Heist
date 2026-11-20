@@ -11,7 +11,7 @@ from echo_heist.ui.render.layout.monitor import Monitor, age, identifier, tabs
 from echo_heist.ui.render.security.signals import GUARD_NAMES, STATE_COLORS, STATE_LABELS
 from echo_heist.ui.render.theme import Fonts
 
-GUARD_TABS = tabs(5)
+GUARD_TABS = tabs(6)
 STATE_SUMMARY = {
     GuardState.PATROL: "Following its assigned patrol.",
     GuardState.INVESTIGATE: "Checking a cue or a reported location.",

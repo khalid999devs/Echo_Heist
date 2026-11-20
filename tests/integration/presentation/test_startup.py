@@ -34,7 +34,7 @@ def test_skip_cannot_launch_a_mission_and_silent_settings_are_respected(
     assert result.game is not None
     assert result.report["completed"] and result.report["skip_requested"]
     assert result.report["sound_cues"] == 0
-    assert result.game.audio.enabled and len(result.game.audio.music_data) == 5
+    assert result.game.audio.enabled and len(result.game.audio.music_paths) == 5
     assert result.game.audio.current_music == "title"
     flow = result.game.flow
     flow.frame(pygame.event.get(), 16)

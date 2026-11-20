@@ -5,7 +5,7 @@ from collections import Counter
 import pytest
 
 from echo_heist.autonomy.gateway import NexusGateway
-from echo_heist.core.contracts.autonomy.policy import DeploymentRequest
+from echo_heist.core.contracts.autonomy.policy import PRESETS, DeploymentRequest
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.environment.presentation import PropKind
 from echo_heist.core.contracts.results import RunOutcome
@@ -15,7 +15,7 @@ from echo_heist.infrastructure.resources import load_sensor_rules, resource_byte
 from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 
-COMPANION_WIN, COMPANION_CAPTURE = 23, 4  # Balanced outcomes with the authored props
+COMPANION_WIN, COMPANION_CAPTURE = 44, 18
 
 
 @pytest.fixture(scope="module")
@@ -42,7 +42,7 @@ def test_every_authored_prop_is_live_from_tick_zero(
         PropKind.DOOR: 3,
         PropKind.GLASS: 2,
         PropKind.CANISTER: 3,
-        PropKind.LOCKER: 5,
+        PropKind.LOCKER: 8,
     }
     assert all(p.openness == 1.0 for p in props if p.kind == PropKind.DOOR)
     assert not any(p.broken or p.occupant_id for p in props)
@@ -99,10 +99,17 @@ def test_companion_plays_the_prop_facility_deterministically(
     def attempt() -> tuple[RunOutcome | None, str]:
         # A fresh gateway each time: NEXUS memory adapts after every attempt.
         fresh = NexusGateway(level, rules, sensors, None)
-        run = fresh.deploy(DeploymentRequest("COMPANION", seed, level.static_map.map_id))
+        run = fresh.deploy(
+            DeploymentRequest("COMPANION", seed, level.static_map.map_id, PRESETS["RUSH"])
+        )
+        used_cover = set()
         while run.tick < 9_000:
             if run.step(()).mission_end is not None:
                 break
+            status = run.observe(run.actor_id).own_status
+            if status.concealed:
+                used_cover.add(status.hidden_in or status.tile)
+        assert len(used_cover) >= 2
         end = run.presentation_snapshot().mission_end
         return (end.outcome if end else None), run.fingerprint()
 

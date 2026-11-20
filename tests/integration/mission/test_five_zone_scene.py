@@ -138,10 +138,10 @@ def test_mouse_menu_and_responsive_coordinates() -> None:
         0,
     )
     assert flow.session.lab_note and flow.session.lab_selected == 4
-    flow.frame([key(pygame.KEYDOWN, pygame.K_2), key(pygame.KEYUP, pygame.K_2)], 0)
-    assert flow.session.lab_selected == 1
-    selected = flow.session.simulation.presentation_snapshot().guards[1]
-    assert selected.actor_id == "guard-core-sentinel" and selected.algorithm == "BFS"
+    flow.frame([key(pygame.KEYDOWN, pygame.K_1), key(pygame.KEYUP, pygame.K_1)], 0)
+    assert flow.session.lab_selected == 0
+    selected = flow.session.simulation.presentation_snapshot().guards[0]
+    assert selected.actor_id == "guard-cargo" and selected.algorithm == "BFS"
     fingerprint = flow.session.simulation.fingerprint()
     for _ in range(3):
         flow.draw(pygame.Surface((1280, 1440)))
@@ -186,19 +186,20 @@ def test_art_and_gait_follow_committed_movement_without_changing_simulation() ->
     assert flow.session.actor_motion[flow.level.operative_id].phase == phase
 
 
-def test_default_live_guard_allows_actual_lower_route_core_and_extraction() -> None:
+def test_default_live_guards_allow_actual_entry_extraction() -> None:
     flow = start(security_enabled=True)
     assert flow.session is not None
     first = flow.session.simulation.presentation_snapshot()
     # The validated registry activates every authored post with its real role.
     assert {(guard.actor_id, guard.algorithm) for guard in first.guards} == {
+        ("guard-cargo", "BFS"),
         ("guard-core", "ALPHA-BETA"),
         ("guard-core-sentinel", "BFS"),
         ("guard-research", "A*"),
         ("guard-security", "BFS"),
         ("guard-service", "BFS"),
     }
-    route = list(mission_path(flow.level, "lower"))
+    route = list(mission_path(flow.level, "upper"))
     # P04: after the alarm the Interceptor holds the gate it predicts (here the
     # Research Return), so the escape uses the alternate Security corridor.
     back = list(mission_path(flow.level, "upper", returning=True))

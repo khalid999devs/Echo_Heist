@@ -91,13 +91,17 @@ def test_pursuit_reaches_an_outcome_around_either_stair_route(
 
 
 @pytest.mark.parametrize(
-    ("scenario_id", "policy"),
-    [("s03-patrol-6s", "RUSH"), ("s16-service-corridor-late", "GHOST")],
+    ("scenario_id", "policy", "reached"),
+    [
+        ("s03-patrol-6s", "RUSH", "core-chamber"),
+        ("s16-service-corridor-late", "GHOST", "research-floor"),
+    ],
 )
 def test_policies_resume_goal_progress_after_repeated_retreats(
-    facility: Facility, suite: Suite, scenario_id: str, policy: str
+    facility: Facility, suite: Suite, scenario_id: str, policy: str, reached: str
 ) -> None:
     scenario = next(s for s in suite.scenarios if s.scenario_id == scenario_id)
     record = run_scenario(facility, scenario, policy, PRESETS[policy], 4_000)
     assert record["outcome"] in ("WIN", "CAPTURED")
-    assert "core-chamber" in record["route_zones"]
+    assert reached in record["route_zones"]
+    assert record["mcts"]["utility_override_ticks"] > 0

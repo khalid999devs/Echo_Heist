@@ -1,5 +1,7 @@
 # Work claims and runnable handoffs
 
+2026-11-20: [Lab gameplay renewal](../quality/reports/release_candidate/LAB_GAMEPLAY.md) records the repaired Companion stair behavior, HUD cleanup and new presentation captures. The updated [runbook](../release/draft/DEMO.md) uses seed 23 for the paired Companion demo.
+
 2026-11-20: [Final presentation rehearsal](../quality/reports/release_candidate/FINAL_REHEARSAL.md) records Khalid's end-to-end audit, two UI fixes, current Mac candidate and offline backup footage. See the [presentation runbook](../release/draft/DEMO.md). Physical Windows delivery QA remains with Suhita.
 
 2026-11-20: [Live decision monitor review](../quality/reports/release_candidate/DECISION_MONITORS.md) records Khalid's review of real Companion wins/captures and the F2/F3 presentation update. Physical Windows delivery QA remains with Suhita.

@@ -2,7 +2,8 @@
 
 2026-11-20, Khalid. Suhita's remaining implementation was accepted in [PR #9](https://github.com/khalid999devs/Echo_Heist/pull/9). [PR #10](https://github.com/khalid999devs/Echo_Heist/pull/10) merged the two-exit map, pursuit and final report changes. The Core security revision adds a fifth guard, wider cones, solid chassis clearance and consistent stun audio. See current Status for the build and test baseline.
 
-- [Final rehearsal and package](../../../../quality/reports/release_candidate/FINAL_REHEARSAL.md)
+- [Current lab clips and package](../../../../quality/reports/release_candidate/LAB_GAMEPLAY.md)
+- [Earlier rehearsal evidence](../../../../quality/reports/release_candidate/FINAL_REHEARSAL.md)
 - [Classroom runbook](../../../../release/draft/DEMO.md)
 - [Decision monitor verification](../../../../quality/reports/release_candidate/DECISION_MONITORS.md)
 - [Core security and stun review](../../../../quality/reports/release_candidate/CORE_SECURITY.md)

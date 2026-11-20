@@ -12,6 +12,14 @@ Results use the approved 50 extraction, 40 stealth and 10 pace weights. The thre
 
 `uv run --locked python tests/fixtures/autonomy/live_capture.py --output output/lab-gameplay/work/stealth/native-review` exercised the production Cocoa window with audio ready. Seed 44 won and seed 4 was captured. All three live tabs, pause and NEXUS reset passed. Native music now streams directly from bundled files after an SDL music-pause deadlock was reproduced with the recorder.
 
+### Merged build and footage
+
+The gameplay revision merged as `74d8596` in [PR #11](https://github.com/khalid999devs/Echo_Heist/pull/11). `uv run --locked --all-extras python scripts/checks/run.py` passed structure, Ruff, mypy and 348 tests. [Branch CI](https://github.com/khalid999devs/Echo_Heist/actions/runs/44693504577) passed Linux headless checks and the Windows and macOS frozen builds and smoke checks. The Apple Silicon candidate from the same runtime passed codesign and nine Cocoa frozen smoke checks from the extracted archive with audio ready.
+
+Seven clips were captured after merge from `74d8596`. Human takes used the game's ordinary keyboard input with rehearsed timing. Companion ran live with Rush and NEXUS memory off. Both wins scored 64/B with three confirmed encounters. The Human capture at tick 1493 shows three cover stops and deploys Echo at 0:46. The Companion capture at tick 3021 follows two locker hides and an under-desk hide. The Research Tracker's grab completed at 1:46 in the clip. The opening used the production bootstrap with all three launch cues.
+
+Every MP4 decoded through its last frame at 1920 × 1080 and 30 fps with stereo game audio. The ZIP in `output/lab-gameplay` includes all seven clips and `START_HERE.txt` with timestamps. ZIP integrity checks passed. It is 220,204,369 bytes with SHA-256 `5aea093ac512ba4f62e2f95c5bc4c53e3e2cc95e8e11f67d75746f18608dd392`.
+
 ## Previous recording revision
 
 2026-11-20, Khalid. Runtime `2c1cdc7`, Apple Silicon macOS 26.4.1. See the [presentation runbook](../../../release/draft/DEMO.md) for the live sequence and monitor controls.

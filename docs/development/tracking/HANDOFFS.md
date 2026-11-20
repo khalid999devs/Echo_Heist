@@ -1,5 +1,7 @@
 # Work claims and runnable handoffs
 
+2026-11-20: [Final presentation rehearsal](../quality/reports/release_candidate/FINAL_REHEARSAL.md) records Khalid's end-to-end audit, two UI fixes, current Mac candidate and offline backup footage. See the [presentation runbook](../release/draft/DEMO.md). Physical Windows delivery QA remains with Suhita.
+
 2026-11-20: [Live decision monitor review](../quality/reports/release_candidate/DECISION_MONITORS.md) records Khalid's review of real Companion wins/captures and the F2/F3 presentation update. Physical Windows delivery QA remains with Suhita.
 
 2026-11-20: [Core security and stun review](../quality/reports/release_candidate/CORE_SECURITY.md) records Khalid's difficulty, collision and audio revisions. Physical Windows delivery QA remains with Suhita. Use the current [Status](STATUS.md) and [runnable handoff](handoffs/khalid/day_04/RELEASE_CANDIDATE.md).

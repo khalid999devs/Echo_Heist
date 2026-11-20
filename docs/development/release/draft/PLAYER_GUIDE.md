@@ -29,7 +29,7 @@ Take either stairway upstairs. Hold Interact beside the Core, then escape downst
 
 Melee has two charges and four seconds of recovery. A legal resisted hit still costs a charge and makes noise. Crouch to move through clearances beneath marked desks. Lockers conceal you when entered out of view. Sprint into breakable glass or walk into a loose canister to make noise and draw a guard away.
 
-Settings → Controls remaps the ten gameplay actions. Open Accessibility to choose sound captions and high-contrast HUD, and use Save Preferences to retain those choices and key bindings. Music, sound effects, window mode and reduced flashing use the general settings.
+Settings → Controls remaps the ten gameplay actions. Use Save Preferences there to retain the bindings. Accessibility lets you configure sound captions and high-contrast HUD and save those choices. Music, sound effects, window mode and reduced flashing use the general settings.
 
 Results show the authoritative 50-point extraction, up to 40-point stealth and 10-point pace breakdown. A distinct confirmed encounter costs 12 stealth points. Capture or abort earns 0/F. Gadget counts are informational. R retries with the same seed, N lets you select a new seed, and D shows report details. Open Report from the title menu to browse saved attempts after a relaunch. Workshop → NEXUS Memory lets you turn adaptation on/off or clear learned memory before deploying again.
 

@@ -77,3 +77,18 @@ git reset --hard origin/main
 ```
 
 [PR #13](https://github.com/khalid999devs/Echo_Heist/pull/13) carries these changes. It is merged with a merge commit rather than a squash, so the tagged commit stays in the history of `main`.
+
+## Release 0.1.0a2
+
+Published on 2026-11-24 as [ECHO HEIST 0.1.0a2](https://github.com/khalid999devs/Echo_Heist/releases/tag/v0.1.0a2), the latest release. The annotated tag `v0.1.0a2` points at `e9d60cbe6a4a03e51a94a9a202d53bbf12839204`, the merge of [PR #14](https://github.com/khalid999devs/Echo_Heist/pull/14). It ships the [Core room balance](../planning/balance/CORE_ROOM.md). The description lists the improved logic only and points to the 0.1.0a1 install steps. v0.1.0a1 stays published as the presentation build.
+
+| Asset | Bytes | SHA-256 |
+| --- | --- | --- |
+| `echo-heist-0.1.0a2-windows-x64.zip` | 112,643,990 | `2138b544ba6022b5838edbd4c203493608a47336c99a74a100d86257eb3dbc09` |
+| `echo-heist-0.1.0a2-macos-arm64.zip` | 113,468,257 | `6cdec491a37c77458b5d289b8c35043655143d668f24b39081b9140320e526e5` |
+
+Both zips come from the main push run [45244029746](https://github.com/khalid999devs/Echo_Heist/actions/runs/45244029746) on the merge commit, where headless-checks, windows-x64 and macos-arm64 passed. The PR run [45241705134](https://github.com/khalid999devs/Echo_Heist/actions/runs/45241705134) on the branch head passed as well, and the merge commit has the same file tree. Each manifest records version 0.1.0a2, a clean working tree, Python 3.13.17, PyInstaller 6.22.3, fingerprint schema 17 and gameplay hash `34e81693bd86de8b25d0dde651d03608bb2cb43d3ec8e894a7ed13d53418c159`. Signing is unchanged, `unsigned` for Windows and `ad-hoc; not notarized` for macOS.
+
+Checks on the downloaded zips. Both CI smoke summaries report `passed: true` with scope `CI dummy video`. Each SHA-256 matches its manifest, and each zip carries `LICENSE.md` at its root. On Khalid's Apple Silicon Mac the extracted app passes `codesign --verify --deep --strict` and prints `0.1.0a2` for `--version`. Hands-on play of these exact zips on clean Windows and macOS machines has not been done yet.
+
+The README download links now point to the 0.1.0a2 zips, and its wide-test sentence uses the new sweep numbers.

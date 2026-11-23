@@ -24,17 +24,25 @@ def test_packaged_posts_get_real_roles_and_a_stable_revision(
     registry = build_security_registry(level, rules)
     roles = {value.guard_id: value.role for value in registry.assignments}
     assert roles == {
-        "guard-cargo": GuardRole.SENTINEL,
+        "guard-cargo": GuardRole.INTERCEPTOR,
         "guard-core": GuardRole.INTERCEPTOR,
-        "guard-core-sentinel": GuardRole.SENTINEL,
+        "guard-vault": GuardRole.TRACKER,
         "guard-research": GuardRole.TRACKER,
         "guard-security": GuardRole.SENTINEL,
         "guard-service": GuardRole.SENTINEL,
     }
     core = registry.assignment("guard-core")
     assert core.zone_id == "core-chamber"
-    assert registry.assignment("guard-core-sentinel").zone_id == "core-chamber"
+    assert registry.assignment("guard-vault").zone_id == "core-chamber"
     assert core.chokepoint_ids == ("choke-research-core", "choke-security-core")
+    # The second Interceptor defends the Service Wing gates on the way out.
+    cargo = registry.assignment("guard-cargo")
+    assert cargo.zone_id == "service-wing"
+    assert cargo.chokepoint_ids == (
+        "choke-entry-service",
+        "choke-service-research",
+        "choke-service-security",
+    )
     assert all(value.patrol.points[0] != value.patrol.points[-1] for value in registry.assignments)
     spec = registry.spec(load_sensor_rules())
     assert {patrol.actor_id for patrol in spec.patrols} == set(roles)

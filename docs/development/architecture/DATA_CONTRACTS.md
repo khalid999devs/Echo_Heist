@@ -61,7 +61,7 @@ Reject duplicate/missing objective anchors, invalid patrol coordinates, unknown 
 | Simulation / rendering | 30 Hz / target 60 FPS |
 | Logical tile / example map | 32 px / approximately 80 x 56 cells |
 | Walk / sprint | 2.2 / 3.6 tiles per second |
-| Guards | Roughly 5-6: 2-3 Sentinels, 1-2 Trackers, one Interceptor |
+| Guards | Roughly 5-6: 2-3 Sentinels, 1-2 Trackers, one Interceptor. Shipped: six guards, two Sentinels, two Trackers and two Interceptors (user override for the second Interceptor, 2026-11-22; see the [final presentation record](../quality/reports/final_presentation/FINAL_PRESENTATION.md)) |
 | Capture telegraph | Approximately 0.4 s, represented as ticks |
 | Echo | Three charges, previous 2.5 s path replayed backward |
 | EMP | One charge, approximately 2.5 tiles radius / 3 s disable |

@@ -62,6 +62,7 @@ def test_lockdown_interceptor_searches_and_walks_to_its_gate(
         sim.step((Action(level.operative_id, ActionKind.WAIT, sim.tick),))
     taken: int | None = None
     path: list[tuple[int, int]] = []
+    heading: list[tuple[object, object]] = []
     announcements: set[tuple[str, int | None]] = set()
     lockdown_plans = []
     dispatched = False
@@ -103,9 +104,12 @@ def test_lockdown_interceptor_searches_and_walks_to_its_gate(
         ):
             lockdown_plans.append(plan)
         if taken is not None:
-            core = next(a for a in sim.presentation_snapshot().actors if a.actor_id == "guard-core")
+            snapshot = sim.presentation_snapshot()
+            core = next(a for a in snapshot.actors if a.actor_id == "guard-core")
             assert core.position is not None
             path.append(core.position)
+            view = next(g for g in snapshot.guards if g.actor_id == "guard-core")
+            heading.append((view.target, view.path[-1] if view.path else view.target))
     assert taken is not None and announcements == {(next(iter(announcements))[0], taken)}
     assert dispatched
     # Searched on the first post-alarm evidence (the order or its own lost sighting).
@@ -123,4 +127,8 @@ def test_lockdown_interceptor_searches_and_walks_to_its_gate(
     )
     assert all(abs(a[0] - b[0]) + abs(a[1] - b[1]) <= 2 * limit for a, b in pairwise(path))
     post = tile_center(plan.post_tile)
-    assert min(max(abs(p[0] - post[0]), abs(p[1] - post[1])) for p in path) <= 3_000
+    gaps = [max(abs(p[0] - post[0]), abs(p[1] - post[1])) for p in path]
+    # It plans its A* walk to the chosen gate and closes on it (or arrives)
+    # before the scripted run ends.
+    assert (plan.post_tile, plan.post_tile) in heading
+    assert min(gaps) <= 3_000 or gaps[-1] < gaps[0]

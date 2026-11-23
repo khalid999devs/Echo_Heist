@@ -11,6 +11,8 @@ from echo_heist.core.contracts.security.model import GuardPatrol, GuardRole, Sec
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
 from echo_heist.core.contracts.world import ActorKind, ActorSpawn, MapObject, StaticMap, tile_center
 from echo_heist.core.simulation.engine import Simulation
+from echo_heist.core.simulation.systems.motion import body_occupied, move_actor
+from echo_heist.core.simulation.world import ActorState, WorldState
 from echo_heist.infrastructure.resources import load_sensor_rules
 
 
@@ -62,15 +64,14 @@ def test_diagonal_corner_and_other_actor_block_physical_body(rules: GameRules) -
 
 
 @pytest.mark.parametrize("intruder", [ActorKind.OPERATIVE, ActorKind.COMPANION])
-def test_chassis_blocks_sprint_but_stun_buys_time_to_go_around(
+def test_chassis_blocks_sprint_but_a_stunned_guard_is_stepped_past(
     rules: GameRules, intruder: ActorKind
 ) -> None:
     rules = replace(rules, sprint_speed_units_per_second=960_000)
-    # One tile wide approaching a guard, with a side bay at the contact point.
-    open_tiles = {(x, 2) for x in range(1, 7)} | {(x, 3) for x in range(3, 7)}
-    walls = frozenset((x, y) for x in range(8) for y in range(6) if (x, y) not in open_tiles)
+    # A one-tile lane with the guard standing in it: no way around the body.
+    walls = frozenset((x, y) for x in range(8) for y in range(5) if not (y == 2 and 0 < x < 7))
     sim = Simulation(
-        StaticMap("guard-chassis", 8, 6, walls, walls),
+        StaticMap("guard-chassis", 8, 5, walls, walls),
         (
             ActorSpawn("intruder", (1, 2), intruder),
             ActorSpawn("guard", (4, 2), ActorKind.SENTINEL),
@@ -81,25 +82,57 @@ def test_chassis_blocks_sprint_but_stun_buys_time_to_go_around(
         ),
     )
 
-    def sprint(direction: tuple[int, int]) -> None:
-        sim.step((Action("intruder", ActionKind.MOVE, sim.tick, direction, sprint=True),))
+    def move(direction: tuple[int, int], *, sprint: bool = False) -> None:
+        sim.step((Action("intruder", ActionKind.MOVE, sim.tick, direction, sprint=sprint),))
 
     for _ in range(5):
-        sprint((1, 0))
+        move((1, 0), sprint=True)
     blocked = sim.observe("intruder").own_status.position
     assert blocked is not None
     assert tile_center((4, 2))[0] - blocked[0] >= rules.guard_intruder_clearance_units
 
     hit = sim.step((Action("intruder", ActionKind.MELEE, sim.tick),))
     assert any(event.kind == EventKind.GUARD_STUNNED for event in hit.events)
-    sprint((1, 0))
-    assert sim.observe("intruder").own_status.position == blocked
-    for _ in range(13):
-        sprint((0, 1))
-    for _ in range(24):
-        sprint((1, 0))
-    assert sim.observe("intruder").own_status.tile == (5, 3)
+    # The slumped body no longer walls off the lane: walk straight past it.
+    for _ in range(20):
+        move((1, 0))
+    assert sim.observe("intruder").own_status.tile[0] >= 5
     assert sim.presentation_snapshot().mission_end is None
+
+
+def test_overlapping_bodies_may_separate_but_not_press_closer(rules: GameRules) -> None:
+    world = WorldState(
+        {
+            "intruder": ActorState("intruder", ActorKind.OPERATIVE, (60_000, 60_000)),
+            "guard": ActorState("guard", ActorKind.SENTINEL, (66_000, 60_000)),
+        }
+    )
+    intruder = world.actors["intruder"]
+    assert body_occupied(world, intruder, (63_000, 60_000), rules)
+    assert not body_occupied(world, intruder, (58_000, 60_000), rules)
+    world.actors["guard"].stunned_until = 10
+    assert not body_occupied(world, intruder, (66_000, 60_000), rules)
+
+
+def test_a_guard_that_walks_into_an_unseen_body_turns_toward_it(rules: GameRules) -> None:
+    # The thief stands at the guard's shoulder, outside a westward view cone.
+    world = WorldState(
+        {
+            "guard": ActorState("guard", ActorKind.TRACKER, (66_000, 60_000), facing=(-1, 0)),
+            "thief": ActorState("thief", ActorKind.COMPANION, (56_000, 50_000)),
+        }
+    )
+    events: list[EventKind] = []
+    move_actor(
+        world,
+        StaticMap("shoulder", 10, 10),
+        rules,
+        Action("guard", ActionKind.MOVE, 0, (-1, 0)),
+        lambda kind, *_: events.append(kind),
+    )
+    guard = world.actors["guard"]
+    assert guard.position == (66_000, 60_000) and events == [EventKind.ACTION_REJECTED]
+    assert guard.facing == (-1, -1)
 
 
 def test_step_order_is_stable_and_noise_is_not_per_render_frame(rules: GameRules) -> None:

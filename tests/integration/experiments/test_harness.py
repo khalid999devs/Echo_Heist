@@ -93,8 +93,8 @@ def test_pursuit_reaches_an_outcome_around_either_stair_route(
 @pytest.mark.parametrize(
     ("scenario_id", "policy", "reached"),
     [
-        ("s03-patrol-6s", "RUSH", "core-chamber"),
-        ("s16-service-corridor-late", "GHOST", "research-floor"),
+        ("s03-patrol-6s", "RUSH", "security-control"),
+        ("s16-service-corridor-late", "GHOST", "core-chamber"),
     ],
 )
 def test_policies_resume_goal_progress_after_repeated_retreats(

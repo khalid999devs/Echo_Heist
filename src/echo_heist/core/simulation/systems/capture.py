@@ -61,8 +61,10 @@ def update_captures(
                     world_map,
                     guard.position,
                     actor.position,
-                    # A revealed actor sits inside its cover's solid clearance.
-                    allow_solid_end=actor.crouched and actor.tile in world_map.crouch_tiles,
+                    # A revealed actor sits inside its cover's solid clearance
+                    # (under a desk, or behind a locker door).
+                    allow_solid_end=(actor.crouched and actor.tile in world_map.crouch_tiles)
+                    or actor.hidden_in is not None,
                 )
             ]
             if not guard.incapacitated(world.tick)

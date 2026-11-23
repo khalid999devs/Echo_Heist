@@ -23,7 +23,7 @@ from echo_heist.ui.scenes.design.workshop import WORKSHOP_CONTROLS
 from echo_heist.ui.scenes.flow import GameFlow, Scene, load_level
 from echo_heist.ui.scenes.menus import CHAPTER_CARD, MODE_BUTTONS
 
-WIN_SEED = 44
+WIN_SEED = 42
 
 
 def key(code: int) -> list[pygame.event.Event]:
@@ -106,7 +106,7 @@ def main() -> int:
                 if (
                     seed == WIN_SEED
                     and session.telemetry.nexus is not None
-                    and session.telemetry.nexus.interceptor is not None
+                    and session.telemetry.nexus.interceptors
                     and "interceptor-search" not in shots
                 ):
                     click(AUTONOMY_TABS[2])

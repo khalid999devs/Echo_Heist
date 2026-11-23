@@ -66,7 +66,7 @@ def test_packaged_map_loads_with_stable_anchors_zones_and_tags() -> None:
         "guard-security",
         "guard-research",
         "guard-core",
-        "guard-core-sentinel",
+        "guard-vault",
     }
 
 

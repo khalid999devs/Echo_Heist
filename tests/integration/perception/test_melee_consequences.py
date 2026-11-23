@@ -71,3 +71,42 @@ def test_only_audible_guards_investigate_original_impact_and_memory_expires(rule
     assert evidence_expired(expired, sensors, memory)
     outcome = sentinel.decide(expired, patrols[1], sensors, memory)
     assert outcome.memory.state in (GuardState.RETURN, GuardState.PATROL)
+
+
+@pytest.mark.parametrize("kind", [ActorKind.OPERATIVE, ActorKind.COMPANION])
+def test_a_chaser_grabs_past_a_stunned_guard_without_restarting(rules, kind):
+    wall = frozenset((x, y) for x in range(12) for y in range(9) if x in (0, 11) or y in (0, 8))
+    patrols = (
+        GuardPatrol("front", ((4, 4), (4, 5)), role=GuardRole.POST),
+        GuardPatrol("chaser", ((7, 4), (2, 4))),
+    )
+    sim = Simulation(
+        StaticMap("stunned-lane", 12, 9, wall, wall),
+        (
+            ActorSpawn("intruder", (3, 4), kind),
+            ActorSpawn("front", (4, 4), ActorKind.SENTINEL),
+            ActorSpawn("chaser", (7, 4), ActorKind.SENTINEL),
+        ),
+        rules=rules,
+        security=SecuritySpec(patrols, load_sensor_rules(), wall),
+    )
+    events = []
+    stunned_until = None
+    while sim.tick < 240 and sim.presentation_snapshot().mission_end is None:
+        chaser = next(g for g in sim.presentation_snapshot().guards if g.actor_id == "chaser")
+        if stunned_until is None and chaser.state == GuardState.CHASE:
+            action = Action("intruder", ActionKind.MELEE, sim.tick)
+        else:
+            action = Action("intruder", ActionKind.WAIT, sim.tick)
+        result = sim.step((action,))
+        events.extend(result.events)
+        if any(e.kind == EventKind.GUARD_STUNNED for e in result.events):
+            stunned_until = sim.tick + rules.melee_stun_ticks
+    end = sim.presentation_snapshot().mission_end
+    assert stunned_until is not None and end is not None
+    # The chaser steps past the slumped body and starts its grab while the
+    # front guard is still down, instead of jamming behind it and churning.
+    grabs = [e for e in events if e.kind == EventKind.CAPTURE_STARTED and e.actor_id == "chaser"]
+    assert end.capture_by == "chaser" and grabs and grabs[0].tick < stunned_until
+    cancels = [e for e in events if e.kind == EventKind.CAPTURE_CANCELED and e.actor_id == "chaser"]
+    assert len(cancels) <= 1

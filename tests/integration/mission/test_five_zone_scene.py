@@ -141,7 +141,7 @@ def test_mouse_menu_and_responsive_coordinates() -> None:
     flow.frame([key(pygame.KEYDOWN, pygame.K_1), key(pygame.KEYUP, pygame.K_1)], 0)
     assert flow.session.lab_selected == 0
     selected = flow.session.simulation.presentation_snapshot().guards[0]
-    assert selected.actor_id == "guard-cargo" and selected.algorithm == "BFS"
+    assert selected.actor_id == "guard-cargo" and selected.algorithm == "ALPHA-BETA"
     fingerprint = flow.session.simulation.fingerprint()
     for _ in range(3):
         flow.draw(pygame.Surface((1280, 1440)))
@@ -192,14 +192,16 @@ def test_default_live_guards_allow_actual_entry_extraction() -> None:
     first = flow.session.simulation.presentation_snapshot()
     # The validated registry activates every authored post with its real role.
     assert {(guard.actor_id, guard.algorithm) for guard in first.guards} == {
-        ("guard-cargo", "BFS"),
+        ("guard-cargo", "ALPHA-BETA"),
         ("guard-core", "ALPHA-BETA"),
-        ("guard-core-sentinel", "BFS"),
+        ("guard-vault", "A*"),
         ("guard-research", "A*"),
         ("guard-security", "BFS"),
         ("guard-service", "BFS"),
     }
     route = list(mission_path(flow.level, "upper"))
+    for _ in range(180):  # wait at the entry while the Service patrol turns away
+        flow.frame([], 34)
     # P04: after the alarm the Interceptor holds the gate it predicts (here the
     # Research Return), so the escape uses the alternate Security corridor.
     back = list(mission_path(flow.level, "upper", returning=True))

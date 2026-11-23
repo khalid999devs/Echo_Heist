@@ -246,10 +246,10 @@ class AutonomousMission:
                     ),
                 )
             )
-        if nexus is not None and (interceptor := nexus.interceptor) is not None:
+        for interceptor in nexus.interceptors if nexus is not None else ():
             evidence.append(
                 GameEvent(
-                    f"interceptor-plan:{interceptor.evaluated_tick}",
+                    f"interceptor-plan:{interceptor.guard_id}:{interceptor.evaluated_tick}",
                     interceptor.evaluated_tick,
                     EventKind.POLICY_DECISION,
                     interceptor.guard_id,
@@ -281,10 +281,9 @@ class AutonomousMission:
 
     def _sample(self) -> AutonomyTelemetry:
         status = self.simulation.nexus_status()
-        plans = dict(self.simulation.intercept_plans())
+        plans = self.simulation.intercept_plans()
         nexus = None
         if status is not None:
-            plan = next(iter(plans.items()), None)
             nexus = NexusTrace(
                 max(0, status.evaluated_tick),
                 status.announcement,
@@ -298,18 +297,19 @@ class AutonomousMission:
                     )
                     for order in status.dispatches
                 ),
-                InterceptorTrace(
-                    plan[0],
-                    plan[1].evaluated_tick,
-                    plan[1].post_id,
-                    plan[1].post_tile,
-                    plan[1].depth,
-                    plan[1].evaluated_leaves,
-                    plan[1].pruned_branches,
-                    plan[1].value,
-                )
-                if plan is not None
-                else None,
+                tuple(
+                    InterceptorTrace(
+                        guard_id,
+                        plan.evaluated_tick,
+                        plan.post_id,
+                        plan.post_tile,
+                        plan.depth,
+                        plan.evaluated_leaves,
+                        plan.pruned_branches,
+                        plan.value,
+                    )
+                    for guard_id, plan in plans
+                ),
             )
         trace = self.controller.trace if self.controller is not None else None
         return AutonomyTelemetry(trace, nexus, self._protocol_state, self._execution)

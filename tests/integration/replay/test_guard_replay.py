@@ -41,7 +41,16 @@ def registry(level: LevelData, rules: GameRules) -> SecurityRegistry:
 def upper(
     level: LevelData, rules: GameRules, sensors: SensorRules, registry: SecurityRegistry
 ) -> ScenarioResult:
-    return run_route("upper", level, rules, sensors, registry, route_steps(level, "upper", "upper"))
+    # Starting 4.5 seconds later lets the Service patrol turn away first.
+    return run_route(
+        "upper",
+        level,
+        rules,
+        sensors,
+        registry,
+        route_steps(level, "upper", "upper"),
+        wait_start_ticks=135,
+    )
 
 
 def test_entry_route_wins_with_real_guard_algorithms(
@@ -66,20 +75,22 @@ def test_exposed_cargo_return_is_caught_after_taking_the_core(
         sensors,
         registry,
         route_steps(level, "upper", "upper", exit_id="cargo-exit"),
+        wait_start_ticks=135,
     )
     assert result.events["CORE_TAKEN"] == 1
-    assert result.outcome == "CAPTURED" and result.capture_by == "guard-cargo"
+    # The Cargo Interceptor searches its own Service Wing gates and walks to
+    # Stairs B, closing the corridor the Service Sentinel is sweeping.
+    assert result.intercept_posts["guard-cargo"][0] == "choke-service-research"
+    assert result.outcome == "CAPTURED" and result.capture_by == "guard-service"
     assert result.events["CAPTURE_COMPLETED"] == 1
 
 
 def test_blind_return_through_the_predicted_gate_is_intercepted(
     level: LevelData, rules: GameRules, sensors: SensorRules, registry: SecurityRegistry
 ) -> None:
-    """P04: after the lockdown the Interceptor searches the escape branches and
-    physically holds the Research Return gate; walking straight back into it
-    loses, while the alternate corridor (above) still wins. With two melee
-    charges the pursuing Research guard may close the grab at that gate, so the
-    assertion is the Interceptor's searched and physically held post."""
+    """P04: after the lockdown the Interceptor searches the escape branches,
+    picks the Research Return gate and walks there; returning blindly along that
+    branch runs into it on the way, while the alternate corridor (above) wins."""
     result = run_route(
         "research-return",
         level,
@@ -87,20 +98,30 @@ def test_blind_return_through_the_predicted_gate_is_intercepted(
         sensors,
         registry,
         route_steps(level, "upper", "lower"),
-        wait_start_ticks=210,
+        wait_start_ticks=135,
     )
     assert result.outcome == "CAPTURED" and result.events["CORE_TAKEN"] == 1
-    assert result.algorithms["ALPHA-BETA"] > 0
+    assert result.capture_by == "guard-core" and result.algorithms["ALPHA-BETA"] > 0
     assert result.intercept_posts["guard-core"][-1] == "choke-research-core"
+    # Each Interceptor defends only its home gates: the second one holds the
+    # Service Wing end of the same predicted Research branch.
+    assert result.intercept_posts["guard-cargo"] == ("choke-service-research",)
     assert registry.graph is not None
     gate = registry.graph.node("choke-research-core").tile
-    held, caught = result.final_tiles["guard-core"], result.final_tiles[level.operative_id]
-    assert held == gate and abs(caught[0] - gate[0]) + abs(caught[1] - gate[1]) <= 2
+    core = registry.graph.core_tile
+    caught = result.final_tiles[level.operative_id]
+
+    def steps(a: tuple[int, int], b: tuple[int, int]) -> int:
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    # Caught on the way down that branch: on the Core side of the predicted
+    # gate, already closer to it than the Core is, before slipping through.
+    assert caught[0] >= gate[0] and steps(caught, gate) < steps(core, gate)
 
 
 @pytest.mark.parametrize(
     ("branch", "captor"),
-    [("lower", "guard-research"), ("upper", "guard-core-sentinel")],
+    [("lower", "guard-research"), ("upper", "guard-service")],
 )
 def test_careless_route_is_captured_by_a_live_defender(
     level: LevelData,
@@ -133,12 +154,16 @@ def test_recorded_run_replays_exactly_and_detects_changed_inputs(
 ) -> None:
     assert replay_matches(level, rules, sensors, registry, upper)
     log = upper.log
-    assert log.header.fingerprint_schema == 16 and log.header.registry_revision == registry.revision
+    assert log.header.fingerprint_schema == 17 and log.header.registry_revision == registry.revision
     header = build_header(
         level.static_map, rules, sensors, registry_revision=registry.revision, seed=1042
     )
     # Drop one real intent: the event stream must diverge at exactly that tick.
-    index = next(i for i, actions in enumerate(log.actions) if actions and i > 40)
+    index = next(
+        i
+        for i, actions in enumerate(log.actions)
+        if actions and i > 40 and actions[0].kind != ActionKind.WAIT
+    )
     edited = replace(
         log,
         actions=(

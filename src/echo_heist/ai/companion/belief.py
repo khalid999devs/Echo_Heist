@@ -12,7 +12,7 @@ from math import cos, radians
 from echo_heist.ai.companion.briefing import GuardBrief, MissionBriefing
 from echo_heist.core.contracts.observations import EntityView, Observation
 from echo_heist.core.contracts.world import ActorKind, Tile, tile_center
-from echo_heist.core.perception.sensors import line_of_sight
+from echo_heist.core.perception.sensors import can_see
 
 GUARDS = frozenset({ActorKind.SENTINEL, ActorKind.TRACKER, ActorKind.INTERCEPTOR})
 DANGER_TTL_TICKS = 90
@@ -122,18 +122,25 @@ class Beliefs:
         return weights
 
     def watched_by(self, observation: Observation, tile: Tile) -> Sighting | None:
-        """A visible active guard whose observed cone currently covers ``tile``."""
-        threshold = cos(radians(self.half_angle_degrees))
+        """A visible active guard whose observed cone currently covers ``tile``.
+
+        Uses the same cone and ray test as guard sensing, from the guard's seen
+        position. For its own tile the Companion tests where it actually stands:
+        a tile centre tucked behind cover can hide an exposed body at its edge.
+        """
+        own = observation.own_status
+        point = own.position if tile == own.tile and own.position is not None else tile_center(tile)
+        seen = {entity.actor_id: entity for entity in observation.visible_entities}
         for sighting in self.threats(observation):
-            dx, dy = tile[0] - sighting.tile[0], tile[1] - sighting.tile[1]
-            length = (dx * dx + dy * dy) ** 0.5
-            fx, fy = sighting.facing
-            inside = length == 0 or (
-                length <= self.sight_range_tiles
-                and dx * fx + dy * fy >= threshold * length * max(1.0, (fx * fx + fy * fy) ** 0.5)
-            )
-            if inside and line_of_sight(
-                observation.map_static, tile_center(sighting.tile), tile_center(tile)
+            entity = seen[sighting.guard_id]
+            origin = entity.position or tile_center(entity.tile)
+            if origin == point or can_see(
+                observation.map_static,
+                origin,
+                point,
+                entity.facing,
+                self.sight_range_tiles,
+                self.half_angle_degrees,
             ):
                 return sighting
         return None

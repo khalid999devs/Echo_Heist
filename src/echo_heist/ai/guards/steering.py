@@ -8,7 +8,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, replace
 
 from echo_heist.ai.guards.fuzzy import investigate_urgency
-from echo_heist.ai.navigation.grid import PathResult, neighbors
+from echo_heist.ai.navigation.grid import PathResult, neighbors, unsnag
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.events import SecurityReport
 from echo_heist.core.contracts.observations import EntityView, Observation
@@ -27,12 +27,15 @@ from echo_heist.core.contracts.world import (
     Position,
     StaticMap,
     Tile,
+    position_tile,
     tile_center,
 )
 
 type Planner = Callable[[StaticMap, Tile, Tile], PathResult]
 
 INTRUDERS = (ActorKind.OPERATIVE, ActorKind.COMPANION)
+GLANCE_TICKS = 30  # keep looking toward a shape lost from sight for one second
+SPOT_GRACE_TICKS = 10  # keep staring at a half-seen shape before going to check
 SALIENCE = {
     "CROUCH": 0.15,
     "FOOTSTEP": 0.25,
@@ -237,62 +240,37 @@ def witnessed_hide(observation: Observation, memory: GuardMemory) -> VisualCue |
     return max(cues, key=lambda cue: (cue.tick, cue.cue_id)) if cues else None
 
 
+def glancing(observation: Observation, memory: GuardMemory) -> bool:
+    """Was the quarry seen within the last moment?"""
+    return memory.last_seen_tick >= 0 and observation.tick - memory.last_seen_tick <= GLANCE_TICKS
+
+
+def spot_lapsed(observation: Observation, memory: GuardMemory) -> bool:
+    """Has a half-seen shape been out of sight long enough to go and check it?
+
+    Dropping to a check on the first unseen tick made a guard at the edge of its
+    range flick between identifying and checking on every tick."""
+    return (
+        memory.state == GuardState.SPOTTED
+        and observation.tick - memory.last_seen_tick > SPOT_GRACE_TICKS
+    )
+
+
 def evidence_expired(observation: Observation, rules: SensorRules, memory: GuardMemory) -> bool:
     return (
         memory.evidence_tick >= 0 and observation.tick - memory.evidence_tick > rules.memory_ticks
     )
 
 
-GUARDS = (ActorKind.SENTINEL, ActorKind.TRACKER, ActorKind.INTERCEPTOR)
-BODY_CLEARANCE = UNIT // 2  # another guard this close ahead blocks the step
-
-
-def give_way(observation: Observation, position: Position, direction: Tile, delta: Tile) -> Tile:
-    """Step around a visible guard body instead of pushing into it forever.
-
-    Two guards each pushing into the other's body on different axes used to
-    deadlock in narrow corridors (P07 softlock). Using only this guard's own
-    observation: if a seen guard is within half a tile ahead, try the other
-    axis toward the waypoint, else sidestep perpendicular away from the
-    blocker. Intruders never count as blockers, so pursuit is unchanged.
-    """
-    if direction == (0, 0):
-        return direction
-
-    def blocked(step: Tile) -> bool:
-        ahead = (
-            position[0] + step[0] * UNIT // 10,
-            position[1] + step[1] * UNIT // 10,
-        )
-        return any(
-            entity.kind in GUARDS
-            and entity.actor_id != observation.agent_id
-            and entity.position is not None
-            and (entity.position[0] - ahead[0]) ** 2 + (entity.position[1] - ahead[1]) ** 2
-            < (entity.position[0] - position[0]) ** 2 + (entity.position[1] - position[1]) ** 2
-            and (entity.position[0] - position[0]) ** 2 + (entity.position[1] - position[1]) ** 2
-            < BODY_CLEARANCE**2
-            for entity in observation.visible_entities
-        )
-
-    if not blocked(direction):
-        return direction
-    world_map = observation.map_static
-    tile = observation.own_status.tile
-    other = (0, sign(delta[1])) if direction[0] else (sign(delta[0]), 0)
-    options = [other] if other != (0, 0) else []
-    if direction[0]:
-        options += [(0, 1), (0, -1)]
-    else:
-        options += [(1, 0), (-1, 0)]
-    for step in options:
-        if (
-            step != (0, 0)
-            and not blocked(step)
-            and world_map.can_walk((tile[0] + step[0], tile[1] + step[1]))
-        ):
-            return step
-    return direction
+def open_line(world_map: StaticMap, start: Position, end: Position) -> bool:
+    """Is the straight walk from ``start`` to ``end`` clear of walls and furniture?"""
+    dx, dy = end[0] - start[0], end[1] - start[1]
+    steps = max(1, max(abs(dx), abs(dy)) * 8 // UNIT)
+    for index in range(steps + 1):
+        point = start[0] + dx * index // steps, start[1] + dy * index // steps
+        if world_map.point_blocked(point) or not world_map.can_walk(position_tile(point)):
+            return False
+    return True
 
 
 def steer(
@@ -307,9 +285,10 @@ def steer(
     world_map = observation.map_static
     position = own.position or tile_center(own.tile)
     wait = Action(observation.agent_id, ActionKind.WAIT, observation.tick)
-    if target is not None and not world_map.can_walk(target):
-        # A cue can originate beneath a desk. Investigate a reachable edge of
-        # that physical cover; never walk through it or infer identity.
+    cover = {item.tile for item in world_map.objects if item.kind == "HideSpot"}
+    if target is not None and (not world_map.can_walk(target) or target in cover):
+        # A cue or last sighting can lie beneath a desk or inside a locker.
+        # Investigate a reachable edge of that cover; never push into it.
         approaches = [
             result.path
             for tile in neighbors(target)
@@ -322,7 +301,21 @@ def steer(
         return GuardDecision(wait, memory, own.facing)
     path = memory.path
     stale = memory.path_revision != observation.geometry_revision
-    if stale or target != memory.path_goal or (not path and not arrived(position, target)):
+    # Running a quarry down directly can leave the plan behind: a path that no
+    # longer starts beside the guard would pull it back to where it came from.
+    drifted = (
+        bool(path)
+        and distance(own.tile, path[0]) > 1
+        and not any(
+            link.tile == own.tile and link.destination == path[0] for link in world_map.stairs
+        )
+    )
+    if (
+        stale
+        or drifted
+        or target != memory.path_goal
+        or (not path and not arrived(position, target))
+    ):
         result = plan(world_map, own.tile, target)
         path = result.path[1:]
         memory = replace(
@@ -364,12 +357,36 @@ def steer(
     direction = (
         (sign(dx), 0) if abs(dx) > UNIT // 10 else (0, sign(dy)) if abs(dy) > UNIT // 10 else (0, 0)
     )
-    direction = give_way(observation, position, direction, (dx, dy))
+    direction = unsnag(world_map, position, direction, (dx, dy))
+    quarry = intruder.position if intruder is not None else None
+    if quarry is None and memory.last_seen_tile is not None and glancing(observation, memory):
+        quarry = tile_center(memory.last_seen_tile)  # flickering sight keeps one course
+    if (
+        memory.state == GuardState.CHASE
+        and quarry is not None
+        and quarry != position
+        and open_line(world_map, position, quarry)
+    ):
+        # A seen quarry in the open is run down directly. Re-centring on tile
+        # paths made a chaser shadow a thief moving across its line, or step back
+        # each time a thief hopped between two rows, instead of closing in.
+        dx, dy = quarry[0] - position[0], quarry[1] - position[1]
+        direction = (sign(dx), 0) if abs(dx) >= abs(dy) else (0, sign(dy))
+        direction = unsnag(world_map, position, direction, (dx, dy))
     facing = direction if direction != (0, 0) else own.facing
-    if memory.state == GuardState.SPOTTED and intruder is not None:
+    if memory.state in (GuardState.SPOTTED, GuardState.CHASE) and intruder is not None:
+        # Keep a seen quarry in the cone; an axis-aligned step used to turn a
+        # chaser away from a diagonal target, so it lost and re-spotted it.
         look = intruder.position or tile_center(intruder.tile)
         facing = (sign(look[0] - position[0]), sign(look[1] - position[1]))
         facing = facing if facing != (0, 0) else own.facing
+    elif memory.last_seen_tile is not None and glancing(observation, memory):
+        # A shape that just slipped out of sight is still watched. Snapping back
+        # to the walking direction made a guard at the edge of its range flick
+        # its view between the shape and the path on every tick.
+        look = tile_center(memory.last_seen_tile)
+        glance = (sign(look[0] - position[0]), sign(look[1] - position[1]))
+        facing = glance if glance != (0, 0) else facing
     if (
         observation.tick < memory.wait_until
         or memory.state == GuardState.SPOTTED

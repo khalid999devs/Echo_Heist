@@ -17,6 +17,7 @@ from random import Random
 from echo_heist.ai.companion import tactics
 from echo_heist.ai.companion.belief import Beliefs
 from echo_heist.ai.companion.briefing import MissionBriefing, PolicyWeights, policy_weights
+from echo_heist.ai.companion.stealth import lanes
 from echo_heist.ai.companion.stealth.cover import safe_cover
 from echo_heist.ai.companion.utility import (
     Override,
@@ -26,7 +27,7 @@ from echo_heist.ai.companion.utility import (
     melee_available,
 )
 from echo_heist.ai.navigation.astar import astar
-from echo_heist.ai.navigation.grid import distances_from
+from echo_heist.ai.navigation.grid import distances_from, unsnag
 from echo_heist.ai.navigation.routes import ZoneRoute, zone_routes
 from echo_heist.ai.planning.mcts import MctsResult, search
 from echo_heist.core.contracts.actions import Action, ActionKind
@@ -35,8 +36,13 @@ from echo_heist.core.contracts.autonomy.policy import PolicySelection
 from echo_heist.core.contracts.config.gameplay import GameRules
 from echo_heist.core.contracts.observations import Observation
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
-from echo_heist.core.contracts.world import MissionPhase, Position, StairLink, Tile, tile_center
-from echo_heist.core.perception.sensors import line_of_sight
+from echo_heist.core.contracts.world import (
+    MissionPhase,
+    Position,
+    StairLink,
+    Tile,
+    tile_center,
+)
 
 ITERATIONS = 64
 MAX_DEPTH = 4
@@ -56,6 +62,11 @@ ALERT_TICKS = 150
 STALL_TICKS = 600
 FLEE_TICKS = 75
 BLOCK_TILES = 4
+EXIT_SWITCH_COST = 40  # A* cost an alternative exit must save to win
+EXIT_COMMIT_TICKS = 180
+GATE_HOLD_TICKS = 45
+GATE_ABANDON_TICKS = 600
+ESCAPE_HOLD_TICKS = 15
 ABANDON_TICKS = 180
 RECOVERY_TICKS = 900  # time without getting closer to the actual objective
 STAIR_COMMIT_SECONDS = 2
@@ -140,6 +151,10 @@ class CompanionController:
         self.objective_best: int | None = None
         self.objective_progress_at = 0
         self.exit_replan_at = 0
+        self.exit_locked_until = self.hold_ticks = 0
+        self.escape_from: Position | None = None
+        self.escape_until = self.turns = 0
+        self.last_action: Action | None = None
         self.stair_attempt: StairLink | None = None
         self.last_stair_crossing: tuple[StairLink, int] | None = None
         self.stair_backoff: StairBackoff | None = None
@@ -192,19 +207,30 @@ class CompanionController:
         bodies = {guard.tile for guard in active_guards(observation)}
         own = observation.own_status.tile
 
+        jammed = {tile for tile, until in self.jammed.items() if until > observation.tick}
+
         def penalty(tile: Tile) -> int:
-            return self.weights.risk_weight * danger.get(tile, 0) // 2 + (
-                BODY_COST if tile in bodies else 0
+            return (
+                self.weights.risk_weight * danger.get(tile, 0) // 2
+                + (BODY_COST if tile in bodies else 0)
+                + (JAM_COST if tile in jammed else 0)
             )
 
         options = []
         for tile in exits:
             path = astar(observation.map_static, own, tile, penalty=penalty)
             if path.path:
-                # Require a small gain to change destination between tactical searches.
-                options.append((path.cost + (4 if tile != self.extraction_goal else 0), tile))
-        if options:
-            self.extraction_goal = min(options)[1]
+                # Switching exits turns the escape around; demand a clear gain.
+                options.append(
+                    (path.cost + (EXIT_SWITCH_COST if tile != self.extraction_goal else 0), tile)
+                )
+        current = any(tile == self.extraction_goal for _, tile in options)
+        if options and (not current or observation.tick >= self.exit_locked_until):
+            choice = min(options)[1]
+            if choice != self.extraction_goal:
+                # Commit: re-deciding every search bounced between the two escapes.
+                self.exit_locked_until = observation.tick + EXIT_COMMIT_TICKS
+            self.extraction_goal = choice
 
     def _needs_recovery(self, observation: Observation) -> bool:
         own = observation.own_status
@@ -328,7 +354,12 @@ class CompanionController:
                 observation.tick + WAIT_TICKS * 2,
                 self._safe_crumb(observation.tick),
             )
-        else:
+        elif not (
+            self.directive.action == tactics.RETREAT
+            and observation.tick < self.directive.until_tick
+        ):
+            # A back-off out of a patrol's lane finishes first; advancing (or
+            # using a gadget) straight back into it is exactly what it avoids.
             self.directive = Directive(choice)
         self.path_goal = None  # replan the physical path for the new directive
 
@@ -347,13 +378,7 @@ class CompanionController:
         )
 
     def _safe_crumb(self, tick: int, *, far: bool = False) -> Tile | None:
-        """A remembered tile some steps back that no observed cone covers."""
-        danger = self.beliefs.danger(tick)
-        trail = list(self.crumbs)[: -(14 if far else 6)]
-        for tile in reversed(trail):
-            if danger.get(tile, 0) == 0:
-                return tile
-        return trail[0] if trail else None
+        return lanes.safe_crumb(self.beliefs.danger(tick), self.crumbs, far=far)
 
     # --------------------------------------------------------------- execution
     def _route_goal(self, observation: Observation) -> Tile:
@@ -393,11 +418,7 @@ class CompanionController:
         danger = self.beliefs.danger(observation.tick)
         weight = self.weights.risk_weight
         # Observed bodies are physical obstacles (every policy routes around them).
-        bodies = {
-            entity.tile
-            for entity in observation.visible_entities
-            if entity.actor_id != self.actor_id
-        } - {own.tile}
+        bodies = lanes.bodies(observation, self.actor_id) - {own.tile}
 
         jammed = {tile for tile, until in self.jammed.items() if until > observation.tick}
 
@@ -470,64 +491,70 @@ class CompanionController:
             direction = (_sign(dx), 0)
         if direction == (0, 0):
             return Action(self.actor_id, ActionKind.WAIT, tick)
+        direction = unsnag(observation.map_static, position, direction, (dx, dy))
         ahead = (own.tile[0] + direction[0], own.tile[1] + direction[1])
         if (
             self.directive.action == tactics.ADVANCE
             and self.weights.risk_weight > 0
             and tick - self.last_watched > self.rules.pursuit_grace_ticks
             and self.tile_ticks < self.rules.simulation_hz * 3
-            and self.beliefs.watched_by(observation, ahead) is not None
         ):
-            self.utility = ("HOLD", "Wait at cover until the patrol turns")
-            return Action(self.actor_id, ActionKind.WAIT, tick)
-        if self.still_ticks >= 2:
-            # Pressed against a body: side-step into an open parallel lane.
-            bodies = {e.tile for e in observation.visible_entities if e.actor_id != self.actor_id}
-            world_map = observation.map_static
-            sides = [(direction[1], direction[0]), (-direction[1], -direction[0])]
-            if (self.still_ticks // 6) % 2:
-                sides.reverse()
-            for side in sides:
-                lane = (own.tile[0] + side[0], own.tile[1] + side[1])
-                if world_map.can_walk(lane) and lane not in bodies:
-                    return Action(self.actor_id, ActionKind.MOVE, tick, side, sprint=sprint)
-            # A body fills a one-tile corridor: treat the way ahead as jammed and re-route.
+            closing, exposed = lanes.lane_pressure(
+                observation, self.beliefs, own.tile, ahead, self.rules.simulation_hz
+            )
+            if self.beliefs.watched_by(observation, ahead) is not None or closing:
+                crumb = self._safe_crumb(tick) if exposed else None
+                if crumb is not None and crumb != own.tile:
+                    # Standing in the patrol's lane is no cover: back off first.
+                    self.directive = Directive(tactics.RETREAT, tick + WAIT_TICKS, crumb)
+                    self.path_goal = None
+                    self.utility = ("HOLD", "Back out of the patrol's lane and let it pass")
+                    return self._steer(observation, crumb, False)
+                if self.hold_ticks >= GATE_HOLD_TICKS and lanes.gate_guarded(
+                    observation, self.briefing.graph, self.legs, self.progress
+                ):  # a guard planted on the gate never turns away: reroute
+                    self._avoid_gate(observation)
+                self.utility = ("HOLD", "Wait at cover until the patrol turns")
+                return Action(self.actor_id, ActionKind.WAIT, tick)
+        if self.still_ticks >= 2:  # pressed against a body: side-step into a parallel lane
+            side = lanes.side_lane(observation, self.actor_id, direction, self.still_ticks)
+            if side is not None:
+                return Action(self.actor_id, ActionKind.MOVE, tick, side, sprint=sprint)
+            # A body fills a one-tile corridor: jam the way ahead and re-route. If a guard
+            # stands in the only way on, back off out of its reach and let it move.
             ahead = (own.tile[0] + direction[0], own.tile[1] + direction[1])
             for tile in (ahead, *(self.path[:1])):
                 self.jammed[tile] = tick + JAM_TICKS
             self.path_goal = None
+            back = lanes.backoff(observation, self.actor_id, direction)
+            if back is not None and self.directive.action != tactics.RETREAT:
+                self.directive = Directive(tactics.RETREAT, tick + WAIT_TICKS, back)
+                self.utility = ("HOLD", "A guard blocks the way: back off and let it move")
+                return self._steer(observation, back, False)
         return Action(self.actor_id, ActionKind.MOVE, tick, direction, sprint=sprint)
 
+    def _avoid_gate(self, observation: Observation) -> None:
+        tick = observation.tick
+        leg = self.legs[0]
+        gate = self.briefing.graph.node(leg.route.nodes[self.progress]).tile
+        self.abandoned[leg.route.nodes] = tick + GATE_ABANDON_TICKS
+        lanes.jam_around(self.jammed, gate, tick + GATE_ABANDON_TICKS)
+        self.exit_locked_until = 0  # the committed exit may lie behind this gate
+        self.pending, self.path_goal = "guarded gate", None
+
     def _avoid(self, guard: Position, tick: int) -> None:
-        tile = (guard[0] // UNIT, guard[1] // UNIT)
-        for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)):
-            self.jammed[(tile[0] + dx, tile[1] + dy)] = tick + JAM_TICKS
+        lanes.jam_around(self.jammed, (guard[0] // UNIT, guard[1] // UNIT), tick + JAM_TICKS)
         self.path_goal = None
 
     def _escape(self, observation: Observation, away: Position) -> Action:
         own = observation.own_status
         position = own.position or tile_center(own.tile)
-        threats = tuple(
-            guard.position or tile_center(guard.tile) for guard in active_guards(observation)
-        ) or (away,)
-        occupied = {guard.tile for guard in observation.visible_entities}
-        options = []
-        for direction in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-            tile = (own.tile[0] + direction[0], own.tile[1] + direction[1])
-            if not observation.map_static.can_walk(tile, crouched=own.crouched):
-                continue
-            point = tile_center(tile)
-            if tile in occupied:
-                continue
-            exposed = sum(line_of_sight(observation.map_static, guard, point) for guard in threats)
-            distance = min((point[0] - x) ** 2 + (point[1] - y) ** 2 for x, y in threats)
-            options.append((exposed, -distance, direction))
+        options = lanes.escape_steps(observation, self.actor_id, away, self.last_action)
         if not options:
             return Action(self.actor_id, ActionKind.WAIT, observation.tick)
-        options.sort()
         # A rejected step (a body or an exact fixture edge) rotates to the next option.
         choice = (self.still_ticks // 3) % len(options) if self.previous == position else 0
-        direction = options[choice][2]
+        direction = options[choice]
         return Action(
             self.actor_id, ActionKind.MOVE, observation.tick, direction, sprint=not own.crouched
         )
@@ -615,10 +642,8 @@ class CompanionController:
 
     def _stand(self, observation: Observation, goal: Tile) -> Action:
         """Stand at a tile centre clear of the desk; low headroom moves one tile further."""
-        own = observation.own_status
-        tick = observation.tick
-        position = own.position or tile_center(own.tile)
-        center = tile_center(own.tile)
+        own, tick = observation.own_status, observation.tick
+        position, center = own.position or tile_center(own.tile), tile_center(own.tile)
         failed = self.last_kind == ActionKind.CROUCH and self.last_tick == tick - 1
         if not failed and max(abs(a - b) for a, b in zip(center, position, strict=True)) <= ARRIVE:
             return Action(self.actor_id, ActionKind.CROUCH, tick)
@@ -782,7 +807,10 @@ class CompanionController:
             )
         if action.kind == ActionKind.ECHO:
             self.echo_ready_at = tick + 120
-        self.previous = position
+        self.hold_ticks = self.hold_ticks + 1 if self.utility[0] == "HOLD" else 0
+        free = grabbed or self.previous == position or self.utility[0] == "ESCAPE"  # turn now
+        action, self.turns = lanes.damp_reversal(action, self.last_action, self.turns, free)
+        self.previous, self.last_action = position, action
         self.last_kind, self.last_tick = action.kind, tick
         self._record()
         return action
@@ -797,6 +825,13 @@ class CompanionController:
             self.path_goal = None
             return Action(self.actor_id, ActionKind.EMP, tick)
         if override.kind == "ESCAPE" and override.away_from is not None:
+            fleeing = self.directive.action == FLEE
+            aim = self.directive.goal if fleeing else self._safe_crumb(tick, far=True)
+            # Commit to a flee (dropping it walked back into reach), never past the guard.
+            aim = lanes.away_goal(aim, self.crumbs, own.tile, override.away_from)
+            if own.capture_ticks_remaining is None and (not fleeing or aim != self.directive.goal):
+                until = self.directive.until_tick if fleeing else tick + FLEE_TICKS
+                self.directive, self.path_goal = Directive(FLEE, until, aim), None
             return self._escape(observation, override.away_from)
         if override.kind == "REACT" and self.directive.action != FLEE:
             if self.weights.sprint:
@@ -854,6 +889,8 @@ class CompanionController:
                 return hidden
         world_map = observation.map_static
         if self.directive.action != tactics.HIDE and not world_map.can_walk(own.tile):
+            if lanes.guard_near(observation, self.beliefs):  # stay hidden while it passes
+                return Action(self.actor_id, ActionKind.WAIT, tick)
             # Crawl out from under cover toward the goal before standing up.
             exits = [
                 tile
@@ -881,8 +918,15 @@ class CompanionController:
                 self.directive = Directive(
                     FLEE, max(directive.until_tick, tick + 30), directive.goal
                 )
-                aim = directive.goal if directive.goal not in (None, own.tile) else goal
-                return self._steer(observation, aim or goal, not own.crouched)
+                # Hold at a reached crumb; re-aiming at the goal there jittered.
+                aim = directive.goal if directive.goal is not None else goal
+                step = self._steer(observation, aim, not own.crouched)
+                threat = lanes.closing_threat(observation, step.direction)
+                if threat is not None:  # hold the escape briefly instead of dithering
+                    self.escape_from, self.escape_until = threat, tick + ESCAPE_HOLD_TICKS
+                if tick < self.escape_until and self.escape_from is not None:
+                    return self._escape(observation, self.escape_from)
+                return step
             self.directive = Directive(tactics.ADVANCE)
             self.flee_started = -1
             self.pending = "breaking line of sight"  # re-plan now that contact is broken

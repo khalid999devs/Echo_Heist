@@ -18,6 +18,7 @@ from echo_heist.ai.guards.steering import (
     identify,
     investigate,
     phase_rules,
+    spot_lapsed,
     steer,
     strongest_cue,
     visible_intruder,
@@ -137,7 +138,7 @@ def decide(
         )
         if memory.state == GuardState.CHASE and sight_expired:
             memory = _return(observation, patrol, memory)
-        elif memory.state == GuardState.SPOTTED:
+        elif spot_lapsed(observation, memory):
             memory = replace(memory, state=GuardState.INVESTIGATE, target=memory.last_seen_tile)
         elif memory.state in (
             GuardState.INVESTIGATE,

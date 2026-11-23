@@ -147,7 +147,11 @@ class ScriptedRun:
                 "Synthetic announcement / presentation QA",
                 0,
                 (GuardTask("guard-service", "CHECK SOUND", (22, 20), 0),),
-                InterceptorTrace("guard-core", 0, "choke-research-core", (32, 34), 3, 18, 7, 0.62),
+                (
+                    InterceptorTrace(
+                        "guard-core", 0, "choke-research-core", (32, 34), 3, 18, 7, 0.62
+                    ),
+                ),
             ),
             self.protocol_state,
         )

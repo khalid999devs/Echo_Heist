@@ -40,6 +40,10 @@ INTENTS = {
 POST_NAMES = {
     "choke-security-core": "Security gate",
     "choke-research-core": "Research gate",
+    "choke-service-security": "Stairs A",
+    "choke-service-research": "Stairs B",
+    "choke-entry-service": "Entry gate",
+    "choke-cross-link": "Cross-link",
 }
 
 
@@ -175,24 +179,28 @@ def _nexus(ui: Monitor, data: AutonomyTelemetry, tick: int, hz: int) -> None:
 
 
 def _interceptor(ui: Monitor, data: AutonomyTelemetry, tick: int, hz: int) -> None:
-    trace = data.nexus.interceptor if data.nexus else None
-    ui.card(234, 106)
-    ui.text("INTERCEPT PLAN", 244, theme.ACCENT, 48)
-    if trace is None:
+    traces = data.nexus.interceptors if data.nexus else ()
+    if not traces:
+        ui.card(234, 106)
+        ui.text("INTERCEPT PLAN", 244, theme.ACCENT, 48)
         ui.text("Awaiting evidence", 267, theme.TEXT, 48, font=ui.fonts.body)
-        ui.paragraph("The guard needs a sighting, a radio report or a director order.", 300, x=48)
-    else:
+        ui.paragraph("Each guard needs a sighting, a radio report or a director order.", 300, x=48)
+    # One card per Interceptor; each searches only the gates of its own zone.
+    for index, trace in enumerate(traces[:2]):
+        top = 234 + index * 112
+        name = GUARD_NAMES.get(trace.guard_id, ("", identifier(trace.guard_id)))[1]
         label = POST_NAMES.get(trace.post_id, identifier(trace.post_id.removeprefix("choke-")))
-        ui.text(label, 266, theme.TEXT, 48, font=ui.fonts.body)
+        ui.card(top, 102)
+        ui.text(name.upper(), top + 10, theme.ACCENT, 48)
+        ui.text(age(tick, trace.evaluated_tick, hz), top + 10, theme.MUTED, right=454)
+        ui.text(f"Holds {label}", top + 32, theme.TEXT, 48, font=ui.fonts.body)
         ui.text(
-            f"Target tile {trace.target}  /  searched {age(tick, trace.evaluated_tick, hz)}",
-            304,
+            f"{trace.evaluated_nodes} leaves scored  •  {trace.pruned_nodes} pruned"
+            f"  •  value {trace.value:.2f}",
+            top + 72,
             theme.MUTED,
             48,
         )
-        ui.text("SEARCH TRACE", 366, theme.ACCENT)
-        ui.text(f"Depth {trace.depth}   •   {trace.evaluated_nodes} leaves scored", 396)
-        ui.text(f"{trace.pruned_nodes} branches pruned   •   escape value {trace.value:.2f}", 426)
     ui.rule(461)
     ui.text("MINIMAX + ALPHA-BETA", 475, theme.ACCENT)
     ui.paragraph(

@@ -104,8 +104,26 @@ All takes are recorded from the native game window by `record_final.py` with gam
     - Szepesvári is spelled correctly.
     - The Word file's "last modified by" field names the authors instead of "Un-named".
   - **Report checks:** still 25 pages, with Times New Roman and Courier New embedded in the PDF, and `validate.py` passes.
+
+  Report restyle after the user's review (2026-11-23):
+  - **Colours:** headings and the title are near black. Table headers are light grey with black text, and table rows, borders and the key words box use neutral greys. The only blue left is the reference links.
+  - **Captions:** 10 pt italic in a softer grey. Table captions are left-aligned with their full-width tables, and the gap between a figure caption and the next table caption is wider.
+  - **Diagrams:** the mood and architecture diagrams no longer have a white outline behind their arrow labels. The labels are a shade lighter and were moved so none touches a line. The slide figures were not changed.
+  - **Pseudocode:** 10 pt Courier New (was 9 pt) with 1.1 line spacing and more padding, and an even 12 pt gap above and below each box. Long lines were rewrapped so none breaks inside the box.
+  - **Equations:** formulas are Word equations (OMML) written by `report_math.js`: stacked fractions, a real square root, an overbar, a brace for the escape-score cases, and true minus, times, infinity, alpha and beta signs. Display equations cover the score, fuzzy urgency, escape score, route weight, UCT and the MCTS result. Worked numbers in the text are inline equations, and Table 8.1 routes use arrows.
+  - **New explanations:** the report now defines the variables in the escape-score and UCT formulas, and says what MAX and MIN mean in Table 8.3.
+  - **Layout fixes:** Table 8.3 has tighter rows so it fits on one page, and the hand-worked endings in 8.4 are left-aligned so the inline equations do not stretch word spacing.
+  - **References:** full author names instead of initials, italic journal and book titles, clickable blue links (9 link annotations in the PDF) and 7 pt between entries.
+  - **Checks:** 26 pages, all 34 captions in order with no missing references, no dashes, and `validate.py` passes. LibreOffice drew the equations in Liberation Serif and OpenSymbol; Word will use Cambria Math.
+
+  Final report correction (2026-11-23), at the user's request:
+  - **Section 9 shortened:** it keeps only automatic tests, the wide robot test, the stress test, speed and known limits, each in two or three plain sentences. The glitch-checker, replay fingerprint and recording details, the search and decision counts from the stress runs, and the human-run bullet were removed from the report (they stay in this record).
+  - **Semicolons removed:** every semicolon in the report was replaced with a comma or a full stop, including Table 8.3, which now separates children with commas, and the team table. Pseudocode statements that shared a line now sit on separate lines.
+  - **Checks:** still 26 pages, 34 captions with no missing references, no dashes, 9 clickable links, and `validate.py` passes.
 - **Videos:** `output/videos/`, full-speed 1080p takes and double-speed versions: 00 opening, 01 human gadget heist, 02 human capture, 03 robot escape (seed 42), 04 robot capture (seed 82, recut to leave out the wall glitch), 05 F3 guard monitor. Every file decodes to its last frame.
 
 ## Output folder and workspace
 
 On 2026-11-22, at the user's request, `output/` was reduced to three folders: `proposal/` (the class proposal deck), `final/` (the deck and report) and `videos/`. The presentation workspace (deck and report builders, data, figures, clips and raw recordings) moved outside the repository to `../Echo_Heist_archive/presentation-build/`. The LinkedIn post and the proposal build sources were kept in `../Echo_Heist_archive/old-output/`. All other older evidence folders under `output/` (phase reviews, native builds, extracted packages, logs and superseded recordings) were deleted to free disk space. Older reports that link into those folders keep their recorded numbers, but the local files no longer exist.
+
+On 2026-11-23, at the user's request, the submitted PDFs were also committed under [`docs/submission/`](../../../../submission/): `ECHO_HEIST_Final_Presentation.pdf` (24 slides, 39.8 MB) and `Echo_Heist_Final_Project_Report.pdf` (26 pages, 3.7 MB). They are byte-identical to the copies in `output/final/`. The .pptx, the .docx and the videos stay local.

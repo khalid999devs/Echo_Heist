@@ -6,6 +6,7 @@ import platform
 import shutil
 import subprocess
 import sys
+import zipfile
 from dataclasses import asdict
 from hashlib import file_digest
 from importlib.metadata import version
@@ -62,6 +63,9 @@ def main() -> int:
         )
     else:
         shutil.make_archive(str(archive.with_suffix("")), "zip", ROOT / "dist", "EchoHeist")
+    # Ship the license beside the app at the archive root, outside the signed bundle.
+    with zipfile.ZipFile(archive, "a", zipfile.ZIP_DEFLATED) as package:
+        package.write(ROOT / "LICENSE.md", "LICENSE.md")
     commit = subprocess.run(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True
     ).stdout.strip()

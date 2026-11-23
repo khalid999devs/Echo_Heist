@@ -114,9 +114,9 @@ def test_blind_return_through_the_predicted_gate_is_intercepted(
     def steps(a: tuple[int, int], b: tuple[int, int]) -> int:
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-    # Caught on the way down that branch: on the Core side of the predicted
-    # gate, already closer to it than the Core is, before slipping through.
-    assert caught[0] >= gate[0] and steps(caught, gate) < steps(core, gate)
+    # Caught at the predicted gate: the Interceptor patrols the hall beside it,
+    # holds it before the runner arrives and grabs it within reach of the gate.
+    assert steps(caught, gate) <= 4 < steps(core, gate)
 
 
 @pytest.mark.parametrize(

@@ -3,8 +3,11 @@
 The Tracker chases only what it actually identifies. When sight breaks it plans
 with A* to its own last-seen tile, inspects a few reachable neighbors ranked by
 the motion it actually observed, then returns once memory expires. Radio
-SIGHTING reports from other guards become investigation leads that keep their
-reporter's original tick; they never confirm identity or reveal a new position.
+SIGHTING reports from other guards near its own patrol become investigation
+leads that keep their reporter's original tick; they never confirm identity or
+reveal a new position. Reports from far parts of the facility are left to the
+guards there, so a Tracker keeps watch over its own area instead of following
+the radio across both floors.
 """
 
 from collections import deque
@@ -39,6 +42,7 @@ from echo_heist.core.contracts.world import StaticMap, Tile, tile_center
 
 SEARCH_RADIUS = 2
 SEARCH_TILES = 4
+REPORT_RADIUS_TILES = 18  # grid distance from the Tracker's own patrol, the same reach as NEXUS
 
 
 def plausible_neighbors(world_map: StaticMap, origin: Tile, heading: Tile) -> tuple[Tile, ...]:
@@ -70,8 +74,11 @@ def plausible_neighbors(world_map: StaticMap, origin: Tile, heading: Tile) -> tu
     return tuple(candidates[:SEARCH_TILES])
 
 
-def report_lead(observation: Observation, memory: GuardMemory) -> SecurityReport | None:
-    """Newest unexpired SIGHTING from another guard that is newer than current evidence."""
+def report_lead(
+    observation: Observation, memory: GuardMemory, patrol: GuardPatrol
+) -> SecurityReport | None:
+    """Newest unexpired SIGHTING from another guard near this Tracker's patrol
+    that is newer than its current evidence."""
     leads = [
         report
         for report in observation.shared_reports
@@ -79,6 +86,7 @@ def report_lead(observation: Observation, memory: GuardMemory) -> SecurityReport
         and report.report_kind == "SIGHTING"
         and observation.tick <= report.expires_at_tick
         and report.tick > max(memory.evidence_tick, memory.last_seen_tick)
+        and min(distance(report.tile, point) for point in patrol.points) <= REPORT_RADIUS_TILES
     ]
     return max(leads, key=lambda report: (report.tick, report.event_id)) if leads else None
 
@@ -159,7 +167,7 @@ def decide(
                 evidence_tile=hidden.tile,
             )
         elif memory.state != GuardState.CHASE:
-            lead = report_lead(observation, memory)
+            lead = report_lead(observation, memory, patrol)
             cue = strongest_cue(observation, verify_within)
             if lead is not None and (cue is None or lead.tick >= cue.tick):
                 memory = replace(

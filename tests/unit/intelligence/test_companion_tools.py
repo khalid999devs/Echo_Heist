@@ -13,6 +13,7 @@ from echo_heist.ai.companion import tactics
 from echo_heist.ai.companion.belief import Sighting
 from echo_heist.ai.companion.briefing import policy_weights
 from echo_heist.ai.companion.stealth import lanes
+from echo_heist.ai.companion.stealth.timing import PATIENCE_TICKS, Patience
 from echo_heist.ai.companion.utility import emergency
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.autonomy.policy import Emergency, PolicySelection
@@ -182,3 +183,42 @@ def test_a_flee_goal_past_the_close_guard_is_swapped_for_one_behind_the_robot() 
     assert lanes.away_goal((7, 2), trail, (5, 4), guard) == (4, 4)
     assert lanes.away_goal((2, 4), trail, (5, 4), guard) == (2, 4)
     assert lanes.away_goal((7, 2), [(6, 4), (7, 4)], (5, 4), guard) is None
+
+
+class _Cones:
+    """Beliefs stand-in: the tiles a visible guard's observed cone covers."""
+
+    def __init__(self, *tiles: tuple[int, int], recent: tuple[Sighting, ...] = ()) -> None:
+        self.tiles = set(tiles)
+        self.sightings = {sighting.guard_id: sighting for sighting in recent}
+
+    def watched_by(self, observation: Observation, tile: tuple[int, int]) -> Sighting | None:
+        if tile not in self.tiles:
+            return None
+        return Sighting("guard-v", ActorKind.TRACKER, (8, 4), (-1, 0), observation.tick, False)
+
+
+def test_companion_waits_for_a_gap_near_the_core_but_never_forever() -> None:
+    """Near the Core it holds while the next tile is watched, keeps going once it
+    is already seen or carries the Core, and gives up after a bounded wait."""
+    own = OwnStatus((4, 4), Inventory(), position=tile_center((4, 4)))
+
+    def at(tick: int, status: OwnStatus = own) -> Observation:
+        return Observation("echo-companion", tick, ROOM, MissionPhase.INFILTRATE, status, ())
+
+    east = Action("echo-companion", ActionKind.MOVE, 100, (1, 0))
+    ahead = _Cones((5, 4))
+    carrying = replace(own, inventory=Inventory(core_held=True))
+    assert not Patience().hold(at(100), ahead, east, "INFILTRATE")  # only near the Core
+    assert not Patience().hold(at(100), _Cones(), east, "REACH_CORE")  # the way is clear
+    assert not Patience().hold(at(100), _Cones((4, 4), (5, 4)), east, "REACH_CORE")
+    assert not Patience().hold(at(100, carrying), ahead, east, "REACH_CORE")
+    patience = Patience()
+    assert patience.hold(at(100), ahead, east, "REACH_CORE")
+    assert patience.hold(at(99 + PATIENCE_TICKS), ahead, east, "REACH_CORE")
+    assert not patience.hold(at(100 + PATIENCE_TICKS), ahead, east, "REACH_CORE")
+    assert not patience.hold(at(101 + PATIENCE_TICKS), ahead, east, "REACH_CORE")  # resting
+    # A searching guard just out of view beside the next tile still counts for a second.
+    beside = _Cones(recent=(Sighting("guard-v", ActorKind.TRACKER, (6, 5), (-1, -1), 90, False),))
+    assert Patience().hold(at(100), beside, east, "REACH_CORE")
+    assert not Patience().hold(at(130), beside, east, "REACH_CORE")

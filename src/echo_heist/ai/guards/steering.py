@@ -68,14 +68,11 @@ def arrived(position: Position, tile: Tile | None) -> bool:
 
 
 def phase_rules(observation: Observation, rules: SensorRules) -> SensorRules:
-    """Lockdown shortens patrol pauses and lengthens searches; sensing is unchanged."""
+    """Lockdown shortens patrol pauses; searches and sensing are unchanged, so a
+    guard that loses the thief after the alarm gives up as soon as it would before."""
     if observation.phase != MissionPhase.LOCKDOWN:
         return rules
-    return replace(
-        rules,
-        patrol_pause_ticks=max(1, rules.patrol_pause_ticks // 2),
-        search_ticks=rules.search_ticks * 130 // 100,
-    )
+    return replace(rules, patrol_pause_ticks=max(1, rules.patrol_pause_ticks // 2))
 
 
 def visible_intruder(observation: Observation) -> EntityView | None:

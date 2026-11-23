@@ -206,12 +206,15 @@ def test_t04_tracker_searches_last_seen_then_expires_without_tracking_hidden_mov
 
 
 def test_sentinel_report_reaches_tracker_with_original_tick_only(rules: GameRules) -> None:
+    # The sighting at (6, 4) is 18 tiles from the near Tracker's patrol and 38
+    # from the far one: only a Tracker covering that area follows the radio.
     sim = secured(
-        bordered(30, 10),
+        bordered(50, 10),
         rules,
         (6, 4),
         GuardPatrol("sentinel", ((3, 4), (4, 4))),
-        GuardPatrol("tracker", ((26, 8), (27, 8)), GuardRole.TRACKER),
+        GuardPatrol("tracker", ((20, 8), (21, 8)), GuardRole.TRACKER),
+        GuardPatrol("far-tracker", ((40, 8), (41, 8)), GuardRole.TRACKER),
     )
     sent = None
     for _ in range(40):
@@ -219,9 +222,9 @@ def test_sentinel_report_reaches_tracker_with_original_tick_only(rules: GameRule
             if event.kind == EventKind.REPORT_SENT and sent is None:
                 sent = dict(event.details)
     assert sent is not None
-    tracker = next(
-        view for view in sim.presentation_snapshot().guards if view.actor_id == "tracker"
-    )
+    views = {view.actor_id: view for view in sim.presentation_snapshot().guards}
+    tracker, far = views["tracker"], views["far-tracker"]
+    assert far.state == GuardState.PATROL and far.evidence_kind == ""
     assert tracker.evidence_kind == "REPORT" and tracker.state == GuardState.INVESTIGATE
     assert tracker.evidence_tick <= sim.tick - 1 and tracker.last_seen_tile is None
     assert tracker.identification_ticks == 0  # a radio lead never confirms identity

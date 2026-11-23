@@ -78,8 +78,8 @@ The latest builds are on the [Releases page](https://github.com/khalid999devs/Ec
 
 | Platform | File | First run |
 | --- | --- | --- |
-| Windows, 64-bit | [echo-heist-0.1.0a1-windows-x64.zip](https://github.com/khalid999devs/Echo_Heist/releases/download/v0.1.0a1/echo-heist-0.1.0a1-windows-x64.zip) | Extract the whole zip, keep the `EchoHeist` folder together and open `EchoHeist.exe` |
-| macOS, Apple Silicon | [echo-heist-0.1.0a1-macos-arm64.zip](https://github.com/khalid999devs/Echo_Heist/releases/download/v0.1.0a1/echo-heist-0.1.0a1-macos-arm64.zip) | Extract the zip and open `Echo Heist.app` |
+| Windows, 64-bit | [echo-heist-0.1.0a2-windows-x64.zip](https://github.com/khalid999devs/Echo_Heist/releases/download/v0.1.0a2/echo-heist-0.1.0a2-windows-x64.zip) | Extract the whole zip, keep the `EchoHeist` folder together and open `EchoHeist.exe` |
+| macOS, Apple Silicon | [echo-heist-0.1.0a2-macos-arm64.zip](https://github.com/khalid999devs/Echo_Heist/releases/download/v0.1.0a2/echo-heist-0.1.0a2-macos-arm64.zip) | Extract the zip and open `Echo Heist.app` |
 
 The builds are not signed by Microsoft or Apple yet, so each system asks once before the first launch.
 
@@ -128,7 +128,7 @@ An escape earns 50 points, up to 40 more for stealth (minus 12 each time a guard
 
 **Fair play is built into the architecture.** Each character receives a filtered, read-only observation of what it can perceive and returns an action. Only the simulation changes the world, so no AI can read the player's true position or peek at another character's plan.
 
-The guards are strong on purpose. In a wide test of 1,200 robot missions over seeds 1 to 400, the Rush personality reached the Core 75 times and escaped twice, while Balanced and Ghost never got out. The [project report](docs/submission/Echo_Heist_Final_Project_Report.pdf) explains every algorithm with worked examples and traces one real decision step by step through minimax and MCTS.
+The guards are strong on purpose. In a wide test of 1,200 robot missions over seeds 1 to 400, the robots stole the Core 168 times, but only the Rush personality got out, three times. Balanced and Ghost reach the Core and are caught on the way out. The [project report](docs/submission/Echo_Heist_Final_Project_Report.pdf) explains every algorithm with worked examples and traces one real decision step by step through minimax and MCTS.
 
 ## Engineering highlights
 

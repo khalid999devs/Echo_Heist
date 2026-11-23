@@ -19,6 +19,8 @@ from echo_heist.ai.companion.belief import Beliefs
 from echo_heist.ai.companion.briefing import MissionBriefing, PolicyWeights, policy_weights
 from echo_heist.ai.companion.stealth import lanes
 from echo_heist.ai.companion.stealth.cover import safe_cover
+from echo_heist.ai.companion.stealth.timing import Patience
+from echo_heist.ai.companion.tactics import Directive
 from echo_heist.ai.companion.utility import (
     Override,
     active_guards,
@@ -74,15 +76,6 @@ STAIR_RETRY_TICKS = 12
 
 
 @dataclass(frozen=True, slots=True)
-class Directive:
-    """The strategic choice being executed and how long it holds."""
-
-    action: str
-    until_tick: int = 0
-    goal: Tile | None = None
-
-
-@dataclass(frozen=True, slots=True)
 class StairBackoff:
     link: StairLink
     until_tick: int
@@ -112,6 +105,7 @@ class CompanionController:
         self.rng = rng  # a dedicated, seeded decision stream supplied by the runtime
         self.state = "INFILTRATE"
         self.directive = Directive(tactics.ADVANCE)
+        self.patience = Patience()  # wait for a gap in a guard's view near the Core
         self.legs: tuple[tactics.Leg, ...] = ()
         self.progress = 0
         self.path: tuple[Tile, ...] = ()
@@ -942,7 +936,11 @@ class CompanionController:
         core = next((hint for hint in observation.interactions if hint.kind == "Core"), None)
         if core is not None and not own.inventory.core_held:
             return Action(self.actor_id, ActionKind.INTERACT, tick, target_id=core.target_id)
-        return self._steer(observation, goal, self._sprinting(observation))
+        step = self._steer(observation, goal, self._sprinting(observation))
+        if self.patience.hold(observation, self.beliefs, step, self.state):
+            self.still_ticks = self.tile_ticks = 0  # a deliberate hold is not being stuck
+            return Action(self.actor_id, ActionKind.WAIT, tick)
+        return step
 
     def _sprinting(self, observation: Observation) -> bool:
         own = observation.own_status

@@ -557,7 +557,7 @@ def anchors_and_patrols(facility: Facility) -> None:
         ),
         ("security", "SENTINEL", ((44, 8), (43, 8), (43, 10), (44, 10), (44, 8))),
         ("research", "TRACKER", ((37, 34), (35, 34), (35, 33), (37, 33), (37, 34))),
-        ("core", "INTERCEPTOR", ((59, 26), (54, 26), (54, 25), (59, 25), (59, 26))),
+        ("core", "INTERCEPTOR", ((60, 28), (53, 28), (53, 29), (60, 29), (60, 28))),
     )
     for name, kind, points in routes:
         facility.object(facility.patrols, "route-" + name, "PatrolRoute", *points[0], points=points)

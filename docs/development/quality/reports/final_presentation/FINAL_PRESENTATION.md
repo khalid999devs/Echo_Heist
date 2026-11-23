@@ -93,7 +93,8 @@ All takes are recorded from the native game window by `record_final.py` with gam
   Final recheck before submission (2026-11-23):
   - **Slide 15 clip replaced:** the user spotted a glitch in `tracker-catch`, which was cut from the seed 82 `companion-capture` take at 48.0 to 53.8 s. A pursuing guard above the Core Chamber corridor keeps walking into the wall beside the door for about five seconds (game time 0:42 to 0:47) instead of going round. The slide now uses `tracker-astar`, cut from the `guard-monitor` take at 26.9 to 31.1 s. In it, the F3 monitor shows the Vault Tracker planning a 27-step A* path to a radio report (40 tiles expanded), then spotting the robot and replanning to it with only a few tiles per plan.
   - **Other clips:** the slide 9 capture clip does not show the problem; its pursuing guard walks along the wall to the door.
-  - **Still open:** the full video `04 Robot - Caught by the Trackers` in `output/videos/` still contains the glitch. The game code was not changed, so the wall-walking pursuit remains an open movement bug.
+  - **Video 04 recut:** the guard is the Vault Tracker. Once its stun wears off at 45.4 s of the take, it walks into the Core Chamber wall and stays there until the capture at 53.4 s. `export_final.py` now leaves out 45.2 to 53.4 s of that take and joins the two parts with a 0.5 s crossfade. Both versions of `04 Robot - Caught by the Trackers` run to the robot breaking the Vault Tracker's grab (game time 0:39), then fade to the CAPTURED report, which names the Research Tracker. The full-speed version is 52.3 s and the 2x version 22.5 s, and both decode to the last frame.
+  - **Still open:** the game code was not changed, so the wall-walking pursuit remains an open movement bug. Re-recording seed 82 would repeat it, because runs are deterministic.
   - **Report numbers:** the text was reread, and every Chapter 8 number was recomputed: route weights, all 40 endings, the minimax levels, the alpha-beta bounds, the UCT scores and the fuzzy example.
   - **Report fixes:**
     - The guard mood diagram had its two Chase and Search labels swapped.
@@ -103,7 +104,7 @@ All takes are recorded from the native game window by `record_final.py` with gam
     - Szepesvári is spelled correctly.
     - The Word file's "last modified by" field names the authors instead of "Un-named".
   - **Report checks:** still 25 pages, with Times New Roman and Courier New embedded in the PDF, and `validate.py` passes.
-- **Videos:** `output/videos/`, full-speed 1080p takes and double-speed versions: 00 opening, 01 human gadget heist, 02 human capture, 03 robot escape (seed 42), 04 robot capture (seed 82), 05 F3 guard monitor. Every file decodes to its last frame.
+- **Videos:** `output/videos/`, full-speed 1080p takes and double-speed versions: 00 opening, 01 human gadget heist, 02 human capture, 03 robot escape (seed 42), 04 robot capture (seed 82, recut to leave out the wall glitch), 05 F3 guard monitor. Every file decodes to its last frame.
 
 ## Output folder and workspace
 

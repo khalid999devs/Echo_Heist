@@ -29,7 +29,7 @@ from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import SecurityRegistry, build_security_registry
 
-WIN_SEED, CAPTURE_SEED = 42, 4
+WIN_SEED, CAPTURE_SEED = 164, 4
 
 
 @pytest.fixture(scope="module")

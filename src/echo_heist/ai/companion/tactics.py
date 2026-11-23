@@ -16,7 +16,7 @@ from random import Random
 from echo_heist.ai.companion.briefing import MissionBriefing, PolicyWeights
 from echo_heist.ai.navigation.routes import ZoneRoute
 from echo_heist.core.contracts.security.director import RouteGraph
-from echo_heist.core.contracts.world import ActorKind
+from echo_heist.core.contracts.world import ActorKind, Tile
 
 ADVANCE, ALTERNATE, WAIT, HIDE, RETREAT = "ADVANCE", "ALTERNATE", "WAIT", "HIDE", "RETREAT"
 ECHO, EMP, MELEE = "ECHO", "EMP", "MELEE"
@@ -30,6 +30,15 @@ CONVERGE = 0.5
 RESUME = 0.3
 SWITCH_SECONDS = 4.0
 ARRIVAL = 0.5
+
+
+@dataclass(frozen=True, slots=True)
+class Directive:
+    """The strategic choice being executed and how long it holds."""
+
+    action: str
+    until_tick: int = 0
+    goal: Tile | None = None
 
 
 def _draw(belief: dict[str, float], rng: Random) -> str:

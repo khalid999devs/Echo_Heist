@@ -8,7 +8,7 @@
   "stair_travel_ticks": 24,
   "lockdown_guard_speed_percent": 120,
   "sentinel_speed_units_per_second": 54000,
-  "tracker_speed_units_per_second": 72000,
+  "tracker_speed_units_per_second": 60000,
   "interceptor_speed_units_per_second": 84000,
   "actor_radius_units": 6000,
   "interaction_range_units": 33000,

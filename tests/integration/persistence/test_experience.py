@@ -70,7 +70,7 @@ def test_scored_reports_are_authoritative_matched_and_persisted(
     assert (report.result.score, report.result.grade, report.policy_label) == (0, "F", "Human")
     assert service.report(aborted) is report  # one report per run key
     win = finish(
-        gateway, DeploymentRequest("COMPANION", 44, map_id, PRESETS["RUSH"]), "app:2", abort=False
+        gateway, DeploymentRequest("COMPANION", 42, map_id, PRESETS["RUSH"]), "app:2", abort=False
     )
     scored = service.report(win)
     assert scored is not None and scored.result.outcome == RunOutcome.WIN

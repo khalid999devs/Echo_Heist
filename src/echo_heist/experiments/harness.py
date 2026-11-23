@@ -77,10 +77,12 @@ def run_scenario(
     stairs: list[str] = []
     interceptor = {"searches": 0, "evaluated_leaves": 0, "pruned_branches": 0}
     posts: list[str] = []
+    last_search: dict[str, int] = {}
+    held: dict[str, str] = {}
     fuzzy_evaluations = transitions = 0
     decisions = visited = best = overrides = expanded = no_path = 0
     still = longest_still = 0
-    last_trace = last_search = -1
+    last_trace = -1
     previous = run.observe(actor).own_status.position
     tick_ms: list[float] = []
     while run.tick < tick_cap:
@@ -114,13 +116,16 @@ def run_scenario(
             no_path += not trace.path
         if trace is not None and trace.utility_action:
             overrides += 1
-        plan = telemetry.nexus.interceptor if telemetry.nexus else None
-        if plan is not None and plan.evaluated_tick != last_search:
-            last_search = plan.evaluated_tick
+        for plan in telemetry.nexus.interceptors if telemetry.nexus else ():
+            if plan.evaluated_tick == last_search.get(plan.guard_id):
+                continue
+            last_search[plan.guard_id] = plan.evaluated_tick
             interceptor["searches"] += 1
             interceptor["evaluated_leaves"] += plan.evaluated_nodes
             interceptor["pruned_branches"] += plan.pruned_nodes
-            if not posts or posts[-1] != plan.post_id:
+            # Each Interceptor holds its own gates: log a post when that guard changes it.
+            if held.get(plan.guard_id) != plan.post_id:
+                held[plan.guard_id] = plan.post_id
                 posts.append(plan.post_id)
         if result.mission_end is not None:
             break

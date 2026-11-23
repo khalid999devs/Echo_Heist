@@ -127,10 +127,12 @@ class NexusTrace:
     announcement: str = ""
     announcement_tick: int | None = None
     tasks: tuple[GuardTask, ...] = ()
-    interceptor: InterceptorTrace | None = None
+    # One entry per Interceptor that has searched, in guard id order.
+    interceptors: tuple[InterceptorTrace, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "tasks", tuple(self.tasks))
+        object.__setattr__(self, "interceptors", tuple(self.interceptors))
         if self.evaluated_tick < 0:
             raise ValueError("NEXUS telemetry needs its actual evaluation tick")
         if self.announcement and self.announcement_tick is None:

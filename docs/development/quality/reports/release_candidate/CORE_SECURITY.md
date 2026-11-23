@@ -6,7 +6,7 @@
 
 - Five defenders now patrol the facility. A BFS Sentinel sweeps the east side of the Core chamber, while the existing Interceptor covers the lower approaches and can man either return gate.
 - The view cone widens from 100° to 112° across. Opaque geometry still clips it with the same ray test shown by the renderer. Amber indicates patrol/identification and red highlights confirmed pursuit. Guards keep their rear blind spots. The F3 panel can select all five defenders by mouse or number key.
-- Intruder-to-guard body clearance grows from 0.40 to 0.52 tile between centers. A stunned body still occupies space. A stun buys time to go around it. Movement, stair landings and locker entry use the same check. The fingerprint schema is 15.
+- Intruder-to-guard body clearance grows from 0.40 to 0.52 tile between centers. A stunned body still occupies space. A stun buys time to go around it. (Superseded on 2026-11-22: a stunned or disabled guard no longer blocks movement, and an intruder under a desk only blocks by body contact. See the [final presentation report](../final_presentation/FINAL_PRESENTATION.md).) Movement, stair landings and locker entry use the same check. The fingerprint schema is 15.
 - Both a stun and resisted impact play one clang from the same committed noise event that guards hear. A rejected strike plays the unavailable cue and emits no impact. Reception depends on acoustic distance and blockers. A responding guard receives the impact's original tile and tick.
 - Companion recovery holds its route through routine risk changes. A new goal, changed geometry or blocked movement can still trigger replanning. The former Ghost stair loop in `s16-service-corridor-late` now reaches the Core and is captured at tick 3380.
 

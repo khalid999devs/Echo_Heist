@@ -14,6 +14,7 @@ from echo_heist.core.contracts.world import (
     MissionPhase,
     Position,
     StaticMap,
+    Tile,
     position_tile,
 )
 from echo_heist.core.simulation.world import GUARD_KINDS, ActorState, Emit, WorldState
@@ -23,18 +24,51 @@ def distance_squared(first: Position, second: Position) -> int:
     return (first[0] - second[0]) ** 2 + (first[1] - second[1]) ** 2
 
 
-def body_occupied(world: WorldState, actor: ActorState, target: Position, rules: GameRules) -> bool:
+def body_occupied(
+    world: WorldState,
+    actor: ActorState,
+    target: Position,
+    rules: GameRules,
+    desks: frozenset[Tile] = frozenset(),
+) -> ActorState | None:
+    """The body ``target`` would press into, or None when the way is clear.
+
+    Guards and intruders block each other. Guards slide past fellow guards, so
+    two patrols meeting head-on in a one-tile corridor cannot deadlock. A
+    stunned or EMP-disabled guard is a slumped body anyone can step past, and
+    an actor already inside another's clearance (a guard waking up beside it)
+    may always move apart, so no case freezes motion against a wall. Someone
+    shut inside a locker is out of the walkway entirely, and an intruder tucked
+    under a desk (``desks``) only blocks by plain body contact: the wider
+    guard margin let a thief at a desk's edge wall off the corridor in front.
+    """
     guard = actor.kind in GUARD_KINDS
-    return any(
-        other is not actor
-        and distance_squared(target, other.position)
-        < (
-            rules.guard_intruder_clearance_units
-            if guard != (other.kind in GUARD_KINDS)
-            else 2 * rules.actor_radius_units
-        )
-        ** 2
-        for other in world.actors.values()
+
+    def tucked(body: ActorState) -> bool:
+        return body.kind not in GUARD_KINDS and body.crouched and body.tile in desks
+
+    for other in world.actors.values():
+        if (
+            other is actor
+            or other.hidden_in is not None  # shut inside a locker, out of the walkway
+            or (other.kind in GUARD_KINDS and (guard or other.incapacitated(world.tick)))
+        ):
+            continue
+        wide = guard != (other.kind in GUARD_KINDS) and not (tucked(actor) or tucked(other))
+        clearance = rules.guard_intruder_clearance_units if wide else 2 * rules.actor_radius_units
+        gap = distance_squared(target, other.position)
+        if gap < clearance**2 and gap <= distance_squared(actor.position, other.position):
+            return other
+    return None
+
+
+def toward(origin: Position, target: Position) -> Tile:
+    """The closest of the eight facings from ``origin`` to ``target``."""
+    dx, dy = target[0] - origin[0], target[1] - origin[1]
+    big = max(abs(dx), abs(dy))
+    return (
+        (dx > 0) - (dx < 0) if 2 * abs(dx) >= big else 0,
+        (dy > 0) - (dy < 0) if 2 * abs(dy) >= big else 0,
     )
 
 
@@ -154,6 +188,7 @@ def move_actor(
     count = max(1, (max(abs(dx), abs(dy)) + max_substep - 1) // max_substep)
     origin = actor.position
     visited = [actor.tile]
+    bumped: ActorState | None = None
     for index in range(count):
         delta = (
             dx * (index + 1) // count - dx * index // count,
@@ -163,19 +198,28 @@ def move_actor(
             candidate = list(actor.position)
             candidate[axis] += delta[axis]
             target = candidate[0], candidate[1]
-            if (
-                delta[axis]
-                and body_fits(world_map, target, rules.actor_radius_units, crouched=actor.crouched)
-                and not body_occupied(world, actor, target, rules)
+            if delta[axis] and body_fits(
+                world_map, target, rules.actor_radius_units, crouched=actor.crouched
             ):
-                actor.position = target
+                blocker = body_occupied(world, actor, target, rules, world_map.crouch_tiles)
+                if blocker is None:
+                    actor.position = target
+                elif blocker.kind not in GUARD_KINDS:
+                    bumped = blocker
         if actor.tile != visited[-1]:
             visited.append(actor.tile)
     actor.traversed_tiles = tuple(visited)
     if actor.position == origin:
+        if bumped is not None and actor.kind in GUARD_KINDS:
+            # Walking into a body is felt: the guard turns toward it, and its own
+            # sight then decides what it is (an unseen thief at its shoulder no
+            # longer holds it in a shoving match).
+            actor.facing = toward(actor.position, bumped.position)
         emit(EventKind.ACTION_REJECTED, actor.actor_id, (("reason", "blocked"),))
         return
-    actor.facing = action.direction
+    if actor.actor_id not in world.guard_memories:
+        # Registry guards face where their decision looks (a chaser watches its quarry).
+        actor.facing = action.direction
     actor.sprinting = sprint
     if sprint:
         actor.sprint_ticks_remaining -= 1

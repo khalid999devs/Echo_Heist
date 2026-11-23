@@ -1,9 +1,10 @@
-"""Unweighted four-neighbor BFS with an actual path and expansion count."""
+"""Unweighted four-neighbor BFS with an actual path and expansion count, plus lane steering."""
 
 from collections import deque
 from dataclasses import dataclass
 
-from echo_heist.core.contracts.world import StaticMap, Tile
+from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
+from echo_heist.core.contracts.world import Position, StaticMap, Tile
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,3 +59,31 @@ def distances_from(
                 found[tile] = found[current] + 1
                 pending.append(tile)
     return found
+
+
+def unsnag(world_map: StaticMap, position: Position, direction: Tile, delta: Tile) -> Tile:
+    """Centre on the waypoint's lane before a shoulder clips a wall corner.
+
+    Steering is axis-first, so a body arriving off-centre could press its body
+    into the corner of the next tile on every tick and never move again (P08
+    stuck guard). When the step leans toward solid ground just ahead, slide
+    across toward the lane first; open floor keeps the direct step.
+    """
+    if direction == (0, 0):
+        return direction
+    axis = 0 if direction[0] else 1
+    other = 1 - axis
+    if abs(delta[other]) <= UNIT // 10:
+        return direction
+    corner = [0, 0]
+    corner[axis] = position[axis] + direction[axis] * UNIT // 2
+    corner[other] = position[other] - sign(delta[other]) * UNIT // 2
+    if not world_map.point_blocked((corner[0], corner[1])):
+        return direction
+    slide = [0, 0]
+    slide[other] = sign(delta[other])
+    return slide[0], slide[1]
+
+
+def sign(value: int) -> int:
+    return (value > 0) - (value < 0)

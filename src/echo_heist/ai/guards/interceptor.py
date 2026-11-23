@@ -17,6 +17,7 @@ from echo_heist.ai.guards.steering import (
     distance,
     identify,
     phase_rules,
+    spot_lapsed,
     steer,
     visible_intruder,
 )
@@ -248,7 +249,7 @@ def decide(
         memory = identify(observation, rules, memory, intruder)
         return steer(observation, memory, memory.target, astar, intruder)
     memory = replace(memory, identity_ticks=max(0, memory.identity_ticks - 2))
-    if memory.state == GuardState.SPOTTED:
+    if spot_lapsed(observation, memory):
         memory = replace(memory, state=GuardState.INVESTIGATE, target=memory.last_seen_tile)
     lead = _evidence(observation, memory) if graph is not None else None
     own_loss = (

@@ -78,8 +78,8 @@ The latest builds are on the [Releases page](https://github.com/khalid999devs/Ec
 
 | Platform | File | First run |
 | --- | --- | --- |
-| Windows, 64-bit | [echo-heist-0.1.0a2-windows-x64.zip](https://github.com/khalid999devs/Echo_Heist/releases/download/v0.1.0a2/echo-heist-0.1.0a2-windows-x64.zip) | Extract the whole zip, keep the `EchoHeist` folder together and open `EchoHeist.exe` |
-| macOS, Apple Silicon | [echo-heist-0.1.0a2-macos-arm64.zip](https://github.com/khalid999devs/Echo_Heist/releases/download/v0.1.0a2/echo-heist-0.1.0a2-macos-arm64.zip) | Extract the zip and open `Echo Heist.app` |
+| Windows, 64-bit | [echo-heist-0.1.0a3-windows-x64.zip](https://github.com/khalid999devs/Echo_Heist/releases/download/v0.1.0a3/echo-heist-0.1.0a3-windows-x64.zip) | Extract the whole zip, keep the `EchoHeist` folder together and open `EchoHeist.exe` |
+| macOS, Apple Silicon | [echo-heist-0.1.0a3-macos-arm64.zip](https://github.com/khalid999devs/Echo_Heist/releases/download/v0.1.0a3/echo-heist-0.1.0a3-macos-arm64.zip) | Extract the zip and open `Echo Heist.app` |
 
 The builds are not signed by Microsoft or Apple yet, so each system asks once before the first launch.
 

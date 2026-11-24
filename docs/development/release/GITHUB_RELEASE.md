@@ -92,3 +92,18 @@ Both zips come from the main push run [45244029746](https://github.com/khalid999
 Checks on the downloaded zips. Both CI smoke summaries report `passed: true` with scope `CI dummy video`. Each SHA-256 matches its manifest, and each zip carries `LICENSE.md` at its root. On Khalid's Apple Silicon Mac the extracted app passes `codesign --verify --deep --strict` and prints `0.1.0a2` for `--version`. Hands-on play of these exact zips on clean Windows and macOS machines has not been done yet.
 
 The README download links now point to the 0.1.0a2 zips, and its wide-test sentence uses the new sweep numbers.
+
+## Release 0.1.0a3
+
+Published on 2026-11-24 as [ECHO HEIST 0.1.0a3](https://github.com/khalid999devs/Echo_Heist/releases/tag/v0.1.0a3), the latest release. The annotated tag `v0.1.0a3` points at `d41b911bb052222013e62f2817d4b6a11a48f3a5`, the merge of [PR #16](https://github.com/khalid999devs/Echo_Heist/pull/16). It ships the [Companion planner and light easing](../planning/balance/COMPANION.md). The description lists the changes in plain words and points to the 0.1.0a1 install steps.
+
+| Asset | Bytes | SHA-256 |
+| --- | --- | --- |
+| `echo-heist-0.1.0a3-windows-x64.zip` | 112,690,613 | `6c18100a790b04f95a34f98ed6a4b349531be0ffacda886d5a82c55dc73a812a` |
+| `echo-heist-0.1.0a3-macos-arm64.zip` | 113,517,380 | `21e54a22cbd9192983284fb0ff75aebed6d96d0a9008f22bcabb0870abc31d77` |
+
+Both zips come from the main push run [45430577076](https://github.com/khalid999devs/Echo_Heist/actions/runs/45430577076) on the merge commit, where headless-checks, windows-x64 and macos-arm64 passed. The PR run [45428434578](https://github.com/khalid999devs/Echo_Heist/actions/runs/45428434578) passed as well. Each manifest records version 0.1.0a3, source commit `d41b911`, a clean working tree, Python 3.13.17, PyInstaller 6.22.3, fingerprint schema 17 and gameplay hash `2ee2b9d5146a7574cff6c32bc625725e3905749bcc52745e17a51366123a5cd4`. Signing is unchanged, `unsigned` for Windows and `ad-hoc; not notarized` for macOS.
+
+Checks on the downloaded zips. Both CI smoke summaries report `passed: true` with scope `CI dummy video`. Each SHA-256 matches its manifest, and each zip carries `LICENSE.md` at its root. On Khalid's Apple Silicon Mac the extracted app passes `codesign --verify --deep --strict` and prints `0.1.0a3` for `--version`. Hands-on play of these exact zips on clean Windows and macOS machines has not been done yet.
+
+The README download links now point to the 0.1.0a3 zips, and its wide-test sentence uses the new sweep numbers.

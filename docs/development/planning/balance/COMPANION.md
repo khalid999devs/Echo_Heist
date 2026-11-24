@@ -51,5 +51,6 @@ During development the same planner was measured step by step on seeds 1 to 30 w
 - The robot wins about one mission in ten, far short of the six in ten that was asked for. Most losses come after the theft. The Research Tracker catches it near the Research stairs, the Vault Tracker catches it near the Core, and before the theft the Cargo Interceptor catches Ghost runs in the Service Wing.
 - A guard that turns somewhere the robot never saw it turn can still surprise it. Prediction uses only the robot's own sightings.
 - About one robot mission in five is still free after five minutes, waiting for a gap.
+- The glitch probe from the presentation build, run on Ghost seeds 1 to 24, flags the robot stepping back and forth between two tiles above the Core room door in 7 missions (and turning on the spot in 11) while it waits for the Vault Tracker, and the Vault Tracker repeating a grab in 2. Two nearly equal plans alternate as the robot crosses the tile edge. A small price on stepping straight back removed every flag on Ghost seeds 1 to 15, but over seeds 1 to 100 the robots then froze in most runs and won 6 times instead of 30, so it was not shipped.
 - The earlier Companion decision loop is still in `controller.py`, as the base class the new agent builds on.
 - Hands-on human play of this build has not been recorded yet.

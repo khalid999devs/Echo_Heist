@@ -20,6 +20,7 @@ from echo_heist.ai.guards.steering import (
     follow_dispatch,
     identify,
     investigate,
+    patrol_pause,
     phase_rules,
     spot_lapsed,
     steer,
@@ -194,7 +195,9 @@ def decide(
             index = (memory.patrol_index + 1) % len(patrol.points)
             target = patrol.points[index]
             memory = replace(
-                memory, patrol_index=index, wait_until=observation.tick + rules.patrol_pause_ticks
+                memory,
+                patrol_index=index,
+                wait_until=observation.tick + patrol_pause(rules, memory, observation.tick),
             )
     elif (
         memory.state in (GuardState.CHASE, GuardState.INVESTIGATE)

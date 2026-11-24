@@ -200,7 +200,7 @@ def test_default_live_guards_allow_actual_entry_extraction() -> None:
         ("guard-service", "BFS"),
     }
     route = list(mission_path(flow.level, "upper"))
-    for _ in range(180):  # wait at the entry while the Service patrol turns away
+    for _ in range(300):  # wait at the entry while the Service patrol turns away
         flow.frame([], 34)
     # P04: after the alarm the Interceptor holds the gate it predicts (here the
     # Research Return), so the escape uses the alternate Security corridor.

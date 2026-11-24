@@ -6,7 +6,7 @@
   "sprint_duration_ticks": 90,
   "sprint_recharge_ticks": 120,
   "stair_travel_ticks": 24,
-  "lockdown_guard_speed_percent": 120,
+  "lockdown_guard_speed_percent": 110,
   "sentinel_speed_units_per_second": 54000,
   "tracker_speed_units_per_second": 60000,
   "interceptor_speed_units_per_second": 84000,
@@ -31,6 +31,6 @@
   "sprint_footstep_interval_ticks": 7,
   "chase_guard_speed_percent": 125,
   "melee_cooldown_ticks": 120,
-  "pursuit_grace_ms": 1000,
+  "pursuit_grace_ms": 1300,
   "pursuit_pressure_percent": 103
 }

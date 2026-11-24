@@ -79,7 +79,7 @@ def test_a_real_pursuit_is_one_encounter_and_emp_cannot_reset_it(
 ) -> None:
     sim = facility(rules, kind, (5, 3), second=True)
     confirmations = 0
-    for _ in range(20):
+    for _ in range(24):  # identification takes 22 ticks at this range
         result = sim.step()
         confirmations += sum(e.kind == EventKind.SIGHTING_CONFIRMED for e in result.events)
     assert confirmations >= 1

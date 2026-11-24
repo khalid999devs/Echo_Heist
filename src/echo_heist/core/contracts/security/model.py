@@ -45,6 +45,10 @@ class SensorRules:
     search_ticks: int
     report_ttl_ticks: int
     patrol_pause_ticks: int
+    # What a thief sees around itself on its own floor, walls or not: the same
+    # area a human player sees on a default 1280 x 720 screen.
+    intruder_view_half_width_tiles: int = 7
+    intruder_view_half_height_tiles: int = 4
 
     def __post_init__(self) -> None:
         if any(
@@ -83,6 +87,8 @@ class SecuritySpec:
     # Public chokepoint graph for interception and the NEXUS director rules.
     graph: RouteGraph | None = None
     director: DirectorRules | None = None
+    # Floor rectangles (left, top, width, height): a thief's screen view stays on its floor.
+    view_regions: tuple[tuple[int, int, int, int], ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "patrols", tuple(self.patrols))
@@ -177,6 +183,9 @@ class GuardMemory:
     fuzzy_trace: FuzzyTrace | None = None
     intercept: InterceptPlan | None = None
     live_pursuit_ticks: int = 0
+    # Drawn from the mission seed: this guard's own rhythm at patrol corners.
+    # Zero keeps the plain configured pause.
+    cadence: int = 0
 
     def __post_init__(self) -> None:
         for name in ("last_seen_tile", "target", "path_goal", "search_origin", "evidence_tile"):

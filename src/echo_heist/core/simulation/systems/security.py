@@ -21,7 +21,7 @@ from echo_heist.core.contracts.security.model import (
     VisualCue,
 )
 from echo_heist.core.contracts.world import POSITION_UNITS_PER_TILE as UNIT
-from echo_heist.core.contracts.world import ActorKind, StaticMap
+from echo_heist.core.contracts.world import ActorKind, StaticMap, Tile
 from echo_heist.core.perception.concealment import (
     inspection_reveals,
     is_concealed,
@@ -29,7 +29,7 @@ from echo_heist.core.perception.concealment import (
 )
 from echo_heist.core.perception.sensors import can_see, line_of_sight, sound_reaches
 from echo_heist.core.simulation.systems.motion import clear_reach
-from echo_heist.core.simulation.world import Emit, WorldState
+from echo_heist.core.simulation.world import ActorState, Emit, WorldState
 
 INTRUDERS = frozenset({ActorKind.OPERATIVE, ActorKind.COMPANION})
 CONTROLLED = frozenset({GuardRole.SENTINEL, GuardRole.TRACKER, GuardRole.INTERCEPTOR})
@@ -204,11 +204,41 @@ def _sees(
             rules.sight_range_tiles,
             rules.half_angle_degrees,
         )
-    return (actor.position[0] - target.position[0]) ** 2 + (
+    if (actor.position[0] - target.position[0]) ** 2 + (
         actor.position[1] - target.position[1]
     ) ** 2 <= (rules.sight_range_tiles * UNIT) ** 2 and line_of_sight(
         world_map, actor.position, target.position
-    )
+    ):
+        return True
+    return _on_screen(spec, actor.tile, target.tile)
+
+
+def _label(world: WorldState, viewer: ActorState, other: str) -> str:
+    """The guard state a player reads above a guard on screen."""
+    memory = world.guard_memories.get(other)
+    return memory.state.value if memory is not None and viewer.kind in INTRUDERS else ""
+
+
+def _on_screen(spec: SecuritySpec, viewer: Tile, other: Tile) -> bool:
+    """A thief sees its own floor around itself through walls, like a human's screen."""
+    rules = spec.rules
+    if (
+        abs(viewer[0] - other[0]) > rules.intruder_view_half_width_tiles
+        or abs(viewer[1] - other[1]) > rules.intruder_view_half_height_tiles
+    ):
+        return False
+
+    def floor(tile: Tile) -> int:
+        return next(
+            (
+                index
+                for index, (left, top, width, height) in enumerate(spec.view_regions)
+                if left <= tile[0] < left + width and top <= tile[1] < top + height
+            ),
+            -1,
+        )
+
+    return bool(spec.view_regions) and floor(viewer) == floor(other) >= 0
 
 
 def _witness(
@@ -293,6 +323,7 @@ def refresh(
                     concealed=is_concealed(
                         world_map, other.tile, other.crouched, hidden_in=other.hidden_in
                     ),
+                    alert=_label(world, actor, other.actor_id),
                 )
             )
         world.visible_entities[actor_id] = tuple(visible)

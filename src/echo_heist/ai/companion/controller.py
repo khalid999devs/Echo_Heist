@@ -17,9 +17,11 @@ from random import Random
 from echo_heist.ai.companion import tactics
 from echo_heist.ai.companion.belief import Beliefs
 from echo_heist.ai.companion.briefing import MissionBriefing, PolicyWeights, policy_weights
+from echo_heist.ai.companion.spacetime.foresight import Foresight
 from echo_heist.ai.companion.stealth import lanes
 from echo_heist.ai.companion.stealth.cover import safe_cover
-from echo_heist.ai.companion.stealth.timing import Patience
+from echo_heist.ai.companion.stealth.exits import BODY_COST, JAM_COST, choose_exit
+from echo_heist.ai.companion.stealth.timing import theft_window
 from echo_heist.ai.companion.tactics import Directive
 from echo_heist.ai.companion.utility import (
     Override,
@@ -56,16 +58,12 @@ HIDE_MAX_TICKS = 240
 CLEAR_TICKS = 60
 BREADCRUMBS = 150
 FLEE = "FLEE"
-BODY_COST = 60
 JAM_TICKS = 90
 FLEE_LIMIT_TICKS = 180
-JAM_COST = 400
 ALERT_TICKS = 150
 STALL_TICKS = 600
 FLEE_TICKS = 75
 BLOCK_TILES = 4
-EXIT_SWITCH_COST = 40  # A* cost an alternative exit must save to win
-EXIT_COMMIT_TICKS = 180
 GATE_HOLD_TICKS = 45
 GATE_ABANDON_TICKS = 600
 ESCAPE_HOLD_TICKS = 15
@@ -87,6 +85,10 @@ def _sign(value: int) -> int:
 
 
 class CompanionController:
+    # Whether MCTS may choose to wait, hide or retreat at the root. An agent
+    # that times those moves itself leaves MCTS the route and gadget choices.
+    HOLDS_AT_ROOT = True
+
     def __init__(
         self,
         actor_id: str,
@@ -105,7 +107,7 @@ class CompanionController:
         self.rng = rng  # a dedicated, seeded decision stream supplied by the runtime
         self.state = "INFILTRATE"
         self.directive = Directive(tactics.ADVANCE)
-        self.patience = Patience()  # wait for a gap in a guard's view near the Core
+        self.foresight = Foresight(sight_range_tiles, half_angle_degrees)  # predicted cones
         self.legs: tuple[tactics.Leg, ...] = ()
         self.progress = 0
         self.path: tuple[Tile, ...] = ()
@@ -133,6 +135,7 @@ class CompanionController:
         self.tile_ticks = 0  # ticks spent on the current tile (survives body jitter)
         self.last_tile: Tile | None = None
         self.crumbs: deque[Tile] = deque(maxlen=BREADCRUMBS)
+        self.visited: set[Tile] = set()  # every tile walked, for the exit choice
         self.melee_ready_at: dict[str, int] = {}
         self.echo_ready_at = 0
         self.hidden_since = -1
@@ -193,38 +196,18 @@ class CompanionController:
         return self.extraction_goal if carrying else self.briefing.core_tile
 
     def _choose_exit(self, observation: Observation) -> None:
-        exits = self.briefing.graph.exit_tiles
         self.exit_replan_at = observation.tick + SEARCH_GAP_TICKS
-        if len(exits) < 2:
-            return
-        danger = self.beliefs.danger(observation.tick)
-        bodies = {guard.tile for guard in active_guards(observation)}
-        own = observation.own_status.tile
-
-        jammed = {tile for tile, until in self.jammed.items() if until > observation.tick}
-
-        def penalty(tile: Tile) -> int:
-            return (
-                self.weights.risk_weight * danger.get(tile, 0) // 2
-                + (BODY_COST if tile in bodies else 0)
-                + (JAM_COST if tile in jammed else 0)
-            )
-
-        options = []
-        for tile in exits:
-            path = astar(observation.map_static, own, tile, penalty=penalty)
-            if path.path:
-                # Switching exits turns the escape around; demand a clear gain.
-                options.append(
-                    (path.cost + (EXIT_SWITCH_COST if tile != self.extraction_goal else 0), tile)
-                )
-        current = any(tile == self.extraction_goal for _, tile in options)
-        if options and (not current or observation.tick >= self.exit_locked_until):
-            choice = min(options)[1]
-            if choice != self.extraction_goal:
-                # Commit: re-deciding every search bounced between the two escapes.
-                self.exit_locked_until = observation.tick + EXIT_COMMIT_TICKS
-            self.extraction_goal = choice
+        self.extraction_goal, self.exit_locked_until = choose_exit(
+            observation,
+            self.briefing.graph.exit_tiles,
+            self.beliefs.danger(observation.tick),
+            self.weights.risk_weight,
+            {guard.tile for guard in active_guards(observation)},
+            self.jammed,
+            self.visited,
+            self.extraction_goal,
+            self.exit_locked_until,
+        )
 
     def _needs_recovery(self, observation: Observation) -> bool:
         own = observation.own_status
@@ -314,7 +297,7 @@ class CompanionController:
             and not escape_available(observation, self.rules),
             {gid: self.beliefs.prior(brief) for gid, brief in guards.items()},
             self._branch_threatened(observation, legs),
-            observation.tick - self.progress_tick >= STALL_TICKS,
+            not self.HOLDS_AT_ROOT or observation.tick - self.progress_tick >= STALL_TICKS,
             melee_recovery=self.rules.melee_cooldown_ticks / self.rules.simulation_hz,
         )
         result: MctsResult[str] = search(
@@ -602,6 +585,12 @@ class CompanionController:
                     return Action(self.actor_id, ActionKind.HIDE, tick, target_id=locker.object_id)
                 if own.tile != approach:
                     return self._steer(observation, approach, False)
+                # On the approach but still out of reach: close in on the locker.
+                position = own.position or tile_center(own.tile)
+                dx = tile_center(tile)[0] - position[0]
+                dy = tile_center(tile)[1] - position[1]
+                step = (_sign(dx), 0) if abs(dx) > abs(dy) else (0, _sign(dy))
+                return Action(self.actor_id, ActionKind.MOVE, tick, step)
             else:
                 if own.tile != approach:
                     return self._steer(observation, approach, False)
@@ -714,6 +703,7 @@ class CompanionController:
         appeared = self.beliefs.update(observation)
         if not self.crumbs or self.crumbs[-1] != own.tile:
             self.crumbs.append(own.tile)
+            self.visited.add(own.tile)
         phase = self._phase(observation)
         changed = phase != self.state
         if changed:
@@ -935,12 +925,13 @@ class CompanionController:
                 return self._steer(observation, directive.goal, self._sprinting(observation))
         core = next((hint for hint in observation.interactions if hint.kind == "Core"), None)
         if core is not None and not own.inventory.core_held:
-            return Action(self.actor_id, ActionKind.INTERACT, tick, target_id=core.target_id)
-        step = self._steer(observation, goal, self._sprinting(observation))
-        if self.patience.hold(observation, self.beliefs, step, self.state):
-            self.still_ticks = self.tile_ticks = 0  # a deliberate hold is not being stuck
+            if theft_window(observation, self.beliefs, self.last_watched):
+                return Action(self.actor_id, ActionKind.INTERACT, tick, target_id=core.target_id)
+            if tick - self.last_watched <= CLEAR_TICKS:  # seen: break contact before the theft
+                back = self._safe_crumb(tick, far=True)
+                self.directive, self.path_goal = Directive(FLEE, tick + FLEE_TICKS, back), None
             return Action(self.actor_id, ActionKind.WAIT, tick)
-        return step
+        return self._steer(observation, goal, self._sprinting(observation))
 
     def _sprinting(self, observation: Observation) -> bool:
         own = observation.own_status

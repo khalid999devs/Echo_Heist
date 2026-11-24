@@ -5,7 +5,8 @@ from dataclasses import replace
 import pytest
 
 from echo_heist.ai.companion import tactics
-from echo_heist.ai.companion.controller import CompanionController, Directive
+from echo_heist.ai.companion.stealth.agent import StealthAgent
+from echo_heist.ai.companion.tactics import Directive
 from echo_heist.autonomy.mission import COMPANION_ID, AutonomousMission, build_briefing
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.autonomy.model import CompanionTrace
@@ -29,7 +30,7 @@ from echo_heist.level.io import load_tiled_map
 from echo_heist.level.model import LevelData
 from echo_heist.level.security import SecurityRegistry, build_security_registry
 
-WIN_SEED, CAPTURE_SEED = 164, 4
+WIN_SEED, CAPTURE_SEED = 19, 4
 
 
 @pytest.fixture(scope="module")
@@ -117,16 +118,18 @@ def test_companion_genuinely_wins_or_is_captured_without_recordings(
     end = run.presentation_snapshot().mission_end
     assert end is not None and end.outcome == outcome and end.operative_id == COMPANION_ID
     if outcome == RunOutcome.WIN:
-        assert end.extraction_id == "cargo-exit"
+        assert end.extraction_id == "entry-exit"
         assert kinds.count("CORE_TAKEN") == 1 and kinds.count("LOCKDOWN_STARTED") == 1
     else:
         assert end.capture_by in {item.guard_id for item in registry.assignments}
         assert kinds.count("CAPTURE_COMPLETED") == 1
-    # Real search evidence: 64 simulations, visits within budget, >=3 alternatives.
+    # Real search evidence: 64 simulations, visits within budget, real route choices.
     assert traces and all(trace.simulations == 64 for trace in traces)
     assert all(sum(a.visits for a in trace.alternatives) <= 64 for trace in traces)
-    assert any(len([a for a in t.alternatives if a.visits]) >= 3 for t in traces)
-    assert any(a.mean_reward is None and not a.legal for t in traces for a in t.alternatives)
+    assert any(len([a for a in t.alternatives if a.visits]) >= 2 for t in traces)
+    # Waits, hides and retreats are timed by the space-time planner, not MCTS.
+    holds = {tactics.WAIT, tactics.HIDE, tactics.RETREAT}
+    assert all(not a.legal for t in traces for a in t.alternatives if a.action in holds)
     assert any(t.path and t.path_cost is not None and t.expanded_nodes > 0 for t in traces)
     for trace in traces:
         chosen = next(a for a in trace.alternatives if a.action == trace.chosen_action)
@@ -188,7 +191,7 @@ def test_controller_depends_only_on_its_observations_and_seed(
     choose = original.act
     original.act = recording  # type: ignore[method-assign]
     play(run, 1_200)
-    replica = CompanionController(
+    replica = StealthAgent(
         COMPANION_ID,
         build_briefing(level, registry),
         PolicySelection(),
@@ -202,17 +205,18 @@ def test_controller_depends_only_on_its_observations_and_seed(
     assert all(not observation.shared_reports for observation in observations)
 
 
-def test_stale_tool_choice_falls_back_to_a_legal_wait(
+def test_stale_tool_choice_falls_back_to_a_legal_move(
     level: LevelData, rules: GameRules, sensors: SensorRules, registry: SecurityRegistry
 ) -> None:
     run = deploy(level, rules, sensors, registry, WIN_SEED)
     controller = run.controller
-    assert controller is not None
+    assert isinstance(controller, StealthAgent)
     observation = run.observe(COMPANION_ID)
     empty = replace(observation.own_status, inventory=Inventory(0, 0, False))
-    controller.directive = Directive(tactics.EMP)
-    action = controller._execute(replace(observation, own_status=empty), (13, 19))
-    assert action.kind == ActionKind.WAIT
+    controller.directive = Directive(tactics.ECHO)
+    action = controller.act(replace(observation, own_status=empty))
+    assert action.kind not in (ActionKind.ECHO, ActionKind.EMP, ActionKind.MELEE)
+    assert controller.directive.action == tactics.ADVANCE
 
 
 def test_human_actions_are_forwarded_unchanged_with_the_same_defenders(

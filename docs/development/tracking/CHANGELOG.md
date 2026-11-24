@@ -1,5 +1,10 @@
 # Development changelog
 
+## 2026-11-24 - Companion planner and light easing (0.1.0a3)
+
+- Requested by Khalid after the showcase. The robot thief learns guard beats from its own sightings and plans each move with space-time A*, MCTS keeps the route and gadget choices, and the thief sees about one screen of its floor like a player. Guards get a per-seed rhythm, a chaser no longer freezes beside desk corners, and identification, cone, pursuit grace and lockdown speed are eased a little for everyone. [Record](../planning/balance/COMPANION.md).
+- Seeds 1 to 100, 300 missions: 132 thefts and 30 wins (Ghost 8, Balanced 10, Rush 12), against 3 wins in 1,200 missions on 0.1.0a2. `scripts/checks/run.py` passes with 373 tests. The six-in-ten win rate that was asked for is not reached yet.
+
 ## 2026-11-05 - P04 SR merged with main and adapted to limited melee
 
 - `work/suhita-p04` merges current main (PRs #2/#3/#4) normally; Khalid's presentation, limited melee and experience consumers are preserved. Fingerprint schema **11** (schema-10 melee + P04 NEXUS memory/route graph/director).

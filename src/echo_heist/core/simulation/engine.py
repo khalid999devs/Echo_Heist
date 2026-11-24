@@ -46,6 +46,7 @@ from echo_heist.core.perception.sensors import line_of_sight
 from echo_heist.core.scoring import encounters
 from echo_heist.core.scoring.score import score_run
 from echo_heist.core.simulation import views
+from echo_heist.core.simulation.randomness import seeded_rng
 from echo_heist.core.simulation.systems import security as guard_security
 from echo_heist.core.simulation.systems.capture import update_captures
 from echo_heist.core.simulation.systems.mission import (
@@ -75,6 +76,8 @@ DECISIVE = frozenset(
         EventKind.MISSION_ENDED,
     }
 )
+# Guards start their rounds up to three seconds apart, drawn from the seed.
+START_STAGGER_TICKS = 90
 ROLE_KINDS = {
     GuardRole.SENTINEL: frozenset({ActorKind.SENTINEL}),
     GuardRole.TRACKER: frozenset({ActorKind.TRACKER}),
@@ -197,6 +200,7 @@ class Simulation:
             if any(not world_map.can_walk(obj.tile) for obj in exits):
                 raise ValueError("Extraction markers must be walkable")
         if security is not None:
+            rhythm = seeded_rng(seed, "patrol-rhythm")
             for patrol in security.patrols:
                 guard = self._world.actors.get(patrol.actor_id)
                 if guard is None or guard.kind not in ROLE_KINDS[patrol.role]:
@@ -228,7 +232,10 @@ class Simulation:
                     if next_point[1] < guard.tile[1]
                     else 0,
                 )
-                self._world.guard_memories[patrol.actor_id] = GuardMemory()
+                self._world.guard_memories[patrol.actor_id] = GuardMemory(
+                    wait_until=rhythm.randrange(START_STAGGER_TICKS),
+                    cadence=rhythm.randrange(1, 2**31),
+                )
             if security.director is not None:
                 self._world.nexus = initial_memory(security.director)
             guard_security.refresh(self._world, world_map, security, ())

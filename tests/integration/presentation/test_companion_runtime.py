@@ -49,7 +49,9 @@ def test_first_launch_deploys_the_real_companion_through_the_workshop(tmp_path: 
     assert own.tile != start  # moved by its own controller, not by input
     trace = run.telemetry().companion
     assert trace is not None and trace.actor_id == COMPANION_ID and trace.simulations == 64
-    assert sum(item.visits for item in trace.alternatives) == 64 and trace.path
+    assert sum(item.visits for item in trace.alternatives) == 64
+    # Moving, it shows its planned tiles; holding still, it says why.
+    assert trace.path or trace.utility_action in ("WAIT", "HOLD", "HIDE", "COVER")
     assert not (tmp_path / FILE_NAME).exists()  # evidence is written once, at attempt end
 
 

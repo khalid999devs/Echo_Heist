@@ -1,10 +1,12 @@
 {
   "sight_range_tiles": 8,
-  "half_angle_degrees": 56,
-  "identification_ticks": 18,
-  "near_identification_ticks": 6,
+  "half_angle_degrees": 52,
+  "identification_ticks": 22,
+  "near_identification_ticks": 8,
   "memory_ticks": 150,
   "search_ticks": 90,
   "report_ttl_ticks": 90,
-  "patrol_pause_ticks": 12
+  "patrol_pause_ticks": 12,
+  "intruder_view_half_width_tiles": 7,
+  "intruder_view_half_height_tiles": 4
 }

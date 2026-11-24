@@ -34,7 +34,7 @@ ECHO HEIST started as our final project for the Artificial Intelligence Laborato
 - **Guards with different minds.** Sentinels patrol and use fuzzy logic to decide how worried a noise should make them. Trackers hunt you with A* to the last place they saw you. Interceptors work out which gate you will run for and get there first. Learning to beat one kind does not teach you how to beat the others.
 - **Stealth with real choices.** Step into a locker, crawl under a desk, throw a hologram that replays your last few steps, stun a guard that grabs you, or switch off every guard nearby with an EMP. Gadget charges never come back, so each one matters.
 - **A heist in two halves.** The building stays calm until you lift the Core. Then the alarm sounds, the lights turn red, every guard speeds up and the quiet infiltration becomes an escape.
-- **A robot that plays without you.** Pick a personality in the AI Workshop and the Companion runs the mission by itself, planning with Monte Carlo tree search. Press F2 to see the options it weighed and why it chose one.
+- **A robot that plays without you.** Pick a personality in the AI Workshop and the Companion runs the mission by itself. It sees what a player sees on screen, learns each guard's beat by watching, and times every step with a space-time search while Monte Carlo tree search picks its route. Press F2 to see the options it weighed and why it chose one.
 - **AI you can watch, and AI that plays fair.** Press F3 to see each guard's mood, senses and planned path. No character cheats. Every AI acts only on what it could actually see or hear.
 - **A building that learns.** Turn on NEXUS memory and a trick that works twice gets answered on the next attempt, for example by checking decoys more carefully or guarding the route you keep using.
 - **Runs you can replay.** Every mission comes from a seed, so you can retry the exact same situation or press N for a new one. Escapes are scored out of 100, ranked from S to F and saved to your history.
@@ -124,11 +124,11 @@ An escape earns 50 points, up to 40 more for stealth (minus 12 each time a guard
 | **2 Trackers** | Hunt you down to where they last saw you | A* search with an estimate that understands staircases, plus a short last-seen memory |
 | **2 Interceptors** | Predict your escape and block a gate | Minimax with alpha-beta pruning over the routes you are likely to take |
 | **NEXUS** | The building's brain, with no body | Turns guard reports into jobs, scores them by priority and assigns the best guard to each, with optional memory between missions |
-| **Companion** | The robot thief that plays the heist alone | A mission state machine, utility scores for emergencies, Monte Carlo tree search for tactics and A* that avoids known danger |
+| **Companion** | The robot thief that plays the heist alone | Learns guard beats from its own sightings, plans each move with space-time A* against their predicted view, and uses Monte Carlo tree search for route and gadget choices |
 
 **Fair play is built into the architecture.** Each character receives a filtered, read-only observation of what it can perceive and returns an action. Only the simulation changes the world, so no AI can read the player's true position or peek at another character's plan.
 
-The guards are strong on purpose. In a wide test of 1,200 robot missions over seeds 1 to 400, the robots stole the Core 168 times, but only the Rush personality got out, three times. Balanced and Ghost reach the Core and are caught on the way out. The [project report](docs/submission/Echo_Heist_Final_Project_Report.pdf) explains every algorithm with worked examples and traces one real decision step by step through minimax and MCTS.
+The guards are strong on purpose. In a wide test of 300 robot missions over seeds 1 to 100, the robots stole the Core 132 times and got out 30 times, with every personality winning some runs. Most losses come on the way out, once the alarm is up. The [project report](docs/submission/Echo_Heist_Final_Project_Report.pdf) explains every algorithm with worked examples and traces one real decision step by step through minimax and MCTS.
 
 ## Engineering highlights
 

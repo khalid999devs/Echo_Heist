@@ -66,6 +66,7 @@ class SecurityRegistry:
     revision: str
     graph: RouteGraph | None = None
     director: DirectorRules | None = None
+    view_regions: tuple[tuple[int, int, int, int], ...] = ()
 
     def assignment(self, guard_id: str) -> GuardAssignment:
         return next(value for value in self.assignments if value.guard_id == guard_id)
@@ -79,6 +80,7 @@ class SecurityRegistry:
             self.sound_blocking_tiles,
             self.graph,
             director,
+            self.view_regions,
         )
 
 
@@ -217,4 +219,5 @@ def build_security_registry(level: LevelData, rules: GameRules) -> SecurityRegis
         sha256(canonical.encode()).hexdigest(),
         build_route_graph(level),
         director,
+        tuple((deck.left, deck.top, deck.width, deck.height) for deck in level.decks),
     )

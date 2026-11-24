@@ -11,7 +11,7 @@ from collections.abc import Callable, Iterable
 from dataclasses import replace
 
 from echo_heist.ai.companion.briefing import GuardBrief, MissionBriefing, policy_weights
-from echo_heist.ai.companion.controller import CompanionController
+from echo_heist.ai.companion.stealth.agent import StealthAgent
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.autonomy.model import (
     AutonomyTelemetry,
@@ -125,7 +125,7 @@ class AutonomousMission:
         )
         self.request, self.protocol = request, protocol
         self.controller = (
-            CompanionController(
+            StealthAgent(
                 self._actor_id,
                 build_briefing(level, registry),
                 request.policy,

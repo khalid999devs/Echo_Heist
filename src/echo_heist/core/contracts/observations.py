@@ -26,6 +26,9 @@ class EntityView:
     facing: Tile = (0, -1)
     crouched: bool = False
     concealed: bool = False
+    # The state label a player sees above a guard (PATROL, CHASE and so on).
+    # Only an intruder's view carries it; empty for everyone else.
+    alert: str = ""
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "tile", immutable_tile(self.tile))

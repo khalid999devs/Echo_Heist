@@ -49,7 +49,7 @@ def upper(
         sensors,
         registry,
         route_steps(level, "upper", "upper"),
-        wait_start_ticks=135,
+        wait_start_ticks=180,
     )
 
 

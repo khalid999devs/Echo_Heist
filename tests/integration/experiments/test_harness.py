@@ -91,17 +91,24 @@ def test_pursuit_reaches_an_outcome_around_either_stair_route(
 
 
 @pytest.mark.parametrize(
-    ("scenario_id", "policy", "reached"),
+    ("scenario_id", "policy", "reached", "outcomes"),
     [
-        ("s03-patrol-6s", "RUSH", "security-control"),
-        ("s16-service-corridor-late", "GHOST", "core-chamber"),
+        ("s03-patrol-6s", "RUSH", "security-control", ("WIN", "CAPTURED")),
+        # A cautious robot may still be waiting for its gap at the Core: no softlock
+        # on the way there is the point.
+        ("s16-service-corridor-late", "GHOST", "core-chamber", ("WIN", "CAPTURED", "TIMEOUT")),
     ],
 )
-def test_policies_resume_goal_progress_after_repeated_retreats(
-    facility: Facility, suite: Suite, scenario_id: str, policy: str, reached: str
+def test_policies_keep_making_goal_progress(
+    facility: Facility,
+    suite: Suite,
+    scenario_id: str,
+    policy: str,
+    reached: str,
+    outcomes: tuple[str, ...],
 ) -> None:
     scenario = next(s for s in suite.scenarios if s.scenario_id == scenario_id)
     record = run_scenario(facility, scenario, policy, PRESETS[policy], 4_000)
-    assert record["outcome"] in ("WIN", "CAPTURED")
+    assert record["outcome"] in outcomes
     assert reached in record["route_zones"]
     assert record["mcts"]["utility_override_ticks"] > 0

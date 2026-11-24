@@ -6,8 +6,13 @@ beside a guard it saw a moment ago, and moves once the way is clear. The cone
 test is the belief check, the same cone and ray test the guards use, applied to
 guards in the Companion's own view or memory, so it never reads hidden state.
 Without the memory it would peek at a searching guard it can see from one tile
-but not the next, stepping back and forth. A bounded wait and a rest afterwards stop a guard
-that never turns away from stalling the run.
+but not the next, stepping back and forth. A bounded wait and a rest afterwards
+stop a guard that never turns away from stalling the run.
+
+The same patience decides when to take the Core. Taking it starts a lockdown
+in which every guard is faster, so a theft seen by a guard almost always ends
+in capture. The Companion starts the hold only when no guard has had it in
+view for a while, none can see it now and none stands close and facing it.
 """
 
 from dataclasses import dataclass
@@ -15,12 +20,33 @@ from dataclasses import dataclass
 from echo_heist.ai.companion.belief import Beliefs
 from echo_heist.core.contracts.actions import Action, ActionKind
 from echo_heist.core.contracts.observations import Observation
-from echo_heist.core.contracts.world import Tile
+from echo_heist.core.contracts.world import ActorKind, Tile
 
 PATIENT_PHASES = frozenset({"REACH_CORE", "TAKE_CORE"})
 PATIENCE_TICKS = 75  # longest single hold, 2.5 seconds
 REST_TICKS = 60  # after giving up, keep moving for 2 seconds before holding again
 RECENT_TICKS = 30  # a guard seen within the last second is assumed to still be there
+UNSEEN_TICKS = 45  # out of every cone for 1.5 seconds before the theft
+FACING_TILES = 4  # a guard this close and facing the Companion will see the theft
+GUARDS = frozenset({ActorKind.SENTINEL, ActorKind.TRACKER, ActorKind.INTERCEPTOR})
+
+
+def theft_window(observation: Observation, beliefs: Beliefs, last_watched: int) -> bool:
+    """True when taking the Core now is unlikely to be witnessed."""
+    own = observation.own_status
+    if observation.tick - last_watched <= UNSEEN_TICKS:
+        return False
+    if beliefs.watched_by(observation, own.tile) is not None:
+        return False
+    for guard in observation.visible_entities:
+        if guard.kind not in GUARDS or guard.disabled or guard.stunned:
+            continue
+        dx, dy = own.tile[0] - guard.tile[0], own.tile[1] - guard.tile[1]
+        reach = max(abs(dx), abs(dy))
+        facing = dx * guard.facing[0] + dy * guard.facing[1] > 0
+        if reach <= 1 or (reach <= FACING_TILES and facing):
+            return False
+    return True
 
 
 def _beside_recent_guard(beliefs: Beliefs, tick: int, tile: Tile) -> bool:

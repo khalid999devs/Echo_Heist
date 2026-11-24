@@ -42,9 +42,9 @@ def test_timed_sprint_is_audible_while_light_walk_stays_local(rules: GameRules) 
 
 
 def test_wider_cone_catches_oblique_movement_and_respects_cover(rules: GameRules) -> None:
-    # Offset (3, 4) is about 53 degrees off-axis. It used to miss the cone.
-    exposed = simulation(rules, (6, 7))
-    occluded = simulation(rules, (6, 7), opaque=frozenset({(4, 4), (5, 4)}))
+    # Offset (4, 4) is 45 degrees off-axis, well inside the 52-degree half-angle.
+    exposed = simulation(rules, (7, 7))
+    occluded = simulation(rules, (7, 7), opaque=frozenset({(4, 4), (5, 5)}))
     rear = simulation(rules, (1, 3))
     for sim in (exposed, occluded, rear):
         sim.step()
@@ -114,7 +114,7 @@ def test_reports_expire_while_guard_is_disabled_and_external_guard_intents_rejec
     rules: GameRules,
 ) -> None:
     sim = simulation(rules, (5, 3))
-    for _ in range(19):
+    for _ in range(23):  # identification takes 22 ticks at this range
         sim.step()
     assert sim.observe("sentinel").shared_reports
     result = sim.step(

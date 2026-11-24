@@ -6,6 +6,7 @@ stair and identification rules. Nothing here reads Simulation state.
 
 from collections.abc import Callable
 from dataclasses import dataclass, replace
+from math import isqrt
 
 from echo_heist.ai.guards.fuzzy import investigate_urgency
 from echo_heist.ai.navigation.grid import PathResult, neighbors, unsnag
@@ -50,6 +51,8 @@ MOTION = "UNIDENTIFIED_MOTION"
 HIDE_ENTRY = "HIDE_ENTRY"
 DISPATCH = "DISPATCH"
 VERIFY_ECHO_TILES = 4
+SHOULDER_UNITS = UNIT // 5  # half a body's width, as the motion rules size it
+PAUSE_SPREAD = 2
 
 
 def distance(first: Tile, second: Tile) -> int:
@@ -73,6 +76,21 @@ def phase_rules(observation: Observation, rules: SensorRules) -> SensorRules:
     if observation.phase != MissionPhase.LOCKDOWN:
         return rules
     return replace(rules, patrol_pause_ticks=max(1, rules.patrol_pause_ticks // 2))
+
+
+def patrol_pause(rules: SensorRules, memory: GuardMemory, tick: int) -> int:
+    """How long a guard lingers at the patrol corner it just reached.
+
+    Each guard has its own rhythm drawn from the mission seed, so different
+    seeds walk the same routes at different times while one seed always
+    replays identically. A pause lasts one to three times the configured one.
+    """
+    base = rules.patrol_pause_ticks
+    if not memory.cadence:
+        return base
+    mixed = (memory.cadence * 0x9E3779B1 + tick * 0x85EBCA77 + memory.patrol_index) & 0xFFFFFFFF
+    mixed ^= mixed >> 15
+    return base + mixed % (base * PAUSE_SPREAD + 1)
 
 
 def visible_intruder(observation: Observation) -> EntityView | None:
@@ -260,13 +278,24 @@ def evidence_expired(observation: Observation, rules: SensorRules, memory: Guard
 
 
 def open_line(world_map: StaticMap, start: Position, end: Position) -> bool:
-    """Is the straight walk from ``start`` to ``end`` clear of walls and furniture?"""
+    """Is the straight walk from ``start`` to ``end`` clear of walls and furniture?
+
+    Both shoulders must pass, not just the centre line. A line that only the
+    centre clears made a chaser beside a desk corner alternate every tick
+    between running at its quarry and stepping back onto its path.
+    """
     dx, dy = end[0] - start[0], end[1] - start[1]
+    length = max(1, isqrt(dx * dx + dy * dy))
+    side = (-dy * SHOULDER_UNITS // length, dx * SHOULDER_UNITS // length)
     steps = max(1, max(abs(dx), abs(dy)) * 8 // UNIT)
-    for index in range(steps + 1):
-        point = start[0] + dx * index // steps, start[1] + dy * index // steps
-        if world_map.point_blocked(point) or not world_map.can_walk(position_tile(point)):
-            return False
+    for offset in ((0, 0), side, (-side[0], -side[1])):
+        for index in range(steps + 1):
+            point = (
+                start[0] + offset[0] + dx * index // steps,
+                start[1] + offset[1] + dy * index // steps,
+            )
+            if world_map.point_blocked(point) or not world_map.can_walk(position_tile(point)):
+                return False
     return True
 
 
